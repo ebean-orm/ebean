@@ -1,7 +1,7 @@
 package io.ebean.querybean.generator;
 
-import javax.tools.FileObject;
-import javax.tools.JavaFileObject;
+import static io.ebean.querybean.generator.APContext.logError;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedHashSet;
@@ -9,26 +9,25 @@ import java.util.Map;
 import java.util.Set;
 import java.util.StringJoiner;
 
+import javax.tools.FileObject;
+import javax.tools.JavaFileObject;
+
 /**
  * Write the source code for the factory.
  */
 class SimpleModuleInfoWriter {
 
-  private final ProcessingContext processingContext;
-
   private final String factoryPackage;
-  private final String factoryShortName;
+  private final String factoryShortName= "EbeanEntityRegister";
   private final String factoryFullName;
   private final JavaFileObject javaFileObject;
 
   private Append writer;
 
-  SimpleModuleInfoWriter(ProcessingContext processingContext) throws IOException {
-    this.processingContext = processingContext;
-    this.factoryPackage = processingContext.getFactoryPackage();
-    this.factoryShortName = "EbeanEntityRegister";
+  SimpleModuleInfoWriter() throws IOException {
+    this.factoryPackage = ProcessingContext.getFactoryPackage();
     this.factoryFullName = factoryPackage + "." + factoryShortName;
-    this.javaFileObject = processingContext.createWriter(factoryFullName);
+    this.javaFileObject = APContext.createSourceFile(factoryFullName);
   }
 
   void write() throws IOException {
@@ -44,22 +43,23 @@ class SimpleModuleInfoWriter {
 
   private void writeServicesFile() {
     try {
-      FileObject jfo = processingContext.createMetaInfServicesWriter();
+      FileObject jfo = ProcessingContext.createMetaInfServicesWriter();
       if (jfo != null) {
         Writer writer = jfo.openWriter();
+        ProcessingContext.addService(factoryFullName);
         writer.write(factoryFullName);
         writer.close();
       }
     } catch (IOException e) {
-      processingContext.logError(null, "Failed to write services file " + e.getMessage());
+      logError("Failed to write services file " + e.getMessage());
     }
   }
 
   private void writeManifestFile() {
     try {
-      final Set<String> allEntityPackages = processingContext.getAllEntityPackages();
+      final Set<String> allEntityPackages = ProcessingContext.getAllEntityPackages();
       if (!allEntityPackages.isEmpty()) {
-        FileObject jfo = processingContext.createManifestWriter();
+        FileObject jfo = ProcessingContext.createManifestWriter();
         if (jfo != null) {
           Writer writer = jfo.openWriter();
           writer.write("generated-by: Ebean query bean generator\n");
@@ -69,7 +69,7 @@ class SimpleModuleInfoWriter {
         }
       }
     } catch (IOException e) {
-      processingContext.logError(null, "Failed to write services file " + e.getMessage());
+      logError("Failed to write services file " + e.getMessage());
     }
   }
 
@@ -84,13 +84,13 @@ class SimpleModuleInfoWriter {
 
   private void writeNativeImageFile() {
     try {
-      Set<String> allEntities = new LinkedHashSet<>(processingContext.getDbEntities());
-      for (Set<String> value : processingContext.getOtherDbEntities().values()) {
+      Set<String> allEntities = new LinkedHashSet<>(ProcessingContext.getDbEntities());
+      for (Set<String> value : ProcessingContext.getOtherDbEntities().values()) {
         allEntities.addAll(value);
       }
 
       if (!allEntities.isEmpty()) {
-        FileObject jfo = processingContext.createNativeImageWriter(factoryPackage + ".ebean-entity");
+        FileObject jfo = ProcessingContext.createNativeImageWriter(factoryPackage + ".ebean-entity");
         if (jfo != null) {
           boolean first = true;
           Writer writer = jfo.openWriter();
@@ -111,7 +111,7 @@ class SimpleModuleInfoWriter {
         }
       }
     } catch (IOException e) {
-      processingContext.logError(null, "Failed to write services file " + e.getMessage());
+      logError("Failed to write services file " + e.getMessage());
     }
   }
 
@@ -130,7 +130,7 @@ class SimpleModuleInfoWriter {
   void buildAtContextModule(Append writer) {
     writer.append(Constants.AT_GENERATED).eol();
     writer.append("@ModuleInfo(");
-    if (processingContext.hasOtherClasses()) {
+    if (ProcessingContext.hasOtherClasses()) {
       writer.append("other={%s}, ", otherClasses());
     }
     writer.append("entities={%s}", prefixEntities());
@@ -138,11 +138,11 @@ class SimpleModuleInfoWriter {
   }
 
   private String otherClasses() {
-    return quoteTypes(processingContext.getOtherClasses());
+    return quoteTypes(ProcessingContext.getOtherClasses());
   }
 
   private String prefixEntities() {
-    return quoteTypes(processingContext.getPrefixEntities());
+    return quoteTypes(ProcessingContext.getPrefixEntities());
   }
 
   private String quoteTypes(Set<String> otherClasses) {
@@ -158,9 +158,9 @@ class SimpleModuleInfoWriter {
 
     writer.append("public class %s implements EntityClassRegister {", factoryShortName).eol().eol();
     writeMethodOtherClasses();
-    writeMethodEntityClasses(processingContext.getDbEntities(), null);
+    writeMethodEntityClasses(ProcessingContext.getDbEntities(), null);
 
-    final Map<String, Set<String>> otherDbEntities = processingContext.getOtherDbEntities();
+    final Map<String, Set<String>> otherDbEntities = ProcessingContext.getOtherDbEntities();
     for (Map.Entry<String, Set<String>> otherDb : otherDbEntities.entrySet()) {
       writeMethodEntityClasses(otherDb.getValue(), otherDb.getKey());
     }
@@ -171,11 +171,11 @@ class SimpleModuleInfoWriter {
   private void writeMethodOtherClasses() {
     writeMethodComment("Register AttributeConverter etc", "");
     writer.append("  private List<Class<?>> otherClasses() {").eol();
-    if (!processingContext.hasOtherClasses()) {
+    if (!ProcessingContext.hasOtherClasses()) {
       writer.append("    return Collections.emptyList();").eol();
     } else {
       writer.append("    List<Class<?>> others = new ArrayList<>();").eol();
-      for (String otherType : processingContext.getOtherClasses()) {
+      for (String otherType : ProcessingContext.getOtherClasses()) {
         writer.append("    others.add(%s.class);", otherType).eol();
       }
       writer.append("    return others;").eol();
@@ -192,14 +192,14 @@ class SimpleModuleInfoWriter {
       writeMethodComment("Entities with no @DbName", dbName);
     }
     writer.append("  private List<Class<?>> %s() {", method).eol();
-    if (dbEntities.isEmpty() && !processingContext.hasOtherClasses()) {
+    if (dbEntities.isEmpty() && !ProcessingContext.hasOtherClasses()) {
       writer.append("    return Collections.emptyList();").eol();
     } else {
       writer.append("    List<Class<?>> entities = new ArrayList<>();").eol();
       for (String dbEntity : dbEntities) {
         writer.append("    entities.add(%s.class);", dbEntity).eol();
       }
-      if (processingContext.hasOtherClasses()) {
+      if (ProcessingContext.hasOtherClasses()) {
         writer.append("    entities.addAll(otherClasses());").eol();
       }
       writer.append("    return entities;").eol();

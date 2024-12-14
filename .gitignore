@@ -19,3 +19,5 @@ profiling/
 *.iws
 .idea/
 *uuid.state
+querybean-generator/.factorypath
+*.class

@@ -1,16 +1,20 @@
 package io.ebean.querybean.generator;
 
 
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeMirror;
-import javax.tools.JavaFileObject;
+import static io.ebean.querybean.generator.APContext.asTypeElement;
+import static io.ebean.querybean.generator.APContext.createSourceFile;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
+import javax.tools.JavaFileObject;
 
 /**
  * A simple implementation that generates and writes query beans.
@@ -22,7 +26,6 @@ class SimpleQueryBeanWriter {
   private final TypeElement element;
   private final TypeElement implementsInterface;
   private String implementsInterfaceShortName;
-  private final ProcessingContext processingContext;
   private final String dbName;
   private final String beanFullName;
   private final boolean isEntity;
@@ -34,25 +37,24 @@ class SimpleQueryBeanWriter {
   private final boolean fullyQualify;
   private Append writer;
 
-  SimpleQueryBeanWriter(TypeElement element, ProcessingContext processingContext) {
+  SimpleQueryBeanWriter(TypeElement element) {
     this.element = element;
-    this.processingContext = processingContext;
     this.beanFullName = element.getQualifiedName().toString();
     boolean nested = element.getNestingKind().isNested();
     this.destPackage = Util.packageOf(nested, beanFullName) + ".query";
     String sn = Util.shortName(nested, beanFullName);
     this.shortInnerName = Util.shortName(false, sn);
     this.shortName = sn.replace('.', '$');
-    this.isEntity = processingContext.isEntity(element);
-    this.embeddable = processingContext.isEmbeddable(element);
+    this.isEntity = EntityPrism.isPresent(element);
+    this.embeddable = ProcessingContext.isEmbeddable(element);
     this.dbName = findDbName();
     this.implementsInterface = initInterface(element);
-    this.fullyQualify = processingContext.isNameClash(shortName);
+    this.fullyQualify = ProcessingContext.isNameClash(shortName);
   }
 
   private TypeElement initInterface(TypeElement element) {
     for (TypeMirror anInterface : element.getInterfaces()) {
-      TypeElement e = (TypeElement)processingContext.asElement(anInterface);
+      TypeElement e = asTypeElement(anInterface);
       String name = e.getQualifiedName().toString();
       if (!name.startsWith("java") && !name.startsWith("io.ebean")) {
         return e;
@@ -62,7 +64,7 @@ class SimpleQueryBeanWriter {
   }
 
   private String findDbName() {
-    return processingContext.findDbName(element);
+    return ProcessingContext.findDbName(element);
   }
 
   private boolean isEntity() {
@@ -88,8 +90,8 @@ class SimpleQueryBeanWriter {
    * Includes properties from mapped super classes and usual inheritance.
    */
   private void addClassProperties() {
-    for (VariableElement field : processingContext.allFields(element)) {
-      PropertyType type = processingContext.getPropertyType(field);
+    for (VariableElement field : ProcessingContext.allFields(element)) {
+      PropertyType type = ProcessingContext.getPropertyType(field);
       if (type != null) {
         type.addImports(importTypes, fullyQualify);
         properties.add(new PropertyMeta(field.getSimpleName().toString(), type));
@@ -102,7 +104,7 @@ class SimpleQueryBeanWriter {
    */
   void writeRootBean() throws IOException {
     gatherPropertyDetails();
-    processingContext.addEntity(beanFullName, dbName);
+    ProcessingContext.addEntity(beanFullName, dbName);
     writer = new Append(createFileWriter());
     writePackage();
     writeImports();
@@ -339,15 +341,13 @@ class SimpleQueryBeanWriter {
   }
 
   private void writeAssocBeanFetch() {
-    if (isEntity()) {
-      // inherit the fetch methods
-      if (implementsInterface != null) {
-        writeAssocBeanExpression(false, "eq", "Is equal to by ID property.");
-        writeAssocBeanExpression(true, "eqIfPresent", "Is equal to by ID property if the value is not null, if null no expression is added.");
-        writeAssocBeanExpression(false, "in", "IN the given values.", implementsInterfaceShortName + "...", "in");
-        writeAssocBeanExpression(false, "inBy", "IN the given interface values.", "Collection<? extends " + implementsInterfaceShortName + ">", "in");
-        writeAssocBeanExpression(true, "inOrEmptyBy", "IN the given interface values if the collection is not empty. No expression is added if the collection is empty..", "Collection<? extends " + implementsInterfaceShortName + ">", "inOrEmpty");
-      }
+    // inherit the fetch methods
+    if (isEntity() && (implementsInterface != null)) {
+      writeAssocBeanExpression(false, "eq", "Is equal to by ID property.");
+      writeAssocBeanExpression(true, "eqIfPresent", "Is equal to by ID property if the value is not null, if null no expression is added.");
+      writeAssocBeanExpression(false, "in", "IN the given values.", implementsInterfaceShortName + "...", "in");
+      writeAssocBeanExpression(false, "inBy", "IN the given interface values.", "Collection<? extends " + implementsInterfaceShortName + ">", "in");
+      writeAssocBeanExpression(true, "inOrEmptyBy", "IN the given interface values if the collection is not empty. No expression is added if the collection is empty..", "Collection<? extends " + implementsInterfaceShortName + ">", "inOrEmpty");
     }
   }
 
@@ -358,7 +358,7 @@ class SimpleQueryBeanWriter {
   private void writeAssocBeanExpression(boolean nullable, String expression, String comment, String param, String actualExpression) {
     final String nullableAnnotation = nullable ? "@Nullable " : "";
     String values = expression.startsWith("in") ? "values" : "value";
-    String castVarargs = expression.equals("in") ? "(Object[])" : "";
+    String castVarargs = "in".equals(expression) ? "(Object[])" : "";
     writer.append("  /**").eol();
     writer.append("   * ").append(comment).eol();
     writer.append("   */").eol();
@@ -388,7 +388,7 @@ class SimpleQueryBeanWriter {
   }
 
   private Writer createFileWriter() throws IOException {
-    JavaFileObject jfo = processingContext.createWriter(destPackage + "." + "Q" + shortName, element);
+    JavaFileObject jfo = createSourceFile(destPackage + "." + "Q" + shortName, element);
     return jfo.openWriter();
   }
 

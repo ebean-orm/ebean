@@ -1,27 +1,11 @@
 package io.ebean.querybean.generator;
 
-import javax.annotation.processing.Filer;
-import javax.annotation.processing.FilerException;
-import javax.annotation.processing.Messager;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.util.ElementFilter;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
-import javax.tools.Diagnostic;
-import javax.tools.FileObject;
-import javax.tools.JavaFileObject;
-import javax.tools.StandardLocation;
+import static io.ebean.querybean.generator.APContext.filer;
+import static io.ebean.querybean.generator.APContext.logError;
+import static io.ebean.querybean.generator.APContext.logNote;
+import static io.ebean.querybean.generator.APContext.typeElement;
+import static io.ebean.querybean.generator.ProcessorUtils.trimAnnotations;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.LineNumberReader;
@@ -35,99 +19,82 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-/**
- * Context for the source generation.
- */
+import javax.annotation.processing.FilerException;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.AnnotationValue;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.ElementFilter;
+import javax.tools.FileObject;
+import javax.tools.StandardLocation;
+
+/** Context for the source generation. */
 class ProcessingContext implements Constants {
 
-  private final ProcessingEnvironment processingEnv;
-  private final Types typeUtils;
-  private final Filer filer;
-  private final Messager messager;
-  private final Elements elementUtils;
+  private static final ThreadLocal<Ctx> CTX = new ThreadLocal<>();
 
-  private final PropertyTypeMap propertyTypeMap = new PropertyTypeMap();
+  private static final class Ctx {
+    private final Set<String> services = new TreeSet<>();
 
-  private final ReadModuleInfo readModuleInfo;
+    private final PropertyTypeMap propertyTypeMap = new PropertyTypeMap();
 
-  /**
-   * All entity packages regardless of DB (for META-INF/ebean-generated-info.mf).
-   */
-  private final Set<String> allEntityPackages = new TreeSet<>();
+    /** All entity packages regardless of DB (for META-INF/ebean-generated-info.mf). */
+    private final Set<String> allEntityPackages = new TreeSet<>();
 
-  private final Set<String> otherClasses = new TreeSet<>();
+    private final Set<String> otherClasses = new TreeSet<>();
 
-  /**
-   * The DB name prefixed entities.
-   */
-  private final Set<String> prefixEntities = new TreeSet<>();
+    /** The DB name prefixed entities. */
+    private final Set<String> prefixEntities = new TreeSet<>();
 
-  /**
-   * Entity classes for the default database.
-   */
-  private final Set<String> dbEntities = new TreeSet<>();
+    /** Entity classes for the default database. */
+    private final Set<String> dbEntities = new TreeSet<>();
 
-  /**
-   * Entity classes for non default databases.
-   */
-  private final Map<String, Set<String>> otherDbEntities = new TreeMap<>();
+    /** Entity classes for non default databases. */
+    private final Map<String, Set<String>> otherDbEntities = new TreeMap<>();
 
-  /**
-   * All loaded entities regardless of db (to detect ones we add back from loadedPrefixEntities).
-   */
-  private final Set<String> loaded = new HashSet<>();
+    /**
+     * All loaded entities regardless of db (to detect ones we add back from loadedPrefixEntities).
+     */
+    private final Set<String> loaded = new HashSet<>();
 
-  /**
-   * For partial compile the previous list of prefixed entity classes.
-   */
-  private final List<String> loadedPrefixEntities = new ArrayList<>();
+    /** For partial compile the previous list of prefixed entity classes. */
+    private final List<String> loadedPrefixEntities = new ArrayList<>();
 
-  /**
-   * The package for the generated EntityClassRegister.
-   */
-  private String factoryPackage;
-
-  ProcessingContext(ProcessingEnvironment processingEnv) {
-    this.processingEnv = processingEnv;
-    this.typeUtils = processingEnv.getTypeUtils();
-    this.filer = processingEnv.getFiler();
-    this.messager = processingEnv.getMessager();
-    this.elementUtils = processingEnv.getElementUtils();
-    this.readModuleInfo = new ReadModuleInfo(this);
+    /** The package for the generated EntityClassRegister. */
+    private String factoryPackage;
   }
 
-  TypeElement entityAnnotation() {
-    return elementUtils.getTypeElement(ENTITY);
+  static void init(ProcessingEnvironment processingEnv) {
+    APContext.init(processingEnv);
+    CTX.set(new Ctx());
   }
 
-  TypeElement embeddableAnnotation() {
-    return elementUtils.getTypeElement(EMBEDDABLE);
+  static void clear() {
+    APContext.clear();
+
+    CTX.remove();
   }
 
-  TypeElement converterAnnotation() {
-    return elementUtils.getTypeElement(CONVERTER);
-  }
-
-  TypeElement componentAnnotation() {
-    return elementUtils.getTypeElement(EBEAN_COMPONENT);
-  }
-
-  /**
-   * Gather all the fields (properties) for the given bean element.
-   */
-  List<VariableElement> allFields(Element element) {
+  /** Gather all the fields (properties) for the given bean element. */
+  static List<VariableElement> allFields(Element element) {
     List<VariableElement> list = new ArrayList<>();
     gatherProperties(list, element);
     return list;
   }
 
-  /**
-   * Recursively gather all the fields (properties) for the given bean element.
-   */
-  private void gatherProperties(List<VariableElement> fields, Element element) {
+  /** Recursively gather all the fields (properties) for the given bean element. */
+  private static void gatherProperties(List<VariableElement> fields, Element element) {
     TypeElement typeElement = (TypeElement) element;
     TypeMirror superclass = typeElement.getSuperclass();
-    Element mappedSuper = typeUtils.asElement(superclass);
+    var mappedSuper = APContext.asTypeElement(superclass);
     if (isMappedSuperOrInheritance(mappedSuper)) {
       gatherProperties(fields, mappedSuper);
     }
@@ -140,25 +107,21 @@ class ProcessingContext implements Constants {
     }
   }
 
-  /**
-   * Not interested in static, transient or Ebean internal fields.
-   */
-  private boolean ignoreField(VariableElement field) {
+  /** Not interested in static, transient or Ebean internal fields. */
+  private static boolean ignoreField(VariableElement field) {
     return isStaticOrTransient(field) || ignoreEbeanInternalFields(field);
   }
 
-  private boolean ignoreEbeanInternalFields(VariableElement field) {
+  private static boolean ignoreEbeanInternalFields(VariableElement field) {
     String fieldName = field.getSimpleName().toString();
     return fieldName.startsWith("_ebean") || fieldName.startsWith("_EBEAN");
   }
 
-  private boolean isStaticOrTransient(VariableElement field) {
+  private static boolean isStaticOrTransient(VariableElement field) {
     Set<Modifier> modifiers = field.getModifiers();
-    return (
-      modifiers.contains(Modifier.STATIC) ||
-      modifiers.contains(Modifier.TRANSIENT) ||
-      hasAnnotations(field, "jakarta.persistence.Transient")
-    );
+    return (modifiers.contains(Modifier.STATIC)
+        || modifiers.contains(Modifier.TRANSIENT)
+        || hasAnnotations(field, "jakarta.persistence.Transient"));
   }
 
   private static boolean hasAnnotations(Element element, String... annotations) {
@@ -180,50 +143,35 @@ class ProcessingContext implements Constants {
     return null;
   }
 
-  private boolean isMappedSuperOrInheritance(Element mappedSuper) {
+  private static boolean isMappedSuperOrInheritance(Element mappedSuper) {
     return hasAnnotations(mappedSuper, MAPPED_SUPERCLASS, INHERITANCE, DISCRIMINATOR_VALUE);
   }
 
-  private boolean isEntityOrEmbedded(Element mappedSuper) {
-    return hasAnnotations(mappedSuper, ENTITY, EMBEDDABLE);
+  private static boolean isEntityOrEmbedded(Element mappedSuper) {
+
+    return EntityPrism.isPresent(mappedSuper) || EmbeddablePrism.isPresent(mappedSuper);
   }
 
-  boolean isEntity(Element element) {
-    return hasAnnotations(element, ENTITY);
+  static boolean isEmbeddable(Element element) {
+    return EmbeddablePrism.isPresent(element);
   }
 
-  boolean isEmbeddable(Element element) {
-    return hasAnnotations(element, EMBEDDABLE);
+  /** Find the DbName annotation and return name if found. */
+  static String findDbName(TypeElement element) {
+
+    return DbNamePrism.getOptionalOn(element).map(DbNamePrism::value).orElse(null);
   }
 
-  /**
-   * Find the DbName annotation and return name if found.
-   */
-  String findDbName(TypeElement element) {
-    return FindDbName.value(element, typeUtils);
-  }
-
-  /**
-   * Return true if it is a DbJson field.
-   */
+  /** Return true if it is a DbJson field. */
   private static boolean dbJsonField(Element field) {
-    return hasAnnotations(field, DBJSON, DBJSONB);
-  }
-
-  /**
-   * Return true if it is a DbArray field.
-   */
-  private static boolean dbArrayField(Element field) {
-    return hasAnnotations(field, DBARRAY);
+    return DbJsonPrism.isPresent(field) || DbJsonBPrism.isPresent(field);
   }
 
   private static boolean dbToMany(Element field) {
-    return hasAnnotations(field, ONE_TO_MANY, MANY_TO_MANY);
+    return OneToManyPrism.isPresent(field) || ManyToManyPrism.isPresent(field);
   }
 
-  /**
-   * Escape the type (e.g. java.lang.String) from the TypeMirror toString().
-   */
+  /** Escape the type (e.g. java.lang.String) from the TypeMirror toString(). */
   private static String typeDef(TypeMirror typeMirror) {
     if (typeMirror.getKind() == TypeKind.DECLARED) {
       DeclaredType declaredType = (DeclaredType) typeMirror;
@@ -233,21 +181,12 @@ class ProcessingContext implements Constants {
     }
   }
 
-  private String trimAnnotations(String type) {
-    int pos = type.indexOf("@");
-    if (pos == -1) {
-      return type;
-    }
-    String remainder = type.substring(0, pos) + type.substring(type.indexOf(' ') + 1);
-    return trimAnnotations(remainder);
-  }
-
-  PropertyType getPropertyType(VariableElement field) {
+  static PropertyType getPropertyType(VariableElement field) {
     boolean toMany = dbToMany(field);
     if (dbJsonField(field)) {
-      return propertyTypeMap.getDbJsonType();
+      return CTX.get().propertyTypeMap.getDbJsonType();
     }
-    if (dbArrayField(field)) {
+    if (DbArrayPrism.isPresent(field)) {
       // get generic parameter type
       DeclaredType declaredType = (DeclaredType) field.asType();
       String fullType = typeDef(declaredType.getTypeArguments().get(0));
@@ -256,23 +195,23 @@ class ProcessingContext implements Constants {
     final TypeMirror typeMirror = field.asType();
     TypeMirror currentType = typeMirror;
     while (currentType != null) {
-      PropertyType type = propertyTypeMap.getType(typeDef(currentType));
+      PropertyType type = CTX.get().propertyTypeMap.getType(typeDef(currentType));
       if (type != null) {
         // simple scalar type
         return type;
       }
       // go up in class hierarchy
-      TypeElement fieldType = (TypeElement) typeUtils.asElement(currentType);
+      TypeElement fieldType = APContext.asTypeElement(currentType);
       currentType = (fieldType == null) ? null : fieldType.getSuperclass();
     }
 
-    Element fieldType = typeUtils.asElement(typeMirror);
+    Element fieldType = APContext.asTypeElement(typeMirror);
     if (fieldType == null) {
       return null;
     }
 
     // workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=544288
-    fieldType = elementUtils.getTypeElement(fieldType.toString());
+    fieldType = typeElement(fieldType.toString());
     if (fieldType.getKind() == ElementKind.ENUM) {
       String fullType = typeDef(typeMirror);
       return new PropertyTypeEnum(fullType, Split.shortName(fullType));
@@ -281,7 +220,7 @@ class ProcessingContext implements Constants {
     // look for targetEntity annotation attribute
     final String targetEntity = readTargetEntity(field);
     if (targetEntity != null) {
-      final TypeElement element = elementUtils.getTypeElement(targetEntity);
+      final TypeElement element = typeElement(targetEntity);
       if (isEntityOrEmbedded(element)) {
         boolean embeddable = isEmbeddable(element);
         return createPropertyTypeAssoc(embeddable, toMany, typeDef(element.asType()));
@@ -300,45 +239,27 @@ class ProcessingContext implements Constants {
     } else {
       result = null;
     }
-
     if (result != null) {
       return result;
+    } else if (APContext.isAssignable(typeMirror.toString(), "java.lang.Comparable")) {
+      return new PropertyTypeScalarComparable(trimAnnotations(typeMirror.toString()));
     } else {
-      if (typeInstanceOf(typeMirror, "java.lang.Comparable")) {
-        return new PropertyTypeScalarComparable(trimAnnotations(typeMirror.toString()));
-      } else {
-        return new PropertyTypeScalar(trimAnnotations(typeMirror.toString()));
-      }
+      return new PropertyTypeScalar(trimAnnotations(typeMirror.toString()));
     }
   }
 
-  private boolean typeInstanceOf(final TypeMirror typeMirror, final CharSequence desiredInterface) {
-    TypeElement typeElement = (TypeElement) typeUtils.asElement(typeMirror);
-    if (typeElement == null || typeElement.getQualifiedName().contentEquals("java.lang.Object")) {
-      return false;
-    }
-    if (typeElement.getQualifiedName().contentEquals(desiredInterface)) {
-      return true;
-    }
-
-    return typeInstanceOf(typeElement.getSuperclass(), desiredInterface) ||
-      typeElement
-        .getInterfaces()
-        .stream()
-        .anyMatch(t -> typeInstanceOf(t, desiredInterface));
-  }
-
-  private PropertyType createManyTypeAssoc(VariableElement field, DeclaredType declaredType) {
+  private static PropertyType createManyTypeAssoc(
+      VariableElement field, DeclaredType declaredType) {
     boolean toMany = dbToMany(field);
     List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
     if (typeArguments.size() == 1) {
-      Element argElement = typeUtils.asElement(typeArguments.get(0));
+      Element argElement = APContext.asTypeElement(typeArguments.get(0));
       if (isEntityOrEmbedded(argElement)) {
         boolean embeddable = isEmbeddable(argElement);
         return createPropertyTypeAssoc(embeddable, toMany, typeDef(argElement.asType()));
       }
     } else if (typeArguments.size() == 2) {
-      Element argElement = typeUtils.asElement(typeArguments.get(1));
+      Element argElement = APContext.asTypeElement(typeArguments.get(1));
       if (isEntityOrEmbedded(argElement)) {
         boolean embeddable = isEmbeddable(argElement);
         return createPropertyTypeAssoc(embeddable, toMany, typeDef(argElement.asType()));
@@ -347,7 +268,7 @@ class ProcessingContext implements Constants {
     return null;
   }
 
-  private String readTargetEntity(Element declaredType) {
+  private static String readTargetEntity(Element declaredType) {
     for (AnnotationMirror annotation : declaredType.getAnnotationMirrors()) {
       final Object targetEntity = readTargetEntityFromAnnotation(annotation);
       if (targetEntity != null) {
@@ -358,7 +279,8 @@ class ProcessingContext implements Constants {
   }
 
   private static Object readTargetEntityFromAnnotation(AnnotationMirror mirror) {
-    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : mirror.getElementValues().entrySet()) {
+    for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
+        mirror.getElementValues().entrySet()) {
       if ("targetEntity".equals(entry.getKey().getSimpleName().toString())) {
         return entry.getValue().getValue();
       }
@@ -366,11 +288,10 @@ class ProcessingContext implements Constants {
     return null;
   }
 
-  /**
-   * Create the QAssoc PropertyType.
-   */
-  private PropertyType createPropertyTypeAssoc(boolean embeddable, boolean toMany, String fullName) {
-    TypeElement typeElement = elementUtils.getTypeElement(fullName);
+  /** Create the QAssoc PropertyType. */
+  private static PropertyType createPropertyTypeAssoc(
+      boolean embeddable, boolean toMany, String fullName) {
+    TypeElement typeElement = typeElement(fullName);
     String type;
     if (typeElement.getNestingKind().isNested()) {
       type = typeElement.getEnclosingElement().toString() + "$" + typeElement.getSimpleName();
@@ -378,73 +299,48 @@ class ProcessingContext implements Constants {
       type = typeElement.getQualifiedName().toString();
     }
 
-    String suffix = toMany ? "Many" : embeddable ? "": "One";
+    String suffix = toMany ? "Many" : embeddable ? "" : "One";
     String[] split = Split.split(type);
     String propertyName = "Q" + split[1] + ".Assoc" + suffix;
     String importName = split[0] + ".query.Q" + split[1];
     return new PropertyTypeAssoc(propertyName, importName);
   }
 
-  /**
-   * Create a file writer for the given class name.
-   */
-  JavaFileObject createWriter(String factoryClassName, Element originatingElement) throws IOException {
-    return filer.createSourceFile(factoryClassName, originatingElement);
-  }
-
-  /**
-   * Create a file writer for the given class name without an originating element.
-   */
-  JavaFileObject createWriter(String factoryClassName) throws IOException {
-    return filer.createSourceFile(factoryClassName);
-  }
-
-  void logError(Element e, String msg, Object... args) {
-    messager.printMessage(Diagnostic.Kind.ERROR, String.format(msg, args), e);
-  }
-
-  void logNote(String msg, Object... args) {
-    messager.printMessage(Diagnostic.Kind.NOTE, String.format(msg, args));
-  }
-
-  void readModuleInfo() {
+  static void readModuleInfo() {
     String factory = loadMetaInfServices();
     if (factory != null) {
-      TypeElement factoryType = elementUtils.getTypeElement(factory);
+      TypeElement factoryType = APContext.typeElement(factory);
       if (factoryType != null) {
+
         // previous prefixed entities to add back for partial compile
-        final ModuleMeta read = readModuleInfo.read(factoryType);
-        loadedPrefixEntities.addAll(read.getEntities());
-        otherClasses.addAll(read.getOther());
+        var p = ModuleInfoPrism.getInstanceOn(factoryType);
+        CTX.get().loadedPrefixEntities.addAll(p.entities());
+        CTX.get().otherClasses.addAll(p.other());
       }
     }
   }
 
-  /**
-   * Register an entity with optional dbName.
-   */
-  void addEntity(String beanFullName, String dbName) {
-    loaded.add(beanFullName);
+  /** Register an entity with optional dbName. */
+  static void addEntity(String beanFullName, String dbName) {
+    CTX.get().loaded.add(beanFullName);
     final String pkg = packageOf(beanFullName);
     if (pkg != null) {
-      allEntityPackages.add(pkg);
+      CTX.get().allEntityPackages.add(pkg);
       updateFactoryPackage(pkg);
     }
     if (dbName != null) {
-      prefixEntities.add(dbName + ":" + beanFullName);
-      otherDbEntities.computeIfAbsent(dbName, s -> new TreeSet<>()).add(beanFullName);
+      CTX.get().prefixEntities.add(dbName + ":" + beanFullName);
+      CTX.get().otherDbEntities.computeIfAbsent(dbName, s -> new TreeSet<>()).add(beanFullName);
     } else {
-      prefixEntities.add(beanFullName);
-      dbEntities.add(beanFullName);
+      CTX.get().prefixEntities.add(beanFullName);
+      CTX.get().dbEntities.add(beanFullName);
     }
   }
 
-  /**
-   * Add back entity classes for partial compile.
-   */
-  int complete() {
+  /** Add back entity classes for partial compile. */
+  static int complete() {
     int added = 0;
-    for (String oldPrefixEntity : loadedPrefixEntities) {
+    for (String oldPrefixEntity : CTX.get().loadedPrefixEntities) {
       // maybe split as dbName:entityClass
       final String[] prefixEntityClass = oldPrefixEntity.split(":");
 
@@ -456,7 +352,7 @@ class ProcessingContext implements Constants {
       } else {
         entityClass = prefixEntityClass[0];
       }
-      if (!loaded.contains(entityClass)) {
+      if (!CTX.get().loaded.contains(entityClass)) {
         addEntity(entityClass, dbName);
         added++;
       }
@@ -464,7 +360,7 @@ class ProcessingContext implements Constants {
     return added;
   }
 
-  private String packageOf(String beanFullName) {
+  private static String packageOf(String beanFullName) {
     final int pos = beanFullName.lastIndexOf('.');
     if (pos > -1) {
       return beanFullName.substring(0, pos);
@@ -472,69 +368,70 @@ class ProcessingContext implements Constants {
     return null;
   }
 
-  private void updateFactoryPackage(String pkg) {
-    if (pkg != null && (factoryPackage == null || factoryPackage.length() > pkg.length())) {
-      factoryPackage = pkg;
+  private static void updateFactoryPackage(String pkg) {
+    if (pkg != null
+        && (CTX.get().factoryPackage == null || CTX.get().factoryPackage.length() > pkg.length())) {
+      CTX.get().factoryPackage = pkg;
     }
   }
 
-  FileObject createMetaInfServicesWriter() throws IOException {
+  static FileObject createMetaInfServicesWriter() throws IOException {
     return createMetaInfWriter(METAINF_SERVICES_MODULELOADER);
   }
 
-  FileObject createManifestWriter() throws IOException {
+  static FileObject createManifestWriter() throws IOException {
     return createMetaInfWriter(METAINF_MANIFEST);
   }
 
-  FileObject createNativeImageWriter(String name) throws IOException {
+  static FileObject createNativeImageWriter(String name) throws IOException {
     String nm = "META-INF/native-image/" + name + "/reflect-config.json";
     return createMetaInfWriter(nm);
   }
 
-  FileObject createMetaInfWriter(String target) throws IOException {
-    return filer.createResource(StandardLocation.CLASS_OUTPUT, "", target);
+  static FileObject createMetaInfWriter(String target) throws IOException {
+    return filer().createResource(StandardLocation.CLASS_OUTPUT, "", target);
   }
 
-  public boolean hasOtherClasses() {
-    return !otherClasses.isEmpty();
+  static boolean hasOtherClasses() {
+    return !CTX.get().otherClasses.isEmpty();
   }
 
-  public Set<String> getOtherClasses() {
-    return otherClasses;
+  static Set<String> getOtherClasses() {
+    return CTX.get().otherClasses;
   }
 
-  void addOther(Element element) {
-    otherClasses.add(element.toString());
+  static void addOther(Element element) {
+    CTX.get().otherClasses.add(element.toString());
   }
 
-  Set<String> getPrefixEntities() {
-    return prefixEntities;
+  static Set<String> getPrefixEntities() {
+    return CTX.get().prefixEntities;
   }
 
-  Set<String> getDbEntities() {
-    return dbEntities;
+  static Set<String> getDbEntities() {
+    return CTX.get().dbEntities;
   }
 
-  Map<String, Set<String>> getOtherDbEntities() {
-    return otherDbEntities;
+  static Map<String, Set<String>> getOtherDbEntities() {
+    return CTX.get().otherDbEntities;
   }
 
-
-  Set<String> getAllEntityPackages() {
-    return allEntityPackages;
+  static Set<String> getAllEntityPackages() {
+    return CTX.get().allEntityPackages;
   }
 
-  String getFactoryPackage() {
-    return factoryPackage != null ? factoryPackage : "unknown";
+  static String getFactoryPackage() {
+    return CTX.get().factoryPackage != null ? CTX.get().factoryPackage : "unknown";
   }
 
   /**
-   * Return the class name of the generated EntityClassRegister
-   * (such that we can read the current metadata for partial compile).
+   * Return the class name of the generated EntityClassRegister (such that we can read the current
+   * metadata for partial compile).
    */
-  String loadMetaInfServices() {
+  static String loadMetaInfServices() {
     try {
-      FileObject fileObject = processingEnv.getFiler().getResource(StandardLocation.CLASS_OUTPUT, "", METAINF_SERVICES_MODULELOADER);
+      FileObject fileObject =
+          filer().getResource(StandardLocation.CLASS_OUTPUT, "", METAINF_SERVICES_MODULELOADER);
       if (fileObject != null) {
         Reader reader = fileObject.openReader(true);
         LineNumberReader lineReader = new LineNumberReader(reader);
@@ -547,19 +444,24 @@ class ProcessingContext implements Constants {
     } catch (FileNotFoundException | NoSuchFileException e) {
       // ignore - no services file yet
     } catch (FilerException e) {
-      logNote(null, "FilerException reading services file: " + e.getMessage());
+      logNote("FilerException reading services file: " + e.getMessage());
     } catch (Exception e) {
       e.printStackTrace();
-      logError(null, "Error reading services file: " + e.getMessage());
+      logError("Error reading services file: " + e.getMessage());
     }
     return null;
   }
 
-  Element asElement(TypeMirror mirror) {
-    return typeUtils.asElement(mirror);
+  static boolean isNameClash(String shortName) {
+    return CTX.get().propertyTypeMap.isNameClash(shortName);
   }
 
-  boolean isNameClash(String shortName) {
-    return propertyTypeMap.isNameClash(shortName);
+  static void validateModule() {
+    APContext.moduleInfoReader()
+        .ifPresent(r -> r.validateServices(AT_GENERATED, CTX.get().services));
+  }
+
+  public static void addService(String factoryFullName) {
+    CTX.get().services.add(factoryFullName);
   }
 }

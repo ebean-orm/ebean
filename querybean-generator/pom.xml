@@ -10,17 +10,71 @@
   <name>querybean generator</name>
   <description>Querybean generator</description>
   <artifactId>querybean-generator</artifactId>
+  
+  <properties>
+    <avaje.prisms.version>1.36</avaje.prisms.version>
+  </properties>
 
+  <dependencies>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-api</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-querybean</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>jakarta-persistence-api</artifactId>
+      <version>${ebean-persistence-api.version}</version>
+      <optional>true</optional>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <version>1.0.0</version>
+      <optional>true</optional>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-prisms</artifactId>
+      <version>${avaje.prisms.version}</version>
+      <optional>true</optional>
+      <scope>provided</scope>
+    </dependency>
+  
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-spi-service</artifactId>
+      <version>2.8</version>
+    </dependency>
+
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>junit</artifactId>
+      <version>1.5</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
           <source>11</source>
           <target>11</target>
-          <!-- Turn off annotation processing for building -->
-          <compilerArgs>-proc:none</compilerArgs>
         </configuration>
       </plugin>
     </plugins>
