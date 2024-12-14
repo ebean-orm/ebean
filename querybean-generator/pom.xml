@@ -25,13 +25,6 @@
     </dependency>
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-querybean</artifactId>
-      <version>${project.version}</version>
-      <optional>true</optional>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.ebean</groupId>
       <artifactId>jakarta-persistence-api</artifactId>
       <version>${ebean-persistence-api.version}</version>
       <optional>true</optional>

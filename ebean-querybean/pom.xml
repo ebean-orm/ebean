@@ -77,6 +77,13 @@
       <scope>test</scope>
     </dependency>
 
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>querybean-generator</artifactId>
+      <version>14.8.0</version>
+      <scope>provided</scope>
+    </dependency>
+
   </dependencies>
 
   <build>

@@ -2,21 +2,13 @@
 @GeneratePrism(io.ebean.annotation.DbJson.class)
 @GeneratePrism(io.ebean.annotation.DbJsonB.class)
 @GeneratePrism(io.ebean.annotation.DbName.class)
-@GeneratePrism(io.ebean.annotation.DbName.class)
 @GeneratePrism(io.ebean.annotation.EbeanComponent.class)
 @GeneratePrism(io.ebean.config.ModuleInfo.class)
-@GeneratePrism(io.ebean.config.ModuleInfo.class)
-@GeneratePrism(io.ebean.typequery.Generated.class)
 
 @GeneratePrism(jakarta.persistence.Converter.class)
-@GeneratePrism(jakarta.persistence.DiscriminatorValue.class)
-@GeneratePrism(jakarta.persistence.Embeddable.class)
 @GeneratePrism(jakarta.persistence.Embeddable.class)
 @GeneratePrism(jakarta.persistence.Entity.class)
-@GeneratePrism(jakarta.persistence.Entity.class)
-@GeneratePrism(jakarta.persistence.Inheritance.class)
 @GeneratePrism(jakarta.persistence.ManyToMany.class)
-@GeneratePrism(jakarta.persistence.MappedSuperclass.class)
 @GeneratePrism(jakarta.persistence.OneToMany.class)
 package io.ebean.querybean.generator;
 
