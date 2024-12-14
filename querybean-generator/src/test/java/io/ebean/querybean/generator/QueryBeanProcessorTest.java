@@ -20,6 +20,7 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class QueryBeanProcessorTest {
@@ -36,7 +37,8 @@ class QueryBeanProcessorTest {
         .forEach(File::delete);
   }
 
-  @Test
+  // uncomment this to debug the processor for diagnosing issues
+  // @Test
   void testGeneration() throws Exception {
     final String source =
         Paths.get("src/test/java/io/ebean/querybean/generator/entities")
