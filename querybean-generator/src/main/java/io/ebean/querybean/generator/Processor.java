@@ -3,15 +3,21 @@ package io.ebean.querybean.generator;
 import static io.ebean.querybean.generator.APContext.logError;
 import static io.ebean.querybean.generator.APContext.logNote;
 import static io.ebean.querybean.generator.APContext.typeElement;
+import static java.util.stream.Collectors.joining;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -24,6 +30,7 @@ import io.avaje.prism.GenerateUtils;
 @GenerateUtils
 @GenerateAPContext
 @GenerateModuleInfoReader
+@SupportedOptions("buildPlugin")
 @SupportedAnnotationTypes({
   ConverterPrism.PRISM_TYPE,
   EbeanComponentPrism.PRISM_TYPE,
@@ -39,6 +46,26 @@ public class Processor extends AbstractProcessor implements Constants {
   public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
     ProcessingContext.init(processingEnv);
+    try {
+
+      // write a note in target so that other apts can know spi is running
+      var file = APContext.getBuildResource("avaje-processors.txt");
+      var addition = new StringBuilder();
+      //if file exists, dedup and append current processor
+      if (file.toFile().exists()) {
+        var result =
+          Stream.concat(Files.lines(file), Stream.of("ebean-querybean-generator"))
+            .distinct()
+            .collect(joining("\n"));
+        addition.append(result);
+      } else {
+        addition.append("ebean-querybean-generator");
+      }
+      Files.writeString(file, addition.toString(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+      PomPluginWriter.addPlugin2Pom();
+    } catch (IOException e) {
+      // not an issue worth failing over
+    }
   }
 
   @Override

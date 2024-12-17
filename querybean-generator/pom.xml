@@ -12,7 +12,7 @@
   <artifactId>querybean-generator</artifactId>
   
   <properties>
-    <avaje.prisms.version>1.36</avaje.prisms.version>
+    <avaje.prisms.version>1.37</avaje.prisms.version>
   </properties>
 
   <dependencies>
