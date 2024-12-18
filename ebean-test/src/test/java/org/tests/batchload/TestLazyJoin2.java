@@ -57,7 +57,7 @@ public class TestLazyJoin2 extends BaseTestCase {
     assertNotNull(billingAddress);
 
     List<Order> list = DB.find(Order.class).fetchLazy("customer", "name")
-      .fetch("customer.contacts", "contactName, phone, email").fetch("customer.shippingAddress")
+      .fetch("customer.contacts", "firstName, lastName, phone, email").fetch("customer.shippingAddress")
       .where().eq("status", Order.Status.NEW).order().asc("id").findList();
 
     Order order2 = list.get(0);
