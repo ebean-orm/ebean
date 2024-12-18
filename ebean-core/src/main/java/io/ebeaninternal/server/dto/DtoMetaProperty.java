@@ -13,7 +13,7 @@ import java.sql.SQLException;
 
 final class DtoMetaProperty implements DtoReadSet {
 
-  private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+  private static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
 
   private final Class<?> dtoType;
   private final String name;
