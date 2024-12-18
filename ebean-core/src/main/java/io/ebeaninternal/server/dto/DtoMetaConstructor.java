@@ -14,7 +14,7 @@ final class DtoMetaConstructor {
 
   private final Class<?>[] types;
   private final MethodHandle handle;
-  private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+  private static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
   private final ScalarType<?>[] scalarTypes;
 
   DtoMetaConstructor(TypeManager typeManager, Constructor<?> constructor, Class<?> someClass) throws NoSuchMethodException, IllegalAccessException {
