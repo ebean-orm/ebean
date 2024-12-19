@@ -8,6 +8,6 @@ module io.ebean.querybean.generator {
   requires static io.ebean.annotation;
   requires static jakarta.persistence.api;
 
-  provides javax.annotation.processing.Processor with io.ebean.querybean.generator.Processor;
+  provides javax.annotation.processing.Processor with io.ebean.querybean.generator.QueryBeanProcessor;
 
 }
