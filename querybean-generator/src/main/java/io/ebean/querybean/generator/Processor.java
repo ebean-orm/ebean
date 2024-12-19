@@ -38,7 +38,7 @@ import io.avaje.prism.GenerateUtils;
   EmbeddablePrism.PRISM_TYPE,
   ModuleInfoPrism.PRISM_TYPE
 })
-public class QueryBeanProcessor extends AbstractProcessor implements Constants {
+public class Processor extends AbstractProcessor implements Constants {
 
   private SimpleModuleInfoWriter moduleWriter;
 

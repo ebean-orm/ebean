@@ -63,7 +63,7 @@ class QueryBeanProcessorTest {
             List.of("--release=" + Integer.getInteger("java.specification.version")),
             null,
             files);
-    task.setProcessors(List.of(new QueryBeanProcessor()));
+    task.setProcessors(List.of(new Processor()));
 
     assertThat(task.call()).isTrue();
   }
