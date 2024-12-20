@@ -4,8 +4,8 @@ import io.ebean.QueryIterator;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.DtoQueryRequest;
 import io.ebeaninternal.server.persist.Binder;
-
 import jakarta.persistence.PersistenceException;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,13 +15,20 @@ import java.util.function.Predicate;
 public final class DtoQueryEngine {
 
   private final Binder binder;
+  private final int defaultFetchSizeFindEach;
+  private final int defaultFetchSizeFindList;
 
-  public DtoQueryEngine(Binder binder) {
+  public DtoQueryEngine(Binder binder, int defaultFetchSizeFindEach, int defaultFetchSizeFindList) {
     this.binder = binder;
+    this.defaultFetchSizeFindEach = defaultFetchSizeFindEach;
+    this.defaultFetchSizeFindList = defaultFetchSizeFindList;
   }
 
   public <T> List<T> findList(DtoQueryRequest<T> request) {
     try {
+      if (defaultFetchSizeFindList > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindList);
+      }
       request.executeSql(binder, SpiQuery.Type.LIST);
       List<T> rows = new ArrayList<>();
       while (request.next()) {
@@ -38,6 +45,9 @@ public final class DtoQueryEngine {
 
   public <T> QueryIterator<T> findIterate(DtoQueryRequest<T> request) {
     try {
+      if (defaultFetchSizeFindEach > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+      }
       request.executeSql(binder, SpiQuery.Type.ITERATE);
       return new DtoQueryIterator<>(request);
     } catch (SQLException e) {
@@ -46,7 +56,10 @@ public final class DtoQueryEngine {
   }
 
   public <T> void findEach(DtoQueryRequest<T> request, Consumer<T> consumer) {
-     try {
+    try {
+      if (defaultFetchSizeFindEach > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+      }
       request.executeSql(binder, SpiQuery.Type.ITERATE);
       while (request.next()) {
         consumer.accept(request.readNextBean());
@@ -61,6 +74,9 @@ public final class DtoQueryEngine {
   public <T> void findEach(DtoQueryRequest<T> request, int batchSize, Consumer<List<T>> consumer) {
     try {
       List<T> buffer = new ArrayList<>();
+      if (defaultFetchSizeFindEach > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+      }
       request.executeSql(binder, SpiQuery.Type.ITERATE);
       while (request.next()) {
         buffer.add(request.readNextBean());
@@ -82,6 +98,9 @@ public final class DtoQueryEngine {
 
   public <T> void findEachWhile(DtoQueryRequest<T> request, Predicate<T> consumer) {
     try {
+      if (defaultFetchSizeFindEach > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+      }
       request.executeSql(binder, SpiQuery.Type.ITERATE);
       while (request.next()) {
         if (!consumer.test(request.readNextBean())) {

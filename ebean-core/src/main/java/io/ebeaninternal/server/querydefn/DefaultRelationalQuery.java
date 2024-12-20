@@ -207,6 +207,13 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   }
 
   @Override
+  public final void setDefaultFetchBuffer(int fetchSize) {
+    if (bufferFetchSizeHint == 0) {
+      bufferFetchSizeHint = fetchSize;
+    }
+  }
+
+  @Override
   public DefaultRelationalQuery setBufferFetchSizeHint(int bufferFetchSizeHint) {
     this.bufferFetchSizeHint = bufferFetchSizeHint;
     return this;
