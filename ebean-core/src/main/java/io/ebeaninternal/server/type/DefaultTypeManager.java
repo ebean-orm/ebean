@@ -7,13 +7,13 @@ import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.*;
+import io.ebean.lookup.Lookups;
 import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.GeoTypeProvider;
-import io.ebeaninternal.lookup.Lookups;
 import io.ebeaninternal.server.core.ServiceUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -650,11 +650,11 @@ public final class DefaultTypeManager implements TypeManager {
         if (wrappedType == null) {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
-        ScalarTypeConverter converter = foundType.getDeclaredConstructor().newInstance();
+        ScalarTypeConverter converter = Lookups.newDefaultInstance(foundType);
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, converter);
         log.log(DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
         add(stw);
-      } catch (Exception e) {
+      } catch (Throwable e) {
         log.log(ERROR, "Error registering ScalarTypeConverter " + foundType.getName(), e);
       }
     }
@@ -674,11 +674,11 @@ public final class DefaultTypeManager implements TypeManager {
         if (wrappedType == null) {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
-        AttributeConverter converter = foundType.getDeclaredConstructor().newInstance();
+        AttributeConverter converter =  Lookups.newDefaultInstance(foundType);
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, new AttributeConverterAdapter(converter));
         log.log(DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
         add(stw);
-      } catch (Exception e) {
+      } catch (Throwable e) {
         log.log(ERROR, "Error registering AttributeConverter " + foundType.getName(), e);
       }
     }

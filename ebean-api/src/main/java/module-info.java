@@ -1,6 +1,7 @@
 module io.ebean.api {
 
   uses io.ebean.config.AutoConfigure;
+  uses io.ebean.config.LookupProvider;
   uses io.ebean.datasource.DataSourceAlertFactory;
   uses io.ebean.service.BootstrapService;
   uses io.ebean.service.SpiJsonService;
@@ -22,15 +23,16 @@ module io.ebean.api {
   exports io.ebean;
   exports io.ebean.bean;
   exports io.ebean.cache;
-  exports io.ebean.meta;
+  exports io.ebean.common;
   exports io.ebean.config;
   exports io.ebean.config.dbplatform;
+  exports io.ebean.docstore;
   exports io.ebean.event;
   exports io.ebean.event.readaudit;
   exports io.ebean.event.changelog;
-  exports io.ebean.common;
-  exports io.ebean.docstore;
   exports io.ebean.plugin;
+  exports io.ebean.lookup to io.ebean.core;
+  exports io.ebean.meta;
   exports io.ebean.metric;
   exports io.ebean.search;
   exports io.ebean.service;

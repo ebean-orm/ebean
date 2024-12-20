@@ -1,5 +1,7 @@
 package io.ebean.config;
 
+import io.ebean.lookup.Lookups;
+
 /**
  * Helper to find classes taking into account the context class loader.
  */
@@ -73,9 +75,8 @@ public class ClassLoadConfig {
    */
   public Object newInstance(String className) {
     try {
-      Class<?> cls = forName(className);
-      return cls.getDeclaredConstructor().newInstance();
-    } catch (Exception e) {
+      return Lookups.newDefaultInstance(forName(className));
+    } catch (Throwable e) {
       throw new IllegalArgumentException("Error constructing " + className, e);
     }
   }

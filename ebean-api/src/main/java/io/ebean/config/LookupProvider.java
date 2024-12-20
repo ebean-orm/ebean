@@ -1,4 +1,4 @@
-package io.ebean.core.type;
+package io.ebean.config;
 
 import java.lang.invoke.MethodHandles.Lookup;
 

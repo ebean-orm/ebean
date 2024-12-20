@@ -11,9 +11,9 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
+import io.ebean.lookup.Lookups;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
-import io.ebeaninternal.lookup.Lookups;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.Entity;
@@ -95,9 +95,9 @@ public class BootupClasses implements Predicate<Class<?>> {
   public void runServerConfigStartup(DatabaseBuilder config) {
     for (Class<?> cls : serverConfigStartupCandidates) {
       try {
-        ServerConfigStartup newInstance = (ServerConfigStartup) cls.getDeclaredConstructor().newInstance();
+        ServerConfigStartup newInstance = Lookups.newDefaultInstance(cls);
         newInstance.onStart(config);
-      } catch (Exception e) {
+      } catch (Throwable e) {
         // assume that the desired behavior is to fail - add your own try catch if needed
         throw new IllegalStateException("Error running ServerConfigStartup " + cls, e);
       }
@@ -207,9 +207,7 @@ public class BootupClasses implements Predicate<Class<?>> {
    */
   private <T> T create(Class<T> cls, boolean logOnException) {
     try {
-      return (T) Lookups.getLookup(cls)
-          .findConstructor(cls, MethodType.methodType(void.class))
-          .invoke();
+      return Lookups.newDefaultInstance(cls);
     } catch (NoSuchMethodException e) {
       log.log(DEBUG, "Ignore/expected - no default constructor: {0}", e.getMessage());
       return null;
