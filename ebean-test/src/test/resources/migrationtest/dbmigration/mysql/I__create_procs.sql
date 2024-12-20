@@ -7,6 +7,7 @@ delimiter $$
 -- deletes all constraints and foreign keys referring to TABLE.COLUMN
 --
 CREATE PROCEDURE usp_ebean_drop_foreign_keys(IN p_table_name VARCHAR(255), IN p_column_name VARCHAR(255))
+-- play-ebean-start
 BEGIN
 DECLARE done INT DEFAULT FALSE;
 DECLARE c_fk_name CHAR(255);
@@ -29,6 +30,7 @@ END LOOP;
 
 CLOSE curs;
 END
+-- play-ebean-end
 $$
 
 DROP PROCEDURE IF EXISTS usp_ebean_drop_column;
@@ -39,10 +41,12 @@ delimiter $$
 -- deletes the column and ensures that all indices and constraints are dropped first
 --
 CREATE PROCEDURE usp_ebean_drop_column(IN p_table_name VARCHAR(255), IN p_column_name VARCHAR(255))
+-- play-ebean-start
 BEGIN
 CALL usp_ebean_drop_foreign_keys(p_table_name, p_column_name);
 SET @sql = CONCAT('ALTER TABLE `', p_table_name, '` DROP COLUMN `', p_column_name, '`');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
 END
+-- play-ebean-end
 $$

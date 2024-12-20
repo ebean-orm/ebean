@@ -6,6 +6,7 @@ delimiter $$
 --
 CREATE OR REPLACE PROCEDURE usp_ebean_drop_foreign_keys(IN table_name NVARCHAR(256), IN column_name NVARCHAR(256))
 AS
+-- play-ebean-start
 BEGIN
 DECLARE foreign_key_names TABLE(CONSTRAINT_NAME NVARCHAR(256), TABLE_NAME NVARCHAR(256));
 DECLARE i INT;
@@ -17,6 +18,7 @@ EXEC 'ALTER TABLE "' || ESCAPE_DOUBLE_QUOTES(:foreign_key_names.TABLE_NAME[i]) |
 END FOR;
 
 END;
+-- play-ebean-end
 $$
 
 delimiter $$
@@ -26,8 +28,10 @@ delimiter $$
 --
 CREATE OR REPLACE PROCEDURE usp_ebean_drop_column(IN table_name NVARCHAR(256), IN column_name NVARCHAR(256))
 AS
+-- play-ebean-start
 BEGIN
 CALL usp_ebean_drop_foreign_keys(table_name, column_name);
 EXEC 'ALTER TABLE "' || UPPER(ESCAPE_DOUBLE_QUOTES(table_name)) || '" DROP ("' || UPPER(ESCAPE_DOUBLE_QUOTES(column_name)) || '")';
 END;
+-- play-ebean-end
 $$
