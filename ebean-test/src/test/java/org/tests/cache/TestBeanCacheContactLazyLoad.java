@@ -52,24 +52,30 @@ public class TestBeanCacheContactLazyLoad extends BaseTestCase {
 
     DB.save(contact);
 
-    // Only get two properties, so we have to lazy-load later
-    final Contact contactDb = DB.find(Contact.class).where().eq("email", "tim@button.com").select("email,lastName").findOne();
-    assertThat(contactDb).isNotNull();
-    LoggedSql.start();
-    contactDb.setLastName("Buttonnnn");
-    List<String> sql = LoggedSql.collect();
-    assertThat(sql).isEmpty(); // setter did not trigger lazy load
+    try {
 
-    // trigger lazy load
-    assertThat(contactDb.getPhone()).isEqualTo("1234567890");
-    sql = LoggedSql.collect();
-    assertThat(sql).isNotEmpty(); // Lazy-load took place
+      // Only get two properties, so we have to lazy-load later
+      final Contact contactDb = DB.find(Contact.class).where().eq("email", "tim@button.com").select("email,lastName").findOne();
+      assertThat(contactDb).isNotNull();
+      LoggedSql.start();
+      contactDb.setLastName("Buttonnnn");
+      List<String> sql = LoggedSql.collect();
+      assertThat(sql).isEmpty(); // setter did not trigger lazy load
 
-    final Contact contactDb2 = DB.find(Contact.class).where().eq("email", "tim@button.com").select("email,lastName").findOne();
-    sql = LoggedSql.stop();
-    assertThat(sql).isEmpty(); // We expect that the bean was loaded from cache
-    assertThat(contactDb2).isNotNull();
-    assertThat(contactDb2.getLastName()).isEqualTo("Button");
+      // trigger lazy load
+      assertThat(contactDb.getPhone()).isEqualTo("1234567890");
+      sql = LoggedSql.collect();
+      assertThat(sql).isNotEmpty(); // Lazy-load took place
+
+      final Contact contactDb2 = DB.find(Contact.class).where().eq("email", "tim@button.com").select("email,lastName").findOne();
+      sql = LoggedSql.stop();
+      assertThat(sql).isEmpty(); // We expect that the bean was loaded from cache
+      assertThat(contactDb2).isNotNull();
+      assertThat(contactDb2.getLastName()).isEqualTo("Button");
+    } finally {
+      DB.delete(customer);
+      DB.find(Contact.class).where().eq("email", "tim@button.com").delete();
+    }
   }
 
 }

@@ -243,11 +243,12 @@ public final class InternalConfiguration {
   }
 
   DtoQueryEngine createDtoQueryEngine() {
-    return new DtoQueryEngine(binder);
+    return new DtoQueryEngine(binder, config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList());
   }
 
   RelationalQueryEngine createRelationalQueryEngine() {
-    return new DefaultRelationalQueryEngine(binder, config.getDatabaseBooleanTrue(), config.getPlatformConfig().getDbUuid().useBinaryOptimized());
+    return new DefaultRelationalQueryEngine(binder, config.getDatabaseBooleanTrue(), config.getPlatformConfig().getDbUuid().useBinaryOptimized(),
+      config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList());
   }
 
   OrmQueryEngine createOrmQueryEngine() {

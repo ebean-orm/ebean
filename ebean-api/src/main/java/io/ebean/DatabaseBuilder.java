@@ -1924,8 +1924,8 @@ public interface DatabaseBuilder {
   DatabaseBuilder setLocalOnlyL2Cache(boolean localOnlyL2Cache);
 
   /**
-   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code> or
-   * <code>&x64;jakarta.validation.contstraints.NotNull</code>
+   * Controls if Ebean should ignore <code>&#64;javax.validation.contstraints.NotNull</code> or
+   * <code>&#64;jakarta.validation.contstraints.NotNull</code>
    * with respect to generating a <code>NOT NULL</code> column.
    * <p>
    * Normally when Ebean sees javax NotNull annotation it means that column is defined as NOT NULL.

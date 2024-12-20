@@ -141,7 +141,11 @@ public class TestExecuteComplete extends BaseTestCase {
     cust.setName("Roland");
     DB.save(cust);
 
-    assertThat(getInScopeTransaction()).isNull();
+    try {
+      assertThat(getInScopeTransaction()).isNull();
+    } finally {
+      DB.delete(cust);
+    }
   }
 
   @ForPlatform(Platform.H2)
