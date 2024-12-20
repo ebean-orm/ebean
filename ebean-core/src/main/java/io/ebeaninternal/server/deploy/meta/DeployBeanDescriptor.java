@@ -13,6 +13,7 @@ import io.ebean.event.changelog.ChangeLogFilter;
 import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ConcurrencyMode;
+import io.ebeaninternal.lookup.Lookups;
 import io.ebeaninternal.server.core.CacheOptions;
 import io.ebeaninternal.server.deploy.BeanDescriptor.EntityType;
 import io.ebeaninternal.server.deploy.*;
@@ -24,7 +25,7 @@ import io.ebeaninternal.server.rawsql.SpiRawSql;
 import jakarta.persistence.Entity;
 import jakarta.persistence.MappedSuperclass;
 
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.util.*;
 
 /**
@@ -48,6 +49,8 @@ public class DeployBeanDescriptor<T> {
 
   private final DatabaseBuilder.Settings config;
   private final BeanDescriptorManager manager;
+  private final Lookup lookup;
+
   /**
    * Map of BeanProperty Linked so as to preserve order.
    */
@@ -136,6 +139,7 @@ public class DeployBeanDescriptor<T> {
     this.manager = manager;
     this.config = config;
     this.beanType = beanType;
+    this.lookup = Lookups.getLookup(beanType);
   }
 
   public BindMaxLength bindMaxLength() {
@@ -144,8 +148,7 @@ public class DeployBeanDescriptor<T> {
 
   private String[] readPropertyNames() {
     try {
-      Field field = beanType.getField("_ebean_props");
-      return (String[]) field.get(null);
+      return (String[]) lookup.findStaticVarHandle(beanType, "_ebean_props", String[].class).get();
     } catch (Exception e) {
       throw new IllegalStateException("Error getting _ebean_props field on type " + beanType, e);
     }

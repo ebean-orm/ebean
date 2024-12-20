@@ -13,6 +13,7 @@ import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.GeoTypeProvider;
+import io.ebeaninternal.lookup.Lookups;
 import io.ebeaninternal.server.core.ServiceUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
@@ -20,6 +21,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.EnumType;
 import java.io.File;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -597,19 +599,28 @@ public final class DefaultTypeManager implements TypeManager {
   private void initialiseCustomScalarTypes(BootupClasses bootupClasses) {
     for (Class<? extends ScalarType<?>> cls : bootupClasses.getScalarTypes()) {
       try {
+        var lookup = Lookups.getLookup(cls);
         ScalarType<?> scalarType;
         if (objectMapper == null) {
-          scalarType = cls.getDeclaredConstructor().newInstance();
+          scalarType =
+              (ScalarType<?>)
+                  lookup.findConstructor(cls, MethodType.methodType(void.class)).invoke();
         } else {
           try {
             // first try objectMapper constructor
-            scalarType = cls.getDeclaredConstructor(ObjectMapper.class).newInstance(objectMapper);
+            scalarType =
+                (ScalarType<?>)
+                    lookup
+                        .findConstructor(cls, MethodType.methodType(ObjectMapper.class))
+                        .invoke(objectMapper);
           } catch (NoSuchMethodException e) {
-            scalarType = cls.getDeclaredConstructor().newInstance();
+            scalarType =
+                (ScalarType<?>)
+                    lookup.findConstructor(cls, MethodType.methodType(void.class)).invoke();
           }
         }
         add(scalarType);
-      } catch (Exception e) {
+      } catch (Throwable e) {
         log.log(ERROR, "Error loading ScalarType " + cls.getName(), e);
       }
     }
