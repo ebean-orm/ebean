@@ -1,5 +1,6 @@
 package org.tests.transaction;
 
+import io.ebean.TxScope;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
@@ -235,4 +236,19 @@ public class TestNestedTransaction extends BaseTestCase {
     }
     assertModified();
   }
+
+  @Test
+  public void test_txn_with_BatchMode() {
+
+    try (Transaction txn1 = DB.beginTransaction(TxScope.requiresNew())) {
+
+      try (Transaction txn2 = DB.beginTransaction()) {
+        txn2.setBatchMode(true);
+        txn2.commit();
+      }
+      // resume txn1
+      assertThat(txn1.isBatchMode()).isFalse();
+    }
+  }
+
 }
