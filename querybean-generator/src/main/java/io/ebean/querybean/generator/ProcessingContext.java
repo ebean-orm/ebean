@@ -446,7 +446,6 @@ class ProcessingContext implements Constants {
     } catch (FilerException e) {
       logNote("FilerException reading services file: " + e.getMessage());
     } catch (Exception e) {
-      e.printStackTrace();
       logError("Error reading services file: " + e.getMessage());
     }
     return null;

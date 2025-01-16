@@ -7,10 +7,11 @@
     <version>14.8.1</version>
   </parent>
 
+  <version>14.8.2-RC2</version>
   <name>querybean generator</name>
-  <description>Querybean generator</description>
   <artifactId>querybean-generator</artifactId>
-  
+  <description>Querybean generator</description>
+
   <properties>
     <avaje.prisms.version>1.36</avaje.prisms.version>
   </properties>
@@ -38,7 +39,7 @@
       <optional>true</optional>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-prisms</artifactId>
@@ -46,7 +47,7 @@
       <optional>true</optional>
       <scope>provided</scope>
     </dependency>
-  
+
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-spi-service</artifactId>

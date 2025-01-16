@@ -2,6 +2,7 @@ package io.ebean.querybean.generator;
 
 import static io.ebean.querybean.generator.APContext.logError;
 import static io.ebean.querybean.generator.APContext.logNote;
+import static io.ebean.querybean.generator.APContext.logWarn;
 import static io.ebean.querybean.generator.APContext.typeElement;
 
 import java.util.Arrays;
@@ -9,6 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.FilerException;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
@@ -97,13 +99,10 @@ public class Processor extends AbstractProcessor implements Constants {
       if (moduleWriter == null) {
         moduleWriter = new SimpleModuleInfoWriter();
       }
-    } catch (Exception e) {
-      e.printStackTrace();
-      logError(
-          "Failed to initialise EntityClassRegister error:"
-              + e
-              + " stack:"
-              + Arrays.toString(e.getStackTrace()));
+    } catch (FilerException e) {
+      logWarn(null, "FilerException trying to write EntityClassRegister: " + e);
+    } catch (Throwable e) {
+      logError("Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
   }
 
@@ -130,7 +129,6 @@ public class Processor extends AbstractProcessor implements Constants {
           new SimpleQueryBeanWriter((TypeElement) element);
       beanWriter.writeRootBean();
     } catch (Exception e) {
-      e.printStackTrace();
       logError(element, "Error generating query beans: " + e);
     }
   }
