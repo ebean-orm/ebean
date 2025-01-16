@@ -1,6 +1,7 @@
 package io.ebean.querybean.generator;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.FilerException;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -16,7 +17,6 @@ import java.util.Set;
 public class Processor extends AbstractProcessor implements Constants {
 
   private ProcessingContext processingContext;
-  private SimpleModuleInfoWriter moduleWriter;
 
   public Processor() {
   }
@@ -49,7 +49,6 @@ public class Processor extends AbstractProcessor implements Constants {
     int count = processEntities(roundEnv);
     processOthers(roundEnv);
     final int loaded = processingContext.complete();
-    initModuleInfoBean();
     if (roundEnv.processingOver()) {
       writeModuleInfoBean();
     }
@@ -86,26 +85,12 @@ public class Processor extends AbstractProcessor implements Constants {
     }
   }
 
-  private void initModuleInfoBean() {
-    try {
-      if (moduleWriter == null) {
-        moduleWriter = new SimpleModuleInfoWriter(processingContext);
-      }
-    } catch (Throwable e) {
-      e.printStackTrace();
-      processingContext.logError(null, "Failed to initialise EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
-    }
-  }
-
   private void writeModuleInfoBean() {
     try {
-      if (moduleWriter == null) {
-        processingContext.logError(null, "EntityClassRegister was not initialised and not written");
-      } else {
-        moduleWriter.write();
-      }
+      new SimpleModuleInfoWriter(processingContext).write();
+    } catch (FilerException e) {
+      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
     } catch (Throwable e) {
-      e.printStackTrace();
       processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
   }
@@ -115,7 +100,6 @@ public class Processor extends AbstractProcessor implements Constants {
       SimpleQueryBeanWriter beanWriter = new SimpleQueryBeanWriter((TypeElement) element, processingContext);
       beanWriter.writeRootBean();
     } catch (Throwable e) {
-      e.printStackTrace();
       processingContext.logError(element, "Error generating query beans: " + e);
     }
   }

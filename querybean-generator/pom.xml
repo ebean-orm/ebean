@@ -7,9 +7,10 @@
     <version>14.8.1</version>
   </parent>
 
+  <version>14.8.2-RC2</version>
   <name>querybean generator</name>
-  <description>Querybean generator</description>
   <artifactId>querybean-generator</artifactId>
+  <description>Querybean generator</description>
 
   <build>
     <plugins>

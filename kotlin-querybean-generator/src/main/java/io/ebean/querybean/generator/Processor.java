@@ -19,14 +19,12 @@ public class Processor extends AbstractProcessor implements Constants {
   private static final String KAPT_KOTLIN_GENERATED_OPTION = "kapt.kotlin.generated";
 
   private ProcessingContext processingContext;
-  private SimpleModuleInfoWriter moduleWriter;
 
   public Processor() {
   }
 
   @Override
   public Set<String> getSupportedOptions() {
-
     Set<String> options =  new LinkedHashSet<>();
     options.add(KAPT_KOTLIN_GENERATED_OPTION);
     options.add(GENERATE_KOTLIN_CODE_OPTION);
@@ -61,7 +59,6 @@ public class Processor extends AbstractProcessor implements Constants {
     int count = processEntities(roundEnv);
     processOthers(roundEnv);
     final int loaded = processingContext.complete();
-    initModuleInfoBean();
     if (roundEnv.processingOver()) {
       writeModuleInfoBean();
     }
@@ -98,26 +95,12 @@ public class Processor extends AbstractProcessor implements Constants {
     }
   }
 
-  private void initModuleInfoBean() {
-    try {
-      if (moduleWriter == null) {
-        moduleWriter = new SimpleModuleInfoWriter(processingContext);
-      }
-    } catch (Throwable e) {
-      e.printStackTrace();
-      processingContext.logError(null, "Failed to initialise EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
-    }
-  }
-
   private void writeModuleInfoBean() {
     try {
-      if (moduleWriter == null) {
-        processingContext.logError(null, "EntityClassRegister was not initialised and not written");
-      } else {
-        moduleWriter.write();
-      }
+      new SimpleModuleInfoWriter(processingContext).write();
+    } catch (FilerException e) {
+      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
     } catch (Throwable e) {
-      e.printStackTrace();
       processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
   }

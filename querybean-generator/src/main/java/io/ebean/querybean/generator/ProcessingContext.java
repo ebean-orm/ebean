@@ -403,6 +403,10 @@ class ProcessingContext implements Constants {
     messager.printMessage(Diagnostic.Kind.ERROR, String.format(msg, args), e);
   }
 
+  void logWarn(String msg, Object... args) {
+    messager.printMessage(Diagnostic.Kind.WARNING, String.format(msg, args));
+  }
+
   void logNote(String msg, Object... args) {
     messager.printMessage(Diagnostic.Kind.NOTE, String.format(msg, args));
   }
@@ -549,7 +553,6 @@ class ProcessingContext implements Constants {
     } catch (FilerException e) {
       logNote(null, "FilerException reading services file: " + e.getMessage());
     } catch (Exception e) {
-      e.printStackTrace();
       logError(null, "Error reading services file: " + e.getMessage());
     }
     return null;
