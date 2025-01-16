@@ -89,7 +89,7 @@ public class Processor extends AbstractProcessor implements Constants {
     try {
       new SimpleModuleInfoWriter(processingContext).write();
     } catch (FilerException e) {
-      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
+      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister: " + e);
     } catch (Throwable e) {
       processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }

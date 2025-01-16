@@ -1,6 +1,7 @@
 package io.ebean.querybean.generator;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.FilerException;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -99,7 +100,7 @@ public class Processor extends AbstractProcessor implements Constants {
     try {
       new SimpleModuleInfoWriter(processingContext).write();
     } catch (FilerException e) {
-      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
+      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister: " + e);
     } catch (Throwable e) {
       processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
