@@ -20,7 +20,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>${project.version}</version>
+      <version>14.8.1</version>
       <optional>true</optional>
       <scope>provided</scope>
     </dependency>
