@@ -7,10 +7,9 @@
     <version>14.8.1</version>
   </parent>
 
-  <version>14.8.2-RC2</version>
   <name>querybean generator</name>
   <artifactId>querybean-generator</artifactId>
-  <description>Querybean generator</description>
+  <description>Generates Ebean Query beans for type safe ORM query building and execution</description>
 
   <build>
     <plugins>
