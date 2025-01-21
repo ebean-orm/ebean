@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.PersistenceIOException;
 import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
+import io.ebean.lookup.Lookups;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
@@ -22,8 +23,8 @@ class BeanDescriptorElementEmbedded<T> extends BeanDescriptorElement<T> {
   BeanDescriptorElementEmbedded(BeanDescriptorMap owner, DeployBeanDescriptor<T> deploy, ElementHelp elementHelp) {
     super(owner, deploy, elementHelp);
     try {
-      this.prototype = (EntityBean) beanType.getDeclaredConstructor().newInstance();
-    } catch (Exception e) {
+      this.prototype = Lookups.newDefaultInstance(beanType);
+    } catch (Throwable e) {
       throw new IllegalStateException("Unable to create entity bean prototype for "+beanType);
     }
     BeanPropertyAssocOne<?>[] embedded = propertiesEmbedded();

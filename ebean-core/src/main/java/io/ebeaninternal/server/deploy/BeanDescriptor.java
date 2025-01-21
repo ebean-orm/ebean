@@ -17,6 +17,7 @@ import io.ebean.event.changelog.ChangeType;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadEvent;
+import io.ebean.lookup.Lookups;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.meta.QueryPlanInit;
@@ -414,8 +415,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       return null;
     }
     try {
-      return (EntityBean) beanType.getDeclaredConstructor().newInstance();
-    } catch (Exception e) {
+      return Lookups.newDefaultInstance(beanType);
+    } catch (Throwable e) {
       throw new IllegalStateException("Error trying to create the prototypeEntityBean for " + beanType, e);
     }
   }
