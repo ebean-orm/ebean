@@ -61,6 +61,13 @@ public final class BindableList implements Bindable {
   }
 
   @Override
+  public void dmlType(GenerateDmlRequest request) {
+    for (Bindable item : items) {
+      item.dmlType(request);
+    }
+  }
+
+  @Override
   public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
     for (Bindable item : items) {
       item.dmlBind(bindRequest, bean);
