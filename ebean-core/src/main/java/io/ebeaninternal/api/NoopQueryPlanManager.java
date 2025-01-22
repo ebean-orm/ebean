@@ -9,6 +9,11 @@ import java.util.List;
 final class NoopQueryPlanManager implements QueryPlanManager {
 
   @Override
+  public void startPlanCapture() {
+    // do nothing
+  }
+
+  @Override
   public void setDefaultThreshold(long thresholdMicros) {
     // do nothing
   }
