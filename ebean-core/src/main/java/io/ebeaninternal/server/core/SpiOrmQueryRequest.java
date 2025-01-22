@@ -136,6 +136,21 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   <A> A getFromQueryCache();
 
   /**
+   * Return if query cache is active.
+   */
+  boolean isQueryCacheActive();
+
+  /**
+   * Return if results should be put to query cache.
+   */
+  boolean isQueryCachePut();
+
+  /**
+   * Put the result to the query cache.
+   */
+  void putToQueryCache(Object result);
+
+  /**
    * Maybe hit the bean cache returning true if everything was obtained from the
    * cache (that there were no misses).
    * <p>
