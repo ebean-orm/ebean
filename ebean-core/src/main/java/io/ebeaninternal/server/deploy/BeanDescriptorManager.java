@@ -4,6 +4,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.DatabaseBuilder;
 import io.ebean.Model;
 import io.ebean.RawSqlBuilder;
+import io.ebean.Transaction;
 import io.ebean.annotation.ConstraintMode;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
@@ -35,6 +36,7 @@ import io.ebeaninternal.server.persist.platform.MultiValueBind;
 import io.ebeaninternal.server.properties.BeanPropertiesReader;
 import io.ebeaninternal.server.properties.BeanPropertyAccess;
 import io.ebeaninternal.server.properties.EnhanceBeanPropertyAccess;
+import io.ebeaninternal.server.transaction.DataSourceSupplier;
 import io.ebeaninternal.server.type.TypeManager;
 import io.ebeaninternal.xmapping.api.XmapEbean;
 import io.ebeaninternal.xmapping.api.XmapEntity;
@@ -96,7 +98,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final Map<String, List<BeanDescriptor<?>>> tableToDescMap = new HashMap<>();
   private final Map<String, List<BeanDescriptor<?>>> tableToViewDescMap = new HashMap<>();
   private final DbIdentity dbIdentity;
-  private final DataSource dataSource;
+  private final DataSourceSupplier dataSourceSupplier;
   private final DatabasePlatform databasePlatform;
   private final SpiCacheManager cacheManager;
   private final BackgroundExecutor backgroundExecutor;
@@ -132,7 +134,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.cacheManager = config.getCacheManager();
     this.docStoreFactory = config.getDocStoreFactory();
     this.backgroundExecutor = config.getBackgroundExecutor();
-    this.dataSource = this.config.getDataSource();
+    this.dataSourceSupplier = config.getDataSourceSupplier();
     this.encryptKeyManager = this.config.getEncryptKeyManager();
     this.databasePlatform = this.config.getDatabasePlatform();
     this.multiValueBind = config.getMultiValueBind();
@@ -1266,7 +1268,39 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {
-    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, stepSize, seqName);
+    return new PlatformIdGenerator() {
+
+      private Map<DataSource, PlatformIdGenerator> map = Collections.synchronizedMap(new WeakHashMap<>());
+
+      private PlatformIdGenerator create() {
+        return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSourceSupplier.getDataSource(), stepSize, seqName);
+      }
+
+      private PlatformIdGenerator get() {
+        return map.computeIfAbsent(dataSourceSupplier.getDataSource(), k -> create());
+      }
+
+      @Override
+      public void preAllocateIds(int allocateSize) {
+        get().preAllocateIds(allocateSize);
+
+      }
+
+      @Override
+      public Object nextId(Transaction transaction) {
+        return get().nextId(transaction);
+      }
+
+      @Override
+      public boolean isDbSequence() {
+        return get().isDbSequence();
+      }
+
+      @Override
+      public String getName() {
+        return get().getName();
+      }
+    };
   }
 
   private void setAccessors(DeployBeanDescriptor<?> deploy) {
