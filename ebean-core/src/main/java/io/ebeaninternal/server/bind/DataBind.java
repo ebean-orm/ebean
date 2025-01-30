@@ -233,7 +233,11 @@ public class DataBind implements DataBinder {
       inputStreams = new ArrayList<>();
     }
     inputStreams.add(inputStream);
-    pstmt.setBinaryStream(++pos, inputStream, length);
+    if (length == -1) {
+      pstmt.setBinaryStream(++pos, inputStream);
+    } else {
+      pstmt.setBinaryStream(++pos, inputStream, length);
+    }
     lastObject = new InputStreamInfo(inputStream, length);
   }
 
