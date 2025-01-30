@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>14.8.1-FOC3-SNAPSHOT</version>
+  <version>14.8.1-FOC3</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -18,7 +18,7 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:FOCONIS/ebean.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>ebean-parent-14.8.1-FOC3</tag>
   </scm>
 
   <licenses>
