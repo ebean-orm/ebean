@@ -72,7 +72,7 @@ class TestRowCount extends BaseTestCase {
 
     int count = query.findCount();
 
-    if (isSqlServer() || isH2()) {
+    if (isSqlServer() || isH2() || isMariaDB() || isMySql()) {
       assertThat(query.getGeneratedSql()).contains("select count(*) from ( select distinct t0.anniversary c0, t0.status c1 from o_customer t0)");
     } else {
       assertThat(query.getGeneratedSql()).contains("select count(*) from ( select distinct t0.anniversary, t0.status from o_customer t0)");
@@ -92,11 +92,11 @@ class TestRowCount extends BaseTestCase {
 
     int count = query.findCount();
 
-    if (isSqlServer() || isH2()) {
+    if (isSqlServer() || isH2() || isMariaDB() || isMySql()) {
       // must use column alias
       assertThat(query.getGeneratedSql()).contains("select count(*) from ( select distinct t0.anniversary c0, t0.status c1, t1.id c2, t1.city c3, t2.id c4, t2.city c5 from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id left join o_address t2 on t2.id = t0.shipping_address_id)");
     } else {
-      assertThat(query.getGeneratedSql()).contains("select count(*) from ( select distinct t0.anniversary, t0.status, t1.id, t1.city, t2.id, t2.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id left join o_address t2 on t2.id = t0.shipping_address_id) as c");
+      assertThat(query.getGeneratedSql()).contains("select count(*) from ( select distinct t0.anniversary, t0.status, t1.id, t1.city, t2.id, t2.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id left join o_address t2 on t2.id = t0.shipping_address_id)");
     }
     assertThat(count).isGreaterThan(0);
   }
