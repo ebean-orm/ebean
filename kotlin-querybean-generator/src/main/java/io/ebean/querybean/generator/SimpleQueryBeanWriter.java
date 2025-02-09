@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -74,19 +73,17 @@ class SimpleQueryBeanWriter {
   private final boolean embeddable;
   private final String dbName;
   private final String beanFullName;
-  private final LangAdapter langAdapter;
-  private boolean writingAssocBean;
+  private final KotlinLangAdapter langAdapter = new KotlinLangAdapter();
+  private boolean writingEmbeddedBean;
   private final String generatedSourcesDir;
 
   private String destPackage;
-  private String origDestPackage;
   private String shortName;
   private final String shortInnerName;
   private final String origShortName;
   private Append writer;
 
   SimpleQueryBeanWriter(TypeElement element, ProcessingContext processingContext) {
-    this.langAdapter = new KotlinLangAdapter();
     this.generatedSourcesDir = processingContext.generatedSourcesDir();
     this.element = element;
     this.processingContext = processingContext;
@@ -95,7 +92,7 @@ class SimpleQueryBeanWriter {
     this.destPackage = Util.packageOf(nested, beanFullName) + ".query";
     String sn = Util.shortName(nested, beanFullName);
     this.shortInnerName = Util.shortName(false, sn);
-    this.shortName = sn.replace(".", "");
+    this.shortName = sn.replace(".", "_"); // $ not supported with Kotlin, see kotlinInnerType()
     this.origShortName = shortName;
     this.isEntity = processingContext.isEntity(element);
     this.embeddable = processingContext.isEmbeddable(element);
@@ -118,8 +115,8 @@ class SimpleQueryBeanWriter {
     return processingContext.findDbName(element);
   }
 
-  private LangAdapter lang() {
-    return langAdapter;
+  private static String kotlinInnerType(String fullType) {
+    return fullType.replace('$', '_');
   }
 
   private void gatherPropertyDetails() {
@@ -148,25 +145,24 @@ class SimpleQueryBeanWriter {
   }
 
   /**
-   * Write the type query bean (root bean).
+   * Write the type query bean.
    */
-  void writeRootBean() throws IOException {
+  void writeBean() throws IOException {
     gatherPropertyDetails();
+    translateKotlinImportTypes();
     if (isEmbeddable()) {
       processingContext.addEntity(beanFullName, dbName);
+      writeEmbeddedBean();
     } else if (isEntity()) {
       processingContext.addEntity(beanFullName, dbName);
       writer = new Append(createFileWriter());
-
-      translateKotlinImportTypes();
 
       writePackage();
       writeImports();
       writeClass();
       writeAlias();
-      writeFields();
+      writeFields(false);
       writeConstructors();
-      //writeStaticAliasClass();
       writeClassEnd();
 
       writer.close();
@@ -196,139 +192,53 @@ class SimpleQueryBeanWriter {
   /**
    * Write the type query assoc bean.
    */
-  void writeAssocBean() throws IOException {
-    writingAssocBean = true;
-    origDestPackage = destPackage;
-    destPackage = destPackage + ".assoc";
-    shortName = "Assoc" + shortName;
+  void writeEmbeddedBean() throws IOException {
+    writingEmbeddedBean = true;
 
-    prepareAssocBeanImports();
     writer = new Append(createFileWriter());
-
     writePackage();
     writeImports();
     writeClass();
-    writeFields();
-    writeConstructors();
+    writeEmbeddedAssoc();
     writeClassEnd();
 
     writer.close();
   }
 
-  /**
-   * Prepare the imports for writing assoc bean.
-   */
-  private void prepareAssocBeanImports() {
-    if (embeddable) {
-      importTypes.add(Constants.TQASSOC);
-    } else {
-      importTypes.add(Constants.TQASSOCBEAN);
-    }
-    if (isEntity()) {
-      importTypes.add(Constants.TQPROPERTY);
-      importTypes.add(origDestPackage + ".Q" + origShortName);
-      //if (implementsInterface != null)  {
-      //  importTypes.add(Constants.AVAJE_LANG_NULLABLE);
-      //  importTypes.add(Constants.JAVA_COLLECTION);
-      //  importTypes.add(implementsInterfaceFullName);
-      //}
-    }
-
-    // remove imports for the same package
-    Iterator<String> importsIterator = importTypes.iterator();
-    String checkImportStart = destPackage + ".QAssoc";
-    while (importsIterator.hasNext()) {
-      String importType = importsIterator.next();
-      if (importType.startsWith(checkImportStart)) {
-        importsIterator.remove();
-      }
-    }
-  }
-
-  /**
-   * Write constructors.
-   */
   private void writeConstructors() {
-    if (writingAssocBean) {
-      writeAssocBeanFetch();
-      writeAssocBeanConstructor();
-    } else {
-      writeRootBeanConstructor();
-    }
+    langAdapter.rootBeanConstructor(writer, shortName, dbName, beanFullName);
+    writeAssocClasses();
   }
 
-  /**
-   * Write the constructors for 'root' type query bean.
-   */
-  private void writeRootBeanConstructor() {
-    lang().rootBeanConstructor(writer, shortName, dbName, beanFullName);
-  }
-
-  private void writeAssocBeanFetch() {
-    if (isEntity()) {
-      //if (implementsInterface != null) {
-      //  writeAssocBeanExpression(false, "eq", "Is equal to by ID property.");
-      //  writeAssocBeanExpression(true, "eqIfPresent", "Is equal to by ID property if the value is not null, if null no expression is added.");
-      //  writeAssocBeanExpression(false, "in", "IN the given values.", implementsInterfaceShortName + "...", "in");
-      //  writeAssocBeanExpression(false, "inBy", "IN the given interface values.", "Collection<" + implementsInterfaceShortName + ">", "in");
-      //  writeAssocBeanExpression(true, "inOrEmptyBy", "IN the given interface values if the collection is not empty. No expression is added if the collection is empty..", "Collection<" + implementsInterfaceShortName + ">", "inOrEmpty");
-      //}
-    }
-  }
-
-  private void writeAssocBeanExpression(boolean nullable,String expression, String comment) {
-    writeAssocBeanExpression(nullable, expression, comment, implementsInterfaceShortName, expression);
-  }
-
-  private void writeAssocBeanExpression(boolean nullable, String expression, String comment, String param, String actualExpression) {
-    final String nullableAnnotation = nullable ? "@Nullable " : "";
-    String values = expression.startsWith("in") ? "values" : "value";
-    writer.append("  /**").eol();
-    writer.append("   * ").append(comment).eol();
-    writer.append("   */").eol();
-    writer.append("  fun %s(%s%s %s): R {", expression, nullableAnnotation, param, values).eol();
-    writer.append("    expr().%s(_name, %s);", actualExpression, values).eol();
-    writer.append("    return _root;").eol();
-    writer.append("  }").eol();
-    writer.eol();
-  }
-
-  /**
-   * Write constructor for 'assoc' type query bean.
-   */
-  private void writeAssocBeanConstructor() {
-    lang().assocBeanConstructor(writer, shortName);
-  }
-
-  /**
-   * Write all the fields.
-   */
-  private void writeFields() {
+  private void writeFields(boolean assocBeans) {
+    String padding = assocBeans ? "  " : "";
     for (PropertyMeta property : properties) {
-      String typeDefn = property.getTypeDefn(shortName, writingAssocBean);
-      lang().fieldDefn(writer, property.getName(), typeDefn);
-      writer.eol();
+      String typeDefn = kotlinTypeDefn(property.getTypeDefn(shortName, assocBeans));
+      writer.append("%s  lateinit var %s: %s", padding, property.getName(), kotlinInnerType(typeDefn)).eol();
     }
     writer.eol();
+  }
+
+  private static String kotlinTypeDefn(String type)  {
+    if (type.endsWith(",Integer>")) {
+      return type.replace(",Integer>", ",Int>");
+    } else {
+      return type;
+    }
   }
 
   /**
    * Write the class definition.
    */
   private void writeClass() {
-    if (writingAssocBean) {
+    if (writingEmbeddedBean) {
       writer.append("/**").eol();
       writer.append(" * Association query bean for %s.", shortName).eol();
       writer.append(" * ").eol();
       writer.append(" * THIS IS A GENERATED OBJECT, DO NOT MODIFY THIS CLASS.").eol();
       writer.append(" */").eol();
       writer.append(Constants.AT_GENERATED).eol();
-      writer.append(Constants.AT_TYPEQUERYBEAN).eol();
-      if (embeddable) {
-        writer.append("class Q%s<R> : TQAssoc<%s,R> {", shortName, beanFullName).eol();
-      } else {
-        writer.append("class Q%s<R> : TQAssocBean<%s,R,Q%s> {", shortName, beanFullName, origShortName).eol();
-      }
+      writer.append("class Q%s {", shortName).eol();
     } else {
       writer.append("/**").eol();
       writer.append(" * Query bean for %s.", shortName).eol();
@@ -344,9 +254,7 @@ class SimpleQueryBeanWriter {
   }
 
   private void writeAlias() {
-    if (!writingAssocBean) {
-      lang().alias(writer, shortName, beanFullName);
-    }
+    langAdapter.alias(writer, shortName, beanFullName);
   }
 
   private void writeClassEnd() {
@@ -358,7 +266,7 @@ class SimpleQueryBeanWriter {
    */
   private void writeImports() {
     for (String importType : importTypes) {
-      writer.append("import %s;", importType).eol();
+      writer.append("import %s;", kotlinInnerType(importType)).eol();
     }
     writer.eol();
   }
@@ -379,4 +287,54 @@ class SimpleQueryBeanWriter {
     return new FileWriter(absFile);
   }
 
+  private void writeEmbeddedAssoc() {
+    writer.append("  @io.ebean.typequery.Generated(\"io.ebean.querybean.generator\") @io.ebean.typequery.TypeQueryBean(\"v1\")").eol();
+    writer.append("  class Assoc<R> : io.ebean.typequery.TQAssoc<%s,R> {", beanFullName).eol().eol();
+    writeFields(true);
+    writer.append("    protected constructor(name: String, root: R) : super(name, root)").eol();
+    writer.append("    protected constructor(name: String, root: R, prefix: String) : super(name, root, prefix)").eol();
+    writer.append("  }").eol().eol();
+  }
+
+  private void writeAssocClasses() {
+    writer.append("  @io.ebean.typequery.Generated(\"io.ebean.querybean.generator\") @io.ebean.typequery.TypeQueryBean(\"v1\")").eol();
+    writer.append("  abstract class Assoc<R> : io.ebean.typequery.TQAssocBean<%s, R, Q%s> {", beanFullName, shortName).eol();
+
+    writeFields(true);
+    writer.append("    protected constructor(name: String, root: R) : super(name, root)").eol();
+    writer.append("    protected constructor(name: String, root: R, prefix: String) : super(name, root, prefix)").eol();
+    writer.append("  }").eol().eol();
+
+    writer.append("  @io.ebean.typequery.Generated(\"io.ebean.querybean.generator\") @io.ebean.typequery.TypeQueryBean(\"v1\")").eol();
+    writer.append("  class AssocOne<R> : Assoc<R> {").eol();
+    writer.append("    constructor(name: String, root: R) : super(name, root)").eol();
+    writer.append("    constructor(name: String, root: R, prefix: String) : super(name, root, prefix)").eol();
+    writer.append("  }").eol().eol();
+
+    writer.append("  @io.ebean.typequery.Generated(\"io.ebean.querybean.generator\") @io.ebean.typequery.TypeQueryBean(\"v1\")").eol();
+    writer.append("  class AssocMany<R> : Assoc<R>, io.ebean.typequery.TQAssocMany<%s, R, Q%s> {", beanFullName, shortName).eol();
+    writer.append("    constructor(name: String, root: R) : super(name, root)").eol();
+    writer.append("    constructor(name: String, root: R, prefix: String) : super(name, root, prefix)").eol();
+    writer.eol();
+    writer.append("    override fun filterMany(apply: java.util.function.Consumer<Q%s>): R {", shortName).eol();
+    writer.append("      val list: io.ebean.ExpressionList<%s> = _newExpressionList<%s>()", beanFullName, beanFullName).eol();
+    writer.append("      apply.accept(Q%s(list))", shortName).eol();
+    writer.append("      return _filterMany(list)").eol();
+    writer.append("    }").eol().eol();
+    writer.append("    override fun filterMany(filter: io.ebean.ExpressionList<%s>): R {", beanFullName).eol();
+    writer.append("      return _filterMany(filter)").eol();
+    writer.append("    }").eol().eol();
+    writer.append("    override fun filterManyRaw(rawExpressions: String, vararg params: Any): R {").eol();
+    writer.append("      return _filterManyRaw(rawExpressions, *params)").eol();
+    writer.append("    }").eol().eol();
+
+    writer.append("    override fun isEmpty(): R {").eol();
+    writer.append("      return _isEmpty() ").eol();
+    writer.append("    }").eol().eol();
+    writer.append("    override fun isNotEmpty(): R {").eol();
+    writer.append("      return _isNotEmpty() ").eol();
+    writer.append("    }").eol().eol();
+
+    writer.append("  }").eol();
+  }
 }

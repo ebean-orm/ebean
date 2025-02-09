@@ -286,9 +286,8 @@ final class DefaultDbSqlContext implements DbSqlContext {
     if (useColumnAlias) {
       sb.append(' ');
       sb.append(columnAliasPrefix);
-      sb.append(columnIndex);
+      sb.append(columnIndex++);
     }
-    columnIndex++;
   }
 
   @Override

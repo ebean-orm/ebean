@@ -228,12 +228,14 @@ final class CQueryBuilder {
     query.setMaxRows(0);
 
     boolean countDistinct = query.isDistinct();
+    boolean useColumnAlias = selectCountWithColumnAlias;
     boolean withAgg = false;
     if (!countDistinct) {
       withAgg = includesAggregation(request, query);
       if (!withAgg) {
         // minimise select clause for standard count
         query.setSelectId();
+        useColumnAlias = false;
       }
     }
 
@@ -246,7 +248,7 @@ final class CQueryBuilder {
     }
 
     predicates.prepare(true);
-    SqlTree sqlTree = createSqlTree(request, predicates, selectCountWithColumnAlias && withAgg);
+    SqlTree sqlTree = createSqlTree(request, predicates, useColumnAlias);
     if (SpiQuery.TemporalMode.CURRENT == query.temporalMode()) {
       sqlTree.addSoftDeletePredicate(query);
     }

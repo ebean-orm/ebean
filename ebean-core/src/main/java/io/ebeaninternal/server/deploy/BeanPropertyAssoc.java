@@ -363,7 +363,9 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     BeanProperty[] others = target.propertiesBaseScalar();
     if (descriptor.isRawSqlBased()) {
       String dbColumn = owner.dbColumn();
-      return new ImportedIdSimple(owner, dbColumn, null, idProp, 0);
+      if (dbColumn != null) {
+        return new ImportedIdSimple(owner, dbColumn, null, idProp, 0);
+      }
     }
     if (idProp == null) {
       return null;
