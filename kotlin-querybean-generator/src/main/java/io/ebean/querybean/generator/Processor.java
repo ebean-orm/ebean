@@ -109,8 +109,7 @@ public class Processor extends AbstractProcessor implements Constants {
   private void generateQueryBeans(Element element) {
     try {
       SimpleQueryBeanWriter beanWriter = new SimpleQueryBeanWriter((TypeElement) element, processingContext);
-      beanWriter.writeRootBean();
-      beanWriter.writeAssocBean();
+      beanWriter.writeBean();
     } catch (Throwable e) {
       processingContext.logError(element, "Error generating query beans: " + e);
     }
