@@ -1,5 +1,6 @@
 package org.example.order
 
+import io.ebean.annotation.DbMap
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Version
@@ -15,4 +16,7 @@ class Customer(
 
   @Version
   var version: Long = 0
+
+  @DbMap(length = 800)
+  var params: Map<String, Any> = mapOf()
 }

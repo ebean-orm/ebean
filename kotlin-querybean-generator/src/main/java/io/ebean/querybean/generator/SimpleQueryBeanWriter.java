@@ -50,6 +50,8 @@ class SimpleQueryBeanWriter {
   private static final Set<String> kotlinBlackListedImports = Collections.unmodifiableSet(
     new HashSet<>(
       Arrays.asList(
+        "?",
+        "extends",
         "java.util.ArrayList",
         "java.util.HashMap",
         "java.util.HashSet",
@@ -213,18 +215,16 @@ class SimpleQueryBeanWriter {
   private void writeFields(boolean assocBeans) {
     String padding = assocBeans ? "  " : "";
     for (PropertyMeta property : properties) {
-      String typeDefn = kotlinTypeDefn(property.getTypeDefn(shortName, assocBeans));
+      String typeDefn = toKotlinType(property.getTypeDefn(shortName, assocBeans));
       writer.append("%s  lateinit var %s: %s", padding, property.getName(), kotlinInnerType(typeDefn)).eol();
     }
     writer.eol();
   }
 
-  private static String kotlinTypeDefn(String type)  {
-    if (type.endsWith(",Integer>")) {
-      return type.replace(",Integer>", ",Int>");
-    } else {
-      return type;
-    }
+  private static String toKotlinType(String type)  {
+    return type
+      .replace("? extends Object", "Any")
+      .replace(",Integer>", ",Int>");
   }
 
   /**
