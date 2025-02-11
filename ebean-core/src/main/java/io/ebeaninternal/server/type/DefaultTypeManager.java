@@ -599,13 +599,18 @@ public final class DefaultTypeManager implements TypeManager {
   private void initialiseCustomScalarTypes(BootupClasses bootupClasses) {
     for (Class<? extends ScalarType<?>> cls : bootupClasses.getScalarTypes()) {
       try {
+        var lookup = Lookups.getLookup(cls);
         ScalarType<?> scalarType;
         if (objectMapper == null) {
           scalarType = Lookups.newDefaultInstance(cls);
         } else {
           try {
             // first try objectMapper constructor
-            scalarType = Lookups.newDefaultInstance(cls);
+            scalarType =
+                (ScalarType<?>)
+                    lookup
+                        .findConstructor(cls, MethodType.methodType(ObjectMapper.class))
+                        .invoke(objectMapper);
           } catch (NoSuchMethodException e) {
             scalarType = Lookups.newDefaultInstance(cls);
           }
