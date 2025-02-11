@@ -322,10 +322,6 @@ class SimpleQueryBeanWriter {
     writer.append("    public R filterManyRaw(String rawExpressions, Object... params) { return _filterManyRaw(rawExpressions, params); }").eol();
     writer.eol();
     writer.append("    @Override").eol();
-    writer.append("    @Deprecated(forRemoval = true)").eol();
-    writer.append("    public R filterMany(String expressions, Object... params) { return _filterMany(expressions, params); }").eol();
-    writer.eol();
-    writer.append("    @Override").eol();
     writer.append("    public R isEmpty() { return _isEmpty(); }").eol();
     writer.eol();
     writer.append("    @Override").eol();

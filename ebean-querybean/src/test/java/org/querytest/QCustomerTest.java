@@ -667,7 +667,7 @@ public class QCustomerTest {
 
     new QCustomer()
       .name.startsWith("Postgres")
-      .contacts.filterMany("firstName istartsWith ?", "Rob")
+      .contacts.filterManyRaw("firstName like ?", "Rob%")
       .findList();
 
     final LocalDate startDate = LocalDate.now().minusDays(7);
@@ -675,7 +675,7 @@ public class QCustomerTest {
 
     new QCustomer()
       .name.startsWith("Postgres")
-      .contacts.filterMany("whenCreated inRange ? to ?", startDate, endDate)
+      .contacts.filterManyRaw("whenCreated >= ? and whenCreated < ?", startDate, endDate)
       .findList();
   }
 
