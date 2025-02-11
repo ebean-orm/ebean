@@ -242,7 +242,7 @@ final class CQueryBuilder {
     boolean withAgg = false;
     if (!countDistinct) {
       withAgg = includesAggregation(request, query);
-      if (!withAgg) {
+      if (!withAgg && request.descriptor().hasId()) {
         // minimise select clause for standard count
         query.setSelectId();
         useColumnAlias = false;
