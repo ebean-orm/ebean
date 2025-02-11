@@ -1,14 +1,17 @@
 package org.tests.transaction;
 
-import io.ebean.TxScope;
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
+import io.ebean.TxScope;
+import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import org.assertj.core.api.ListAssert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.tests.model.basic.EBasic;
+import org.tests.model.basic.EBasicVer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -248,6 +251,36 @@ public class TestNestedTransaction extends BaseTestCase {
       }
       // resume txn1
       assertThat(txn1.isBatchMode()).isFalse();
+    }
+  }
+
+  @Test
+  public void test_txn_nextedWithInnerBatch() {
+    try (Transaction txn1 = DB.beginTransaction(TxScope.requiresNew())) {
+      try (Transaction txn2 = DB.beginTransaction()) {
+        LoggedSql.start();
+        txn2.setBatchMode(true);
+
+        EBasicVer basic = new EBasicVer("New name");
+        basic.setId(1000);
+        basic.setDescription("New description");
+        DB.save(basic);
+
+        txn2.flush();
+
+        basic.setOther("Other");
+        DB.save(basic);
+
+        txn2.commit();
+
+        ListAssert<String> sqlAssert = assertThat(LoggedSql.stop()).hasSize(6);
+        sqlAssert.element(0).asString().contains("insert into e_basicver");
+        sqlAssert.element(1).asString().contains("-- bind(1000,New name");
+        sqlAssert.element(2).asString().contains("-- executeBatch() size:1");
+        sqlAssert.element(3).asString().contains("update e_basicver");
+        sqlAssert.element(4).asString().contains("-- bind(Other,");
+        sqlAssert.element(5).asString().contains("-- executeBatch() size:1");
+      }
     }
   }
 
