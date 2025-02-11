@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
+import org.tests.model.noid.NoIdBean;
 
 import java.util.List;
 
@@ -99,6 +100,29 @@ class TestRowCount extends BaseTestCase {
       assertThat(query.getGeneratedSql()).contains("select count(*) from ( select distinct t0.anniversary, t0.status, t1.id, t1.city, t2.id, t2.city from o_customer t0 left join o_address t1 on t1.id = t0.billing_address_id left join o_address t2 on t2.id = t0.shipping_address_id)");
     }
     assertThat(count).isGreaterThan(0);
+  }
+
+  @Test
+  void find_count_noIdProperty() {
+    LoggedSql.start();
+
+    DB.find(NoIdBean.class)
+    .select("name, subject")
+    .findCount();
+
+    DB.find(NoIdBean.class)
+    .setDistinct(true)
+    .select("name, subject")
+    .findCount();
+
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql.get(0)).contains("select count(*) from noidbean t0");
+    if (isSqlServer() || isH2() || isMariaDB() || isMySql()) {
+      assertThat(sql.get(1)).contains("select count(*) from ( select distinct t0.name c0, t0.subject c1 from noidbean t0)");
+    } else {
+      assertThat(sql.get(1)).contains("select count(*) from ( select distinct t0.name, t0.subject from noidbean t0)");
+    }
   }
 
 }
