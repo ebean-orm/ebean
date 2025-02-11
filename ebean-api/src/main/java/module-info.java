@@ -31,7 +31,6 @@ module io.ebean.api {
   exports io.ebean.event.readaudit;
   exports io.ebean.event.changelog;
   exports io.ebean.plugin;
-  exports io.ebean.lookup to io.ebean.core;
   exports io.ebean.meta;
   exports io.ebean.metric;
   exports io.ebean.search;

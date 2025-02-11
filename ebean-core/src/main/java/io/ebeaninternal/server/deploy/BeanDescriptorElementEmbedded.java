@@ -3,7 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.PersistenceIOException;
 import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
-import io.ebean.lookup.Lookups;
+import io.ebean.plugin.Lookups;
 import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;

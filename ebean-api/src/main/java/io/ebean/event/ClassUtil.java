@@ -1,6 +1,6 @@
 package io.ebean.event;
 
-import io.ebean.lookup.Lookups;
+import io.ebean.plugin.Lookups;
 
 /**
  * Helper to find classes taking into account the context class loader.

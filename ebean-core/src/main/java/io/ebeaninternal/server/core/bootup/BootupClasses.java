@@ -11,7 +11,7 @@ import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeLogRegister;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
-import io.ebean.lookup.Lookups;
+import io.ebean.plugin.Lookups;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.api.CoreLog;
 import jakarta.persistence.AttributeConverter;

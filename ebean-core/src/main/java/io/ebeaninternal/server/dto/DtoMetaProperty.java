@@ -8,7 +8,7 @@ import java.sql.SQLException;
 
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
-import io.ebean.lookup.Lookups;
+import io.ebean.plugin.Lookups;
 import io.ebeaninternal.server.type.TypeManager;
 
 final class DtoMetaProperty implements DtoReadSet {

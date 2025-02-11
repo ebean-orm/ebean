@@ -1,4 +1,4 @@
-package io.ebean.lookup;
+package io.ebean.plugin;
 
 import static java.util.stream.Collectors.toMap;
 

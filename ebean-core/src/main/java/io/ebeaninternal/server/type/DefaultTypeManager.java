@@ -7,7 +7,7 @@ import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.*;
-import io.ebean.lookup.Lookups;
+import io.ebean.plugin.Lookups;
 import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
@@ -599,24 +599,15 @@ public final class DefaultTypeManager implements TypeManager {
   private void initialiseCustomScalarTypes(BootupClasses bootupClasses) {
     for (Class<? extends ScalarType<?>> cls : bootupClasses.getScalarTypes()) {
       try {
-        var lookup = Lookups.getLookup(cls);
         ScalarType<?> scalarType;
         if (objectMapper == null) {
-          scalarType =
-              (ScalarType<?>)
-                  lookup.findConstructor(cls, MethodType.methodType(void.class)).invoke();
+          scalarType = Lookups.newDefaultInstance(cls);
         } else {
           try {
             // first try objectMapper constructor
-            scalarType =
-                (ScalarType<?>)
-                    lookup
-                        .findConstructor(cls, MethodType.methodType(ObjectMapper.class))
-                        .invoke(objectMapper);
+            scalarType = Lookups.newDefaultInstance(cls);
           } catch (NoSuchMethodException e) {
-            scalarType =
-                (ScalarType<?>)
-                    lookup.findConstructor(cls, MethodType.methodType(void.class)).invoke();
+            scalarType = Lookups.newDefaultInstance(cls);
           }
         }
         add(scalarType);
