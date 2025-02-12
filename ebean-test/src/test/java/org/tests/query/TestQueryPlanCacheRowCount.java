@@ -20,7 +20,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Order> query = DB.find(Order.class).where().eq("status", Order.Status.NEW).ge("id", 1)
-      .order().desc("id");
+      .orderBy().desc("id");
 
     int rc0 = query.findCount();
 
@@ -47,7 +47,7 @@ public class TestQueryPlanCacheRowCount extends BaseTestCase {
 
     // should still hit query plan cache
     Query<Order> query2 = DB.find(Order.class).where().eq("status", Order.Status.NEW)
-      .ge("id", idGt).order().desc("id");
+      .ge("id", idGt).orderBy().desc("id");
 
     int rc2 = query2.findCount();
 

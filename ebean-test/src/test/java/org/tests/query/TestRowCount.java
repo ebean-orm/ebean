@@ -27,7 +27,7 @@ class TestRowCount extends BaseTestCase {
       .where()
       .gt("id", 1)
       .gt("details.id", 1)
-      .order("id desc").query();
+      .orderBy("id desc").query();
 
     int rc = query.findCount();
     List<Object> ids = query.findIds();

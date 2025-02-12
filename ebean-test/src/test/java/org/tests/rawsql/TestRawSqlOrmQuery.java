@@ -133,7 +133,7 @@ class TestRawSqlOrmQuery extends BaseTestCase {
 
     query.setFirstRow(1);
     query.setMaxRows(2);
-    query.order("id");
+    query.orderBy("id");
 
     List<Customer> list = query.findList();
 
@@ -263,14 +263,14 @@ class TestRawSqlOrmQuery extends BaseTestCase {
     query.setMaxRows(100);
 
     if (isSqlServer()) {
-      query.order("coalesce(shipDate, getdate()) desc");
+      query.orderBy("coalesce(shipDate, getdate()) desc");
       query.findList();
 
       assertThat(sqlOf(query)).contains("order by coalesce(o.ship_date, getdate()) desc");
       assertThat(sqlOf(query)).contains("select top 100");
 
     } else {
-      query.order("coalesce(shipDate, now()) desc");
+      query.orderBy("coalesce(shipDate, now()) desc");
       query.findList();
 
       if (isDb2()) {
@@ -299,14 +299,14 @@ class TestRawSqlOrmQuery extends BaseTestCase {
     query.orderById(true);
 
     if (isSqlServer()) {
-      query.order("coalesce(shipDate, getdate()) desc");
+      query.orderBy("coalesce(shipDate, getdate()) desc");
       query.findList();
 
       assertThat(sqlOf(query)).contains("order by coalesce(o.ship_date, getdate()) desc, o.id");
       assertThat(sqlOf(query)).contains("select top 100");
 
     } else {
-      query.order("coalesce(shipDate, now()) desc");
+      query.orderBy("coalesce(shipDate, now()) desc");
       query.findList();
 
       if (isDb2()) {
@@ -331,7 +331,7 @@ class TestRawSqlOrmQuery extends BaseTestCase {
     query.setRawSql(rawSql);
 
     query.setMaxRows(100);
-    query.order("id desc");
+    query.orderBy("id desc");
     PagedList<Order> pagedList = query.findPagedList();
     pagedList.getList();
     pagedList.getTotalCount();

@@ -18,7 +18,7 @@ public class TestQueryPathJoinAndOrder extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = DB.find(Customer.class).select("id,name, status").fetch("contacts")
-      .order().asc("id").order().desc("contacts.firstName").setMaxRows(3).findList();
+      .orderBy().asc("id").orderBy().desc("contacts.firstName").setMaxRows(3).findList();
 
     assertNotNull(list);
 

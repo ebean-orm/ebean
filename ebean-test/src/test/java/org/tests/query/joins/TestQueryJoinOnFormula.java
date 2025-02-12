@@ -79,7 +79,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     // Tests if SqlTreeBuilder.IncludesDistiller.createExtraJoin appends formulaJoinProperties
     Query<OrderShipment> shipQuery = DB.find(OrderShipment.class)
       .select("id")
-      .order().asc("order.totalAmount");
+      .orderBy().asc("order.totalAmount");
 
     shipQuery.findList();
     assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
@@ -137,7 +137,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     Query<OrderShipment> shipQuery = DB.find(OrderShipment.class)
       .select("id")
       .fetch("order", "totalAmount")
-      .order().asc("order.totalAmount");
+      .orderBy().asc("order.totalAmount");
 
     shipQuery.findList();
     assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id, t1.id, z_bt1.total_amount "

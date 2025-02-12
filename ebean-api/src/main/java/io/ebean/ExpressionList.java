@@ -54,14 +54,6 @@ public interface ExpressionList<T> {
   Query<T> orderById(boolean orderById);
 
   /**
-   * @deprecated migrate to {@link #orderBy(String)}
-   */
-  @Deprecated(since = "13.19", forRemoval = true)
-  default ExpressionList<T> order(String orderByClause) {
-    return orderBy(orderByClause);
-  }
-
-  /**
    * Set the order by clause replacing the existing order by clause if there is
    * one.
    * <p>
@@ -70,14 +62,6 @@ public interface ExpressionList<T> {
    * respectively.
    */
   ExpressionList<T> orderBy(String orderBy);
-
-  /**
-   * @deprecated migrate to {@link #orderBy()}.
-   */
-  @Deprecated(forRemoval = true)
-  default OrderBy<T> order() {
-    return orderBy();
-  }
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
@@ -355,7 +339,7 @@ public interface ExpressionList<T> {
    *  List<String> names =
    *    DB.find(Customer.class)
    *      .select("name")
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .findSingleAttributeList();
    *
    * }</pre>
@@ -368,7 +352,7 @@ public interface ExpressionList<T> {
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .setMaxRows(100)
    *      .findSingleAttributeList();
    *
@@ -1713,7 +1697,7 @@ public interface ExpressionList<T> {
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
    *        .endAnd()
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .findList();
    * }</pre>
    */
@@ -1734,7 +1718,7 @@ public interface ExpressionList<T> {
    *    .or()
    *      .eq("status", Customer.Status.ACTIVE)
    *      .isNull("anniversary")
-   *    .order().asc("name")
+   *    .orderBy().asc("name")
    *    .findList();
    *
    * }</pre>
@@ -1754,7 +1738,7 @@ public interface ExpressionList<T> {
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
    *        .endAnd()
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .findList();
    *
    * }</pre>
@@ -1788,7 +1772,7 @@ public interface ExpressionList<T> {
    *       .gt("id", 1)
    *       .eq("anniversary", onAfter)
    *       .endNot()
-   *     .order()
+   *     .orderBy()
    *       .asc("name")
    *     .findList();
    *
