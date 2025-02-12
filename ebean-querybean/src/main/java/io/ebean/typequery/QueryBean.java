@@ -100,22 +100,6 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   }
 
   /**
-   * Construct with a transaction.
-   */
-  protected QueryBean(Class<T> beanType, Transaction transaction) {
-    this(beanType);
-    query.usingTransaction(transaction);
-  }
-
-  /**
-   * Construct with a database and transaction.
-   */
-  protected QueryBean(Class<T> beanType, Database database, Transaction transaction) {
-    this(beanType, database);
-    query.usingTransaction(transaction);
-  }
-
-  /**
    * Construct using a query.
    */
   @SuppressWarnings("unchecked")
