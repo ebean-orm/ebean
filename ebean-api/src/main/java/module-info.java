@@ -17,7 +17,6 @@ module io.ebean.api {
   requires static io.ebean.types;
   requires static com.fasterxml.jackson.core;
   requires static com.fasterxml.jackson.databind;
-  requires static jakarta.servlet;
 
   exports io.ebean;
   exports io.ebean.bean;
