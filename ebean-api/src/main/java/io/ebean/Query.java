@@ -13,7 +13,7 @@ import org.jspecify.annotations.NullMarked;
  *     .where()
  *       .like("customer.name","rob%")
  *       .gt("orderDate",lastWeek)
- *     .order("customer.id, id desc")
+ *     .orderBy("customer.id, id desc")
  *     .setMaxRows(50)
  *     .findList();
  *
@@ -416,30 +416,6 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
    * @return the Query object
    */
   Query<T> having(Expression addExpressionToHaving);
-
-  /**
-   * @deprecated migrate to {@link #orderBy()}.
-   */
-  @Deprecated(since = "13.19", forRemoval = true)
-  default Query<T> order(String orderByClause) {
-    return orderBy(orderByClause);
-  }
-
-  /**
-   * @deprecated migrate to {@link #orderBy()}.
-   */
-  @Deprecated(since = "13.19", forRemoval = true)
-  default OrderBy<T> order() {
-    return orderBy();
-  }
-
-  /**
-   * @deprecated migrate to {@link #setOrderBy(OrderBy)}.
-   */
-  @Deprecated(since = "13.19", forRemoval = true)
-  default Query<T> setOrder(OrderBy<T> orderBy) {
-    return setOrderBy(orderBy);
-  }
 
   /**
    * Return the OrderBy so that you can append an ascending or descending

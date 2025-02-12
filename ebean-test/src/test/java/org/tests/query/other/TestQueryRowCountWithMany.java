@@ -27,7 +27,7 @@ public class TestQueryRowCountWithMany extends BaseTestCase {
     Query<Order> query = DB.find(Order.class)
       .fetch("details")
       .where().eq("details.product.id", productId)
-      .order("cretime asc").query();
+      .orderBy("cretime asc").query();
 
     List<Order> list = query.findList();
 

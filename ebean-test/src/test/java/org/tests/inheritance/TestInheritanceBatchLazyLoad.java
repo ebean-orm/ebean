@@ -30,7 +30,7 @@ public class TestInheritanceBatchLazyLoad {
     List<Vehicle> list = DB.find(Vehicle.class)
       .select("licenseNumber")
       .where().startsWith("licenseNumber", "VZVZ")
-      .order().asc("licenseNumber")
+      .orderBy().asc("licenseNumber")
       .findList();
 
     assertThat(list).hasSize(2);

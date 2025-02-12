@@ -21,7 +21,7 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
 
     ResetBasicData.reset();
 
-    List<Customer> list = DB.find(Customer.class).select("id, status, shippingAddress").order()
+    List<Customer> list = DB.find(Customer.class).select("id, status, shippingAddress").orderBy()
       .desc("id").findList();
 
     JsonContext json = DB.json();
@@ -42,7 +42,7 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> list = DB.find(Customer.class).select("id, status, shippingAddress")
-      .fetch("contacts").order().desc("id").findList();
+      .fetch("contacts").orderBy().desc("id").findList();
 
     JsonContext json = DB.json();
 
@@ -63,7 +63,7 @@ public class TestTextJsonReadManyLazyLoad extends BaseTestCase {
 
     List<Customer> list = DB.find(Customer.class).select("id, name, status, shippingAddress")
       // .fetch("contacts")
-      .order().desc("id").findList();
+      .orderBy().desc("id").findList();
 
     JsonContext json = DB.json();
 

@@ -24,7 +24,7 @@ public class TestLimitAlterFetchMany extends BaseTestCase {
     Query<Customer> query = DB.find(Customer.class)
       // this will automatically get converted to a
       // query join ... due to the maxRows
-      .fetch("contacts").setMaxRows(5).order("id");
+      .fetch("contacts").setMaxRows(5).orderBy("id");
 
     List<Customer> list = query.findList();
 

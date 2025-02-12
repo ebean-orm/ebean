@@ -36,7 +36,7 @@ class TestLoadBeanCache extends BaseTestCase {
       .setBeanCacheMode(CacheMode.PUT)
       .setUseQueryCache(true)
       .setReadOnly(true)
-      .order("name")
+      .orderBy("name")
       .findMap();
 
     Country loadedNz = map.get("NZ");
