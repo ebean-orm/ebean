@@ -21,7 +21,9 @@ GO
 -- deletes all indices referring to TABLE.COLUMN
 --
 CREATE OR ALTER PROCEDURE usp_ebean_drop_indices @tableName nvarchar(255), @columnName nvarchar(255)
-AS SET NOCOUNT ON
+AS
+-- play-ebean-start
+SET NOCOUNT ON
 declare @sql nvarchar(1000)
 declare @indexName nvarchar(255)
 BEGIN
@@ -41,6 +43,7 @@ BEGIN
   CLOSE index_cursor;
   DEALLOCATE index_cursor;
 END
+-- play-ebean-end
 GO
 
 --
@@ -48,7 +51,9 @@ GO
 -- deletes the default constraint, which has a random name
 --
 CREATE OR ALTER PROCEDURE usp_ebean_drop_default_constraint @tableName nvarchar(255), @columnName nvarchar(255)
-AS SET NOCOUNT ON
+AS
+-- play-ebean-start
+SET NOCOUNT ON
 declare @tmp nvarchar(1000)
 BEGIN
   select @tmp = t1.name from sys.default_constraints t1
@@ -57,6 +62,7 @@ BEGIN
 
   if @tmp is not null EXEC('alter table [' + @tableName +'] drop constraint ' + @tmp);
 END
+-- play-ebean-end
 GO
 
 --
@@ -64,7 +70,9 @@ GO
 -- deletes constraints and foreign keys refering to TABLE.COLUMN
 --
 CREATE OR ALTER PROCEDURE usp_ebean_drop_constraints @tableName nvarchar(255), @columnName nvarchar(255)
-AS SET NOCOUNT ON
+AS
+-- play-ebean-start
+SET NOCOUNT ON
 declare @sql nvarchar(1000)
 declare @constraintName nvarchar(255)
 BEGIN
@@ -90,6 +98,7 @@ BEGIN
   CLOSE name_cursor;
   DEALLOCATE name_cursor;
 END
+-- play-ebean-end
 GO
 
 --
@@ -97,7 +106,9 @@ GO
 -- deletes the column annd ensures that all indices and constraints are dropped first
 --
 CREATE OR ALTER PROCEDURE usp_ebean_drop_column @tableName nvarchar(255), @columnName nvarchar(255)
-AS SET NOCOUNT ON
+AS
+-- play-ebean-start
+SET NOCOUNT ON
 declare @sql nvarchar(1000)
 BEGIN
   EXEC usp_ebean_drop_indices @tableName, @columnName;
@@ -107,4 +118,5 @@ BEGIN
   set @sql = 'alter table [' + @tableName + '] drop column [' + @columnName + ']';
   EXECUTE(@sql);
 END
+-- play-ebean-end
 GO

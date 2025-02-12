@@ -4,7 +4,7 @@ name: Yugabyte
 on:
   workflow_dispatch:
   schedule:
-    - cron: '10 3 * * *'
+    - cron: '10 3 * * 3'
 
 jobs:
   build:

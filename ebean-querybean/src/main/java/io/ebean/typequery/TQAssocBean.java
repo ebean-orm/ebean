@@ -196,7 +196,7 @@ public abstract class TQAssocBean<T, R, QB> extends TQAssoc<T, R> {
     return _root;
   }
 
-  @Deprecated(forRemoval = true)
+  /** Deprecated(forRemoval = true) */
   protected final R _filterMany(String expressions, Object... params) {
     expr().filterMany(_name, expressions, params);
     return _root;
