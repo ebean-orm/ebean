@@ -219,29 +219,6 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
   boolean isCountDistinct();
 
   /**
-   * @deprecated migrate to {@link #usingTransaction(Transaction)} then delete().
-   * <p>
-   * Execute as a delete query returning the number of rows deleted using the given transaction.
-   * <p>
-   * Note that if the query includes joins then the generated delete statement may not be
-   * optimal depending on the database platform.
-   *
-   * @return the number of beans/rows that were deleted.
-   */
-  @Deprecated(forRemoval = true, since = "14.1.0")
-  int delete(Transaction transaction);
-
-  /**
-   * @deprecated migrate to {@link #usingTransaction(Transaction)} then update().
-   * <p>
-   * Execute the UpdateQuery returning the number of rows updated using the given transaction.
-   *
-   * @return the number of beans/rows updated.
-   */
-  @Deprecated(forRemoval = true, since = "14.1.0")
-  int update(Transaction transaction);
-
-  /**
    * Execute the UpdateQuery returning the number of rows updated.
    *
    * @return the number of beans/rows updated.

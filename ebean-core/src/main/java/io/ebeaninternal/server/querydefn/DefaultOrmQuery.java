@@ -1482,17 +1482,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final int delete(Transaction transaction) {
-    return server.delete(this);
-  }
-
-  @Override
   public final int update() {
-    return server.update(this);
-  }
-
-  @Override
-  public final int update(Transaction transaction) {
     return server.update(this);
   }
 
