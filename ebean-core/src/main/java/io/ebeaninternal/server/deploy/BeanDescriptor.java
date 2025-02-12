@@ -23,6 +23,7 @@ import io.ebean.meta.QueryPlanInit;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
+import io.ebean.plugin.Lookups;
 import io.ebean.plugin.Property;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.*;
@@ -414,8 +415,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       return null;
     }
     try {
-      return (EntityBean) beanType.getDeclaredConstructor().newInstance();
-    } catch (Exception e) {
+      return Lookups.newDefaultInstance(beanType);
+    } catch (Throwable e) {
       throw new IllegalStateException("Error trying to create the prototypeEntityBean for " + beanType, e);
     }
   }
