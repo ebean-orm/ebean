@@ -72,7 +72,7 @@ class TestBeanState extends BaseTestCase {
 
   @Test
   void setDisableLazyLoad_expect_lazyLoadingDisabled() {
-    List<Customer> custs = DB.find(Customer.class).order("id").findList();
+    List<Customer> custs = DB.find(Customer.class).orderBy("id").findList();
 
     Customer customer = DB.find(Customer.class)
       .setId(custs.get(0).getId())
@@ -88,7 +88,7 @@ class TestBeanState extends BaseTestCase {
   @Test
   void changedProps_when_setManyProperty() {
 
-    Customer customer = DB.find(Customer.class).order("id").setMaxRows(1).findOne();
+    Customer customer = DB.find(Customer.class).orderBy("id").setMaxRows(1).findOne();
 
     BeanState beanState = DB.beanState(customer);
     assertThat(beanState.changedProps()).isEmpty();

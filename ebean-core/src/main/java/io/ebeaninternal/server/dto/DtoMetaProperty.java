@@ -1,19 +1,17 @@
 package io.ebeaninternal.server.dto;
 
-import io.ebean.core.type.DataReader;
-import io.ebean.core.type.ScalarType;
-import io.ebeaninternal.server.type.TypeManager;
-
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.sql.SQLException;
 
-final class DtoMetaProperty implements DtoReadSet {
+import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarType;
+import io.ebean.plugin.Lookups;
+import io.ebeaninternal.server.type.TypeManager;
 
-  private static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
+final class DtoMetaProperty implements DtoReadSet {
 
   private final Class<?> dtoType;
   private final String name;
@@ -33,7 +31,7 @@ final class DtoMetaProperty implements DtoReadSet {
   }
 
   private static MethodHandle lookupMethodHandle(Class<?> dtoType, Method method) throws NoSuchMethodException, IllegalAccessException {
-    return LOOKUP.findVirtual(dtoType, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()));
+    return Lookups.getLookup(dtoType).findVirtual(dtoType, method.getName(), MethodType.methodType(method.getReturnType(), method.getParameterTypes()));
   }
 
   static Type propertyType(Method method) {

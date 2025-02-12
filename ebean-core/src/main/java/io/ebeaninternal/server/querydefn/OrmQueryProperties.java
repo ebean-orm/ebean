@@ -247,7 +247,7 @@ public final class OrmQueryProperties implements Serializable {
     }
 
     if (orderBy != null) {
-      query.setOrder(orderBy.copyWithTrim(path));
+      query.setOrderBy(orderBy.copyWithTrim(path));
     }
   }
 

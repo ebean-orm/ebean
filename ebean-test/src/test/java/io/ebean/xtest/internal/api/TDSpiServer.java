@@ -173,6 +173,16 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
+  public void scopedTransactionEnter(TxScope txScope) {
+
+  }
+
+  @Override
+  public void scopedTransactionExit(Object returnOrThrowable, int opCode) {
+
+  }
+
+  @Override
   public Transaction createTransaction() {
     return null;
   }

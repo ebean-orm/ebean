@@ -111,7 +111,7 @@ package io.ebean;
  *     .fetch("order.customer", "name")
  *     .where().gt("order.id", 0)
  *     .having().gt("totalAmount", 20)
- *     .order().desc("totalAmount")
+ *     .orderBy().desc("totalAmount")
  *     .setMaxRows(10)
  *     .findList();
  *

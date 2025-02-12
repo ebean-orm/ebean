@@ -236,7 +236,7 @@ public final class CQueryEngine {
     }
 
     // order by lower sys period desc
-    query.order().desc(sysPeriodLower);
+    query.orderBy().desc(sysPeriodLower);
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     request.setCancelableQuery(cquery);
     try {

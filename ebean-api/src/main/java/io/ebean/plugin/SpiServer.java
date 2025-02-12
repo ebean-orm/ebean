@@ -1,6 +1,7 @@
 package io.ebean.plugin;
 
 import io.ebean.Database;
+import io.ebean.TxScope;
 import io.ebean.bean.BeanLoader;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.DatabaseBuilder;
@@ -58,4 +59,15 @@ public interface SpiServer extends Database {
    * Typically due to serialisation or multiple stateless updates.
    */
   void loadBean(EntityBeanIntercept ebi);
+
+  /**
+   * Start an enhanced transactional method.
+   */
+  void scopedTransactionEnter(TxScope txScope);
+
+  /**
+   * Handle the end of an enhanced Transactional method.
+   */
+  void scopedTransactionExit(Object returnOrThrowable, int opCode);
+
 }

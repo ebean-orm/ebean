@@ -47,8 +47,9 @@ public class QCustomerTest {
 
       database.save(customer, txn);
 
-      final Customer found = new QCustomer(txn)
+      final Customer found = new QCustomer()
         .name.eq("explicitTransaction")
+        .usingTransaction(txn)
         .findOne();
       assertThat(found).isNotNull();
 
@@ -667,7 +668,7 @@ public class QCustomerTest {
 
     new QCustomer()
       .name.startsWith("Postgres")
-      .contacts.filterManyRaw("lower(firstName) like ?", "rob%")
+      .contacts.filterManyRaw("firstName like ?", "Rob%")
       .findList();
 
     final LocalDate startDate = LocalDate.now().minusDays(7);
@@ -675,7 +676,7 @@ public class QCustomerTest {
 
     new QCustomer()
       .name.startsWith("Postgres")
-      .contacts.filterManyRaw("whenCreated <= ? and whenCreated > ?", startDate, endDate)
+      .contacts.filterManyRaw("whenCreated >= ? and whenCreated < ?", startDate, endDate)
       .findList();
   }
 

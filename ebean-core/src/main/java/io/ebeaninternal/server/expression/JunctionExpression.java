@@ -274,18 +274,8 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public int delete(Transaction transaction) {
-    return exprList.delete(transaction);
-  }
-
-  @Override
   public int update() {
     return exprList.update();
-  }
-
-  @Override
-  public int update(Transaction transaction) {
-    return exprList.update(transaction);
   }
 
   @Override

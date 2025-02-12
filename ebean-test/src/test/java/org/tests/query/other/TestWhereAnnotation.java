@@ -45,7 +45,7 @@ public class TestWhereAnnotation extends BaseTestCase {
     LoggedSql.start();
 
     List<Customer> customers = DB.find(Customer.class)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     List<Order> orders = customers.get(0).getOrders();

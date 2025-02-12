@@ -8,6 +8,8 @@ import io.ebean.config.dbplatform.IdType;
 import io.ebean.config.dbplatform.PlatformIdGenerator;
 import io.ebean.event.*;
 import io.ebean.event.changelog.ChangeLogFilter;
+import io.ebean.plugin.Lookups;
+import io.ebean.text.PathProperties;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.ConcurrencyMode;
 import io.ebeaninternal.server.core.CacheOptions;
@@ -18,7 +20,7 @@ import io.ebeaninternal.server.idgen.UuidV1IdGenerator;
 import io.ebeaninternal.server.idgen.UuidV1RndIdGenerator;
 import io.ebeaninternal.server.idgen.UuidV4IdGenerator;
 
-import java.lang.reflect.Field;
+import java.lang.invoke.MethodHandles.Lookup;
 import java.util.*;
 
 /**
@@ -38,6 +40,7 @@ public class DeployBeanDescriptor<T> {
 
   private final DatabaseBuilder.Settings config;
   private final BeanDescriptorManager manager;
+
   /**
    * Map of BeanProperty Linked so as to preserve order.
    */
@@ -113,8 +116,8 @@ public class DeployBeanDescriptor<T> {
 
   private String[] readPropertyNames() {
     try {
-      Field field = beanType.getField("_ebean_props");
-      return (String[]) field.get(null);
+      final Lookup lookup = Lookups.getLookup(beanType);
+      return (String[]) lookup.findStaticVarHandle(beanType, "_ebean_props", String[].class).get();
     } catch (Exception e) {
       throw new IllegalStateException("Error getting _ebean_props field on type " + beanType, e);
     }

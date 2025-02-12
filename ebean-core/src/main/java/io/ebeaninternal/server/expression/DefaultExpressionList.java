@@ -208,18 +208,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public int delete(Transaction transaction) {
-    return query.delete(transaction);
-  }
-
-  @Override
   public int update() {
     return query.update();
-  }
-
-  @Override
-  public int update(Transaction transaction) {
-    return query.update(transaction);
   }
 
   @Override

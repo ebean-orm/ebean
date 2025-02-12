@@ -72,7 +72,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
       // .setUseCache(false)
       .select("status, orderDate, shipDate, customer").fetch("details", "*")
       // .fetch("details.product","id")
-      .order().asc("id").findList();
+      .orderBy().asc("id").findList();
 
     Order order = orders.get(0);
 

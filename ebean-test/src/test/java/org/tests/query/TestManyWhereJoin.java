@@ -89,7 +89,7 @@ public class TestManyWhereJoin extends BaseTestCase {
 
     Query<Order> query = DB.find(Order.class)
       .where().eq("details.product.id", productId)
-      .order("cretime asc").query();
+      .orderBy("cretime asc").query();
 
     query.findList();
     String sql = sqlOf(query, 3);
@@ -123,7 +123,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     Query<Order> query = DB.find(Order.class)
       //.fetch("details")
       .where().eq("details.product", product)
-      .order("cretime asc").query();
+      .orderBy("cretime asc").query();
 
     query.findList();
     String sql = sqlOf(query, 3);
@@ -157,7 +157,7 @@ public class TestManyWhereJoin extends BaseTestCase {
     Query<Order> query = DB.find(Order.class)
       .fetch("details")
       .where().eq("details.product", product)
-      .order("cretime asc").query();
+      .orderBy("cretime asc").query();
 
     query.findList();
     String sql = sqlOf(query, 3);

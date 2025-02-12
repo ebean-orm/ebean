@@ -199,16 +199,6 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
   void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query);
 
   /**
-   * Start an enhanced transactional method.
-   */
-  void scopedTransactionEnter(TxScope txScope);
-
-  /**
-   * Handle the end of an enhanced Transactional method.
-   */
-  void scopedTransactionExit(Object returnOrThrowable, int opCode);
-
-  /**
    * SqlQuery find single attribute.
    */
   <T> T findSingleAttribute(SpiSqlQuery query, Class<T> cls);
