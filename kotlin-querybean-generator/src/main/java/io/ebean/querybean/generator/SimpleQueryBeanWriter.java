@@ -328,12 +328,6 @@ class SimpleQueryBeanWriter {
     writer.append("      return _filterManyRaw(rawExpressions, *params)").eol();
     writer.append("    }").eol().eol();
 
-    // Ebean 14.x only
-    writer.append("    @Deprecated(\"for removal, migrate to filterManyRaw()\")").eol();
-    writer.append("    override fun filterMany(rawExpressions: String, vararg params: Any): R {").eol();
-    writer.append("      return _filterMany(rawExpressions, *params)").eol();
-    writer.append("    }").eol().eol();
-
     writer.append("    override fun isEmpty(): R {").eol();
     writer.append("      return _isEmpty() ").eol();
     writer.append("    }").eol().eol();
