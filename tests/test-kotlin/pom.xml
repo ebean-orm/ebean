@@ -6,7 +6,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.8.2</version>
+    <version>14.9.0</version>
   </parent>
 
   <artifactId>test-kotlin</artifactId>
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>14.8.2</version>
+      <version>14.9.0</version>
     </dependency>
 
     <dependency>
@@ -53,7 +53,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>14.8.2</version>
+      <version>14.9.0</version>
       <scope>test</scope>
     </dependency>
 
