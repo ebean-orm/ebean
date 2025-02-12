@@ -606,11 +606,7 @@ public final class DefaultTypeManager implements TypeManager {
         } else {
           try {
             // first try objectMapper constructor
-            scalarType =
-                (ScalarType<?>)
-                    lookup
-                        .findConstructor(cls, MethodType.methodType(ObjectMapper.class))
-                        .invoke(objectMapper);
+            scalarType = (ScalarType<?>) lookup.findConstructor(cls, MethodType.methodType(ObjectMapper.class)).invoke(objectMapper);
           } catch (NoSuchMethodException e) {
             scalarType = Lookups.newDefaultInstance(cls);
           }
