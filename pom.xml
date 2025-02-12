@@ -53,8 +53,8 @@
     <ebean-migration.version>14.2.0</ebean-migration.version>
     <ebean-test-containers.version>7.5</ebean-test-containers.version>
     <ebean-datasource.version>9.0</ebean-datasource.version>
-    <ebean-agent.version>14.8.1</ebean-agent.version>
-    <ebean-maven-plugin.version>14.8.1</ebean-maven-plugin.version>
+    <ebean-agent.version>14.9.0-RC1</ebean-agent.version>
+    <ebean-maven-plugin.version>14.9.0-RC1</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
     <maven-javadoc-plugin.version>3.10.1</maven-javadoc-plugin.version>
   </properties>
