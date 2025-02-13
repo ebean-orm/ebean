@@ -255,8 +255,9 @@ public class TestNestedTransaction extends BaseTestCase {
   }
 
   @Test
-  public void test_txn_nextedWithInnerBatch() {
-    try (Transaction txn1 = DB.beginTransaction(TxScope.requiresNew())) {
+  public void test_txn_nestedWithInnerBatch() {
+    try (Transaction txn1 = DB.beginTransaction()) {
+      txn1.setFlushOnQuery(false);
       try (Transaction txn2 = DB.beginTransaction()) {
         LoggedSql.start();
         txn2.setBatchMode(true);
@@ -268,9 +269,10 @@ public class TestNestedTransaction extends BaseTestCase {
 
         txn2.flush();
 
-        basic.setOther("Other");
+        basic.setName("OtherName");
         DB.save(basic);
 
+        // should perform a flush
         txn2.commit();
 
         ListAssert<String> sqlAssert = assertThat(LoggedSql.stop()).hasSize(6);
@@ -278,9 +280,16 @@ public class TestNestedTransaction extends BaseTestCase {
         sqlAssert.element(1).asString().contains("-- bind(1000,New name");
         sqlAssert.element(2).asString().contains("-- executeBatch() size:1");
         sqlAssert.element(3).asString().contains("update e_basicver");
-        sqlAssert.element(4).asString().contains("-- bind(Other,");
+        sqlAssert.element(4).asString().contains("-- bind(OtherName,");
         sqlAssert.element(5).asString().contains("-- executeBatch() size:1");
       }
+
+      // we expect the changes in the nested transaction to made visible
+      // regardless of the other transactions flushOnQuery mode
+      EBasicVer eBasicVer = DB.find(EBasicVer.class, 1000);
+      assertThat(eBasicVer.getName())
+        .describedAs("changes in nested transaction were not flushed")
+        .isEqualTo("OtherName");
     }
   }
 
