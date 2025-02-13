@@ -680,6 +680,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return callable.call();
     } catch (Error e) {
       throw scopeTrans.caughtError(e);
+    } catch (PersistenceException e) {
+      throw scopeTrans.caughtThrowable(e);
     } catch (Exception e) {
       throw new PersistenceException(scopeTrans.caughtThrowable(e));
     } finally {
@@ -699,6 +701,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       runnable.run();
     } catch (Error e) {
       throw t.caughtError(e);
+    } catch (PersistenceException e) {
+      throw t.caughtThrowable(e);
     } catch (Exception e) {
       throw new PersistenceException(t.caughtThrowable(e));
     } finally {
