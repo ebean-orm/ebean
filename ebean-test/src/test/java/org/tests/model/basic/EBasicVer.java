@@ -8,7 +8,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import static io.ebean.annotation.IdentityGenerated.BY_DEFAULT;
 
@@ -27,7 +27,7 @@ public class EBasicVer extends Model {
   String other;
 
   @Version
-  Timestamp lastUpdate;
+  Instant lastUpdate;
 
   public EBasicVer(String name) {
     this.name = name;
@@ -65,11 +65,11 @@ public class EBasicVer extends Model {
     this.other = other;
   }
 
-  public Timestamp getLastUpdate() {
+  public Instant getLastUpdate() {
     return lastUpdate;
   }
 
-  public void setLastUpdate(Timestamp lastUpdate) {
+  public void setLastUpdate(Instant lastUpdate) {
     this.lastUpdate = lastUpdate;
   }
 
