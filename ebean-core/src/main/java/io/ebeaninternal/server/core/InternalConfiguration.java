@@ -584,7 +584,8 @@ public final class InternalConfiguration {
       return QueryPlanManager.NOOP;
     }
     long threshold = config.getQueryPlanThresholdMicros();
-    return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.platform()), extraMetrics);
+    return new CQueryPlanManager(transactionManager, config.getCurrentTenantProvider(),
+      threshold, queryPlanLogger(databasePlatform.platform()), extraMetrics);
   }
 
   /**

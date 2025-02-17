@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.config.CurrentTenantProvider;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.QueryPlanRequest;
 import io.ebean.metric.TimedMetric;
@@ -8,11 +9,9 @@ import io.ebeaninternal.server.transaction.TransactionManager;
 import io.ebeaninternal.server.bind.capture.BindCapture;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static java.lang.System.Logger.Level.ERROR;
 import static java.util.Collections.emptyList;
 
 public final class CQueryPlanManager implements QueryPlanManager {
@@ -21,13 +20,17 @@ public final class CQueryPlanManager implements QueryPlanManager {
 
   private final ConcurrentHashMap<CQueryBindCapture, Object> plans = new ConcurrentHashMap<>();
   private final TransactionManager transactionManager;
+  private final CurrentTenantProvider tenantProvider;
   private final QueryPlanLogger planLogger;
   private final TimedMetric timeCollection;
   private final TimedMetric timeBindCapture;
   private long defaultThreshold;
 
-  public CQueryPlanManager(TransactionManager transactionManager, long defaultThreshold, QueryPlanLogger planLogger, ExtraMetrics extraMetrics) {
+  public CQueryPlanManager(TransactionManager transactionManager,
+                           CurrentTenantProvider tenantProvider,
+                           long defaultThreshold, QueryPlanLogger planLogger, ExtraMetrics extraMetrics) {
     this.transactionManager = transactionManager;
+    this.tenantProvider = tenantProvider;
     this.defaultThreshold = defaultThreshold;
     this.planLogger = planLogger;
     this.timeCollection = extraMetrics.planCollect();
@@ -41,7 +44,7 @@ public final class CQueryPlanManager implements QueryPlanManager {
 
   @Override
   public SpiQueryBindCapture createBindCapture(SpiQueryPlan queryPlan) {
-    return new CQueryBindCapture(this, queryPlan, defaultThreshold);
+    return new CQueryBindCapture(this, queryPlan, defaultThreshold, tenantProvider);
   }
 
   public void notifyBindCapture(CQueryBindCapture planBind, long startNanos) {
@@ -58,16 +61,12 @@ public final class CQueryPlanManager implements QueryPlanManager {
   }
 
   private List<MetaQueryPlan> collectPlans(QueryPlanRequest request) {
-    try (Connection connection = transactionManager.queryPlanConnection()) {
-      CQueryPlanRequest req = new CQueryPlanRequest(connection, request, plans.keySet().iterator());
+
+    CQueryPlanRequest req = new CQueryPlanRequest(transactionManager, request, plans.keySet().iterator());
       while (req.hasNext()) {
         req.nextCapture();
       }
       return req.plans();
-    } catch (SQLException e) {
-      CoreLog.log.log(ERROR, "Error during query plan collection", e);
-      return emptyList();
-    }
   }
 
   public SpiDbQueryPlan collectPlan(Connection connection, SpiQueryPlan queryPlan, BindCapture last) {
