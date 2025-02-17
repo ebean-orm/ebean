@@ -184,11 +184,8 @@ public class TestCustomerFinder extends BaseTestCase {
     }
 
     // obtains db query plans ...
-    QueryPlanRequest request = new QueryPlanRequest();
-    // collect max 1000 plans (use something more like 10)
-    request.maxCount(1_000);
-    // don't collect any more plans if used 10 secs
-    request.maxTimeMillis(10_000);
+    // collect max 10 plans, after 10 secs don't collect any more plans
+    var request = new QueryPlanRequest(10, 10_000);
     List<MetaQueryPlan> plans0 = server().metaInfo().queryPlanCollectNow(request);
     assertThat(plans0).isNotEmpty();
 
@@ -199,7 +196,7 @@ public class TestCustomerFinder extends BaseTestCase {
       System.out.println(plan);
     }
 
-    //DB.getBackgroundExecutor().scheduleWithFixedDelay(...)
+    // DB.backgroundExecutor().scheduleWithFixedDelay(...)
   }
 
   @Test

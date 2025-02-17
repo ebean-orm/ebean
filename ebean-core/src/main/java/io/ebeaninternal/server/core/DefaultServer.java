@@ -56,7 +56,6 @@ import java.sql.Statement;
 import java.time.Clock;
 import java.util.*;
 import java.util.concurrent.Callable;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -105,7 +104,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final EncryptKeyManager encryptKeyManager;
   private final SpiJsonContext jsonContext;
   private final DocumentStore documentStore;
-  private final MetaInfoManager metaInfoManager;
+  private final DefaultMetaInfoManager metaInfoManager;
   private final CurrentTenantProvider currentTenantProvider;
   private final SpiLogManager logManager;
   private final PersistenceContextScope defaultPersistenceContextScope;
@@ -156,8 +155,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     DocStoreIntegration docStoreComponents = config.createDocStoreIntegration(this);
     this.transactionManager = config.createTransactionManager(this, docStoreComponents.updateProcessor());
     this.documentStore = docStoreComponents.documentStore();
-    this.queryPlanManager = config.initQueryPlanManager(transactionManager);
-    this.metaInfoManager = new DefaultMetaInfoManager(this, this.config.getMetricNaming());
+    this.queryPlanManager = config.initQueryPlanManager(this, transactionManager);
+    this.metaInfoManager = new DefaultMetaInfoManager(this, queryPlanManager);
     this.serverPlugins = config.getPlugins();
     this.ddlGenerator = config.initDdlGenerator(this);
     this.scriptRunner = new DScriptRunner(this);
@@ -326,31 +325,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       migrationRunner.loadProperties(config.getProperties());
       migrationRunner.run(config.getDataSource());
     }
-    startQueryPlanCapture();
-  }
-
-  private void startQueryPlanCapture() {
-    if (config.isQueryPlanCapture()) {
-      long secs = config.getQueryPlanCapturePeriodSecs();
-      if (secs > 10) {
-        log.log(INFO, "capture query plan enabled, every {0}secs", secs);
-        backgroundExecutor.scheduleWithFixedDelay(this::collectQueryPlans, secs, secs, TimeUnit.SECONDS);
-      }
-    }
-  }
-
-  private void collectQueryPlans() {
-    QueryPlanRequest request = new QueryPlanRequest();
-    request.maxCount(config.getQueryPlanCaptureMaxCount());
-    request.maxTimeMillis(config.getQueryPlanCaptureMaxTimeMillis());
-
-    // obtains query explain plans ...
-    List<MetaQueryPlan> plans = metaInfoManager.queryPlanCollectNow(request);
-    QueryPlanListener listener = config.getQueryPlanListener();
-    if (listener == null) {
-      listener = DefaultQueryPlanListener.INSTANT;
-    }
-    listener.process(new QueryPlanCapture(this, plans));
+    queryPlanManager.startPlanCapture();
   }
 
   @Override

@@ -579,12 +579,12 @@ public final class InternalConfiguration {
     return new DefaultServerCacheManager(builder);
   }
 
-  public QueryPlanManager initQueryPlanManager(TransactionManager transactionManager) {
+  public QueryPlanManager initQueryPlanManager(DefaultServer server, TransactionManager transactionManager) {
     if (!config.isQueryPlanEnable()) {
       return QueryPlanManager.NOOP;
     }
     long threshold = config.getQueryPlanThresholdMicros();
-    return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.platform()), extraMetrics);
+    return new CQueryPlanManager(server, transactionManager, threshold, queryPlanLogger(databasePlatform.platform()), extraMetrics);
   }
 
   /**
