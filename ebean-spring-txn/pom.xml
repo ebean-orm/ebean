@@ -12,7 +12,7 @@
   <description>Ebean support for Spring transactions</description>
 
   <properties>
-    <spring.framework.version>5.3.25</spring.framework.version>
+    <spring.framework.version>6.1.14</spring.framework.version>
     <spring.boot.version>2.7.3</spring.boot.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
