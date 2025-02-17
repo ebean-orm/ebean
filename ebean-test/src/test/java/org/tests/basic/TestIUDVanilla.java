@@ -7,7 +7,7 @@ import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTMaster;
 
 import jakarta.persistence.OptimisticLockException;
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,12 +24,12 @@ public class TestIUDVanilla extends BaseTestCase {
     assertNotNull(e0.getId());
     assertNotNull(e0.getLastUpdate());
 
-    Timestamp lastUpdate0 = e0.getLastUpdate();
+    Instant lastUpdate0 = e0.getLastUpdate();
 
     e0.setName("modified");
     e0.save();
 
-    Timestamp lastUpdate1 = e0.getLastUpdate();
+    Instant lastUpdate1 = e0.getLastUpdate();
     assertNotNull(lastUpdate1);
     assertNotSame(lastUpdate0, lastUpdate1);
 

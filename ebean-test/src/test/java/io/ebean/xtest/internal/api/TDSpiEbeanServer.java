@@ -51,17 +51,8 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public ExtendedServer extended() {
-    return this;
-  }
-
-  @Override
   public long clockNow() {
     return System.currentTimeMillis();
-  }
-
-  @Override
-  public void setClock(Clock clock) {
   }
 
   @Override
