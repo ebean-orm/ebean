@@ -1002,11 +1002,8 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     if (!(mappedProp instanceof DeployBeanPropertyAssocOne<?>)) {
       throw new PersistenceException("Error on " + prop + ". mappedBy property " + targetDesc + "." + mappedBy + " is not a OneToOne?");
     }
-    DeployBeanPropertyAssocOne<?> mappedAssocOne = (DeployBeanPropertyAssocOne<?>) mappedProp;
-    if (!mappedAssocOne.isOneToOne()) {
-      throw new PersistenceException("Error on " + prop + ". mappedBy property " + targetDesc + "." + mappedBy + " is not a OneToOne?");
-    }
-    return mappedAssocOne;
+    // this is allowed to be a OneToOne or ManyToOne
+    return (DeployBeanPropertyAssocOne<?>) mappedProp;
   }
 
   private void checkUniDirectionalPrimaryKeyJoin(DeployBeanPropertyAssocOne<?> prop) {
