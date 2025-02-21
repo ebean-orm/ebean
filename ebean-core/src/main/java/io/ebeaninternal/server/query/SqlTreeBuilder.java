@@ -46,7 +46,7 @@ public final class SqlTreeBuilder {
   private final boolean rawNoId;
   private final boolean disableLazyLoad;
   private final SpiQuery.TemporalMode temporalMode;
-  private SqlTreeNode rootNode;
+  private final SqlTreeNode rootNode;
   private boolean sqlDistinct;
   private final boolean platformDistinctNoLobs;
   private final SqlTreeCommon common;
@@ -73,6 +73,7 @@ public final class SqlTreeBuilder {
     this.alias = null;
     this.ctx = null;
     this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, unmodifiable, null);
+    this.rootNode = buildRootNode(desc);
   }
 
   /**
@@ -100,10 +101,12 @@ public final class SqlTreeBuilder {
     this.alias = new SqlTreeAlias(request.baseTableAlias(), temporalMode);
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
     this.platformDistinctNoLobs = builder.isPlatformDistinctNoLobs();
+    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, readOnly, includeJoin);
+    this.rootNode = buildRootNode(desc);
     String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.historySupport(query);
     CQueryDraftSupport draftSupport = builder.draftSupport(query);
-    String colAlias = subQuery ? null : columnAliasPrefix;
+    String colAlias = subQuery || rootNode.isSingleProperty() ? null : columnAliasPrefix;
     this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, draftSupport, fromForUpdate);
     this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, unmodifiable, includeJoin);
   }
@@ -113,7 +116,6 @@ public final class SqlTreeBuilder {
    */
   public SqlTree build() {
     // build the appropriate chain of SelectAdapter's
-    buildRoot(desc);
     // build the actual String
     String distinctOn = null;
     String selectSql = null;
@@ -214,8 +216,8 @@ public final class SqlTreeBuilder {
     return ctx.content();
   }
 
-  private void buildRoot(STreeType desc) {
-    rootNode = buildSelectChain(null, null, desc, null);
+  private SqlTreeNode buildRootNode(STreeType desc) {
+    SqlTreeNode root = buildSelectChain(null, null, desc, null);
     if (!rawSql) {
       alias.addJoin(queryDetail.getFetchPaths(), desc);
       alias.addJoin(predicates.predicateIncludes(), desc);
@@ -224,6 +226,7 @@ public final class SqlTreeBuilder {
       alias.buildAlias();
       predicates.parseTableAlias(alias);
     }
+    return root;
   }
 
   /**

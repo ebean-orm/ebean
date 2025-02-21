@@ -25,7 +25,7 @@ public class TestLazyJoin2 extends BaseTestCase {
 
       .fetchQuery("customer", "name")
       .fetch("customer.contacts", "firstName, lastName, mobile")
-      .fetch("customer.shippingAddress", "line1, city").order().asc("id").findList();
+      .fetch("customer.shippingAddress", "line1, city").orderBy().asc("id").findList();
 
     Order o0 = l0.get(0);
     Customer c0 = o0.getCustomer();
@@ -40,7 +40,7 @@ public class TestLazyJoin2 extends BaseTestCase {
 
     List<Order> orders = DB.find(Order.class)
       // .select("status")
-      .fetchQuery("customer").order().asc("id").findList();
+      .fetchQuery("customer").orderBy().asc("id").findList();
     // .join("customer.contacts");
 
     // List<Order> list = query.findList();
@@ -57,8 +57,8 @@ public class TestLazyJoin2 extends BaseTestCase {
     assertNotNull(billingAddress);
 
     List<Order> list = DB.find(Order.class).fetchLazy("customer", "name")
-      .fetch("customer.contacts", "contactName, phone, email").fetch("customer.shippingAddress")
-      .where().eq("status", Order.Status.NEW).order().asc("id").findList();
+      .fetch("customer.contacts", "firstName, lastName, phone, email").fetch("customer.shippingAddress")
+      .where().eq("status", Order.Status.NEW).orderBy().asc("id").findList();
 
     Order order2 = list.get(0);
     Customer customer2 = order2.getCustomer();

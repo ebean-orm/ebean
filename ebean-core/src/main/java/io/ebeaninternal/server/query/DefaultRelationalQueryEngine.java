@@ -29,12 +29,17 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   private final String dbTrueValue;
   private final boolean binaryOptimizedUUID;
   private final TimedMetricMap timedMetricMap;
+  private final int defaultFetchSizeFindEach;
+  private final int defaultFetchSizeFindList;
 
-  public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue, boolean binaryOptimizedUUID) {
+  public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue, boolean binaryOptimizedUUID,
+                                      int defaultFetchSizeFindEach, int defaultFetchSizeFindList) {
     this.binder = binder;
     this.dbTrueValue = dbTrueValue == null ? "true" : dbTrueValue;
     this.binaryOptimizedUUID = binaryOptimizedUUID;
     this.timedMetricMap = MetricFactory.get().createTimedMetricMap("sql.query.");
+    this.defaultFetchSizeFindEach = defaultFetchSizeFindEach;
+    this.defaultFetchSizeFindList = defaultFetchSizeFindList;
   }
 
   @Override
@@ -59,6 +64,9 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   @Override
   public void findEach(RelationalQueryRequest request, RowConsumer consumer) {
     try {
+      if (defaultFetchSizeFindEach > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+      }
       request.executeSql(binder, SpiQuery.Type.ITERATE);
       request.mapEach(consumer);
       request.logSummary();
@@ -74,6 +82,9 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   @Override
   public <T> void findEach(RelationalQueryRequest request, RowReader<T> reader, Predicate<T> consumer) {
     try {
+      if (defaultFetchSizeFindEach > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+      }
       request.executeSql(binder, SpiQuery.Type.ITERATE);
       while (request.next()) {
         if (!consumer.test(reader.read())) {
@@ -109,6 +120,9 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   @Override
   public <T> List<T> findList(RelationalQueryRequest request, RowReader<T> reader) {
     try {
+      if (defaultFetchSizeFindList > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindList);
+      }
       request.executeSql(binder, SpiQuery.Type.LIST);
       List<T> rows = new ArrayList<>();
       while (request.next()) {
@@ -129,6 +143,9 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   public <T> T findSingleAttribute(RelationalQueryRequest request, Class<T> cls) {
     ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
     try {
+      if (defaultFetchSizeFindList > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindList);
+      }
       request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
       final DataReader dataReader = binder.createDataReader(request.resultSet());
       T value = null;
@@ -151,6 +168,9 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   public <T> List<T> findSingleAttributeList(RelationalQueryRequest request, Class<T> cls) {
     ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
     try {
+      if (defaultFetchSizeFindList > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindList);
+      }
       request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
       final DataReader dataReader = binder.createDataReader(request.resultSet());
       List<T> rows = new ArrayList<>();
@@ -173,6 +193,9 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   public <T> void findSingleAttributeEach(RelationalQueryRequest request, Class<T> cls, Consumer<T> consumer) {
     ScalarType<T> scalarType = (ScalarType<T>) binder.getScalarType(cls);
     try {
+      if (defaultFetchSizeFindEach > 0) {
+        request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+      }
       request.executeSql(binder, SpiQuery.Type.ATTRIBUTE);
       final DataReader dataReader = binder.createDataReader(request.resultSet());
       while (dataReader.next()) {

@@ -1,34 +1,25 @@
 package io.ebeaninternal.api;
 
-import io.ebean.DB;
 import io.ebean.TxScope;
+import io.ebean.plugin.AOPTransactionScope;
 
 /**
  * Helper object to make AOP generated code simpler.
  */
 public final class HelpScopeTrans {
-  private static boolean enabled = true;
 
   /**
    * Entering an enhanced transactional method.
    */
   public static void enter(TxScope txScope) {
-    if (enabled) {
-      server().scopedTransactionEnter(txScope);
-    }
+    AOPTransactionScope.enter(txScope);
   }
 
   /**
    * Exiting an enhanced transactional method.
    */
   public static void exit(Object returnOrThrowable, int opCode) {
-    if (enabled) {
-      server().scopedTransactionExit(returnOrThrowable, opCode);
-    }
-  }
-
-  private static SpiEbeanServer server() {
-    return (SpiEbeanServer) DB.getDefault();
+    AOPTransactionScope.exit(returnOrThrowable, opCode);
   }
 
   /**
@@ -38,6 +29,6 @@ public final class HelpScopeTrans {
    * @param enabled if set to false, @Transactional will not create a transaction
    */
   public static void setEnabled(boolean enabled) {
-    HelpScopeTrans.enabled = enabled;
+    AOPTransactionScope.setEnabled(enabled);
   }
 }

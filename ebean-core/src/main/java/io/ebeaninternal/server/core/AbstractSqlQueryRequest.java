@@ -93,6 +93,12 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
   protected abstract void requestComplete();
 
   /**
+   * Set the JDBC buffer fetchSize hint if not set explicitly.
+   */
+  public void setDefaultFetchBuffer(int fetchSize) {
+    query.setDefaultFetchBuffer(fetchSize);
+  }
+  /**
    * Close the underlying resources.
    */
   public void close() {

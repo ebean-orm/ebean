@@ -60,11 +60,6 @@ Work at the highest level of abstraction and drop down levels as needed.
         </a>
       </td>
       <td align="center" valign="middle">
-        <a href="https://www.payintech.com/" target="_blank">
-          <img width="222px" src="https://ebean.io/images/sponsor_PayinTech-logo-noir.png">
-        </a>
-      </td>
-      <td align="center" valign="middle">
         <a href="https://www.premium-minds.com" target="_blank">
           <img width="222px" src="https://ebean.io/images/logo-med-principal.png">
         </a>

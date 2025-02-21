@@ -4,12 +4,12 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.7.0</version>
+    <version>14.9.0</version>
   </parent>
 
   <name>querybean generator</name>
-  <description>Querybean generator</description>
   <artifactId>querybean-generator</artifactId>
+  <description>Generates Ebean Query beans for type safe ORM query building and execution</description>
 
   <build>
     <plugins>

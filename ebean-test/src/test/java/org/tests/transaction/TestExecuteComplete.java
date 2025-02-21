@@ -67,7 +67,7 @@ public class TestExecuteComplete extends BaseTestCase {
 
   @ForPlatform(Platform.H2)
   @Test
-  public void transactional_errorOnCommit_expect_threadScopeCleanup() {
+  void transactional_errorOnCommit_expect_threadScopeCleanup() {
     try {
       errorOnCommit();
       fail();
@@ -141,7 +141,11 @@ public class TestExecuteComplete extends BaseTestCase {
     cust.setName("Roland");
     DB.save(cust);
 
-    assertThat(getInScopeTransaction()).isNull();
+    try {
+      assertThat(getInScopeTransaction()).isNull();
+    } finally {
+      DB.delete(cust);
+    }
   }
 
   @ForPlatform(Platform.H2)

@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.7.0</version>
+    <version>14.9.0</version>
   </parent>
 
   <name>ebean ddl generation</name>
@@ -28,14 +28,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>14.7.0</version>
+      <version>14.9.0</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>14.7.0</version>
+      <version>14.9.0</version>
       <scope>provided</scope>
     </dependency>
 
@@ -65,7 +65,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>14.7.0</version>
+      <version>14.9.0</version>
       <scope>test</scope>
     </dependency>
 

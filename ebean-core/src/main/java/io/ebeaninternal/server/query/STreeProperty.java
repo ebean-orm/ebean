@@ -93,6 +93,13 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   void appendSelect(DbSqlContext ctx, boolean subQuery);
 
   /**
+   * Append to group by.
+   */
+  default void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
+    appendSelect(ctx, subQuery);
+  }
+
+  /**
    * Append to the from clause.
    */
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere);

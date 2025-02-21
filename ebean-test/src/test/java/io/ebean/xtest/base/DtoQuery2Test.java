@@ -1,5 +1,7 @@
 package io.ebean.xtest.base;
 
+import io.ebean.DB;
+import io.ebean.Query;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DtoQuery;
 import io.ebean.QueryIterator;
@@ -9,6 +11,7 @@ import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
 
@@ -406,6 +409,24 @@ public class DtoQuery2Test extends BaseTestCase {
     assertThat(robs).isNotEmpty();
   }
 
+  @Test
+  void dto_test_formula_with_group_by() {
+    ResetBasicData.reset();
+
+    Query<Contact> query = server().find(Contact.class)
+      .select("concat(first_name, last_name) as custname, count(*) as cnt")
+      .orderBy("custname desc");
+
+    List<DCustFormula> ret = query.asDto(DCustFormula.class).findList();
+
+    String sql = query.getGeneratedSql();
+    assertThat(sql)
+      .describedAs("group by formula only")
+      .contains("from contact t0 group by concat(first_name, last_name) order by custname desc");
+    assertThat(ret.get(0).getCustname()).isEqualTo("TracyRed");
+    assertThat(ret.get(0).getCnt()).isEqualTo(1L);
+  }
+
   public static class DCust {
 
     final Integer id;
@@ -612,6 +633,35 @@ public class DtoQuery2Test extends BaseTestCase {
     public DCustCamelCols2 setNameFORMe(String nameFORMe) {
       this.nameFORMe = nameFORMe;
       return this;
+    }
+  }
+
+  public static class DCustFormula {
+
+    String custname;
+    Long cnt;
+
+    public DCustFormula() {}
+
+    public void setCustname(String custname) {
+      this.custname = custname;
+    }
+
+    public String getCustname() {
+      return custname;
+    }
+
+    public void setCnt(Long cnt) {
+      this.cnt = cnt;
+    }
+
+    public Long getCnt() {
+      return cnt;
+    }
+
+    @Override
+    public String toString() {
+      return getCustname() + ": " + getCnt();
     }
   }
 }

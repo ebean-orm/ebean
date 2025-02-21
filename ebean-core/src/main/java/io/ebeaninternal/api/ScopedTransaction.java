@@ -168,7 +168,7 @@ public final class ScopedTransaction extends SpiTransactionProxy {
   /**
    * Maybe rollback based on TxScope rollback on settings.
    */
-  public Exception caughtThrowable(Exception e) {
+  public <T extends Exception> T caughtThrowable(T e) {
     return current.caughtThrowable(e);
   }
 

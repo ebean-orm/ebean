@@ -233,17 +233,19 @@ final class CQueryBuilder {
   <T> CQueryRowCount buildRowCountQuery(OrmQueryRequest<T> request) {
     SpiQuery<T> query = request.query();
     // always set the order by to null for row count query
-    query.setOrder(null);
+    query.setOrderBy(null);
     query.setFirstRow(0);
     query.setMaxRows(0);
 
     boolean countDistinct = query.isDistinct();
+    boolean useColumnAlias = selectCountWithColumnAlias;
     boolean withAgg = false;
     if (!countDistinct) {
       withAgg = includesAggregation(request, query);
-      if (!withAgg) {
+      if (!withAgg && request.descriptor().hasId()) {
         // minimise select clause for standard count
         query.setSelectId();
+        useColumnAlias = false;
       }
     }
 
@@ -256,7 +258,7 @@ final class CQueryBuilder {
     }
 
     predicates.prepare(true);
-    SqlTree sqlTree = createSqlTree(request, predicates, selectCountWithColumnAlias && withAgg);
+    SqlTree sqlTree = createSqlTree(request, predicates, useColumnAlias);
     if (SpiQuery.TemporalMode.CURRENT == query.temporalMode()) {
       sqlTree.addSoftDeletePredicate(query);
     }

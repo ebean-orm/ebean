@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.7.0</version>
+    <version>14.9.0</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -22,7 +22,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>14.7.0</version>
+      <version>14.9.0</version>
     </dependency>
 
     <dependency>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>14.7.0</version>
+      <version>14.9.0</version>
     </dependency>
 
     <dependency>
@@ -159,21 +159,21 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>14.7.0</version>
+      <version>14.9.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>14.7.0</version>
+      <version>14.9.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlserver</artifactId>
-      <version>14.7.0</version>
+      <version>14.9.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -233,26 +233,6 @@
             </property>
           </systemProperties>
         </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <doctitle>Ebean 12</doctitle>
-          <overview>src/main/java/io/ebean/overview.html</overview>
-          <excludePackageNames>io.ebeaninternal.*:io.ebeanservice:io.ebean.common:io.ebean.bean:io.ebean.service:io.ebean.metric:io.ebean.util:io.ebean.config.properties:io.ebean.config.dbplatform</excludePackageNames>
-          <linksource>true</linksource>
-          <overview>src/main/java/com/avaje/ebean/overview.html</overview>
-        </configuration>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
 
     </plugins>

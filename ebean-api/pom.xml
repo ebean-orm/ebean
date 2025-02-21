@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.7.0</version>
+    <version>14.9.0</version>
   </parent>
 
   <name>ebean api</name>
@@ -85,23 +85,6 @@
       <version>${jackson.version}</version>
       <optional>true</optional>
     </dependency>
-
-    <!-- JAVAX-DEPENDENCY-START ___
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
-      <optional>true</optional>
-    </dependency>
-    ____ JAVAX-DEPENDENCY-END -->
-    <!-- JAKARTA-DEPENDENCY-START -->
-    <dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
-      <version>6.0.0</version>
-      <optional>true</optional>
-    </dependency>
-    <!-- JAKARTA-DEPENDENCY-END -->
 
   </dependencies>
 

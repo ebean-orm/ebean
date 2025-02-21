@@ -42,7 +42,7 @@ public class TestSelfRefExample extends BaseTestCase {
     DB.save(e8);
 
     Query<SelfRefExample> examples = DB.find(SelfRefExample.class).setLazyLoadBatchSize(1);
-    List<SelfRefExample> list = examples.where().eq("name", "test1").order().asc("id").findList();
+    List<SelfRefExample> list = examples.where().eq("name", "test1").orderBy().asc("id").findList();
 
     assertThat(list).hasSize(2);
 
@@ -66,7 +66,7 @@ public class TestSelfRefExample extends BaseTestCase {
     assertThat(e3Searched.getChildren()).extracting("id").contains(e7.getId());
 
     // If we get all the items, you can see the structure goes down a fair bit further.
-    Query<SelfRefExample> examples2 = DB.createQuery(SelfRefExample.class).order("id asc");
+    Query<SelfRefExample> examples2 = DB.createQuery(SelfRefExample.class).orderBy("id asc");
     List<SelfRefExample> list2 = examples2.findList();
 
     assertEquals(e1.getId(), list2.get(0).getId());

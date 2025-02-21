@@ -133,7 +133,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     query.setMaxRows(10);
     query.setFirstRow(3);
     if (isSqlServer()) {
-      query.order("id");
+      query.orderBy("id");
     }
     query.findList();
 
@@ -213,7 +213,7 @@ public class EbeanServer_eqlTest extends BaseTestCase {
     ResetBasicData.reset();
 
     Query<Customer> name = server().createNamedQuery(Customer.class, "withStatus");
-    name.order().clear().asc("status");
+    name.orderBy().clear().asc("status");
     name.findList();
 
     assertThat(sqlOf(name, 2)).contains("select t0.id, t0.name, t0.status from o_customer t0 order by t0.status");
