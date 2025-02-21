@@ -492,17 +492,17 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
     @Override
     public void add(E o) {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
+      throw new UnsupportedOperationException("This collection is in ReadOnly mode");
     }
 
     @Override
     public void remove() {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
+      throw new UnsupportedOperationException("This collection is in ReadOnly mode");
     }
 
     @Override
     public void set(E o) {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
+      throw new UnsupportedOperationException("This collection is in ReadOnly mode");
     }
 
     @Override

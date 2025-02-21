@@ -1,5 +1,7 @@
 package io.ebean.bean;
 
+import io.ebean.UnloadedPropertyException;
+import io.ebean.UnmodifiableEntityException;
 import io.ebean.ValuePair;
 
 import java.util.*;
@@ -413,13 +415,13 @@ public final class InterceptReadOnly extends InterceptBase {
   @Override
   public void preGetter(int propertyIndex) {
     if (!flags[propertyIndex]) {
-      throw new IllegalStateException("Property not loaded: " + property(propertyIndex));
+      throw new UnloadedPropertyException("Property not loaded: " + property(propertyIndex));
     }
   }
 
   @Override
   public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
@@ -434,57 +436,57 @@ public final class InterceptReadOnly extends InterceptBase {
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, boolean oldValue, boolean newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue) {
-    throw new IllegalStateException("ReadOnly");
+    throw new UnmodifiableEntityException();
   }
 
   @Override

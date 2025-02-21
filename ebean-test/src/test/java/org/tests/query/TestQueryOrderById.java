@@ -2,6 +2,8 @@ package org.tests.query;
 
 import io.ebean.DB;
 import io.ebean.Query;
+import io.ebean.UnloadedPropertyException;
+import io.ebean.UnmodifiableEntityException;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.InterceptReadOnly;
@@ -33,8 +35,7 @@ class TestQueryOrderById extends BaseTestCase {
 
     assertThat(result).isNotEmpty();
     assertThatThrownBy(() -> result.add(new Customer()))
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("ReadOnly");
+      .isInstanceOf(UnsupportedOperationException.class);
 
     Customer customer = result.get(0);
     List<Contact> contacts = customer.getContacts();
@@ -43,8 +44,11 @@ class TestQueryOrderById extends BaseTestCase {
       .isInstanceOf(UnsupportedOperationException.class);
 
     assertThatThrownBy(customer::getOrders)
-      .isInstanceOf(IllegalStateException.class)
+      .isInstanceOf(UnloadedPropertyException.class)
       .hasMessageContaining("Property not loaded: orders");
+
+    assertThatThrownBy(() -> customer.setName("Attempting to Modify"))
+      .isInstanceOf(UnmodifiableEntityException.class);;
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(os);
@@ -72,8 +76,7 @@ class TestQueryOrderById extends BaseTestCase {
 
     assertThat(result).isNotEmpty();
     assertThatThrownBy(() -> result.add(new Customer()))
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("ReadOnly");
+      .isInstanceOf(UnsupportedOperationException.class);
 
     List<Contact> contacts = result.get(0).getContacts();
     assertThat(contacts).isNotEmpty();
@@ -107,24 +110,24 @@ class TestQueryOrderById extends BaseTestCase {
     assertThat(intercept.isLoadedProperty(pos)).isFalse();
     assertThatThrownBy(() -> customer.getBillingAddress())
       .describedAs("Not loaded property returns null")
-      .isInstanceOf(IllegalStateException.class)
+      .isInstanceOf(UnloadedPropertyException.class)
       .hasMessageContaining("Property not loaded: billingAddress");
 
     assertThatThrownBy(() -> customer.setBillingAddress(new Address()))
       .describedAs("Not allowed to mutate a readOnly bean")
-      .isInstanceOf(IllegalStateException.class)
+      .isInstanceOf(UnloadedPropertyException.class)
       .hasMessageContaining("Property not loaded: billingAddress");
 
     assertThatThrownBy(customer::getBillingAddress)
-      .isInstanceOf(IllegalStateException.class)
+      .isInstanceOf(UnloadedPropertyException.class)
       .hasMessageContaining("Property not loaded: billingAddress");
 
     assertThat(intercept).isInstanceOf(InterceptReadOnly.class);
     assertThatThrownBy(customer::getOrders)
-      .isInstanceOf(IllegalStateException.class)
+      .isInstanceOf(UnloadedPropertyException.class)
       .hasMessageContaining("Property not loaded: orders");
     assertThatThrownBy(customer::getContacts)
-      .isInstanceOf(IllegalStateException.class)
+      .isInstanceOf(UnloadedPropertyException.class)
       .hasMessageContaining("Property not loaded: contacts");
   }
 

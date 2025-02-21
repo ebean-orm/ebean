@@ -379,7 +379,7 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
     @Override
     public void remove() {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
+      throw new UnsupportedOperationException("This collection is in ReadOnly mode");
     }
   }
 

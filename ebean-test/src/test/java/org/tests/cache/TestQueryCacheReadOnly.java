@@ -25,24 +25,24 @@ public class TestQueryCacheReadOnly extends BaseTestCase {
 
     List<EBasicVer> alist = baseQuery.findList();
     assertThat(alist).isNotEmpty();
-    assertThatThrownBy(alist::clear).hasMessageContaining("ReadOnly");
+    assertThatThrownBy(alist::clear).isInstanceOf(UnsupportedOperationException.class);
     alist = baseQuery.findList();
     assertThat(alist).isNotEmpty();
-    assertThatThrownBy(alist::clear).hasMessageContaining("ReadOnly");
+    assertThatThrownBy(alist::clear).isInstanceOf(UnsupportedOperationException.class);
 
     Map<String,EBasicVer> amap = baseQuery.setMapKey("name").findMap();
     assertThat(amap).isNotEmpty();
-    assertThatThrownBy(amap::clear).hasMessageContaining("ReadOnly");
+    assertThatThrownBy(amap::clear).isInstanceOf(UnsupportedOperationException.class);
     amap = baseQuery.setMapKey("name").findMap();
     assertThat(amap).isNotEmpty();
-    assertThatThrownBy(amap::clear).hasMessageContaining("ReadOnly");
+    assertThatThrownBy(amap::clear).isInstanceOf(UnsupportedOperationException.class);
 
     Set<EBasicVer> aset = baseQuery.findSet();
     assertThat(aset).isNotEmpty();
-    assertThatThrownBy(aset::clear).hasMessageContaining("ReadOnly");
+    assertThatThrownBy(aset::clear).isInstanceOf(UnsupportedOperationException.class);
     aset = baseQuery.findSet();
     assertThat(aset).isNotEmpty();
-    assertThatThrownBy(aset::clear).hasMessageContaining("ReadOnly");
+    assertThatThrownBy(aset::clear).isInstanceOf(UnsupportedOperationException.class);
 
     // we will get an unmodifiable collection here
     List<Object> attributeList = baseQuery.select("name").findSingleAttributeList();

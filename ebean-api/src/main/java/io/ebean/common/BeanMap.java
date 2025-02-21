@@ -311,12 +311,12 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   @Override
   public void addBean(E bean) {
-    throw new IllegalStateException("Method not allowed on Map. Please use List instead.");
+    throw new UnsupportedOperationException("Method not allowed on Map. Please use List instead.");
   }
 
   @Override
   public void removeBean(E bean) {
-    throw new IllegalStateException("Method not allowed on Map. Please use List instead.");
+    throw new UnsupportedOperationException("Method not allowed on Map. Please use List instead.");
   }
 
   @Override
