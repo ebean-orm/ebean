@@ -101,14 +101,13 @@ public final class SqlTreeBuilder {
     this.alias = new SqlTreeAlias(request.baseTableAlias(), temporalMode);
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
     this.platformDistinctNoLobs = builder.isPlatformDistinctNoLobs();
-    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, readOnly, includeJoin);
+    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, unmodifiable, includeJoin);
     this.rootNode = buildRootNode(desc);
     String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.historySupport(query);
     CQueryDraftSupport draftSupport = builder.draftSupport(query);
     String colAlias = subQuery || rootNode.isSingleProperty() ? null : columnAliasPrefix;
     this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, draftSupport, fromForUpdate);
-    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, unmodifiable, includeJoin);
   }
 
   /**

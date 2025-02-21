@@ -1124,7 +1124,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (allowLoadErrors) {
       sb.append("/ae");
     }
-    if (disableLazyLoading) {
+    if (unmodifiable) {
+      sb.append("/um");
+    } else if (disableLazyLoading) {
       sb.append("/dl");
     }
     if (baseTable != null) {

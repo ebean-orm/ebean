@@ -2,6 +2,7 @@ package io.ebean.bean;
 
 import io.ebean.DB;
 import io.ebean.Database;
+import io.ebean.UnmodifiableEntityException;
 import io.ebean.ValuePair;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -795,7 +796,7 @@ public final class InterceptReadWrite extends InterceptBase {
       setLoadedProperty(propertyIndex);
     } else {
       if (readOnly) {
-        throw new IllegalStateException("ReadOnly");
+        throw new UnmodifiableEntityException();
       }
       setChangeLoaded(propertyIndex);
     }
@@ -804,7 +805,7 @@ public final class InterceptReadWrite extends InterceptBase {
   @Override
   public void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
     if (readOnly) {
-      throw new IllegalStateException("ReadOnly");
+      throw new UnmodifiableEntityException();
     }
     setChangedProperty(propertyIndex);
     if (setDirtyState) {
