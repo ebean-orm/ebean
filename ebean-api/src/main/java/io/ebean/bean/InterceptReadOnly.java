@@ -15,14 +15,14 @@ import java.util.*;
  */
 public final class InterceptReadOnly extends InterceptBase {
 
-  private final boolean[] flags;
+  private final boolean[] loaded;
 
   /**
    * Create with a given entity.
    */
   public InterceptReadOnly(Object ownerBean) {
     super(ownerBean);
-    this.flags = new boolean[owner._ebean_getPropertyNames().length];
+    this.loaded = new boolean[owner._ebean_getPropertyNames().length];
   }
 
   @Override
@@ -92,7 +92,7 @@ public final class InterceptReadOnly extends InterceptBase {
 
   @Override
   public boolean isPartial() {
-    for (boolean flag : flags) {
+    for (boolean flag : loaded) {
       if (!flag) {
         return true;
       }
@@ -127,10 +127,10 @@ public final class InterceptReadOnly extends InterceptBase {
 
   @Override
   public boolean hasIdOnly(int idIndex) {
-    for (int i = 0; i < flags.length; i++) {
+    for (int i = 0; i < loaded.length; i++) {
       if (i == idIndex) {
-        if (!flags[i]) return false;
-      } else if (flags[i]) {
+        if (!loaded[i]) return false;
+      } else if (loaded[i]) {
         return false;
       }
     }
@@ -234,7 +234,7 @@ public final class InterceptReadOnly extends InterceptBase {
 
   @Override
   public int propertyLength() {
-    return flags.length;
+    return loaded.length;
   }
 
   @Override
@@ -243,27 +243,27 @@ public final class InterceptReadOnly extends InterceptBase {
     if (position == -1) {
       throw new IllegalArgumentException("Property not found - " + propertyName);
     }
-    flags[position] = loaded;
+    this.loaded[position] = loaded;
   }
 
   @Override
   public void setPropertyUnloaded(int propertyIndex) {
-    flags[propertyIndex] = false;
+    loaded[propertyIndex] = false;
   }
 
   @Override
   public void setLoadedProperty(int propertyIndex) {
-    flags[propertyIndex] = true;
+    loaded[propertyIndex] = true;
   }
 
   @Override
   public void setLoadedPropertyAll() {
-    Arrays.fill(flags, true);
+    Arrays.fill(loaded, true);
   }
 
   @Override
   public boolean isLoadedProperty(int propertyIndex) {
-    return flags[propertyIndex];
+    return loaded[propertyIndex];
   }
 
   @Override
@@ -317,8 +317,8 @@ public final class InterceptReadOnly extends InterceptBase {
       return null;
     }
     final Set<String> props = new LinkedHashSet<>();
-    for (int i = 0; i < flags.length; i++) {
-      if (flags[i]) {
+    for (int i = 0; i < loaded.length; i++) {
+      if (loaded[i]) {
         props.add(property(i));
       }
     }
@@ -372,8 +372,8 @@ public final class InterceptReadOnly extends InterceptBase {
 
   @Override
   public boolean[] loaded() {
-    final boolean[] ret = new boolean[flags.length];
-    System.arraycopy(flags, 0, ret, 0, ret.length);
+    final boolean[] ret = new boolean[loaded.length];
+    System.arraycopy(loaded, 0, ret, 0, ret.length);
     return ret;
   }
 
@@ -399,7 +399,7 @@ public final class InterceptReadOnly extends InterceptBase {
 
   @Override
   public void initialisedMany(int propertyIndex) {
-    flags[propertyIndex] = true;
+    loaded[propertyIndex] = true;
   }
 
   @Override
@@ -414,14 +414,14 @@ public final class InterceptReadOnly extends InterceptBase {
 
   @Override
   public void preGetter(int propertyIndex) {
-    if (!flags[propertyIndex]) {
+    if (!loaded[propertyIndex]) {
       throw new UnloadedPropertyException("Property not loaded: " + property(propertyIndex));
     }
   }
 
   @Override
   public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
@@ -436,57 +436,57 @@ public final class InterceptReadOnly extends InterceptBase {
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, boolean oldValue, boolean newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue) {
-    throw new UnmodifiableEntityException();
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override

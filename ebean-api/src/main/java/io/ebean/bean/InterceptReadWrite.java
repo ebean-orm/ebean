@@ -796,7 +796,7 @@ public final class InterceptReadWrite extends InterceptBase {
       setLoadedProperty(propertyIndex);
     } else {
       if (readOnly) {
-        throw new UnmodifiableEntityException();
+        throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
       }
       setChangeLoaded(propertyIndex);
     }
@@ -805,7 +805,7 @@ public final class InterceptReadWrite extends InterceptBase {
   @Override
   public void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
     if (readOnly) {
-      throw new UnmodifiableEntityException();
+      throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
     }
     setChangedProperty(propertyIndex);
     if (setDirtyState) {

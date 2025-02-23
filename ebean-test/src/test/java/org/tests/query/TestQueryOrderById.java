@@ -48,7 +48,8 @@ class TestQueryOrderById extends BaseTestCase {
       .hasMessageContaining("Property not loaded: orders");
 
     assertThatThrownBy(() -> customer.setName("Attempting to Modify"))
-      .isInstanceOf(UnmodifiableEntityException.class);;
+      .isInstanceOf(UnmodifiableEntityException.class)
+      .hasMessageContaining("Attempting to modify name");
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     ObjectOutputStream oos = new ObjectOutputStream(os);
