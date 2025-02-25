@@ -5,8 +5,11 @@ import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ModifyAwareMapTest {
 
@@ -23,6 +26,13 @@ public class ModifyAwareMapTest {
   private ModifyAwareMap<String, Integer> createEmptyMap() {
     HashMap<String, Integer> set = new HashMap<>();
     return new ModifyAwareMap<>(set);
+  }
+
+  @Test
+  void freeze() {
+    Map<String, Integer> frozen = createMap().freeze();
+    assertThatThrownBy(() -> frozen.put("junk", 1))
+      .isInstanceOf(UnsupportedOperationException.class);
   }
 
   @Test

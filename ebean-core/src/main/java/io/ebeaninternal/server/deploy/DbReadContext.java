@@ -102,4 +102,9 @@ public interface DbReadContext {
    */
   void handleLoadError(String fullName, Exception e);
 
+  /**
+   * Return true if this many property should be included in unmodifiable
+   * query via a secondary query.
+   */
+  boolean includeSecondary(BeanPropertyAssocMany<?> many);
 }
