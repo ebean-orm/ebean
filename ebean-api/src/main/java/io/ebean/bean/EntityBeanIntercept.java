@@ -552,4 +552,9 @@ public interface EntityBeanIntercept extends Serializable {
    * Update the 'next' mutable info returning the content that was obtained via dirty detection.
    */
   String mutableNext(int propertyIndex);
+
+  /**
+   * Return true if this entity bean should be frozen. Used to handle recursive freezing.
+   */
+  boolean freeze();
 }

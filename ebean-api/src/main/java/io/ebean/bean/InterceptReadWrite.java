@@ -110,6 +110,11 @@ public final class InterceptReadWrite extends InterceptBase {
   }
 
   @Override
+  public boolean freeze() {
+    throw new UnsupportedOperationException("never expected");
+  }
+
+  @Override
   public String toString() {
     return "InterceptReadWrite@" + hashCode() + "{state=" + state +
       (dirty ? " dirty;" : "") +

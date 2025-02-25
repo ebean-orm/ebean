@@ -16,6 +16,7 @@ import java.util.*;
 public final class InterceptReadOnly extends InterceptBase {
 
   private final boolean[] loaded;
+  private boolean frozen;
 
   /**
    * Create with a given entity.
@@ -26,8 +27,18 @@ public final class InterceptReadOnly extends InterceptBase {
   }
 
   @Override
+  public boolean freeze() {
+    if (frozen) {
+      return false;
+    } else {
+      frozen = true;
+      return true;
+    }
+  }
+
+  @Override
   public String toString() {
-    return "InterceptReadOnly{" + owner + '}';
+    return "InterceptReadOnly{frozen:" + frozen + " loaded:" + loadedPropertyNames() + '}';
   }
 
   @Override

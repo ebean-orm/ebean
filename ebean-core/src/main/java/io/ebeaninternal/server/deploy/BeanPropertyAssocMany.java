@@ -1170,7 +1170,14 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   public void freeze(EntityBean entityBean) {
     Object value = getValue(entityBean);
     if (value instanceof BeanCollection) {
-      setValue(entityBean, ((BeanCollection<?>) value).freeze());
+      BeanCollection<?> beanCollection = (BeanCollection<?>) value;
+      Collection<?> entities = beanCollection.actualDetails();
+      if (entities != null) {
+        for (Object actualEntry : entities) {
+          targetDescriptor.freeze((EntityBean) actualEntry);
+        }
+      }
+      setValue(entityBean, beanCollection.freeze());
     } else if (value == null) {
       // make it an error to access the collection (no lazy loading allowed)
       entityBean._ebean_getIntercept().setPropertyUnloaded(propertyIndex);

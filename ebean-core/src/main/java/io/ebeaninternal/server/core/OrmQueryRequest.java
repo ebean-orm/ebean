@@ -2,6 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.*;
 import io.ebean.bean.BeanCollection;
+import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
@@ -778,6 +779,32 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public void clearContext() {
     if (!transaction.isAutoPersistUpdates()) {
       beanDescriptor.contextClear(transaction.persistenceContext());
+    }
+  }
+
+  public void unmodifiableFreeze(Collection<T> beans) {
+    if (query.isUnmodifiable()) {
+      if (beans != null) {
+        for (T bean : beans) {
+          beanDescriptor.freeze((EntityBean) bean);
+        }
+      }
+    }
+  }
+
+  public void unmodifiableFreeze(BeanCollection<T> beanCollection) {
+    if (query.isUnmodifiable()) {
+      if (beanCollection != null) {
+        for (T bean : beanCollection.actualDetails()) {
+          beanDescriptor.freeze((EntityBean) bean);
+        }
+      }
+    }
+  }
+
+  public void unmodifiableFreeze(EntityBean bean) {
+    if (query.isUnmodifiable() && bean != null) {
+      beanDescriptor.freeze(bean);
     }
   }
 }

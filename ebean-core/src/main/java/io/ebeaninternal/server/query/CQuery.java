@@ -44,6 +44,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   private final ReentrantLock lock = new ReentrantLock();
 
   private final boolean loadContextBean;
+  private final boolean unmodifiable;
 
   /**
    * The resultSet rows read.
@@ -207,6 +208,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     } else {
       this.help = createHelp(request);
     }
+    this.unmodifiable = request.query().isUnmodifiable();
     this.collection = (help != null ? help.createEmptyNoParent() : null);
     if (collection != null && Boolean.TRUE.equals(query.isReadOnly())) {
       collection.setReadOnly(true);
@@ -477,6 +479,14 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     return result;
   }
 
+  EntityBean nextBean() {
+    EntityBean bean = next();
+    if (unmodifiable) {
+      request.unmodifiableFreeze(bean);
+    }
+    return bean;
+  }
+
   EntityBean next() {
     if (audit) {
       auditNextBean();
@@ -604,6 +614,11 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
     request.loadContext().register(path(many.name()), many, bc);
+  }
+
+  @Override
+  public boolean includeSecondary(BeanPropertyAssocMany<?> many) {
+    return request.loadContext().includeSecondary(many);
   }
 
   /**

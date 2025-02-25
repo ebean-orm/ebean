@@ -280,9 +280,6 @@ class SqlTreeLoadBean implements SqlTreeLoad {
           if (!partialObject) {
             ebi.setFullyLoadedBean(true);
           }
-          if (unmodifiable) {
-            localDesc.freeze(localBean);
-          }
         } else if (!partialObject) {
           ebi.setFullyLoadedBean(true);
         } else if (readId && !usingContextBean) {
@@ -305,7 +302,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
       boolean forceNewReference = queryMode == Mode.REFRESH_BEAN;
       for (STreePropertyAssocMany many : localDesc.propsMany()) {
         if (many != loadingChildProperty) {
-          if (!unmodifiable) {
+          if (!unmodifiable || ctx.includeSecondary(many.asMany())) {
             // create a proxy for the many (deferred fetching)
             BeanCollection<?> ref = many.createReference(localBean, forceNewReference);
             if (ref != null) {

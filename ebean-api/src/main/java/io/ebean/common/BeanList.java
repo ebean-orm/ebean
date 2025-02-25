@@ -41,7 +41,13 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public List<E> freeze() {
-    return list == null ? null : Collections.unmodifiableList(list);
+    if (list == null) {
+      return null;
+    } else if (list.isEmpty()) {
+      return List.of();
+    } else {
+      return Collections.unmodifiableList(list);
+    }
   }
 
   @Override

@@ -11,9 +11,7 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Default implementation of LoadContext.
@@ -48,6 +46,7 @@ public final class DLoadContext implements LoadContext {
   boolean useReferences;
   private List<OrmQueryProperties> secQuery;
   private Object tenantId;
+  private final Set<BeanProperty> secondaryProperties;
 
   /**
    * Construct for use with JSON marshalling (doc store).
@@ -71,6 +70,7 @@ public final class DLoadContext implements LoadContext {
     this.profileLocation = null;
     this.profilingListener = null;
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, null);
+    this.secondaryProperties = null;
   }
 
   private ObjectGraphOrigin initOrigin() {
@@ -97,6 +97,7 @@ public final class DLoadContext implements LoadContext {
     this.profilingListener = query.profilingListener();
     this.planLabel = query.planLabel();
     this.profileLocation = query.profileLocation();
+    this.secondaryProperties = query.isUnmodifiable() ? new HashSet<>() : null;
 
     ObjectGraphNode parentNode = query.parentNode();
     if (parentNode != null) {
@@ -156,6 +157,14 @@ public final class DLoadContext implements LoadContext {
     ElPropertyValue elGetValue = rootDescriptor.elGetValue(props.getPath());
     boolean many = elGetValue.beanProperty().containsMany();
     registerSecondaryNode(many, props);
+    if (many && secondaryProperties != null) {
+      secondaryProperties.add(elGetValue.beanProperty());
+    }
+  }
+
+  @Override
+  public boolean includeSecondary(BeanPropertyAssocMany<?> many) {
+    return secondaryProperties != null && secondaryProperties.contains(many);
   }
 
   boolean isBeanCacheGet() {
