@@ -28,7 +28,7 @@ drop index if exists ix_migtest_e_basic_indextest6;
 drop index if exists ix_table_textfield2;
 -- apply changes
 create table "migtest_QuOtEd" (
-  id                            varchar(255) not null,
+  id                            varchar not null,
   status1                       varchar(1),
   status2                       varchar(1),
   constraint ck_migtest_quoted_status1 check ( status1 in ('N','A','I')),
@@ -75,7 +75,7 @@ alter table migtest_e_basic alter column status drop not null;
 alter table migtest_e_basic alter column status2 type varchar(1);
 alter table migtest_e_basic alter column status2 set default 'N';
 alter table migtest_e_basic alter column status2 set not null;
-alter table migtest_e_basic alter column a_lob type varchar(255) using a_lob::varchar(255);
+alter table migtest_e_basic alter column a_lob type varchar using a_lob::varchar;
 alter table migtest_e_basic alter column a_lob set default 'X';
 alter table migtest_e_basic alter column a_lob set not null;
 alter table migtest_e_basic alter column user_id set default 23;
@@ -86,11 +86,11 @@ alter table migtest_e_basic add column if not exists old_boolean2 boolean;
 alter table migtest_e_basic add column if not exists eref_id integer;
 alter table migtest_e_history2 alter column test_string drop default;
 alter table migtest_e_history2 alter column test_string drop not null;
-alter table migtest_e_history2 add column if not exists obsolete_string1 varchar(255);
-alter table migtest_e_history2 add column if not exists obsolete_string2 varchar(255);
+alter table migtest_e_history2 add column if not exists obsolete_string1 varchar;
+alter table migtest_e_history2 add column if not exists obsolete_string2 varchar;
 alter table migtest_e_history2_history alter column test_string drop not null;
-alter table migtest_e_history2_history add column if not exists obsolete_string1 varchar(255);
-alter table migtest_e_history2_history add column if not exists obsolete_string2 varchar(255);
+alter table migtest_e_history2_history add column if not exists obsolete_string1 varchar;
+alter table migtest_e_history2_history add column if not exists obsolete_string2 varchar;
 alter table migtest_e_history4 alter column test_number type integer using test_number::integer;
 alter table migtest_e_history4_history alter column test_number type integer using test_number::integer;
 alter table migtest_e_history6 alter column test_number1 drop default;
