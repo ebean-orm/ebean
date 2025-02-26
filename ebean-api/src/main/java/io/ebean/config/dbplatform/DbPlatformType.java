@@ -172,7 +172,6 @@ public class DbPlatformType implements ExtraDbTypes {
    * </p>
    */
   public String renderType(int deployLength, int deployScale, boolean strict) {
-
     int len = deployLength != 0 ? deployLength : defaultLength;
     if (len > maxLength) {
       return fallback.renderType(deployLength, deployScale, strict);
@@ -182,7 +181,6 @@ public class DbPlatformType implements ExtraDbTypes {
       if ((canHaveLength || !strict) && len > 0) {
         renderLengthScale(len, deployScale, sb);
       }
-
       return sb.toString();
     }
   }

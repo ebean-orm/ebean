@@ -155,7 +155,7 @@ create table migtest_mtm_m_migtest_mtm_c (
 
 create table migtest_mtm_m_phone_numbers (
   migtest_mtm_m_id              bigint not null,
-  value                         varchar(255) not null
+  value                         varchar not null
 );
 
 
@@ -196,8 +196,8 @@ drop function if exists table_history_version();
 drop view table_with_history;
 -- apply alter tables
 alter table "table" alter column textfield drop not null;
-alter table "table" add column if not exists "select" varchar(255);
-alter table "table" add column if not exists textfield2 varchar(255);
+alter table "table" add column if not exists "select" varchar;
+alter table "table" add column if not exists textfield2 varchar;
 alter table migtest_ckey_detail add column if not exists one_key integer;
 alter table migtest_ckey_detail add column if not exists two_key varchar(127);
 alter table migtest_ckey_parent add column if not exists assoc_id integer;
@@ -209,7 +209,7 @@ alter table migtest_e_basic alter column status2 drop not null;
 alter table migtest_e_basic alter column a_lob drop default;
 alter table migtest_e_basic alter column a_lob drop not null;
 alter table migtest_e_basic alter column user_id drop not null;
-alter table migtest_e_basic add column if not exists new_string_field varchar(255) default 'foo''bar' not null;
+alter table migtest_e_basic add column if not exists new_string_field varchar default 'foo''bar' not null;
 alter table migtest_e_basic add column if not exists new_boolean_field boolean default true not null;
 alter table migtest_e_basic add column if not exists new_boolean_field2 boolean default true not null;
 alter table migtest_e_basic add column if not exists progress integer default 0 not null;
@@ -218,11 +218,11 @@ alter table migtest_e_history add column if not exists sys_period tstzrange not 
 alter table migtest_e_history alter column test_string type bigint using test_string::bigint;
 alter table migtest_e_history2 alter column test_string set default 'unknown';
 alter table migtest_e_history2 alter column test_string set not null;
-alter table migtest_e_history2 add column if not exists test_string2 varchar(255);
-alter table migtest_e_history2 add column if not exists test_string3 varchar(255) default 'unknown' not null;
+alter table migtest_e_history2 add column if not exists test_string2 varchar;
+alter table migtest_e_history2 add column if not exists test_string3 varchar default 'unknown' not null;
 alter table migtest_e_history2 add column if not exists new_column varchar(20);
-alter table migtest_e_history2_history add column if not exists test_string2 varchar(255);
-alter table migtest_e_history2_history add column if not exists test_string3 varchar(255) default 'unknown';
+alter table migtest_e_history2_history add column if not exists test_string2 varchar;
+alter table migtest_e_history2_history add column if not exists test_string3 varchar default 'unknown';
 alter table migtest_e_history2_history add column if not exists new_column varchar(20);
 alter table migtest_e_history4 alter column test_number type bigint using test_number::bigint;
 alter table migtest_e_history4_history alter column test_number type bigint using test_number::bigint;
@@ -235,8 +235,8 @@ alter table migtest_e_history6_history alter column test_number2 drop not null;
 alter table migtest_e_softdelete add column if not exists deleted boolean default false not null;
 alter table migtest_oto_child add column if not exists master_id bigint;
 alter table table_history alter column textfield drop not null;
-alter table table_history add column if not exists "select" varchar(255);
-alter table table_history add column if not exists textfield2 varchar(255);
+alter table table_history add column if not exists "select" varchar;
+alter table table_history add column if not exists textfield2 varchar;
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I','?'));
 alter table migtest_e_basic add constraint uq_migtest_e_basic_description unique  (description);
