@@ -773,18 +773,6 @@ public interface Database {
   <T> T reference(Class<T> beanType, Object id);
 
   /**
-   * Return the extended API for Database.
-   * <p>
-   * The extended API has the options for executing queries that take an explicit
-   * transaction as an argument.
-   * <p>
-   * Typically, we only need to use the extended API when we do NOT want to use the
-   * usual ThreadLocal based mechanism to obtain the current transaction but instead
-   * supply the transaction explicitly.
-   */
-  ExtendedServer extended();
-
-  /**
    * Either Insert or Update the bean depending on its state.
    * <p>
    * If there is no current transaction one will be created and committed for

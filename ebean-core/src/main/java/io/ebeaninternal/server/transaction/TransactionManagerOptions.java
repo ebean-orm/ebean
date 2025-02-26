@@ -7,7 +7,6 @@ import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.SpiLogManager;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.server.cluster.ClusterManager;
-import io.ebeaninternal.server.core.ClockService;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 
@@ -30,13 +29,11 @@ public final class TransactionManagerOptions {
   final SpiLogManager logManager;
   final TableModState tableModState;
   final ServerCacheNotify cacheNotify;
-  final ClockService clockService;
-
 
   public TransactionManagerOptions(SpiServer server, boolean notifyL2CacheInForeground, DatabaseBuilder.Settings config, TransactionScopeManager scopeManager,
                                    ClusterManager clusterManager, BackgroundExecutor backgroundExecutor, DocStoreUpdateProcessor docStoreUpdateProcessor,
                                    BeanDescriptorManager descMgr, DataSourceSupplier dataSourceSupplier, SpiProfileHandler profileHandler,
-                                   SpiLogManager logManager, TableModState tableModState, ServerCacheNotify cacheNotify, ClockService clockService) {
+                                   SpiLogManager logManager, TableModState tableModState, ServerCacheNotify cacheNotify) {
     this.server = server;
     this.notifyL2CacheInForeground = notifyL2CacheInForeground;
     this.config = config;
@@ -50,7 +47,6 @@ public final class TransactionManagerOptions {
     this.logManager = logManager;
     this.tableModState = tableModState;
     this.cacheNotify = cacheNotify;
-    this.clockService = clockService;
   }
 
 }

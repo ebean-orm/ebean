@@ -83,7 +83,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final QueryPlanManager queryPlanManager;
   private final ExtraMetrics extraMetrics;
   private final DataTimeZone dataTimeZone;
-  private final ClockService clockService;
+  private final Clock clock;
   private final CallOriginFactory callStackFactory;
   private final Persister persister;
   private final OrmQueryEngine queryEngine;
@@ -151,7 +151,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
     this.dataTimeZone = config.getDataTimeZone();
-    this.clockService = config.getClockService();
+    this.clock = config.clock();
 
     DocStoreIntegration docStoreComponents = config.createDocStoreIntegration(this);
     this.transactionManager = config.createTransactionManager(this, docStoreComponents.updateProcessor());
@@ -414,18 +414,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public ExtendedServer extended() {
-    return this;
-  }
-
-  @Override
   public long clockNow() {
-    return clockService.nowMillis();
-  }
-
-  @Override
-  public void setClock(Clock clock) {
-    this.clockService.setClock(clock);
+    return clock.millis();
   }
 
   @Override
