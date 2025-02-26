@@ -25,7 +25,8 @@ public final class DeployTableJoinColumn {
    */
   private String foreignSqlFormula;
   private boolean insertable;
-  private boolean updateable;
+  private boolean updatable;
+  private boolean nullable;
 
   /**
    * Construct when automatically determining the join.
@@ -34,21 +35,24 @@ public final class DeployTableJoinColumn {
    * </p>
    */
   public DeployTableJoinColumn(String localDbColumn, String foreignDbColumn) {
-    this(localDbColumn, foreignDbColumn, true, true);
+    this(localDbColumn, foreignDbColumn, true, true, true);
   }
 
   /**
    * Construct with explicit insertable and updateable flags.
    */
-  public DeployTableJoinColumn(String localDbColumn, String foreignDbColumn, boolean insertable, boolean updateable) {
+  public DeployTableJoinColumn(String localDbColumn, String foreignDbColumn,
+                               boolean insertable, boolean updatable, boolean nullable) {
     this.localDbColumn = nullEmptyString(localDbColumn);
     this.foreignDbColumn = nullEmptyString(foreignDbColumn);
     this.insertable = insertable;
-    this.updateable = updateable;
+    this.updatable = updatable;
+    this.nullable = nullable;
   }
 
-  public DeployTableJoinColumn(boolean order, String ref, String name, boolean insertable, boolean updateable, BeanTable beanTable) {
-    this(ref, name, insertable, updateable);
+  public DeployTableJoinColumn(boolean order, String ref, String name,
+                               boolean insertable, boolean updatable, boolean nullable, BeanTable beanTable) {
+    this(ref, name, insertable, updatable, nullable);
     setReferencedColumn(beanTable);
     if (!order) {
       reverse();
@@ -60,7 +64,7 @@ public final class DeployTableJoinColumn {
       this.localSqlFormula = localSqlFormula;
       this.localDbColumn = null;
       this.insertable = false;
-      this.updateable = false;
+      this.updatable = false;
     }
   }
 
@@ -73,7 +77,7 @@ public final class DeployTableJoinColumn {
       this.foreignSqlFormula = foreignSqlFormula;
       this.foreignDbColumn = null;
       this.insertable = false;
-      this.updateable = false;
+      this.updatable = false;
     }
   }
 
@@ -121,12 +125,12 @@ public final class DeployTableJoinColumn {
     // but will leave it like this for now
     DeployTableJoinColumn ret;
     if (reverse) {
-      ret = new DeployTableJoinColumn(foreignDbColumn, localDbColumn, insertable, updateable);
+      ret = new DeployTableJoinColumn(foreignDbColumn, localDbColumn, insertable, updatable, nullable);
       ret.setLocalSqlFormula(foreignSqlFormula);
       ret.setForeignSqlFormula(localSqlFormula);
 
     } else {
-      ret = new DeployTableJoinColumn(localDbColumn, foreignDbColumn, insertable, updateable);
+      ret = new DeployTableJoinColumn(localDbColumn, foreignDbColumn, insertable, updatable, nullable);
       ret.setLocalSqlFormula(localSqlFormula);
       ret.setForeignSqlFormula(foreignSqlFormula);
     }
@@ -148,8 +152,8 @@ public final class DeployTableJoinColumn {
   /**
    * Return true if this column should be updateable.
    */
-  public boolean isUpdateable() {
-    return updateable;
+  public boolean isUpdatable() {
+    return updatable;
   }
 
   /**
@@ -173,4 +177,7 @@ public final class DeployTableJoinColumn {
     this.localDbColumn = localDbColumn;
   }
 
+  public boolean isNullable() {
+    return nullable;
+  }
 }
