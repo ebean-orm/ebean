@@ -29,8 +29,8 @@ EXECUTE stmt;
 END LOOP;
 
 CLOSE curs;
-END
 -- play-ebean-end
+END
 $$
 
 DROP PROCEDURE IF EXISTS usp_ebean_drop_column;
@@ -47,6 +47,6 @@ CALL usp_ebean_drop_foreign_keys(p_table_name, p_column_name);
 SET @sql = CONCAT('ALTER TABLE `', p_table_name, '` DROP COLUMN `', p_column_name, '`');
 PREPARE stmt FROM @sql;
 EXECUTE stmt;
-END
 -- play-ebean-end
+END
 $$
