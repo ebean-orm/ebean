@@ -266,6 +266,7 @@ public class TestRawSqlBuilder extends BaseTestCase {
           }
         }
       }
+      connection.rollback();
     }
   }
 
