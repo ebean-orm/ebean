@@ -441,6 +441,7 @@ public class QCustomerTest {
         .usingConnection(connection)
         .findList();
 
+      connection.rollback();
       assertThat(foo).hasSize(1);
     }
 
