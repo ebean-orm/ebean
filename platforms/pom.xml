@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.8.1-FOC5</version>
+    <version>14.8.1-FOC6-SNAPSHOT</version>
   </parent>
 
   <artifactId>platforms</artifactId>
