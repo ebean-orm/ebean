@@ -20,7 +20,7 @@ class LookupWriter {
       "META-INF/services/io.ebean.config.LookupProvider";
 
   private static final String FILE_STRING =
-      "package %s.lookup;\n"
+      "package %s;\n"
           + "\n"
           + "import java.lang.invoke.MethodHandles;\n"
           + "\n"
