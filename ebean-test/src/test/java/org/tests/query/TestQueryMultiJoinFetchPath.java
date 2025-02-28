@@ -1,14 +1,20 @@
 package org.tests.query;
 
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.join.*;
+import org.tests.model.join.initfields.Order;
+import org.tests.model.join.initfields.OrderDetail;
+import org.tests.model.join.initfields.OrderInvoice;
+import org.tests.model.join.initfields.OrderItem;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestQueryMultiJoinFetchPath extends BaseTestCase {
 
@@ -65,4 +71,61 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
     }
   }
 
+  @Test
+  public void test_manyNonRoot_RootHasNoMany() {
+    Order o = new Order();
+    DB.save(o);
+
+    OrderItem p1 = new OrderItem();
+    p1.order = o;
+    DB.save(p1);
+
+    OrderItem p2 = new OrderItem();
+    p2.order = o;
+    DB.save(p2);
+
+    OrderDetail d1 = new OrderDetail();
+    d1.order = o;
+    DB.save(d1);
+
+    OrderDetail d2 = new OrderDetail();
+    d2.order = o;
+    DB.save(d2);
+
+    OrderInvoice i1 = new OrderInvoice();
+    i1.order = o;
+    DB.save(i1);
+
+    OrderInvoice i2 = new OrderInvoice();
+    i2.order = o;
+    DB.save(i2);
+
+    // This first query behaves as expected: a main query and its secondary query.
+    LoggedSql.start();
+    List<Order> list1 = DB.find(Order.class)
+      .fetch("orderItems")
+      .fetch("orderDetails")
+      .where().gt("id", 0)
+      .findList();
+
+    assertEquals(2, list1.get(0).orderItems.size());
+    assertEquals(2, list1.get(0).orderDetails.size());
+
+    List<String> sql1 = LoggedSql.stop();
+    assertEquals(2, sql1.size());
+
+    // This query does not eager fetch invoices. We get an NPE on orderInvoices. Only the main query is executed.
+    LoggedSql.start();
+    List<Order> list2 = DB.find(Order.class)
+      .fetch("orderItems")
+      .fetch("orderInvoices")
+      .where().gt("id", 0)
+      .findList();
+
+    assertEquals(2, list2.get(0).orderItems.size());
+    assertEquals(2, list2.get(0).orderInvoices.size());
+
+    List<String> sql2 = LoggedSql.stop();
+    assertEquals(2, sql2.size());
+  }
 }
