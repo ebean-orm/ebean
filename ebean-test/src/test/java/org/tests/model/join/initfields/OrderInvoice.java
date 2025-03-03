@@ -12,5 +12,9 @@ public class OrderInvoice {
   int id;
 
   @ManyToOne
-  public Order order;
+  Order order;
+
+  public OrderInvoice(Order order) {
+    this.order = order;
+  }
 }

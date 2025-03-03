@@ -15,11 +15,27 @@ public class Order {
   int id;
 
   @OneToMany
-  public List<OrderItem> orderItems = new ArrayList<>();
+  List<OrderItem> orderItems = new ArrayList<>();
 
   @OneToMany
-  public List<OrderDetail> orderDetails = new ArrayList<>();
+  List<OrderDetail> orderDetails = new ArrayList<>();
 
   @OneToMany
   public List<OrderInvoice> orderInvoices = List.of(); // Change this to new ArrayList<>() to make the test pass.
+
+  public int id() {
+    return id;
+  }
+
+  public List<OrderItem> orderItems() {
+    return orderItems;
+  }
+
+  public List<OrderDetail> orderDetails() {
+    return orderDetails;
+  }
+
+  public List<OrderInvoice> orderInvoices() {
+    return orderInvoices;
+  }
 }

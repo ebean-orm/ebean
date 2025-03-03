@@ -75,29 +75,14 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
     Order o = new Order();
     DB.save(o);
 
-    OrderItem p1 = new OrderItem();
-    p1.order = o;
-    DB.save(p1);
+    OrderItem p1 = new OrderItem(o);
+    OrderItem p2 = new OrderItem(o);
+    OrderDetail d1 = new OrderDetail(o);
+    OrderDetail d2 = new OrderDetail(o);
+    OrderInvoice i1 = new OrderInvoice(o);
+    OrderInvoice i2 = new OrderInvoice(o);
 
-    OrderItem p2 = new OrderItem();
-    p2.order = o;
-    DB.save(p2);
-
-    OrderDetail d1 = new OrderDetail();
-    d1.order = o;
-    DB.save(d1);
-
-    OrderDetail d2 = new OrderDetail();
-    d2.order = o;
-    DB.save(d2);
-
-    OrderInvoice i1 = new OrderInvoice();
-    i1.order = o;
-    DB.save(i1);
-
-    OrderInvoice i2 = new OrderInvoice();
-    i2.order = o;
-    DB.save(i2);
+    DB.saveAll(p1, p2, d1, d2, i1, i2);
 
     // This first query behaves as expected: a main query and its secondary query.
     LoggedSql.start();
@@ -107,8 +92,8 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
       .where().gt("id", 0)
       .findList();
 
-    assertThat(list1.get(0).orderItems).hasSize(2);
-    assertThat(list1.get(0).orderDetails).hasSize(2);
+    assertThat(list1.get(0).orderItems()).hasSize(2);
+    assertThat(list1.get(0).orderDetails()).hasSize(2);
 
     List<String> sql1 = LoggedSql.collect();
     assertThat(sql1).hasSize(2);
@@ -121,7 +106,7 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
       .where().gt("id", 0)
       .findList();
 
-    assertThat(list2.get(0).orderItems).hasSize(2);
+    assertThat(list2.get(0).orderItems()).hasSize(2);
     assertThat(list2.get(0).orderInvoices).hasSize(2);
 
     List<String> sql2 = LoggedSql.stop();
