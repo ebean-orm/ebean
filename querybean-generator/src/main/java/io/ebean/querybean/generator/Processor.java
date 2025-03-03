@@ -17,6 +17,8 @@ import java.util.Set;
 public class Processor extends AbstractProcessor implements Constants {
 
   private ProcessingContext processingContext;
+  private SimpleModuleInfoWriter moduleWriter;
+  private boolean initModuleWriter;
 
   public Processor() {
   }
@@ -49,6 +51,7 @@ public class Processor extends AbstractProcessor implements Constants {
     int count = processEntities(roundEnv);
     processOthers(roundEnv);
     final int loaded = processingContext.complete();
+    initModuleInfoBean();
     if (roundEnv.processingOver()) {
       writeModuleInfoBean();
     }
@@ -85,11 +88,27 @@ public class Processor extends AbstractProcessor implements Constants {
     }
   }
 
+  private void initModuleInfoBean() {
+    try {
+      if (!initModuleWriter) {
+        moduleWriter = new SimpleModuleInfoWriter(processingContext);
+      }
+    } catch (FilerException e) {
+      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
+    } catch (Throwable e) {
+      processingContext.logError(null, "Failed to initialise EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
+    } finally {
+      initModuleWriter = true;
+    }
+  }
+
   private void writeModuleInfoBean() {
     try {
-      new SimpleModuleInfoWriter(processingContext).write();
-    } catch (FilerException e) {
-      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister: " + e);
+      if (moduleWriter == null) {
+        processingContext.logNote(null, "EntityClassRegister skipped");
+      } else {
+        moduleWriter.write();
+      }
     } catch (Throwable e) {
       processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
