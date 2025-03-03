@@ -14,7 +14,6 @@ import org.tests.model.join.initfields.OrderItem;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class TestQueryMultiJoinFetchPath extends BaseTestCase {
 
@@ -108,24 +107,24 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
       .where().gt("id", 0)
       .findList();
 
-    assertEquals(2, list1.get(0).orderItems.size());
-    assertEquals(2, list1.get(0).orderDetails.size());
+    assertThat(list1.get(0).orderItems).hasSize(2);
+    assertThat(list1.get(0).orderDetails).hasSize(2);
 
-    List<String> sql1 = LoggedSql.stop();
-    assertEquals(2, sql1.size());
+    List<String> sql1 = LoggedSql.collect();
+    assertThat(sql1).hasSize(2);
 
     // This query does not eager fetch invoices. We get an NPE on orderInvoices. Only the main query is executed.
-    LoggedSql.start();
+    LoggedSql.collect();
     List<Order> list2 = DB.find(Order.class)
       .fetch("orderItems")
       .fetch("orderInvoices")
       .where().gt("id", 0)
       .findList();
 
-    assertEquals(2, list2.get(0).orderItems.size());
-    assertEquals(2, list2.get(0).orderInvoices.size());
+    assertThat(list2.get(0).orderItems).hasSize(2);
+    assertThat(list2.get(0).orderInvoices).hasSize(2);
 
     List<String> sql2 = LoggedSql.stop();
-    assertEquals(2, sql2.size());
+    assertThat(sql2).hasSize(2);
   }
 }
