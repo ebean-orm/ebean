@@ -220,7 +220,7 @@ public class DbMigrationTest extends BaseTestCase {
     config.setName(server().name());
     config.loadFromProperties(server().pluginApi().config().getProperties());
     config.setDataSource(server().dataSource());
-    config.setReadOnlyDataSource(server().dataSource());
+    config.setReadOnlyDataSource(server().readOnlyDataSource());
     config.setDdlGenerate(false);
     config.setDdlRun(false);
     config.setRegister(false);
@@ -292,7 +292,7 @@ public class DbMigrationTest extends BaseTestCase {
     config.setName(server().name());
     config.loadFromProperties(server().pluginApi().config().getProperties());
     config.setDataSource(server().dataSource());
-    config.setReadOnlyDataSource(server().dataSource());
+    config.setReadOnlyDataSource(server().readOnlyDataSource());
     config.setDdlGenerate(false);
     config.setDdlRun(false);
     config.setRegister(false);
