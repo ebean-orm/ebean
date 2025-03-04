@@ -8,6 +8,7 @@ import java.io.*;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
 
@@ -239,6 +240,36 @@ public class ModifyAwareListTest {
     set.add("next");
 
     assertTrue(set.isMarkedDirty());
+  }
+
+  @Test
+  void freeze() {
+    ModifyAwareList<String> orig = createList();
+    List<String> frozen = orig.freeze();
+
+    assertThatThrownBy(() -> frozen.add("junk"))
+      .isInstanceOf(UnsupportedOperationException.class);
+  }
+
+  @Test
+  public void freezeAndSerialise() throws IOException, ClassNotFoundException {
+
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(os);
+
+    List<String> orig = createList().freeze();
+    oos.writeObject(orig);
+    oos.flush();
+    oos.close();
+
+    ByteArrayInputStream is = new ByteArrayInputStream(os.toByteArray());
+    ObjectInputStream ois = new ObjectInputStream(is);
+
+    @SuppressWarnings("unchecked")
+    List<String> read = (List<String>)ois.readObject();
+    assertThat(read).contains("A", "B", "C", "D", "E");
+    assertThatThrownBy(() -> read.add("junk"))
+      .isInstanceOf(UnsupportedOperationException.class);
   }
 
   @Test

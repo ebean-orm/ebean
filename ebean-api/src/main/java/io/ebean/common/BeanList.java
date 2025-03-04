@@ -40,6 +40,17 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   }
 
   @Override
+  public List<E> freeze() {
+    if (list == null) {
+      return null;
+    } else if (list.isEmpty()) {
+      return List.of();
+    } else {
+      return Collections.unmodifiableList(list);
+    }
+  }
+
+  @Override
   public void toString(ToStringBuilder builder) {
     builder.addCollection(list);
   }
@@ -487,17 +498,17 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
     @Override
     public void add(E o) {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
+      throw new UnsupportedOperationException("This collection is in ReadOnly mode");
     }
 
     @Override
     public void remove() {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
+      throw new UnsupportedOperationException("This collection is in ReadOnly mode");
     }
 
     @Override
     public void set(E o) {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
+      throw new UnsupportedOperationException("This collection is in ReadOnly mode");
     }
 
     @Override
