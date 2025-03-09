@@ -92,11 +92,14 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
       .where().gt("id", 0)
       .findList();
 
+    List<String> sql1 = LoggedSql.collect();
+    assertThat(sql1).hasSize(2);
+
     assertThat(list1.get(0).orderItems()).hasSize(2);
     assertThat(list1.get(0).orderDetails()).hasSize(2);
 
-    List<String> sql1 = LoggedSql.collect();
-    assertThat(sql1).hasSize(2);
+    sql1 = LoggedSql.collect();
+    assertThat(sql1).describedAs("no further lazy loading occurs").isEmpty();
 
     // This query does not eager fetch invoices. We get an NPE on orderInvoices. Only the main query is executed.
     LoggedSql.collect();
@@ -106,10 +109,15 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
       .where().gt("id", 0)
       .findList();
 
-    assertThat(list2.get(0).orderItems()).hasSize(2);
-    assertThat(list2.get(0).orderInvoices).hasSize(2);
-
-    List<String> sql2 = LoggedSql.stop();
+    List<String> sql2 = LoggedSql.collect();
     assertThat(sql2).hasSize(2);
+    assertThat(sql2.get(0)).contains("from join_initfields_order t0 left join join_initfields_order_item t1 on t1.order_id = t0.id where");
+    assertThat(sql2.get(1)).contains("from join_initfields_order_invoice t0 where ");
+
+    assertThat(list2.get(0).orderItems()).hasSize(2);
+    assertThat(list2.get(0).orderInvoices()).hasSize(2);
+
+    sql2 = LoggedSql.stop();
+    assertThat(sql2).describedAs("no further lazy loading occurs").isEmpty();
   }
 }

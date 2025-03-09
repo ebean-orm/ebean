@@ -1,7 +1,5 @@
 package org.tests.model.lazywithid;
 
-import io.ebean.common.BeanList;
-
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -15,7 +13,7 @@ public class Tune {
   String name;
 
   @OneToMany(cascade = CascadeType.ALL)
-  private List<Looney> loonies = new BeanList<>();
+  private List<Looney> loonies;
 
   public String getName() {
     return name;
