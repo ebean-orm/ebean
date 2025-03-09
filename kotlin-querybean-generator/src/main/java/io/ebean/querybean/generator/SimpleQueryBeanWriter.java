@@ -291,8 +291,8 @@ class SimpleQueryBeanWriter {
     writer.append("  @io.ebean.typequery.Generated(\"io.ebean.querybean.generator\") @io.ebean.typequery.TypeQueryBean(\"v1\")").eol();
     writer.append("  class Assoc<R> : io.ebean.typequery.TQAssoc<%s,R> {", beanFullName).eol().eol();
     writeFields(true);
-    writer.append("    protected constructor(name: String, root: R) : super(name, root)").eol();
-    writer.append("    protected constructor(name: String, root: R, prefix: String) : super(name, root, prefix)").eol();
+    writer.append("    constructor(name: String, root: R) : super(name, root)").eol();
+    writer.append("    constructor(name: String, root: R, prefix: String) : super(name, root, prefix)").eol();
     writer.append("  }").eol().eol();
   }
 

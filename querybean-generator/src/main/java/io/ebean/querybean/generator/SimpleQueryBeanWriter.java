@@ -266,7 +266,7 @@ class SimpleQueryBeanWriter {
       writer.eol();
     }
     writer.eol();
-    writeAssocBeanConstructor("protected Assoc");
+    writeAssocBeanConstructor("public Assoc");
     writeAssocBeanFetch();
     writer.append("  }").eol();
     if (!embeddable) {
