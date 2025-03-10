@@ -688,6 +688,22 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     }
   }
 
+  @Override
+  public void freeze(EntityBean entityBean) {
+    if (entityBean._ebean_getIntercept().freeze()) {
+      // recursively freeze the graph for this entityBean
+      for (BeanProperty beanProperty : propertiesMutable) {
+        beanProperty.freeze(entityBean);
+      }
+      for (BeanPropertyAssocOne<?> one : propertiesOne) {
+        one.freeze(entityBean);
+      }
+      for (BeanPropertyAssocMany<?> many : propertiesMany) {
+        many.freeze(entityBean);
+      }
+    }
+  }
+
   public void metricPersistBatch(PersistRequest.Type type, long startNanos, int size) {
     iudMetrics.addBatch(type, startNanos, size);
   }

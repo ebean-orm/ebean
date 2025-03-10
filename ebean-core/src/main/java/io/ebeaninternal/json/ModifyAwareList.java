@@ -3,12 +3,7 @@ package io.ebeaninternal.json;
 import io.ebean.ModifyAwareType;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * Modify aware wrapper of a list.
@@ -50,6 +45,11 @@ public final class ModifyAwareList<E> implements List<E>, ModifyAwareType, Seria
   @Override
   public int hashCode() {
     return list.hashCode();
+  }
+
+  @Override
+  public List<E> freeze() {
+    return Collections.unmodifiableList(list);
   }
 
   @Override

@@ -2,6 +2,7 @@ package org.tests.batchload;
 
 import io.ebean.BeanState;
 import io.ebean.DB;
+import io.ebean.UnmodifiableEntityException;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.xtest.BaseTestCase;
@@ -126,7 +127,7 @@ class TestBeanState extends BaseTestCase {
     beanState.setReadOnly(true);
 
     // act, try to mutate read only bean
-    assertThrows(IllegalStateException.class, () -> customer.setContacts(new ArrayList<>()));
+    assertThrows(UnmodifiableEntityException.class, () -> customer.setContacts(new ArrayList<>()));
   }
 
   @Test
@@ -139,6 +140,6 @@ class TestBeanState extends BaseTestCase {
     beanState.setReadOnly(true);
 
     // act, try to mutate read only bean
-    assertThrows(IllegalStateException.class, () -> customer.setName("b"));
+    assertThrows(UnmodifiableEntityException.class, () -> customer.setName("b"));
   }
 }
