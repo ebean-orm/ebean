@@ -20,8 +20,7 @@ public class Processor extends AbstractProcessor implements Constants {
   private SimpleModuleInfoWriter moduleWriter;
   private boolean initModuleWriter;
 
-  public Processor() {
-  }
+  private boolean wroteLookup;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -58,6 +57,10 @@ public class Processor extends AbstractProcessor implements Constants {
     if (count > 0) {
       String msg = "Ebean APT generated %s query beans, loaded %s others - META-INF/ebean-generated-info.mf entity-packages: %s";
       processingContext.logNote(msg, count, loaded, processingContext.getAllEntityPackages());
+    }
+    if (!wroteLookup) {
+      wroteLookup = true;
+      LookupWriter.write(processingContext, processingEnv.getElementUtils(), annotations, roundEnv);
     }
     return true;
   }
