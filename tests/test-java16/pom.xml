@@ -52,7 +52,7 @@
         <extensions>true</extensions>
         <configuration>
           <tiles>
-            <tile>io.ebean.tile:enhancement:14.9.0</tile>
+            <tile>io.ebean.tile:enhancement:14.10.0</tile>
           </tiles>
         </configuration>
       </plugin>
