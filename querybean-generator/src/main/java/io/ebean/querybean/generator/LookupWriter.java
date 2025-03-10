@@ -7,13 +7,14 @@ import java.io.Writer;
 import java.util.Collection;
 import java.util.Set;
 
+import javax.annotation.processing.FilerException;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.util.Elements;
 import javax.tools.FileObject;
 
 /** Write the source code for the factory. */
-class LookupWriter {
+final class LookupWriter {
   private LookupWriter() {}
 
   private static final String METAINF_SERVICES_LOOKUP =
@@ -58,21 +59,20 @@ class LookupWriter {
       String fqn = pkg + ".EbeanMethodLookup";
       try {
         var javaFileObject = processingContext.createWriter(fqn);
-
         var writer = new Append(javaFileObject.openWriter());
 
         writer.append(FILE_STRING, pkg);
         writer.close();
         writeServicesFile(processingContext, fqn);
+      } catch (FilerException e) {
+        processingContext.logWarn(null, "FilerException writing Lookup " + e.getMessage());
       } catch (IOException e) {
         processingContext.logError(null, "Failed to write lookup class " + e.getMessage());
       }
     }
   }
 
-  private static void writeServicesFile(ProcessingContext processingContext, String fqn)
-      throws IOException {
-
+  private static void writeServicesFile(ProcessingContext processingContext, String fqn) throws IOException {
     FileObject jfo = processingContext.createMetaInfWriter(METAINF_SERVICES_LOOKUP);
     if (jfo != null) {
       Writer writer = jfo.openWriter();
