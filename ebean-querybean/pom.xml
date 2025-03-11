@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.9.0</version>
+    <version>14.10.0</version>
   </parent>
 
   <name>ebean querybean</name>
@@ -17,7 +17,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>14.9.0</version>
+      <version>14.10.0</version>
       <scope>provided</scope>
     </dependency>
 
@@ -59,14 +59,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>14.9.0</version>
+      <version>14.10.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>14.9.0</version>
+      <version>14.10.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -80,7 +80,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
-      <version>14.9.0</version>
+      <version>14.10.0</version>
       <scope>provided</scope>
     </dependency>
 
