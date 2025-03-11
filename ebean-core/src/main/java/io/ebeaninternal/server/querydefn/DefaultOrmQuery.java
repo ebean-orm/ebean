@@ -1307,6 +1307,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final Query<T> setReadOnly(boolean readOnly) {
+    if (unmodifiable && !readOnly) {
+      throw new IllegalStateException("Not allowed to set readOnly false on query that is unmodifiable");
+    }
     this.readOnly = readOnly;
     return this;
   }
@@ -1352,6 +1355,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Query<T> setUseQueryCache(CacheMode useQueryCache) {
     this.useQueryCache = useQueryCache;
+    if (CacheMode.OFF != useQueryCache) {
+      unmodifiable = true;
+    }
     return this;
   }
 

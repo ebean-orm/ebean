@@ -68,41 +68,41 @@ public class TestQueryCacheReadOnly extends BaseTestCase {
     EBasicVer account = new EBasicVer("an other junk");
     server.save(account);
 
-    Query<EBasicVer> baseQuery = server.find(EBasicVer.class).setUseQueryCache(CacheMode.ON).setReadOnly(false);
+    Query<EBasicVer> baseQuery = server.find(EBasicVer.class).setUseQueryCache(CacheMode.ON);
 
     List<EBasicVer> alist = baseQuery.findList();
     assertThat(alist).isNotEmpty();
-    alist.clear();
+    assertThatThrownBy(alist::clear).isInstanceOf(UnsupportedOperationException.class);
     alist = baseQuery.findList();
     assertThat(alist).isNotEmpty();
-    alist.clear();
+    assertThatThrownBy(alist::clear).isInstanceOf(UnsupportedOperationException.class);
 
     Map<String,EBasicVer> amap = baseQuery.setMapKey("name").findMap();
     assertThat(amap).isNotEmpty();
-    amap.clear();
+    assertThatThrownBy(amap::clear).isInstanceOf(UnsupportedOperationException.class);
     amap = baseQuery.setMapKey("name").findMap();
     assertThat(amap).isNotEmpty();
-    amap.clear();
+    assertThatThrownBy(amap::clear).isInstanceOf(UnsupportedOperationException.class);
 
     Set<EBasicVer> aset = baseQuery.findSet();
     assertThat(aset).isNotEmpty();
-    aset.clear();
+    assertThatThrownBy(aset::clear).isInstanceOf(UnsupportedOperationException.class);
     aset = baseQuery.findSet();
     assertThat(aset).isNotEmpty();
-    aset.clear();
+    assertThatThrownBy(aset::clear).isInstanceOf(UnsupportedOperationException.class);
 
-    List<Object> attributeList = baseQuery.select("name").findSingleAttributeList();
+    final List<Object> attributeList = baseQuery.select("name").findSingleAttributeList();
     assertThat(attributeList).isNotEmpty();
-    attributeList.clear();
-    attributeList = baseQuery.select("name").findSingleAttributeList();
-    assertThat(attributeList).isNotEmpty();
-    attributeList.clear();
+    assertThatThrownBy(attributeList::clear).isInstanceOf(UnsupportedOperationException.class);
+    final List<Object> attributeList2 = baseQuery.select("name").findSingleAttributeList();
+    assertThat(attributeList2).isNotEmpty();
+    assertThatThrownBy(attributeList2::clear).isInstanceOf(UnsupportedOperationException.class);
 
     List<Object> idList = baseQuery.select("name").findIds();
     assertThat(idList).isNotEmpty();
-    idList.clear();
-    idList = baseQuery.select("name").findIds();
-    assertThat(idList).isNotEmpty();
-    idList.clear();
+    assertThatThrownBy(idList::clear).isInstanceOf(UnsupportedOperationException.class);
+    List<Object> idList2 = baseQuery.select("name").findIds();
+    assertThat(idList2).isNotEmpty();
+    assertThatThrownBy(idList2::clear).isInstanceOf(UnsupportedOperationException.class);
   }
 }

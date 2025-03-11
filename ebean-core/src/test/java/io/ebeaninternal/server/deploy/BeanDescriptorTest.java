@@ -28,7 +28,7 @@ public class BeanDescriptorTest extends BaseTest {
   @Test
   public void createReference() {
 
-    Customer bean = customerDesc.createReference(null, false, 42, null);
+    Customer bean = customerDesc.createReference(false, false, 42, null);
     assertThat(bean.getId()).isEqualTo(42);
     Assertions.assertThat(server().beanState(bean).isReadOnly()).isFalse();
   }
@@ -36,14 +36,14 @@ public class BeanDescriptorTest extends BaseTest {
   @Test
   public void createReference_whenReadOnly() {
 
-    Customer bean = customerDesc.createReference(Boolean.TRUE, false, 42, null);
+    Customer bean = customerDesc.createReference(true, false, 42, null);
     Assertions.assertThat(server().beanState(bean).isReadOnly()).isTrue();
   }
 
   @Test
   public void createReference_whenNotReadOnly() {
 
-    Customer bean = customerDesc.createReference(Boolean.FALSE, false, 42, null);
+    Customer bean = customerDesc.createReference(false, false, 42, null);
     Assertions.assertThat(server().beanState(bean).isReadOnly()).isFalse();
 
     bean = customerDesc.createReference(42, null);
@@ -53,7 +53,7 @@ public class BeanDescriptorTest extends BaseTest {
   @Test
   public void createReference_when_disabledLazyLoad() {
 
-    Customer bean = customerDesc.createReference(Boolean.FALSE, true, 42, null);
+    Customer bean = customerDesc.createReference(false, true, 42, null);
     Assertions.assertThat(server().beanState(bean).isDisableLazyLoad()).isTrue();
   }
 
@@ -78,7 +78,7 @@ public class BeanDescriptorTest extends BaseTest {
 
     BeanDescriptor<Animal> animalDesc = spiEbeanServer().descriptor(Animal.class);
 
-    Animal bean = animalDesc.createReference(Boolean.FALSE, false, dog.getId(), null);
+    Animal bean = animalDesc.createReference(false, false, dog.getId(), null);
     assertThat(bean.getId()).isEqualTo(dog.getId());
   }
 

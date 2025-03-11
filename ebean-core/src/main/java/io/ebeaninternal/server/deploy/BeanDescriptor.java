@@ -1781,10 +1781,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Create a reference with a check for the bean in the persistence context.
    */
-  public EntityBean createReference(Boolean readOnly, Object id, PersistenceContext pc) {
+  public EntityBean createReference(PersistenceContext pc, Object id) {
     Object refBean = contextGet(pc, id);
     if (refBean == null) {
-      refBean = createReference(readOnly, false, id, pc);
+      refBean = createReference(false, false, id, pc);
     }
     return (EntityBean) refBean;
   }
@@ -1793,8 +1793,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Create a reference bean based on the id.
    */
   @SuppressWarnings("unchecked")
-  public T createReference(Boolean readOnly, boolean disableLazyLoad, Object id, PersistenceContext pc) {
-    if (cacheSharableBeans && !disableLazyLoad && !Boolean.FALSE.equals(readOnly)) {
+  public T createReference(boolean unmodifiable, boolean disableLazyLoad, Object id, PersistenceContext pc) {
+    if (cacheSharableBeans && unmodifiable) {
       CachedBeanData d = cacheHelp.beanCacheGetData(cacheKey(id));
       if (d != null) {
         Object shareableBean = d.getSharableBean();
@@ -1810,18 +1810,18 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       if (inheritInfo != null && !inheritInfo.isConcrete()) {
         return findReferenceBean(id, pc);
       }
-      EntityBean eb = createEntityBean();
+      EntityBean eb = createEntityBean2(unmodifiable);
       id = convertSetId(id, eb);
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
       if (disableLazyLoad) {
         ebi.setDisableLazyLoad(true);
-      } else {
+      } else if (!unmodifiable) {
         ebi.setBeanLoader(refBeanLoader());
       }
       ebi.setReference(idPropertyIndex);
-      if (Boolean.TRUE == readOnly) {
-        ebi.setReadOnly(true);
-      }
+     // if (Boolean.TRUE == readOnly) {
+     //   ebi.setReadOnly(true);
+     // }
       if (pc != null) {
         contextPut(pc, id, eb);
         ebi.setPersistenceContext(pc);
@@ -2046,11 +2046,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     return pc.putIfAbsent(rootBeanType, id, localBean);
   }
 
-  /**
-   * Create a reference bean and put it in the persistence context (and return it).
-   */
-  public Object contextRef(PersistenceContext pc, Boolean readOnly, boolean disableLazyLoad, Object id) {
-    return createReference(readOnly, disableLazyLoad, id, pc);
+  public Object contextRef(PersistenceContext pc, Object id) {
+    return createReference(false, false, id, pc);
+  }
+
+  public Object contextRef(PersistenceContext pc, Object id, boolean unmodifiable, boolean disableLazyLoad) {
+    return createReference(unmodifiable, disableLazyLoad, id, pc);
   }
 
   /**

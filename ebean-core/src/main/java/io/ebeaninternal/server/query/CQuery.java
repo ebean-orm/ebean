@@ -249,6 +249,11 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   }
 
   @Override
+  public boolean unmodifiable() {
+    return unmodifiable;
+  }
+
+  @Override
   public void propagateState(Object e) {
     if (Boolean.TRUE.equals(readOnly)) {
       if (e instanceof EntityBean) {

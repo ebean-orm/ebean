@@ -107,4 +107,9 @@ public interface DbReadContext {
    * query via a secondary query.
    */
   boolean includeSecondary(BeanPropertyAssocMany<?> many);
+
+  /**
+   * Return true if we are loading unmodifiable beans.
+   */
+  boolean unmodifiable();
 }

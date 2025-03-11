@@ -111,7 +111,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
         localIdBinder = idBinder;
         localDesc = desc;
       } else {
-        localBean = localInfo.createEntityBean();
+        localBean = localInfo.createEntityBean(unmodifiable);
         localType = localInfo.getType();
         localIdBinder = localInfo.getIdBinder();
         localDesc = localInfo.desc();
