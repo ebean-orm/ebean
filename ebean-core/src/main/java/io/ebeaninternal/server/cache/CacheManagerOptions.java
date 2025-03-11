@@ -13,18 +13,20 @@ import io.ebeaninternal.server.cluster.ClusterManager;
 public final class CacheManagerOptions {
 
   private final ClusterManager clusterManager;
-  private final DatabaseBuilder.Settings databaseBuilder;
+  private final String serverName;
   private final boolean localL2Caching;
   private CurrentTenantProvider currentTenantProvider;
   private QueryCacheEntryValidate queryCacheEntryValidate;
   private ServerCacheFactory cacheFactory = new DefaultServerCacheFactory();
   private ServerCacheOptions beanDefault = new ServerCacheOptions();
   private ServerCacheOptions queryDefault = new ServerCacheOptions();
+  private final boolean tenantPartitionedCache;
 
   CacheManagerOptions() {
     this.localL2Caching = true;
     this.clusterManager = null;
-    this.databaseBuilder = null;
+    this.serverName = "db";
+    this.tenantPartitionedCache = false;
     this.cacheFactory = new DefaultServerCacheFactory();
     this.beanDefault = new ServerCacheOptions();
     this.queryDefault = new ServerCacheOptions();
@@ -32,9 +34,10 @@ public final class CacheManagerOptions {
 
   public CacheManagerOptions(ClusterManager clusterManager, DatabaseBuilder.Settings config, boolean localL2Caching) {
     this.clusterManager = clusterManager;
-    this.databaseBuilder = config;
+    this.serverName = config.getName();
     this.localL2Caching = localL2Caching;
     this.currentTenantProvider = config.getCurrentTenantProvider();
+    this.tenantPartitionedCache = config.isTenantPartitionedCache();
   }
 
   public CacheManagerOptions with(ServerCacheOptions beanDefault, ServerCacheOptions queryDefault) {
@@ -55,7 +58,7 @@ public final class CacheManagerOptions {
   }
 
   public String getServerName() {
-    return (databaseBuilder == null) ? "db" : databaseBuilder.getName();
+    return serverName;
   }
 
   public boolean isLocalL2Caching() {
@@ -85,4 +88,6 @@ public final class CacheManagerOptions {
   public QueryCacheEntryValidate getQueryCacheEntryValidate() {
     return queryCacheEntryValidate;
   }
+
+  public boolean isTenantPartitionedCache() { return tenantPartitionedCache; }
 }
