@@ -78,7 +78,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final QueryPlanManager queryPlanManager;
   private final ExtraMetrics extraMetrics;
   private final DataTimeZone dataTimeZone;
-  private final ClockService clockService;
+  private final Clock clock;
   private final CallOriginFactory callStackFactory;
   private final Persister persister;
   private final OrmQueryEngine queryEngine;
@@ -141,7 +141,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
     this.dataTimeZone = config.getDataTimeZone();
-    this.clockService = config.getClockService();
+    this.clock = config.clock();
 
     this.transactionManager = config.createTransactionManager(this);
     this.queryPlanManager = config.initQueryPlanManager(transactionManager);
@@ -390,18 +390,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public ExtendedServer extended() {
-    return this;
-  }
-
-  @Override
   public long clockNow() {
-    return clockService.nowMillis();
-  }
-
-  @Override
-  public void setClock(Clock clock) {
-    this.clockService.setClock(clock);
+    return clock.millis();
   }
 
   @Override
@@ -638,6 +628,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return callable.call();
     } catch (Error e) {
       throw scopeTrans.caughtError(e);
+    } catch (PersistenceException e) {
+      throw scopeTrans.caughtThrowable(e);
     } catch (Exception e) {
       throw new PersistenceException(scopeTrans.caughtThrowable(e));
     } finally {
@@ -657,6 +649,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       runnable.run();
     } catch (Error e) {
       throw t.caughtError(e);
+    } catch (PersistenceException e) {
+      throw t.caughtThrowable(e);
     } catch (Exception e) {
       throw new PersistenceException(t.caughtThrowable(e));
     } finally {

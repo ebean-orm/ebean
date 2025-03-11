@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 /**
  * Service Provider extension to EbeanServer.
  */
-public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectionLoader {
+public interface SpiEbeanServer extends SpiServer, BeanCollectionLoader {
 
   /**
    * Return the NOW time from the Clock.

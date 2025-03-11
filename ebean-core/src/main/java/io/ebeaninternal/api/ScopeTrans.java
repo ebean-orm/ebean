@@ -142,6 +142,8 @@ public final class ScopeTrans {
       transaction.commit();
     } else {
       nestedCommit = true;
+      transaction.flush();
+      // restore the batch settings
       transaction.setFlushOnQuery(restoreBatchFlushOnQuery);
       transaction.setBatchMode(restoreBatch);
       transaction.setBatchOnCascade(restoreBatchOnCascade);

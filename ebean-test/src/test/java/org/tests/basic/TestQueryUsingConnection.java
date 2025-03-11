@@ -32,6 +32,7 @@ public class TestQueryUsingConnection extends BaseTestCase {
         .findCount();
 
       assertThat(count).isGreaterThan(0);
+      connection.rollback();
     }
   }
 

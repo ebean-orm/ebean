@@ -258,6 +258,8 @@ public final class DefaultContainer implements SpiContainer {
     try (Connection connection = config.getDataSource().getConnection()) {
       if (connection.getAutoCommit()) {
         log.log(WARNING, "DataSource [{0}] has autoCommit defaulting to true!", config.getName());
+      } else {
+        connection.rollback();
       }
       return true;
     } catch (SQLException ex) {

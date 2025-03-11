@@ -239,11 +239,6 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public ExtendedServer extended() {
-    return null;
-  }
-
-  @Override
   public void save(Object bean) throws OptimisticLockException {
 
   }

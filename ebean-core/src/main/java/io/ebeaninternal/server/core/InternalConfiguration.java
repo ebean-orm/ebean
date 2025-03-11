@@ -44,6 +44,7 @@ import io.ebeaninternal.server.transaction.*;
 import io.ebeaninternal.server.type.DefaultTypeManager;
 import io.ebeaninternal.server.type.TypeManager;
 
+import java.time.Clock;
 import java.util.*;
 
 import static java.lang.System.Logger.Level.*;
@@ -63,7 +64,7 @@ public final class InternalConfiguration {
   private final DatabasePlatform databasePlatform;
   private final TypeManager typeManager;
   private final DtoBeanManager dtoBeanManager;
-  private final ClockService clockService;
+  private final Clock clock;
   private final DataTimeZone dataTimeZone;
   private final Binder binder;
   private final DeployCreateProperties deployCreateProperties;
@@ -90,7 +91,7 @@ public final class InternalConfiguration {
     this.online = online;
     this.config = config;
     this.jacksonCorePresent = config.getClassLoadConfig().isJacksonCorePresent();
-    this.clockService = new ClockService(config.settings().getClock());
+    this.clock = config.settings().getClock();
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
     this.jsonFactory = config.getJsonFactory();
@@ -148,8 +149,8 @@ public final class InternalConfiguration {
     return new DefaultExpressionFactory(config.isExpressionEqualsWithNullAsNoop(), nativeIlike);
   }
 
-  ClockService getClockService() {
-    return clockService;
+  Clock clock() {
+    return clock;
   }
 
   public ExtraMetrics getExtraMetrics() {
@@ -323,7 +324,7 @@ public final class InternalConfiguration {
     TransactionManagerOptions options =
       new TransactionManagerOptions(server, notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
         beanDescriptorManager, dataSource(), profileHandler(), logManager,
-        tableModState, cacheNotify, clockService);
+        tableModState, cacheNotify);
 
     return new TransactionManager(options);
   }

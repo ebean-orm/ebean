@@ -79,7 +79,7 @@ public final class DeployTableJoin {
       // only add the join column details when name or referencedColumnName is specified
       String ref = deploy.convertQuotes(jc.referencedColumnName());
       String nam = deploy.convertQuotes(jc.name());
-      addJoinColumn(new DeployTableJoinColumn(order, ref, nam, jc.insertable(), jc.updatable(), beanTable));
+      addJoinColumn(new DeployTableJoinColumn(order, ref, nam, jc.insertable(), jc.updatable(), jc.nullable(), beanTable));
     }
   }
 

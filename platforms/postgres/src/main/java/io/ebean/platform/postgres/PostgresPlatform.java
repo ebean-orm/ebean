@@ -60,7 +60,7 @@ public class PostgresPlatform extends DatabasePlatform {
 
     DbPlatformType dbTypeText = new DbPlatformType("text", false);
     DbPlatformType dbBytea = new DbPlatformType("bytea", false);
-    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar", 255, 10_485_760, dbTypeText));
+    dbTypeMap.put(DbType.VARCHAR, new DbPlatformType("varchar", 0, 10_485_760, dbTypeText));
     dbTypeMap.put(DbType.UUID, new DbPlatformType("uuid", false));
     dbTypeMap.put(DbType.INET, new DbPlatformType("inet", false));
     dbTypeMap.put(DbType.CIDR, new DbPlatformType("cidr", false));

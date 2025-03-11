@@ -77,7 +77,12 @@ public class DatabasePlatformFactory {
    */
   private DatabasePlatform byDataSource(DataSource dataSource) {
     try (Connection connection = dataSource.getConnection()) {
-      return byDatabaseMeta(connection.getMetaData(), connection);
+      DatabasePlatform platform = byDatabaseMeta(connection.getMetaData(), connection);
+      if (!connection.getAutoCommit()) {
+        // we must roll back before close.
+        connection.rollback();
+      }
+      return platform;
     } catch (SQLException ex) {
       throw new PersistenceException(ex);
     }
