@@ -67,7 +67,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   @Override
   protected void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException {
     this.resultSet = resultSet;
-    this.dataReader = new RsetDataReader(server.dataTimeZone(), resultSet);
+    this.dataReader = new RsetDataReader(false, server.dataTimeZone(), resultSet);
     obtainPlan(queryPlanKey);
   }
 

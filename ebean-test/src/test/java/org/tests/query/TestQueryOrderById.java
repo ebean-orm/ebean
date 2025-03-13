@@ -139,6 +139,23 @@ class TestQueryOrderById extends BaseTestCase {
   }
 
   @Test
+  void unmodifiableWithReference() {
+    ResetBasicData.reset();
+
+    List<Contact> result = DB.find(Contact.class)
+      .setUnmodifiable(true)
+      .findList();
+
+    assertThat(result).isNotEmpty();
+    for (Contact contact : result) {
+      Customer customer = contact.getCustomer();
+      assertThat(customer.getId()).isNotNull();
+      assertThatThrownBy(() -> customer.setId(42))
+        .isInstanceOf(UnsupportedOperationException.class);
+    }
+  }
+
+  @Test
   void immutableResult() {
     ResetBasicData.reset();
 

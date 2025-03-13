@@ -309,7 +309,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     if (resultSet == null) {
       return false;
     }
-    dataReader = queryPlan.createDataReader(resultSet);
+    dataReader = queryPlan.createDataReader(query.isUnmodifiable(), resultSet);
     return true;
   }
 

@@ -22,8 +22,8 @@ final class CQueryPlanRawSql extends CQueryPlan {
   }
 
   @Override
-  public DataReader createDataReader(ResultSet rset) {
-    return new RsetDataReaderIndexed(dataTimeZone, rset, rsetIndexPositions);
+  public DataReader createDataReader(boolean unmodifiable, ResultSet rset) {
+    return new RsetDataReaderIndexed(unmodifiable, dataTimeZone, rset, rsetIndexPositions);
   }
 
   private int[] createIndexPositions(OrmQueryRequest<?> request, SqlTree sqlTree) {
