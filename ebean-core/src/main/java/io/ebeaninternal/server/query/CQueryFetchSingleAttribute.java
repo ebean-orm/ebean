@@ -137,7 +137,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
     } finally {
       lock.unlock();
     }
-    dataReader = new RsetDataReader(request.dataTimeZone(), pstmt.executeQuery());
+    dataReader = new RsetDataReader(query.isUnmodifiable(), request.dataTimeZone(), pstmt.executeQuery());
     query.checkCancelled();
   }
 

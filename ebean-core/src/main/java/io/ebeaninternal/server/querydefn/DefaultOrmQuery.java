@@ -133,6 +133,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private CacheMode useBeanCache = CacheMode.AUTO;
   private CacheMode useQueryCache = CacheMode.OFF;
   private Boolean readOnly;
+  private boolean unmodifiable;
   private PersistenceContextScope persistenceContextScope;
 
   /**
@@ -514,6 +515,15 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (!useDocStore) {
       createExtraJoinsToSupportManyWhereClause();
     }
+    if (unmodifiable) {
+      readOnly = Boolean.TRUE;
+      disableLazyLoading = true;
+      persistenceContextScope = PersistenceContextScope.QUERY;
+    } else if (disableLazyLoading && Boolean.TRUE.equals(readOnly)) {
+      // "upgrade" this to unmodifiable? hmmm.
+      unmodifiable = true;
+      persistenceContextScope = PersistenceContextScope.QUERY;
+    }
     return markQueryJoins();
   }
 
@@ -763,6 +773,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.nativeSql = nativeSql;
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
+    copy.unmodifiable = unmodifiable;
     copy.readOnly = readOnly;
     if (detail != null) {
       copy.detail = detail.copy();
@@ -1113,7 +1124,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (allowLoadErrors) {
       sb.append("/ae");
     }
-    if (disableLazyLoading) {
+    if (unmodifiable) {
+      sb.append("/um");
+    } else if (disableLazyLoading) {
       sb.append("/dl");
     }
     if (baseTable != null) {
@@ -1277,12 +1290,26 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public Query<T> setUnmodifiable(boolean unmodifiable) {
+    this.unmodifiable = unmodifiable;
+    return this;
+  }
+
+  @Override
   public final Boolean isReadOnly() {
     return readOnly;
   }
 
   @Override
+  public boolean isUnmodifiable() {
+    return unmodifiable;
+  }
+
+  @Override
   public final Query<T> setReadOnly(boolean readOnly) {
+    if (unmodifiable && !readOnly) {
+      throw new IllegalStateException("Not allowed to set readOnly false on query that is unmodifiable");
+    }
     this.readOnly = readOnly;
     return this;
   }
@@ -1328,6 +1355,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Query<T> setUseQueryCache(CacheMode useQueryCache) {
     this.useQueryCache = useQueryCache;
+    if (CacheMode.OFF != useQueryCache) {
+      unmodifiable = true;
+    }
     return this;
   }
 

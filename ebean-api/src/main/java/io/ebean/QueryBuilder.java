@@ -390,6 +390,11 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   /**
    * When set to true when you want the returned beans to be read only.
    */
+  SELF setUnmodifiable(boolean unmodifiable);
+
+  /**
+   * When set to true when you want the returned beans to be read only.
+   */
   SELF setReadOnly(boolean readOnly);
 
   /**
