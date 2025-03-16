@@ -35,14 +35,15 @@ class TestLoadBeanCache extends BaseTestCase {
     Map<String, Country> map = DB.find(Country.class)
       .setBeanCacheMode(CacheMode.PUT)
       .setUseQueryCache(true)
-      .setReadOnly(true)
+      //.setReadOnly(true)
+      .setUnmodifiable(true)
       .orderBy("name")
       .findMap();
 
     Country loadedNz = map.get("NZ");
 
-    // this will hit the cache
-    Country nz = DB.find(Country.class, "NZ");
+    // this will hit the cache, with setUnmodifiable(true) we can use shared bean instances
+    Country nz = DB.find(Country.class).setId("NZ").setUnmodifiable(true).findOne();
 
     assertSame(loadedNz, nz);
   }

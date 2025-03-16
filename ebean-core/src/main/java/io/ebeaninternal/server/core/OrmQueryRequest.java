@@ -547,7 +547,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (orderBy != null && !orderBy.isEmpty()) {
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
     }
-    return cacheBeans;
+    return query.isUnmodifiable() ? Collections.unmodifiableList(cacheBeans) : cacheBeans;
   }
 
   @Override
@@ -566,7 +566,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     for (T bean : cacheBeans) {
       map.put((K) property.pathGet(bean), bean);
     }
-    return map;
+    return query.isUnmodifiable() ? Collections.unmodifiableMap(map) : map;
   }
 
   private ElPropertyValue mapProperty() {
@@ -584,7 +584,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (orderBy != null && !orderBy.isEmpty()) {
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
     }
-    return new LinkedHashSet<>(cacheBeans);
+    var set = new LinkedHashSet<>(cacheBeans);
+    return query.isUnmodifiable() ? Collections.unmodifiableSet(set) : set;
   }
 
   @Override
@@ -601,9 +602,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     //
     CacheIdLookup<T> idLookup = query.cacheIdLookup();
     if (idLookup != null) {
-      BeanCacheResult<T> cacheResult = beanDescriptor.cacheIdLookup(persistenceContext, idLookup.idValues());
+      BeanCacheResult<T> cacheResult = beanDescriptor.cacheIdLookup(persistenceContext, query.isUnmodifiable(), idLookup.idValues());
       // adjust the query (IN clause) based on the cache hits
       this.cacheBeans = idLookup.removeHits(cacheResult);
+      if (query.isUnmodifiable()) {
+        unmodifiableFreeze(cacheBeans);
+      }
       return idLookup.allHits();
     }
     if (!beanDescriptor.isNaturalKeyCaching()) {
@@ -614,7 +618,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       NaturalKeySet naturalKeySet = data.buildKeys();
       if (naturalKeySet != null) {
         // use the natural keys to lookup Ids to then hit the bean cache
-        BeanCacheResult<T> cacheResult = beanDescriptor.naturalKeyLookup(persistenceContext, naturalKeySet.keys());
+        BeanCacheResult<T> cacheResult = beanDescriptor.naturalKeyLookup(persistenceContext, query.isUnmodifiable(), naturalKeySet.keys());
         // adjust the query (IN clause) based on the cache hits
         this.cacheBeans = data.removeHits(cacheResult);
         return data.allHits();

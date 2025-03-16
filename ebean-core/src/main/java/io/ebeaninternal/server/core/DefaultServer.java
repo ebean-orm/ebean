@@ -1004,7 +1004,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return null;
     }
     // Hit the L2 bean cache
-    return desc.cacheBeanGet(id, query.isReadOnly(), pc);
+    return desc.cacheBeanGet(id, query.isUnmodifiable(), pc);
   }
 
   /**

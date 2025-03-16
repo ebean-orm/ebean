@@ -68,13 +68,11 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
       .orderBy().asc("id")
       .findList();
 
-    assertEquals(2, beans.size());
+    assertThat(beans).hasSize(2);
 
     LoggedSql.start();
 
-
-    Transaction txn = DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       txn.setUpdateAllLoadedProperties(true);
 
       EBasicVer basic1 = beans.get(0);
@@ -87,9 +85,6 @@ public class TestUpdateAllLoadedProperties extends BaseTestCase {
       DB.save(basic2);
 
       txn.commit();
-
-    } finally {
-      txn.end();
     }
 
     List<String> loggedSql = LoggedSql.stop();

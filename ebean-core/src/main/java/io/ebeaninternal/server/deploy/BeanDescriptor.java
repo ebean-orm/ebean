@@ -1256,8 +1256,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Load the entity bean as the correct bean type.
    */
-  EntityBean cacheBeanLoadDirect(Object id, Boolean readOnly, CachedBeanData data, PersistenceContext context) {
-    return cacheHelp.loadBeanDirect(id, readOnly, data, context);
+  EntityBean cacheBeanLoadDirect(Object id, boolean unmodifiable, CachedBeanData data, PersistenceContext context) {
+    return cacheHelp.loadBeanDirect(id, unmodifiable, data, context);
   }
 
   /**
@@ -1295,8 +1295,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Return a bean from the bean cache (or null).
    */
-  public T cacheBeanGet(Object id, Boolean readOnly, PersistenceContext context) {
-    return cacheHelp.beanCacheGet(cacheKey(id), readOnly, context);
+  public T cacheBeanGet(Object id, boolean unmodifiable, PersistenceContext context) {
+    return cacheHelp.beanCacheGet(cacheKey(id), unmodifiable, context);
   }
 
   /**
@@ -1325,15 +1325,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     return cacheHelp.beanCacheLoad(bean, ebi, cacheKey(id), context);
   }
 
-  public BeanCacheResult<T> cacheIdLookup(PersistenceContext context, Collection<?> ids) {
-    return cacheHelp.cacheIdLookup(context, ids);
+  public BeanCacheResult<T> cacheIdLookup(PersistenceContext context, boolean unmodifiable, Collection<?> ids) {
+    return cacheHelp.cacheIdLookup(context, unmodifiable, ids);
   }
 
   /**
    * Use natural key lookup to hit the bean cache.
    */
-  public BeanCacheResult<T> naturalKeyLookup(PersistenceContext context, Set<Object> keys) {
-    return cacheHelp.naturalKeyLookup(context, keys);
+  public BeanCacheResult<T> naturalKeyLookup(PersistenceContext context, boolean unmodifiable, Set<Object> keys) {
+    return cacheHelp.naturalKeyLookup(context, unmodifiable, keys);
   }
 
   public void cacheNaturalKeyPut(String key, String newKey) {
@@ -2166,7 +2166,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Set the Id value to the bean (without type conversion).
    */
   public void setId(Object idValue, EntityBean bean) {
-    idProperty.setValueIntercept(bean, idValue);
+    idProperty.setValue(bean, idValue);
   }
 
   @Override

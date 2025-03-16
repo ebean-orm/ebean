@@ -2,6 +2,7 @@ package io.ebeaninternal.server.cache;
 
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.InterceptReadOnly;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -48,25 +49,21 @@ public final class CachedBeanDataFromBean {
     if (!desc.isCacheSharableBeans() || !beanEbi.isFullyLoadedBean()) {
       return null;
     }
-    if (beanEbi.isReadOnly()) {
+    if (beanEbi instanceof InterceptReadOnly) {
       return bean;
     }
-
     // create a readOnly sharable instance by copying the data
-    EntityBean sharableBean = desc.createEntityBean();
+    EntityBean sharableBean = desc.createEntityBean2(true);
     BeanProperty idProp = desc.idProperty();
     if (idProp != null) {
       Object v = idProp.getValue(bean);
       idProp.setValue(sharableBean, v);
     }
-    BeanProperty[] propertiesNonTransient = desc.propertiesNonTransient();
-    for (BeanProperty aPropertiesNonTransient : propertiesNonTransient) {
-      Object v = aPropertiesNonTransient.getValue(bean);
-      aPropertiesNonTransient.setValue(sharableBean, v);
+    for (BeanProperty nonTransient : desc.propertiesNonTransient()) {
+      Object v = nonTransient.getValue(bean);
+      nonTransient.setValue(sharableBean, v);
     }
-    EntityBeanIntercept intercept = sharableBean._ebean_getIntercept();
-    intercept.setReadOnly(true);
-    intercept.setLoaded();
+    desc.freeze(sharableBean);
     return sharableBean;
   }
 
