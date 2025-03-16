@@ -117,7 +117,7 @@ class TestQueryOrderById extends BaseTestCase {
     }
 
     assertThatThrownBy(customer::getOrders)
-      .isInstanceOf(UnloadedPropertyException.class)
+      .isInstanceOf(LazyInitialisationException.class)
       .hasMessageContaining("Property not loaded: orders");
 
     assertThatThrownBy(() -> customer.setName("Attempting to Modify"))
@@ -201,24 +201,24 @@ class TestQueryOrderById extends BaseTestCase {
     assertThat(intercept.isLoadedProperty(pos)).isFalse();
     assertThatThrownBy(() -> customer.getBillingAddress())
       .describedAs("Not loaded property returns null")
-      .isInstanceOf(UnloadedPropertyException.class)
+      .isInstanceOf(LazyInitialisationException.class)
       .hasMessageContaining("Property not loaded: billingAddress");
 
     assertThatThrownBy(() -> customer.setBillingAddress(new Address()))
       .describedAs("Not allowed to mutate a readOnly bean")
-      .isInstanceOf(UnloadedPropertyException.class)
+      .isInstanceOf(LazyInitialisationException.class)
       .hasMessageContaining("Property not loaded: billingAddress");
 
     assertThatThrownBy(customer::getBillingAddress)
-      .isInstanceOf(UnloadedPropertyException.class)
+      .isInstanceOf(LazyInitialisationException.class)
       .hasMessageContaining("Property not loaded: billingAddress");
 
     assertThat(intercept).isInstanceOf(InterceptReadOnly.class);
     assertThatThrownBy(customer::getOrders)
-      .isInstanceOf(UnloadedPropertyException.class)
+      .isInstanceOf(LazyInitialisationException.class)
       .hasMessageContaining("Property not loaded: orders");
     assertThatThrownBy(customer::getContacts)
-      .isInstanceOf(UnloadedPropertyException.class)
+      .isInstanceOf(LazyInitialisationException.class)
       .hasMessageContaining("Property not loaded: contacts");
   }
 

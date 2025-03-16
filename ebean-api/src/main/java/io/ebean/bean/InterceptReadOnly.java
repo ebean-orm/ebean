@@ -1,6 +1,6 @@
 package io.ebean.bean;
 
-import io.ebean.UnloadedPropertyException;
+import io.ebean.LazyInitialisationException;
 import io.ebean.UnmodifiableEntityException;
 import io.ebean.ValuePair;
 
@@ -426,7 +426,7 @@ public final class InterceptReadOnly extends InterceptBase {
   @Override
   public void preGetter(int propertyIndex) {
     if (!loaded[propertyIndex]) {
-      throw new UnloadedPropertyException("Property not loaded: " + property(propertyIndex));
+      throw new LazyInitialisationException("Property not loaded: " + property(propertyIndex));
     }
   }
 

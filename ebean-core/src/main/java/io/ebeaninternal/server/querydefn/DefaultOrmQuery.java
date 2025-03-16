@@ -1356,6 +1356,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final Query<T> setUseQueryCache(CacheMode useQueryCache) {
     this.useQueryCache = useQueryCache;
     if (CacheMode.OFF != useQueryCache) {
+      if (Boolean.FALSE.equals(readOnly)) {
+        throw new IllegalStateException("Not allowed to use query cache with readOnly false");
+      }
       unmodifiable = true;
     }
     return this;
