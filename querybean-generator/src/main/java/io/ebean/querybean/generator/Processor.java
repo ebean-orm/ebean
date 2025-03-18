@@ -17,9 +17,10 @@ import java.util.Set;
 public class Processor extends AbstractProcessor implements Constants {
 
   private ProcessingContext processingContext;
+  private SimpleModuleInfoWriter moduleWriter;
+  private boolean initModuleWriter;
 
-  public Processor() {
-  }
+  private boolean wroteLookup;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -49,12 +50,17 @@ public class Processor extends AbstractProcessor implements Constants {
     int count = processEntities(roundEnv);
     processOthers(roundEnv);
     final int loaded = processingContext.complete();
+    initModuleInfoBean();
     if (roundEnv.processingOver()) {
       writeModuleInfoBean();
     }
     if (count > 0) {
       String msg = "Ebean APT generated %s query beans, loaded %s others - META-INF/ebean-generated-info.mf entity-packages: %s";
       processingContext.logNote(msg, count, loaded, processingContext.getAllEntityPackages());
+    }
+    if (!wroteLookup) {
+      wroteLookup = true;
+      LookupWriter.write(processingContext, processingEnv.getElementUtils(), annotations, roundEnv);
     }
     return true;
   }
@@ -85,11 +91,27 @@ public class Processor extends AbstractProcessor implements Constants {
     }
   }
 
+  private void initModuleInfoBean() {
+    try {
+      if (!initModuleWriter) {
+        moduleWriter = new SimpleModuleInfoWriter(processingContext);
+      }
+    } catch (FilerException e) {
+      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
+    } catch (Throwable e) {
+      processingContext.logError(null, "Failed to initialise EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
+    } finally {
+      initModuleWriter = true;
+    }
+  }
+
   private void writeModuleInfoBean() {
     try {
-      new SimpleModuleInfoWriter(processingContext).write();
-    } catch (FilerException e) {
-      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister: " + e);
+      if (moduleWriter == null) {
+        processingContext.logNote(null, "EntityClassRegister skipped");
+      } else {
+        moduleWriter.write();
+      }
     } catch (Throwable e) {
       processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }

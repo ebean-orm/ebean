@@ -49,7 +49,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     // first one is the main query and others are lazy loading queries
     List<String> loggedSql = LoggedSql.stop();
-    assertTrue(loggedSql.size() > 1);
+    assertThat(loggedSql.size()).isGreaterThan(1);
 
     String lazyLoadSql = loggedSql.get(1);
     // contains the foreign key back to the parent bean (t0.order_id)
@@ -77,8 +77,8 @@ public class TestOrderByWithMany extends BaseTestCase {
     String sql = query.getGeneratedSql();
 
     // t0.id inserted into the middle of the order by
-    assertTrue(sql.contains("order by t1.name desc, t0.id, t2.id asc"));
-    assertTrue(sql.contains("t2.id asc, t2.order_qty asc, t2.cretime desc"));
+    assertThat(sql).contains("order by t1.name desc, t0.id, t2.id asc");
+    assertThat(sql).contains("t2.id asc, t2.order_qty asc, t2.cretime desc");
   }
 
   private void checkAppendId() {
@@ -90,7 +90,7 @@ public class TestOrderByWithMany extends BaseTestCase {
     String sql = query.getGeneratedSql();
 
     // append the id to ensure ordering of root level objects
-    assertTrue(sql.contains("order by t1.name desc, t0.id"));
+    assertThat(sql).contains("order by t1.name desc, t0.id");
   }
 
   private void checkNone() {
@@ -103,8 +103,8 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     // no need to append id to order by as there is no 'many' included in the
     // query
-    assertTrue(sql.contains("order by t1.name desc"));
-    assertTrue(!sql.contains("order by t1.name desc,"));
+    assertThat(sql).contains("order by t1.name desc");
+    assertThat(sql).doesNotContain("order by t1.name desc,");
   }
 
   private void checkBoth() {
@@ -116,7 +116,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     String sql = query.getGeneratedSql();
     // insert id into the middle of the order by
-    assertTrue(sql.contains("order by t1.name, t0.id, t2.ship_time desc"));
+    assertThat(sql).contains("order by t1.name, t0.id, t2.ship_time desc");
   }
 
   private void checkPrepend() {
@@ -128,7 +128,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     String sql = query.getGeneratedSql();
     // prepend id in order by
-    assertTrue(sql.contains("order by t0.id, t1.ship_time desc"));
+    assertThat(sql).contains("order by t0.id, t1.ship_time desc");
   }
 
   private void checkAlreadyIncluded() {
@@ -140,7 +140,7 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     String sql = query.getGeneratedSql();
     // prepend id in order by
-    assertTrue(sql.contains("order by t0.id, t1.ship_time desc"));
+    assertThat(sql).contains("order by t0.id, t1.ship_time desc");
   }
 
   private void checkAlreadyIncluded2() {

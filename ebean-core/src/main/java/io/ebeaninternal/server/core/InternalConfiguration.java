@@ -55,6 +55,7 @@ import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
 
+import java.time.Clock;
 import java.util.*;
 
 import static java.lang.System.Logger.Level.*;
@@ -75,7 +76,7 @@ public final class InternalConfiguration {
   private final DeployInherit deployInherit;
   private final TypeManager typeManager;
   private final DtoBeanManager dtoBeanManager;
-  private final ClockService clockService;
+  private final Clock clock;
   private final DataTimeZone dataTimeZone;
   private final Binder binder;
   private final DeployCreateProperties deployCreateProperties;
@@ -103,7 +104,7 @@ public final class InternalConfiguration {
     this.online = online;
     this.config = config;
     this.jacksonCorePresent = config.getClassLoadConfig().isJacksonCorePresent();
-    this.clockService = new ClockService(config.settings().getClock());
+    this.clock = config.settings().getClock();
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(service(DocStoreFactory.class));
@@ -189,8 +190,8 @@ public final class InternalConfiguration {
     return docStoreFactory;
   }
 
-  ClockService getClockService() {
-    return clockService;
+  Clock clock() {
+    return clock;
   }
 
   public ExtraMetrics getExtraMetrics() {
@@ -391,7 +392,7 @@ public final class InternalConfiguration {
     TransactionManagerOptions options =
       new TransactionManagerOptions(server, notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
         indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
-        tableModState, cacheNotify, clockService);
+        tableModState, cacheNotify);
 
     if (config.isDocStoreOnly()) {
       return new DocStoreTransactionManager(options);
