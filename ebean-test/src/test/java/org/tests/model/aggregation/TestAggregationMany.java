@@ -1,5 +1,6 @@
 package org.tests.model.aggregation;
 
+import io.ebean.LazyInitialisationException;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestAggregationMany extends BaseTestCase {
 
@@ -26,7 +28,7 @@ public class TestAggregationMany extends BaseTestCase {
 
     for (DMachine machine : machines) {
       assertThat(machine.getAuxUseAggs()).isNotEmpty();
-      assertThat(machine.getMachineStats()).isEmpty();
+      assertThrows(LazyInitialisationException.class, machine::getMachineStats);
     }
 
     List<String> sql = LoggedSql.stop();
@@ -57,7 +59,7 @@ public class TestAggregationMany extends BaseTestCase {
 
     for (DMachine machine : machines) {
       assertThat(machine.getAuxUseAggs()).isNotEmpty();
-      assertThat(machine.getMachineStats()).isEmpty();
+      assertThrows(LazyInitialisationException.class, machine::getMachineStats);
     }
 
     List<String> sql = LoggedSql.stop();
@@ -83,7 +85,7 @@ public class TestAggregationMany extends BaseTestCase {
     for (DMachine machine : machines) {
       assertThat(machine.getAuxUseAggs()).isNotEmpty();
       System.out.println(machine);
-      assertThat(machine.getMachineStats()).isEmpty();
+      assertThrows(LazyInitialisationException.class, machine::getMachineStats);
     }
 
     List<String> sql = LoggedSql.stop();

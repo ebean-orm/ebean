@@ -2,7 +2,7 @@ package org.tests.batchload;
 
 import io.ebean.BeanState;
 import io.ebean.DB;
-import io.ebean.UnmodifiableEntityException;
+import io.ebean.LazyInitialisationException;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.xtest.BaseTestCase;
@@ -83,7 +83,7 @@ class TestBeanState extends BaseTestCase {
 
     BeanState beanState = DB.beanState(customer);
     beanState.setDisableLazyLoad(true);
-    assertNull(customer.getName());
+    assertThrows(LazyInitialisationException.class, customer::getName);
   }
 
   @Test

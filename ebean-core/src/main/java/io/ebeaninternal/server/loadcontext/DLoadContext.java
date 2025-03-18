@@ -97,7 +97,7 @@ public final class DLoadContext implements LoadContext {
     this.profilingListener = query.profilingListener();
     this.planLabel = query.planLabel();
     this.profileLocation = query.profileLocation();
-    this.secondaryProperties = query.isUnmodifiable() ? new HashSet<>() : null;
+    this.secondaryProperties = query.isUnmodifiable() || query.isDisableLazyLoading() ? new HashSet<>() : null;
 
     ObjectGraphNode parentNode = query.parentNode();
     if (parentNode != null) {
