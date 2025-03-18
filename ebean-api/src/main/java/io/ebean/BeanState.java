@@ -89,6 +89,13 @@ public interface BeanState {
    * <p>
    * If a setter is called on a readOnly bean it will throw an exception.
    */
+  boolean isUnmodifiable();
+
+  /**
+   * Return true if the bean is readOnly.
+   * <p>
+   * If a setter is called on a readOnly bean it will throw an exception.
+   */
   boolean isReadOnly();
 
   /**

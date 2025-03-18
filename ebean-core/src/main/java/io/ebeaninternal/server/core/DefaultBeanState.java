@@ -4,6 +4,7 @@ import io.ebean.BeanState;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.InterceptReadOnly;
 
 import java.util.Map;
 import java.util.Set;
@@ -57,6 +58,11 @@ public final class DefaultBeanState implements BeanState {
   @Override
   public Map<String, ValuePair> dirtyValues() {
     return intercept.dirtyValues();
+  }
+
+  @Override
+  public boolean isUnmodifiable() {
+    return intercept instanceof InterceptReadOnly;
   }
 
   @Override

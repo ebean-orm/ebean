@@ -1215,11 +1215,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, query);
     Object result = request.getFromQueryCache();
     if (result != null) {
-      if (Boolean.FALSE.equals(request.query().isReadOnly())) {
-        return new CopyOnFirstWriteList<>((List<A>) result);
-      } else {
-        return (List<A>) result;
-      }
+      return (List<A>) result;
     }
     try {
       request.initTransIfRequired();

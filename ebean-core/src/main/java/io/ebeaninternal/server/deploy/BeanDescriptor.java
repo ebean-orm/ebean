@@ -1206,8 +1206,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Try to load the beanCollection from cache return true if successful.
    */
-  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey, Boolean readOnly) {
-    return cacheHelp.manyPropLoad(many, bc, parentKey, readOnly);
+  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey) {
+    return cacheHelp.manyPropLoad(many, bc, parentKey);
   }
 
   /**

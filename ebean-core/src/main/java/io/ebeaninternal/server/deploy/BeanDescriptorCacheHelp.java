@@ -261,7 +261,7 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Try to load the bean collection from cache return true if successful.
    */
-  boolean manyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey, Boolean readOnly) {
+  boolean manyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey) {
     if (many.isElementCollection()) {
       // held as part of the bean cache so skip
       return false;

@@ -153,8 +153,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   private final ProfilingListener profilingListener;
 
-  private final Boolean readOnly;
-
   private long profileOffset;
   private long startNano;
 
@@ -187,7 +185,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.queryMode = query.mode();
     this.loadContextBean = queryMode.isLoadContextBean() || query.getForUpdateLockType() != null;
     this.lazyLoadManyProperty = query.lazyLoadMany();
-    this.readOnly = query.isReadOnly();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.objectGraphNode = query.parentNode();
     this.profilingListener = query.profilingListener();
@@ -244,22 +241,8 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   }
 
   @Override
-  public Boolean isReadOnly() {
-    return readOnly;
-  }
-
-  @Override
   public boolean unmodifiable() {
     return unmodifiable;
-  }
-
-  @Override
-  public void propagateState(Object e) {
-    if (Boolean.TRUE.equals(readOnly)) {
-      if (e instanceof EntityBean) {
-        ((EntityBean) e)._ebean_getIntercept().setReadOnly(true);
-      }
-    }
   }
 
   @Override

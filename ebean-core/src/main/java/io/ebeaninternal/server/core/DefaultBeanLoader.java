@@ -67,12 +67,8 @@ final class DefaultBeanLoader {
     parentDesc.contextPutIfAbsent(pc, parentId, parentBean);
     boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching() && many.isUseCache();
     if (useManyIdCache) {
-      Boolean readOnly = null;
-      if (ebi.isReadOnly()) {
-        readOnly = Boolean.TRUE;
-      }
       final String parentKey = parentDesc.cacheKey(parentId);
-      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentKey, readOnly)) {
+      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentKey)) {
         return;
       }
     }

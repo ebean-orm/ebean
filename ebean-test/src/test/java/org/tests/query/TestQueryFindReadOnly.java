@@ -22,27 +22,30 @@ public class TestQueryFindReadOnly extends BaseTestCase {
 
     DB.save(a0);
 
-    Article ar1 = DB.find(Article.class).setReadOnly(true).setId(a0.getId()).findOne();
+    Article ar1 = DB.find(Article.class)
+      .setUnmodifiable(true)//.setReadOnly(true)
+      .fetch("sections")
+      .setId(a0.getId()).findOne();
 
     assertNotNull(ar1);
-    assertTrue(DB.beanState(ar1).isReadOnly());
+    assertTrue(DB.beanState(ar1).isUnmodifiable()); // .isReadOnly())
 
     List<Section> ar1sections = ar1.getSections();
     assertEquals(1, ar1sections.size());
 
     Section s2 = ar1sections.get(0);
-    assertTrue(DB.beanState(s2).isReadOnly());
+    assertTrue(DB.beanState(s2).isUnmodifiable()); // isReadOnly()
 
     DB.find(Article.class).setBeanCacheMode(CacheMode.PUT).findList();
 
     Article ar0 = DB.find(Article.class, a0.getId());
 
     assertNotNull(ar0);
-    assertFalse(DB.beanState(ar0).isReadOnly());
+    assertFalse(DB.beanState(ar0).isUnmodifiable()); // .isReadOnly()
 
     List<Section> ar0sections = ar0.getSections();
     Section s1 = ar0sections.get(0);
-    assertFalse(DB.beanState(s1).isReadOnly());
+    assertFalse(DB.beanState(s1).isUnmodifiable()); // isReadOnly()
 
   }
 

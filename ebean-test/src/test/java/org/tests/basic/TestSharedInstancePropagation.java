@@ -2,7 +2,6 @@ package org.tests.basic;
 
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
-import io.ebean.bean.BeanCollection;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.OrderDetail;
@@ -28,27 +27,22 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 
     Order order = DB.find(Order.class)
       .setAutoTune(false)
-      .setReadOnly(true)
+      .setUnmodifiable(true) // .setReadOnly(true)
+      .fetch("details")
+      .fetch("details.product", "name")
       .setId(1)
       .findOne();
 
-
     assertNotNull(order);
-    assertTrue(DB.beanState(order).isReadOnly());
+    assertTrue(DB.beanState(order).isUnmodifiable()); // .isReadOnly()
 
     List<OrderDetail> details = order.getDetails();
-    BeanCollection<?> bc = (BeanCollection<?>) details;
-    assertTrue(bc.isReadOnly());
-    assertFalse(bc.isPopulated());
+    assertThrows(UnsupportedOperationException.class, details::clear);
 
-    // lazy load
-    bc.size();
 
-    assertTrue(bc.isPopulated());
-    assertTrue(!bc.isEmpty());
     OrderDetail detail = details.get(0);
 
-    assertTrue(DB.beanState(detail).isReadOnly());
+    assertTrue(DB.beanState(detail).isUnmodifiable()); // .isReadOnly()
     assertFalse(DB.beanState(detail).isReference());
 
     Product product = detail.getProduct();
