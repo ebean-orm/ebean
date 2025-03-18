@@ -160,7 +160,7 @@ class TestQueryOrderById extends BaseTestCase {
     ResetBasicData.reset();
 
     List<Customer> result = DB.find(Customer.class)
-      .setReadOnly(true).setDisableLazyLoading(true)
+      .setUnmodifiable(true) // .setDisableLazyLoading(true)
       .select("id,name")
       .fetch("contacts")
       .findList();
@@ -185,7 +185,7 @@ class TestQueryOrderById extends BaseTestCase {
       .setFirstRow(1)
       .setMaxRows(5);
 
-    query.setReadOnly(true).setDisableLazyLoading(true);
+    query.setUnmodifiable(true); //.setDisableLazyLoading(true);
     List<Customer> list = query.findList();
     if (isSqlServer() || isDb2()) {
       assertSql(query).isEqualTo("select t0.id, t0.name from o_customer t0 order by t0.id offset 1 rows fetch next 5 rows only");

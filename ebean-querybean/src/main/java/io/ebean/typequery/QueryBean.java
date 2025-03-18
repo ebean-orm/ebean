@@ -500,12 +500,6 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   }
 
   @Override
-  public final R setReadOnly(boolean readOnly) {
-    query.setReadOnly(readOnly);
-    return root;
-  }
-
-  @Override
   public final R setBeanCacheMode(CacheMode beanCacheMode) {
     query.setBeanCacheMode(beanCacheMode);
     return root;

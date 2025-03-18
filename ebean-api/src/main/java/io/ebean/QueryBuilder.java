@@ -397,11 +397,6 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   SELF setUnmodifiable(boolean unmodifiable);
 
   /**
-   * When set to true when you want the returned beans to be read only.
-   */
-  SELF setReadOnly(boolean readOnly);
-
-  /**
    * Set a timeout on this query.
    * <p>
    * This will typically result in a call to setQueryTimeout() on a
