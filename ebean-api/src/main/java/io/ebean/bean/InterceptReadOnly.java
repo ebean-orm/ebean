@@ -394,11 +394,6 @@ public final class InterceptReadOnly extends InterceptBase {
   }
 
   @Override
-  public void loadBeanInternal(int loadProperty, BeanLoader loader) {
-
-  }
-
-  @Override
   public void initialisedMany(int propertyIndex) {
     loaded[propertyIndex] = true;
   }

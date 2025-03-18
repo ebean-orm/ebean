@@ -1,18 +1,18 @@
 package org.tests.batchload;
 
+import io.ebean.LazyInitialisationException;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
-import org.tests.model.basic.OrderDetail;
 import org.tests.model.basic.ResetBasicData;
 
+import java.sql.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryDisableLazyLoad extends BaseTestCase {
 
@@ -32,8 +32,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
 
     Order order = l0.get(0);
 
-    List<OrderDetail> details = order.getDetails();
-    assertEquals(details.size(), 0);
+    assertThrows(LazyInitialisationException.class, order::getDetails);
 
     List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
@@ -59,7 +58,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
     Order order = l0.get(0);
 
     // normally invokes lazy loading
-    assertNull(order.getCustomer().getStatus());
+    assertThrows(LazyInitialisationException.class, () -> order.getCustomer().getStatus());
 
     List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);
@@ -83,7 +82,29 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
     Order order = l0.get(0);
 
     // normally invokes lazy loading
-    assertNull(order.getCustomer().getStatus());
+    assertThrows(LazyInitialisationException.class, () -> order.getCustomer().getStatus());
+
+    List<String> loggedSql = LoggedSql.stop();
+    assertThat(loggedSql).hasSize(1);
+  }
+
+  @Test
+  public void onSetter_expect_LazyInitialisationException() {
+    ResetBasicData.reset();
+    LoggedSql.start();
+
+    List<Order> l0 = DB.find(Order.class)
+      .setDisableLazyLoading(true)
+      .select("status, orderDate")
+      .orderBy().asc("id")
+      .findList();
+
+    assertThat(l0).isNotEmpty();
+
+    Order order = l0.get(0);
+
+    // normally invokes lazy loading
+    assertThrows(LazyInitialisationException.class, () -> order.setShipDate(new Date(System.currentTimeMillis())));
 
     List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);

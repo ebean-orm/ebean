@@ -1,10 +1,7 @@
 package io.ebean.xtest.config;
 
-import io.ebean.Database;
-import io.ebean.DatabaseFactory;
-import io.ebean.Transaction;
+import io.ebean.*;
 import io.ebean.annotation.Platform;
-import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
@@ -15,6 +12,7 @@ import org.tests.model.basic.EBasicVer;
 import org.tests.model.draftable.BasicDraftableBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class PlatformNoGeneratedKeysTest {
 
@@ -39,7 +37,7 @@ public class PlatformNoGeneratedKeysTest {
       .findOne();
 
     assertThat(found.getName()).isEqualTo("basic");
-    assertThat(found.getDescription()).isNull();
+    assertThrows(LazyInitialisationException.class, found::getDescription);
   }
 
   @Test

@@ -1,5 +1,6 @@
 package org.tests.text.json;
 
+import io.ebean.LazyInitialisationException;
 import io.ebean.text.json.JsonReadOptions;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
@@ -19,8 +20,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class TestTextJsonReferenceBean extends BaseTestCase {
 
@@ -33,7 +33,7 @@ public class TestTextJsonReferenceBean extends BaseTestCase {
 
     assertThat(DB.beanState(productRefBean).isReference()).isTrue();
     // does not lazy load by default
-    assertThat(productRefBean.getName()).isNull();
+    assertThrows(LazyInitialisationException.class, productRefBean::getName);
   }
 
   @Test
