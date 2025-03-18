@@ -8,7 +8,6 @@ import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.*;
 import io.ebean.bean.PersistenceContext.WithOption;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;

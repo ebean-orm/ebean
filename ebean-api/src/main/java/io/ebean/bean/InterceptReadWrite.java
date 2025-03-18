@@ -2,7 +2,6 @@ package io.ebean.bean;
 
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.UnmodifiableEntityException;
 import io.ebean.ValuePair;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -64,7 +63,6 @@ public final class InterceptReadWrite extends InterceptBase {
    */
   private int state;
   private boolean forceUpdate;
-  private boolean readOnly;
   private boolean dirty;
   /**
    * Flag set to disable lazy loading.
@@ -119,7 +117,6 @@ public final class InterceptReadWrite extends InterceptBase {
     return "InterceptReadWrite@" + hashCode() + "{state=" + state +
       (dirty ? " dirty;" : "") +
       (forceUpdate ? " forceUpdate;" : "") +
-      (readOnly ? " readOnly;" : "") +
       (disableLazyLoad ? " disableLazyLoad;" : "") +
       (lazyLoadFailure ? " lazyLoadFailure;" : "") +
       (fullyLoadedBean ? " fullyLoadedBean;" : "") +
@@ -282,16 +279,6 @@ public final class InterceptReadWrite extends InterceptBase {
   @Override
   public boolean isLoadedFromCache() {
     return loadedFromCache;
-  }
-
-  @Override
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  @Override
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
   }
 
   @Override
@@ -800,18 +787,12 @@ public final class InterceptReadWrite extends InterceptBase {
     if (state == STATE_NEW) {
       setLoadedProperty(propertyIndex);
     } else {
-      if (readOnly) {
-        throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
-      }
       setChangeLoaded(propertyIndex);
     }
   }
 
   @Override
   public void setChangedPropertyValue(int propertyIndex, boolean setDirtyState, Object origValue) {
-    if (readOnly) {
-      throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
-    }
     setChangedProperty(propertyIndex);
     if (setDirtyState) {
       setOriginalValue(propertyIndex, origValue);

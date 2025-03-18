@@ -32,11 +32,11 @@ class TestReadOnlyPropagation extends BaseTestCase {
 
 
     Customer customer = order.getCustomer();
-    assertTrue(DB.beanState(customer).isReadOnly());
+    assertTrue(DB.beanState(customer).isUnmodifiable());
 
     Address billingAddress = customer.getBillingAddress();
     assertNotNull(billingAddress);
-    assertTrue(DB.beanState(billingAddress).isReadOnly());
+    assertTrue(DB.beanState(billingAddress).isUnmodifiable());
 
 
     List<OrderDetail> details = order.getDetails();

@@ -7,7 +7,6 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
 import io.ebean.common.BeanMap;
-import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.text.json.JsonReadOptions;

@@ -92,18 +92,6 @@ public interface BeanState {
   boolean isUnmodifiable();
 
   /**
-   * Return true if the bean is readOnly.
-   * <p>
-   * If a setter is called on a readOnly bean it will throw an exception.
-   */
-  boolean isReadOnly();
-
-  /**
-   * Set the readOnly status for the bean.
-   */
-  void setReadOnly(boolean readOnly);
-
-  /**
    * Advanced - Used to programmatically build a partially or fully loaded
    * entity bean. First create an entity bean via
    * {@link Database#createEntityBean(Class)}, then populate its properties

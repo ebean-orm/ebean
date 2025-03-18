@@ -66,16 +66,6 @@ public final class DefaultBeanState implements BeanState {
   }
 
   @Override
-  public boolean isReadOnly() {
-    return intercept.isReadOnly();
-  }
-
-  @Override
-  public void setReadOnly(boolean readOnly) {
-    intercept.setReadOnly(readOnly);
-  }
-
-  @Override
   public void setLoaded() {
     intercept.setLoaded();
   }

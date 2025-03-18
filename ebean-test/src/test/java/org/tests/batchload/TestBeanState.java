@@ -117,29 +117,4 @@ class TestBeanState extends BaseTestCase {
     assertThat(beanState.changedProps()).containsOnly("contacts");
   }
 
-  @Test
-  void readOnly_when_setManyProperty() {
-    Customer customer = new Customer();
-    customer.setContacts(new ArrayList<>());
-
-    BeanState beanState = DB.beanState(customer);
-    beanState.setLoaded();
-    beanState.setReadOnly(true);
-
-    // act, try to mutate read only bean
-    assertThrows(UnmodifiableEntityException.class, () -> customer.setContacts(new ArrayList<>()));
-  }
-
-  @Test
-  void readOnly_when_setProperty() {
-    Customer customer = new Customer();
-    customer.setName("a");
-
-    BeanState beanState = DB.beanState(customer);
-    beanState.setLoaded();
-    beanState.setReadOnly(true);
-
-    // act, try to mutate read only bean
-    assertThrows(UnmodifiableEntityException.class, () -> customer.setName("b"));
-  }
 }

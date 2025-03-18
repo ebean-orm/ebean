@@ -47,7 +47,7 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 
     Product product = detail.getProduct();
 
-    assertTrue(DB.beanState(product).isReadOnly());
+    assertTrue(DB.beanState(product).isUnmodifiable());
 
     // lazy load
     product.getName();

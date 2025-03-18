@@ -207,9 +207,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     }
     this.unmodifiable = request.query().isUnmodifiable();
     this.collection = (help != null ? help.createEmptyNoParent() : null);
-    if (collection != null && Boolean.TRUE.equals(query.isReadOnly())) {
-      collection.setReadOnly(true);
-    }
   }
 
   private CQueryCollectionAdd<T> createHelp(OrmQueryRequest<T> request) {

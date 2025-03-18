@@ -98,9 +98,6 @@ final class DefaultBeanLoader {
     query.setMode(Mode.LAZYLOAD_MANY);
     query.setLazyLoadManyPath(many.name());
     query.setPersistenceContext(pc);
-    if (ebi.isReadOnly()) {
-      query.setReadOnly(true);
-    }
     if (many.hasOrderColumn()) {
       query.orderBy(many.path() + "." +  many.fetchOrderBy());
     }
@@ -207,9 +204,6 @@ final class DefaultBeanLoader {
     if (embeddedOwnerIndex > -1 || mode == Mode.REFRESH_BEAN) {
       // make sure the query doesn't use the cache
       query.setBeanCacheMode(CacheMode.OFF);
-    }
-    if (ebi.isReadOnly()) {
-      query.setReadOnly(true);
     }
     if (Mode.REFRESH_BEAN == mode) {
       // explicitly state to load all properties on REFRESH.

@@ -169,16 +169,6 @@ public final class InterceptReadOnly extends InterceptBase {
   }
 
   @Override
-  public boolean isReadOnly() {
-    return true;
-  }
-
-  @Override
-  public void setReadOnly(boolean readOnly) {
-
-  }
-
-  @Override
   public void setForceUpdate(boolean forceUpdate) {
 
   }
