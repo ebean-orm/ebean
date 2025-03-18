@@ -21,7 +21,7 @@ class TestReadOnlyPropagation extends BaseTestCase {
     DB.cacheManager().clearAll();
 
     Order order = DB.find(Order.class)
-      .setUnmodifiable(true)//.setReadOnly(true)
+      .setUnmodifiable(true)
       .fetch("customer")
       .fetch("customer.billingAddress")
       .fetch("details")

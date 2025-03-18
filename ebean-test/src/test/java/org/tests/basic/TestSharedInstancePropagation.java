@@ -27,14 +27,14 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 
     Order order = DB.find(Order.class)
       .setAutoTune(false)
-      .setUnmodifiable(true) // .setReadOnly(true)
+      .setUnmodifiable(true)
       .fetch("details")
       .fetch("details.product", "name")
       .setId(1)
       .findOne();
 
     assertNotNull(order);
-    assertTrue(DB.beanState(order).isUnmodifiable()); // .isReadOnly()
+    assertTrue(DB.beanState(order).isUnmodifiable());
 
     List<OrderDetail> details = order.getDetails();
     assertThrows(UnsupportedOperationException.class, details::clear);
@@ -42,7 +42,7 @@ public class TestSharedInstancePropagation extends BaseTestCase {
 
     OrderDetail detail = details.get(0);
 
-    assertTrue(DB.beanState(detail).isUnmodifiable()); // .isReadOnly()
+    assertTrue(DB.beanState(detail).isUnmodifiable());
     assertFalse(DB.beanState(detail).isReference());
 
     Product product = detail.getProduct();

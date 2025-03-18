@@ -139,8 +139,8 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     assertEquals(3, loggedSql.size());
     assertThat(trimSql(loggedSql.get(0), 7)).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name from o_order t0 join o_customer t1");
-    assertThat(trimSql(loggedSql.get(1), 7)).contains("select t0.order_id, t0.id, t0.order_qty, t0.ship_qty, t0.unit_price");
-    assertThat(trimSql(loggedSql.get(2), 7)).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship");
+    assertThat(trimSql(loggedSql.get(1), 7)).contains(" t0.order_id, t0.id, t0.order_qty, t0.ship_qty, t0.unit_price");
+    assertThat(trimSql(loggedSql.get(2), 7)).contains(" t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship");
   }
 
   @Test

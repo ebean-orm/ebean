@@ -25,7 +25,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
     Map<Integer, Customer> map = DB.find(Customer.class)
       .select("id, name, status, billingAddress")
       .setBeanCacheMode(CacheMode.PUT)
-      .setUnmodifiable(true) //.setReadOnly(true)
+      .setUnmodifiable(true)
       .orderBy().asc("id")
       .findMap();
 
@@ -36,7 +36,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
     Customer cust1 = map.get(id);
 
     Customer cust1B = DB.find(Customer.class)
-      .setUnmodifiable(true)//.setReadOnly(true)
+      .setUnmodifiable(true)
       .setUseCache(false)
       .setId(id)
       .findOne();
@@ -53,7 +53,7 @@ public class TestLazyLoadInCache extends BaseTestCase {
     Address billingAddress = cust1.getBillingAddress();
     BeanState billAddrState = DB.beanState(billingAddress);
     // assertTrue(billAddrState.isReference()); // not supported by unmodifiable
-    assertTrue(billAddrState.isUnmodifiable()); // .isReadOnly()
+    assertTrue(billAddrState.isUnmodifiable());
 
     // lazy load .. no longer a reference
     // billingAddress.getCity(); // lazy loading not supported by unmodifiable

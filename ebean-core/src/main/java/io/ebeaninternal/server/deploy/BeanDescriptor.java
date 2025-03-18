@@ -1819,9 +1819,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
         ebi.setBeanLoader(refBeanLoader());
       }
       ebi.setReference(idPropertyIndex);
-     // if (Boolean.TRUE == readOnly) {
-     //   ebi.setReadOnly(true);
-     // }
       if (pc != null) {
         contextPut(pc, id, eb);
         ebi.setPersistenceContext(pc);
