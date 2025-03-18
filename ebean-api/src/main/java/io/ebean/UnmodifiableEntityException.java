@@ -3,7 +3,7 @@ package io.ebean;
 /**
  * Attempted to modify a read only entity.
  */
-public class UnmodifiableEntityException extends UnsupportedOperationException {
+public class UnmodifiableEntityException extends BeanAccessException {
   private static final long serialVersionUID = 1;
 
   /**

@@ -8,7 +8,7 @@ package io.ebean;
  * a unmodifiable entity with lazy loading disabled, accessing an unloaded property
  * throws this LazyInitialisationException instead.
  */
-public class LazyInitialisationException extends UnmodifiableEntityException {
+public class LazyInitialisationException extends BeanAccessException {
 
   /**
    * Create specifying the property that was being accessed.
