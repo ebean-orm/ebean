@@ -8,7 +8,6 @@ import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.*;
 import io.ebean.bean.PersistenceContext.WithOption;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;
@@ -1215,11 +1214,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, query);
     Object result = request.getFromQueryCache();
     if (result != null) {
-      if (Boolean.FALSE.equals(request.query().isReadOnly())) {
-        return new CopyOnFirstWriteList<>((List<A>) result);
-      } else {
-        return (List<A>) result;
-      }
+      return (List<A>) result;
     }
     try {
       request.initTransIfRequired();

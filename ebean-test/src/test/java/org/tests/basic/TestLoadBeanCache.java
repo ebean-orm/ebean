@@ -35,7 +35,6 @@ class TestLoadBeanCache extends BaseTestCase {
     Map<String, Country> map = DB.find(Country.class)
       .setBeanCacheMode(CacheMode.PUT)
       .setUseQueryCache(true)
-      //.setReadOnly(true)
       .setUnmodifiable(true)
       .orderBy("name")
       .findMap();

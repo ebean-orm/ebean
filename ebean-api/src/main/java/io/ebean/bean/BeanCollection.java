@@ -120,18 +120,6 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
   void setLoader(BeanCollectionLoader beanLoader);
 
   /**
-   * Set to true if you want the BeanCollection to be treated as read only. This
-   * means no elements can be added or removed etc.
-   */
-  void setReadOnly(boolean readOnly);
-
-  /**
-   * Return true if the collection should be treated as readOnly and no elements
-   * can be added or removed etc.
-   */
-  boolean isReadOnly();
-
-  /**
    * Add the bean to the collection. This is disallowed for BeanMap.
    */
   void internalAdd(Object bean);
@@ -235,11 +223,6 @@ public interface BeanCollection<E> extends Serializable, ToStringAware {
    * Has been modified by an addition or removal.
    */
   boolean wasTouched();
-
-  /**
-   * Return a shallow copy of this collection that is modifiable.
-   */
-  BeanCollection<E> shallowCopy();
 
   /**
    * Freeze the collection returning an unmodifiable version.

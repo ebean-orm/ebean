@@ -132,7 +132,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private boolean usageProfiling = true;
   private CacheMode useBeanCache = CacheMode.AUTO;
   private CacheMode useQueryCache = CacheMode.OFF;
-  private Boolean readOnly;
   private boolean unmodifiable;
   private PersistenceContextScope persistenceContextScope;
 
@@ -516,12 +515,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
       createExtraJoinsToSupportManyWhereClause();
     }
     if (unmodifiable) {
-      readOnly = Boolean.TRUE;
       disableLazyLoading = true;
-      persistenceContextScope = PersistenceContextScope.QUERY;
-    } else if (disableLazyLoading && Boolean.TRUE.equals(readOnly)) {
-      // "upgrade" this to unmodifiable? hmmm.
-      unmodifiable = true;
       persistenceContextScope = PersistenceContextScope.QUERY;
     }
     return markQueryJoins();
@@ -774,7 +768,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.unmodifiable = unmodifiable;
-    copy.readOnly = readOnly;
     if (detail != null) {
       copy.detail = detail.copy();
     }
@@ -1296,22 +1289,8 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final Boolean isReadOnly() {
-    return readOnly;
-  }
-
-  @Override
   public boolean isUnmodifiable() {
     return unmodifiable;
-  }
-
-  @Override
-  public final Query<T> setReadOnly(boolean readOnly) {
-    if (unmodifiable && !readOnly) {
-      throw new IllegalStateException("Not allowed to set readOnly false on query that is unmodifiable");
-    }
-    this.readOnly = readOnly;
-    return this;
   }
 
   @Override
@@ -1356,9 +1335,6 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final Query<T> setUseQueryCache(CacheMode useQueryCache) {
     this.useQueryCache = useQueryCache;
     if (CacheMode.OFF != useQueryCache) {
-      if (Boolean.FALSE.equals(readOnly)) {
-        throw new IllegalStateException("Not allowed to use query cache with readOnly false");
-      }
       unmodifiable = true;
     }
     return this;

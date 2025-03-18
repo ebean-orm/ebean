@@ -53,7 +53,6 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
     if (bean != null) {
       // set back to the parent bean
       property.setValue(bean, dbVal);
-      ctx.propagateState(dbVal);
       return dbVal;
     } else {
       return null;
@@ -70,12 +69,7 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
         notNull = true;
       }
     }
-    if (notNull) {
-      ctx.propagateState(embeddedBean);
-      return embeddedBean;
-    } else {
-      return null;
-    }
+    return notNull ? embeddedBean : null;
   }
 
   @Override

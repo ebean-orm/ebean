@@ -25,7 +25,7 @@ public final class DLoadContext implements LoadContext {
   private final DLoadBeanContext rootBeanContext;
   private final boolean asDraft;
   private final Timestamp asOf;
-  private final Boolean readOnly;
+  private final boolean unmodifiable;
   private final CacheMode useBeanCache;
   private final int defaultBatchSize;
   private final boolean disableLazyLoading;
@@ -61,7 +61,7 @@ public final class DLoadContext implements LoadContext {
     this.useBeanCache = CacheMode.OFF;
     this.asDraft = false;
     this.asOf = null;
-    this.readOnly = false;
+    this.unmodifiable = false;
     this.disableLazyLoading = false;
     this.disableReadAudit = false;
     this.includeSoftDeletes = false;
@@ -90,7 +90,7 @@ public final class DLoadContext implements LoadContext {
     this.asOf = query.getAsOf();
     this.asDraft = query.isAsDraft();
     this.includeSoftDeletes = query.isIncludeSoftDeletes() && query.mode() == SpiQuery.Mode.NORMAL;
-    this.readOnly = query.isReadOnly();
+    this.unmodifiable = query.isUnmodifiable();
     this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.useBeanCache = query.beanCacheMode();
@@ -239,14 +239,6 @@ public final class DLoadContext implements LoadContext {
     return ebeanServer;
   }
 
-  /**
-   * Return the parent state which defines the sharedInstance and readOnly status
-   * which needs to be propagated to other beans and collections.
-   */
-  Boolean isReadOnly() {
-    return readOnly;
-  }
-
   @Override
   public PersistenceContext persistenceContext() {
     return persistenceContext;
@@ -329,9 +321,7 @@ public final class DLoadContext implements LoadContext {
     if (useDocStore && docStoreMapped) {
       query.setUseDocStore(true);
     }
-    if (readOnly != null) {
-      query.setReadOnly(readOnly);
-    }
+    query.setUnmodifiable(unmodifiable);
     query.setDisableLazyLoading(disableLazyLoading);
     query.asOf(asOf);
     if (asDraft) {

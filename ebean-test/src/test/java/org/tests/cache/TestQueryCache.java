@@ -309,15 +309,15 @@ public class TestQueryCache extends BaseTestCase {
     ServerCache customerCache = DB.cacheManager().queryCache(Customer.class);
     customerCache.clear();
 
-    List<Customer> list = DB.find(Customer.class).setUnmodifiable(true) //.setUseQueryCache(true) //.setReadOnly(true)
+    List<Customer> list = DB.find(Customer.class).setUnmodifiable(true) //.setUseQueryCache(true)
       .where().ilike("name", "Rob")
       .findList();
 
 
     assertThat(list).isNotEmpty();
-    assertThat(DB.beanState(list.get(0)).isReadOnly()).isTrue();
+    assertThat(DB.beanState(list.get(0)).isUnmodifiable()).isTrue();
 
-    List<Customer> list2 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    List<Customer> list2 = DB.find(Customer.class).setUseQueryCache(true)
       .where().ilike("name", "Rob")
       .findList();
 
@@ -330,7 +330,7 @@ public class TestQueryCache extends BaseTestCase {
     // readOnly defaults to true for query cache
     assertSame(list2, list2B);
 
-    List<Customer> list3 = DB.find(Customer.class).setUseQueryCache(true)//.setReadOnly(false)
+    List<Customer> list3 = DB.find(Customer.class).setUseQueryCache(true)
       .where().ilike("name", "Rob")
       .findList();
 

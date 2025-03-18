@@ -1206,8 +1206,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Try to load the beanCollection from cache return true if successful.
    */
-  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey, Boolean readOnly) {
-    return cacheHelp.manyPropLoad(many, bc, parentKey, readOnly);
+  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey) {
+    return cacheHelp.manyPropLoad(many, bc, parentKey);
   }
 
   /**
@@ -1819,9 +1819,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
         ebi.setBeanLoader(refBeanLoader());
       }
       ebi.setReference(idPropertyIndex);
-     // if (Boolean.TRUE == readOnly) {
-     //   ebi.setReadOnly(true);
-     // }
       if (pc != null) {
         contextPut(pc, id, eb);
         ebi.setPersistenceContext(pc);

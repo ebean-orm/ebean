@@ -7,7 +7,6 @@ import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
 import io.ebean.common.BeanMap;
-import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.text.json.JsonReadOptions;
@@ -644,31 +643,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       return null;
     }
 
-    Object cached = beanDescriptor.queryCacheGet(cacheKey);
-    if (cached != null && isAuditReads() && readAuditQueryType()) {
-      if (cached instanceof BeanCollection) {
-        // raw sql can't use L2 cache so normal queries only in here
-        Collection<T> actualDetails = ((BeanCollection<T>) cached).actualDetails();
-        List<Object> ids = new ArrayList<>(actualDetails.size());
-        for (T bean : actualDetails) {
-          ids.add(beanDescriptor.idForJson(bean));
-        }
-        beanDescriptor.readAuditMany(queryPlanKey.partialKey(), "l2-query-cache", ids);
-      }
-    }
-    if (Boolean.FALSE.equals(query.isReadOnly())) {
-      // return shallow copies if readonly is explicitly set to false
-      if (cached instanceof BeanCollection) {
-        cached = ((BeanCollection<?>) cached).shallowCopy();
-      } else if (cached instanceof List) {
-        cached = new CopyOnFirstWriteList<>((List<?>) cached);
-      } else if (cached instanceof Set) {
-        cached = new LinkedHashSet<>((Set<?>) cached);
-      } else if (cached instanceof Map) {
-        cached = new LinkedHashMap<>((Map<?, ?>) cached);
-      }
-    }
-    return cached;
+    return beanDescriptor.queryCacheGet(cacheKey);
   }
 
   /**

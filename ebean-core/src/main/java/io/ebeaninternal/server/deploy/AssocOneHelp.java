@@ -80,7 +80,6 @@ abstract class AssocOneHelp {
     Object val = read(ctx);
     if (bean != null) {
       property.setValue(bean, val);
-      ctx.propagateState(val);
     }
     return val;
   }
