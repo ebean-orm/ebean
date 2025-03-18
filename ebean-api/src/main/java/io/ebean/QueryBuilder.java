@@ -953,6 +953,16 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   FutureList<T> findFutureList();
 
   /**
+   * Execute find map query in a background thread.
+   * <p>
+   * This query will execute in it's own PersistenceContext and using its own transaction.
+   * What that means is that it will not share any bean instances with other queries.
+   *
+   * @return a Future object for the map result of the query
+   */
+  <K> FutureMap<K,T> findFutureMap();
+
+  /**
    * Return a PagedList for this query using firstRow and maxRows.
    * <p>
    * The benefit of using this over findList() is that it provides functionality to get the

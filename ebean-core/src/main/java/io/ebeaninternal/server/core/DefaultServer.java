@@ -1319,6 +1319,33 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public <K, T> FutureMap<K, T> findFutureMap(SpiQuery<T> query) {
+    SpiQuery<T> spiQuery = query.copy();
+    spiQuery.usingFuture();
+    // FutureMap query always run in it's own persistence content
+    spiQuery.setPersistenceContext(new DefaultPersistenceContext());
+    if (!spiQuery.isDisableReadAudit()) {
+      BeanDescriptor<T> desc = descriptorManager.descriptor(spiQuery.getBeanType());
+      desc.readAuditFutureList(spiQuery);
+    }
+    // Create a new transaction solely to execute the findMap() at some future time
+    boolean createdTransaction = false;
+    SpiTransaction transaction = query.transaction();
+    if (transaction == null) {
+      transaction = currentServerTransaction();
+      if (transaction == null) {
+        transaction = (SpiTransaction) createTransaction();
+        createdTransaction = true;
+      }
+      spiQuery.usingTransaction(transaction);
+    }
+    QueryFutureMap<K, T> queryFuture = new QueryFutureMap<>(new CallableQueryMap<>(this, spiQuery, createdTransaction));
+    backgroundExecutor.execute(queryFuture.futureTask());
+    return queryFuture;
+  }
+
+
+  @Override
   public <T> PagedList<T> findPagedList(SpiQuery<T> query) {
     int maxRows = query.getMaxRows();
     if (maxRows == 0) {
