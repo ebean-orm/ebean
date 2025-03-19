@@ -11,25 +11,13 @@ import java.util.concurrent.Callable;
  */
 public final class CallableQueryMap<K, T> extends CallableQuery<T> implements Callable<Map<K, T>> {
 
-  private final boolean createdTransaction;
-
-  public CallableQueryMap(SpiEbeanServer server, SpiQuery<T> query, boolean createdTransaction) {
+  public CallableQueryMap(SpiEbeanServer server, SpiQuery<T> query) {
     super(server, query);
-    this.createdTransaction = createdTransaction;
   }
 
-  /**
-   * Execute the query returning the resulting map.
-   */
   @Override
   public Map<K, T> call() {
-    try {
-      return server.findMap(query);
-    } finally {
-      if (createdTransaction) {
-        transaction.end();
-      }
-    }
+    return server.findMap(query);
   }
 
 }
