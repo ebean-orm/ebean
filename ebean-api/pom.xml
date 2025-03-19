@@ -35,7 +35,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>3.12</version>
+      <version>4.0</version>
     </dependency>
 
     <dependency>
