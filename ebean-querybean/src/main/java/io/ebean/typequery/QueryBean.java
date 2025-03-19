@@ -857,6 +857,11 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   }
 
   @Override
+  public final <K> FutureMap<K,T> findFutureMap() {
+    return query.findFutureMap();
+  }
+
+  @Override
   public final PagedList<T> findPagedList() {
     return query.findPagedList();
   }
