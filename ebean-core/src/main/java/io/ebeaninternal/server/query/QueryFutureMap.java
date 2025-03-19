@@ -27,10 +27,6 @@ public final class QueryFutureMap<K, T> extends BaseFuture<Map<K, T>> implements
     return futureTask;
   }
 
-  public Transaction transaction() {
-    return call.transaction;
-  }
-
   @Override
   public Query<T> getQuery() {
     return call.query;
