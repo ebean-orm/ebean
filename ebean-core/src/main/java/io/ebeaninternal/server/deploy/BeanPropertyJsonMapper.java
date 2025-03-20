@@ -39,22 +39,22 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
   }
 
   @Override
-  public MutableValueInfo createMutableInfo(String json) {
+  public MutableValueInfo createMutableInfo(Object value) {
     if (sourceDetection) {
-      return new SourceMutableValue(scalarType, json);
+      return new SourceMutableValue(scalarType, value);
     } else {
-      return new ChecksumMutableValue(scalarType, json);
+      return new ChecksumMutableValue(scalarType, value);
     }
   }
 
   /**
    * Next when no prior MutableValueInfo.
    */
-  private MutableValueNext next(String json) {
+  private MutableValueNext next(String json, Object value) {
     if (sourceDetection) {
-      return new SourceMutableValue(scalarType, json);
+      return new SourceMutableValue(scalarType, value);
     } else {
-      return new NextPair(json, new ChecksumMutableValue(scalarType, json));
+      return new NextPair(json, new ChecksumMutableValue(scalarType, value));
     }
   }
 
@@ -66,12 +66,13 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
     // mutation detection based on json content or checksum of json content
     // only perform serialisation to json once
     final String json = scalarType.format(value);
+
     final MutableValueInfo oldHash = ebi.mutableInfo(propertyIndex);
     if (oldHash == null) {
       if (value == null) {
         return false; // no change, still null
       }
-      ebi.mutableNext(propertyIndex, next(json));
+      ebi.mutableNext(propertyIndex, next(json, value));
       return true;
     }
     // only perform compute of checksum/hash once (if checksum based)
@@ -92,9 +93,8 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
       }
       if (bean != null) {
         setValue(bean, value);
-        String json = reader.popJson();
-        if (json != null) {
-          final MutableValueInfo hash = createMutableInfo(json);
+        if (value != null) {
+          final MutableValueInfo hash = createMutableInfo(value);
           bean._ebean_getIntercept().mutableInfo(propertyIndex, hash);
         }
       }
@@ -110,10 +110,10 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
   public void setCacheDataValue(EntityBean bean, Object cacheData, PersistenceContext context) {
     if (cacheData instanceof String) {
       // parse back from string to support optimisation of java object serialisation
-      final String jsonContent = (String) cacheData;
-      final MutableValueInfo hash = createMutableInfo(jsonContent);
+      cacheData = scalarType.parse((String) cacheData);
+      final MutableValueInfo hash = createMutableInfo(cacheData);
       bean._ebean_getIntercept().mutableInfo(propertyIndex, hash);
-      cacheData = scalarType.parse(jsonContent);
+
     }
     setValue(bean, cacheData);
   }
@@ -150,9 +150,9 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
     private final ScalarType<?> parent;
     private final long checksum;
 
-    ChecksumMutableValue(ScalarType<?> parent, String json) {
+    ChecksumMutableValue(ScalarType<?> parent, Object value) {
       this.parent = parent;
-      this.checksum = Checksum.checksum(json);
+      this.checksum = Checksum.checksum(parent.format(value));
     }
 
     /**
@@ -185,33 +185,33 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
    */
   private static final class SourceMutableValue implements MutableValueInfo, MutableValueNext {
 
-    private final String originalJson;
+    private final String formattedJson;
     private final ScalarType<?> parent;
 
-    SourceMutableValue(ScalarType<?> parent, String json) {
+    SourceMutableValue(ScalarType<?> parent, Object value) {
       this.parent = parent;
-      this.originalJson = json;
+      this.formattedJson = parent.format(value);
     }
 
     @Override
     public MutableValueNext nextDirty(String json) {
-      return Objects.equals(originalJson, json) ? null : new SourceMutableValue(parent, json);
+      return Objects.equals(formattedJson, json) ? null : new SourceMutableValue(parent, parent.parse(json));
     }
 
     @Override
     public boolean isEqualToObject(Object obj) {
-      return Objects.equals(originalJson, parent.format(obj));
+      return Objects.equals(formattedJson, parent.format(obj));
     }
 
     @Override
     public Object get() {
       // rebuild the 'oldValue' for change log etc
-      return parent.parse(originalJson);
+      return parent.parse(formattedJson);
     }
 
     @Override
     public String content() {
-      return originalJson;
+      return formattedJson;
     }
 
     @Override
