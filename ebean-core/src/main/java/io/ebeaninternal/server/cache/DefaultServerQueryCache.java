@@ -23,7 +23,7 @@ public class DefaultServerQueryCache extends DefaultServerCache {
 
   @Override
   protected Object unwrapEntry(CacheEntry entry) {
-    return ((QueryCacheEntry) entry.getValue()).getValue();
+    return ((QueryCacheEntry) entry.getValue()).value();
   }
 
   @Override
