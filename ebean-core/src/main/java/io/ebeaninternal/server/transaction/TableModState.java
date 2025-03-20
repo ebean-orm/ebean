@@ -6,6 +6,7 @@ import io.ebean.cache.QueryCacheEntryValidate;
 import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
 
+import java.time.Instant;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -23,7 +24,7 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
 
   private static final System.Logger log = AppLog.getLogger("io.ebean.cache.TABLEMOD");
 
-  private final Map<String, Long> tableModStamp = new ConcurrentHashMap<>();
+  private final Map<String, Instant> tableModStamp = new ConcurrentHashMap<>();
 
   public TableModState() {
   }
@@ -32,22 +33,22 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
    * Set the modified timestamp on the tables that have been touched.
    */
   void touch(Set<String> touchedTables) {
-    long modNanoTime = System.nanoTime();
+    final var modTime = Instant.now();
     for (String tableName : touchedTables) {
-      tableModStamp.put(tableName, modNanoTime);
+      tableModStamp.put(tableName, modTime);
     }
     if (log.isLoggable(DEBUG)) {
-      log.log(DEBUG, "TableModState updated - touched:{0} modNanoTime:{1}", touchedTables, modNanoTime);
+      log.log(DEBUG, "TableModState updated - touched:{0} modTime:{1}", touchedTables, modTime);
     }
   }
 
   /**
    * Return true if all the tables are valid based on timestamp comparison.
    */
-  boolean isValid(Set<String> tables, long sinceNanoTime) {
+  boolean isValid(Set<String> tables, Instant sinceTime) {
     for (String tableName : tables) {
-      Long modTime = tableModStamp.get(tableName);
-      if (modTime != null && modTime >= sinceNanoTime) {
+      final var modTime = tableModStamp.get(tableName);
+      if (modTime != null && !modTime.isBefore(sinceTime)) {
         if (log.isLoggable(TRACE)) {
           log.log(TRACE, "Invalidate on table:{0}", tableName);
         }

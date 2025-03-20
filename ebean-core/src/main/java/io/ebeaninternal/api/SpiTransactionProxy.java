@@ -14,6 +14,7 @@ import io.ebeanservice.docstore.api.DocStoreTransaction;
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 
 /**
  * Proxy for an underlying SpiTransaction (most of the API).
@@ -28,8 +29,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public long startNanoTime() {
-    return transaction.startNanoTime();
+  public Instant startTime() {
+    return transaction.startTime();
   }
 
   @Override

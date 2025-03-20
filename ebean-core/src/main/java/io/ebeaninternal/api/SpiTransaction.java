@@ -14,6 +14,7 @@ import io.ebeanservice.docstore.api.DocStoreTransaction;
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 
 /**
  * Extends Transaction with additional API required on server.
@@ -95,7 +96,7 @@ public interface SpiTransaction extends Transaction {
   /**
    * Return the start timestamp for the transaction (JVM side).
    */
-  long startNanoTime();
+  Instant startTime();
 
   /**
    * Return true if this transaction has updateAllLoadedProperties set.
