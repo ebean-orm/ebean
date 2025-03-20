@@ -60,9 +60,9 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
 
   @Override
   public boolean isValid(QueryCacheEntry entry) {
-    Set<String> dependentTables = entry.getDependentTables();
+    Set<String> dependentTables = entry.dependentTables();
     if (dependentTables != null && !dependentTables.isEmpty()) {
-      return isValid(dependentTables, entry.getTimestamp());
+      return isValid(dependentTables, entry.timestamp());
     }
     return true;
   }

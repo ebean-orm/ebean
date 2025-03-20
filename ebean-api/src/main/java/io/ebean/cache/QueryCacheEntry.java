@@ -11,7 +11,7 @@ import java.util.Set;
  * the query cache entry is treated as invalid.
  * </p>
  */
-public class QueryCacheEntry {
+public final class QueryCacheEntry {
 
   private final Object value;
   private final Set<String> dependentTables;
@@ -33,21 +33,21 @@ public class QueryCacheEntry {
   /**
    * Return the actual query result.
    */
-  public Object getValue() {
+  public Object value() {
     return value;
   }
 
   /**
    * Return the tables the query result is dependent on.
    */
-  public Set<String> getDependentTables() {
+  public Set<String> dependentTables() {
     return dependentTables;
   }
 
   /**
    * Return the timestamp used to check for modifications on the dependent tables.
    */
-  public Instant getTimestamp() {
+  public Instant timestamp() {
     return timestamp;
   }
 }
