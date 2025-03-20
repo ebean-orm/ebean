@@ -1,7 +1,9 @@
 package org.tests.cache;
 
 import io.ebean.DB;
+import io.ebean.annotation.Platform;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.cache.EColAB;
 
@@ -15,6 +17,7 @@ public class TestQueryCacheConcurrent extends BaseTestCase {
   private volatile boolean failed;
   private volatile int  step;
 
+  @ForPlatform(Platform.POSTGRES) // H2 isn't good enough for this test
   @Test
   public void testConcurrent() throws InterruptedException {
 

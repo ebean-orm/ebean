@@ -1,5 +1,6 @@
 package io.ebean.cache;
 
+import java.time.Instant;
 import java.util.Set;
 
 /**
@@ -14,7 +15,7 @@ public class QueryCacheEntry {
 
   private final Object value;
   private final Set<String> dependentTables;
-  private final long timestamp;
+  private final Instant timestamp;
 
   /**
    * Create with dependent tables and timestamp.
@@ -23,7 +24,7 @@ public class QueryCacheEntry {
    * @param dependentTables The extra tables the query is dependent on (joins to)
    * @param timestamp       The timestamp that the query uses to check for modifications
    */
-  public QueryCacheEntry(Object value, Set<String> dependentTables, long timestamp) {
+  public QueryCacheEntry(Object value, Set<String> dependentTables, Instant timestamp) {
     this.value = value;
     this.dependentTables = dependentTables;
     this.timestamp = timestamp;
@@ -46,7 +47,7 @@ public class QueryCacheEntry {
   /**
    * Return the timestamp used to check for modifications on the dependent tables.
    */
-  public long getTimestamp() {
+  public Instant getTimestamp() {
     return timestamp;
   }
 }
