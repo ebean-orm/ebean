@@ -12,6 +12,7 @@ import org.tests.model.basic.ResetBasicData;
 import java.util.Map;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestLazyLoadInCache extends BaseTestCase {
@@ -22,9 +23,9 @@ public class TestLazyLoadInCache extends BaseTestCase {
     ResetBasicData.reset();
 
     Map<Integer, Customer> map = DB.find(Customer.class)
-      .select("id, name")
+      .select("id, name, status, billingAddress")
       .setBeanCacheMode(CacheMode.PUT)
-      .setReadOnly(true)
+      .setUnmodifiable(true)
       .orderBy().asc("id")
       .findMap();
 
@@ -35,7 +36,8 @@ public class TestLazyLoadInCache extends BaseTestCase {
     Customer cust1 = map.get(id);
 
     Customer cust1B = DB.find(Customer.class)
-      .setReadOnly(true)
+      .setUnmodifiable(true)
+      .setUseCache(false)
       .setId(id)
       .findOne();
 
@@ -43,20 +45,19 @@ public class TestLazyLoadInCache extends BaseTestCase {
 
     Set<String> loadedProps = DB.beanState(cust1).loadedProps();
 
-    assertTrue(loadedProps.contains("name"));
-    assertFalse(loadedProps.contains("status"));
-
-    cust1.getStatus();
+    assertThat(loadedProps).contains("id", "name", "status");
+    // cust1.getStatus(); // can't lazy load with unmodifiable
+    assertThat(DB.beanState(cust1).isUnmodifiable()).isTrue();
 
     // a readOnly reference
     Address billingAddress = cust1.getBillingAddress();
     BeanState billAddrState = DB.beanState(billingAddress);
-    assertTrue(billAddrState.isReference());
-    assertTrue(billAddrState.isReadOnly());
+    // assertTrue(billAddrState.isReference()); // not supported by unmodifiable
+    assertTrue(billAddrState.isUnmodifiable());
 
     // lazy load .. no longer a reference
-    billingAddress.getCity();
-    assertFalse(billAddrState.isReference());
+    // billingAddress.getCity(); // lazy loading not supported by unmodifiable
+    // assertFalse(billAddrState.isReference());
 
   }
 

@@ -5,7 +5,6 @@ import io.ebean.DB;
 import io.ebean.ExpressionList;
 import io.ebean.annotation.Transactional;
 import io.ebean.annotation.TxIsolation;
-import io.ebean.bean.BeanCollection;
 import io.ebean.cache.ServerCache;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
@@ -304,46 +303,39 @@ public class TestQueryCache extends BaseTestCase {
 
   @Test
   @SuppressWarnings("unchecked")
-  public void testReadOnlyFind() {
-
+  void testReadOnlyFind() {
     ResetBasicData.reset();
 
     ServerCache customerCache = DB.cacheManager().queryCache(Customer.class);
     customerCache.clear();
 
-    List<Customer> list = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()
-      .ilike("name", "Rob").findList();
+    List<Customer> list = DB.find(Customer.class).setUnmodifiable(true) //.setUseQueryCache(true)
+      .where().ilike("name", "Rob")
+      .findList();
 
-    BeanCollection<Customer> bc = (BeanCollection<Customer>) list;
-    assertTrue(bc.isReadOnly());
-    assertFalse(bc.isEmpty());
-    assertTrue(!list.isEmpty());
-    assertTrue(DB.beanState(list.get(0)).isReadOnly());
 
-    List<Customer> list2 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true).where()
-      .ilike("name", "Rob").findList();
+    assertThat(list).isNotEmpty();
+    assertThat(DB.beanState(list.get(0)).isUnmodifiable()).isTrue();
+
+    List<Customer> list2 = DB.find(Customer.class).setUseQueryCache(true)
+      .where().ilike("name", "Rob")
+      .findList();
 
     List<Customer> list2B = DB.find(Customer.class).setUseQueryCache(true)
-      // .setReadOnly(true)
-      .where().ilike("name", "Rob").findList();
+      .where().ilike("name", "Rob")
+      .findList();
 
-    assertSame(list, list2);
+    assertThat(list2).isEqualTo(list);
 
     // readOnly defaults to true for query cache
-    assertSame(list, list2B);
+    assertSame(list2, list2B);
 
-    List<Customer> list3 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(false).where()
-      .ilike("name", "Rob").findList();
+    List<Customer> list3 = DB.find(Customer.class).setUseQueryCache(true)
+      .where().ilike("name", "Rob")
+      .findList();
 
-    assertNotSame(list, list3);
-    BeanCollection<Customer> bc3 = (BeanCollection<Customer>) list3;
-    assertFalse(bc3.isReadOnly());
-    assertFalse(bc3.isEmpty());
-    assertTrue(list3.size() > 0);
-    // TODO: At this stage setReadOnly(false) does create a shallow copy of the List/Set/Map, but does not
-    // change the read only state in the entities.
-    // assertFalse(DB.beanState(list3.get(0)).isReadOnly());
-
+    assertSame(list2, list3);
+    assertThat(list3).isNotEmpty();
   }
 
   @Test

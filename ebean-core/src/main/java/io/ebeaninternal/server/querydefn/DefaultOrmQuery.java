@@ -132,7 +132,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private boolean usageProfiling = true;
   private CacheMode useBeanCache = CacheMode.AUTO;
   private CacheMode useQueryCache = CacheMode.OFF;
-  private Boolean readOnly;
+  private boolean unmodifiable;
   private PersistenceContextScope persistenceContextScope;
 
   /**
@@ -514,6 +514,10 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (!useDocStore) {
       createExtraJoinsToSupportManyWhereClause();
     }
+    if (unmodifiable) {
+      disableLazyLoading = true;
+      persistenceContextScope = PersistenceContextScope.QUERY;
+    }
     return markQueryJoins();
   }
 
@@ -763,7 +767,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.nativeSql = nativeSql;
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
-    copy.readOnly = readOnly;
+    copy.unmodifiable = unmodifiable;
     if (detail != null) {
       copy.detail = detail.copy();
     }
@@ -1113,7 +1117,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (allowLoadErrors) {
       sb.append("/ae");
     }
-    if (disableLazyLoading) {
+    if (unmodifiable) {
+      sb.append("/um");
+    } else if (disableLazyLoading) {
       sb.append("/dl");
     }
     if (baseTable != null) {
@@ -1277,14 +1283,14 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final Boolean isReadOnly() {
-    return readOnly;
+  public Query<T> setUnmodifiable(boolean unmodifiable) {
+    this.unmodifiable = unmodifiable;
+    return this;
   }
 
   @Override
-  public final Query<T> setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-    return this;
+  public boolean isUnmodifiable() {
+    return unmodifiable;
   }
 
   @Override
@@ -1328,6 +1334,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Query<T> setUseQueryCache(CacheMode useQueryCache) {
     this.useQueryCache = useQueryCache;
+    if (CacheMode.OFF != useQueryCache) {
+      unmodifiable = true;
+    }
     return this;
   }
 

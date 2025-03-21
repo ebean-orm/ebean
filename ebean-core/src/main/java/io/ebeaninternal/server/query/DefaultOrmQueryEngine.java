@@ -114,7 +114,7 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
   }
 
   @Override
-  public <T> BeanCollection<T> findMany(OrmQueryRequest<T> request) {
+  public <T> Object findMany(OrmQueryRequest<T> request) {
     flushJdbcBatchOnQuery(request);
     BeanFindController finder = request.finder();
 
@@ -129,22 +129,21 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
       result = finder.postProcessMany(request, result);
     }
 
-    SpiQuery<T> query = request.query();
     if (result != null && request.isBeanCachePutMany()) {
       // load the individual beans into the bean cache
       request.descriptor().cacheBeanPutAll(result.actualDetails());
     }
 
     request.mergeCacheHits(result);
-    if (request.isQueryCachePut()) {
-      // load the query result into the query cache
-      result.setReadOnly(true);
-      request.putToQueryCache(result);
-      if (Boolean.FALSE.equals(query.isReadOnly())) {
-        result = result.shallowCopy();
+    Object finalResult = result;
+    if (request.query().isUnmodifiable()) {
+      finalResult = result == null ? null : result.freeze();
+      if (request.isQueryCachePut()) {
+        // load the query result into the query cache
+        request.putToQueryCache(finalResult);
       }
     }
-    return result;
+    return finalResult;
   }
 
   /**

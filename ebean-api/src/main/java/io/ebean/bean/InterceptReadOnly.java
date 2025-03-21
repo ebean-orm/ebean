@@ -1,37 +1,44 @@
 package io.ebean.bean;
 
+import io.ebean.LazyInitialisationException;
+import io.ebean.UnmodifiableEntityException;
 import io.ebean.ValuePair;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * EntityBeanIntercept optimised for read only use.
  * <p>
  * For the read only use this intercept doesn't need to hold any state that is normally
- * required for updates such as per property changed, loaded, dirty state, original values
+ * required for updates such as per property changed, dirty state, original values
  * bean state etc.
  */
-public class InterceptReadOnly implements EntityBeanIntercept {
+public final class InterceptReadOnly extends InterceptBase {
 
-  private final EntityBean owner;
+  private final boolean[] loaded;
+  private boolean frozen;
 
   /**
    * Create with a given entity.
    */
   public InterceptReadOnly(Object ownerBean) {
-    this.owner = (EntityBean) ownerBean;
+    super(ownerBean);
+    this.loaded = new boolean[owner._ebean_getPropertyNames().length];
+  }
+
+  @Override
+  public boolean freeze() {
+    if (frozen) {
+      return false;
+    } else {
+      frozen = true;
+      return true;
+    }
   }
 
   @Override
   public String toString() {
-    return "InterceptReadOnly{" + owner + '}';
-  }
-
-  @Override
-  public EntityBean owner() {
-    return owner;
+    return "InterceptReadOnly{frozen:" + frozen + " loaded:" + loadedPropertyNames() + '}';
   }
 
   @Override
@@ -95,17 +102,12 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
-  public boolean isFullyLoadedBean() {
-    return false;
-  }
-
-  @Override
-  public void setFullyLoadedBean(boolean fullyLoadedBean) {
-
-  }
-
-  @Override
   public boolean isPartial() {
+    for (boolean flag : loaded) {
+      if (!flag) {
+        return true;
+      }
+    }
     return false;
   }
 
@@ -136,7 +138,14 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public boolean hasIdOnly(int idIndex) {
-    return false;
+    for (int i = 0; i < loaded.length; i++) {
+      if (i == idIndex) {
+        if (!loaded[i]) return false;
+      } else if (loaded[i]) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
@@ -157,16 +166,6 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   @Override
   public boolean isLoadedFromCache() {
     return false;
-  }
-
-  @Override
-  public boolean isReadOnly() {
-    return true;
-  }
-
-  @Override
-  public void setReadOnly(boolean readOnly) {
-
   }
 
   @Override
@@ -235,43 +234,37 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
-  public int findProperty(String propertyName) {
-    return 0;
-  }
-
-  @Override
-  public String property(int propertyIndex) {
-    return null;
-  }
-
-  @Override
   public int propertyLength() {
-    return 0;
+    return loaded.length;
   }
 
   @Override
   public void setPropertyLoaded(String propertyName, boolean loaded) {
-
+    final int position = findProperty(propertyName);
+    if (position == -1) {
+      throw new IllegalArgumentException("Property not found - " + propertyName);
+    }
+    this.loaded[position] = loaded;
   }
 
   @Override
   public void setPropertyUnloaded(int propertyIndex) {
-
+    loaded[propertyIndex] = false;
   }
 
   @Override
   public void setLoadedProperty(int propertyIndex) {
-
+    loaded[propertyIndex] = true;
   }
 
   @Override
   public void setLoadedPropertyAll() {
-
+    Arrays.fill(loaded, true);
   }
 
   @Override
   public boolean isLoadedProperty(int propertyIndex) {
-    return false;
+    return loaded[propertyIndex];
   }
 
   @Override
@@ -321,7 +314,16 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public Set<String> loadedPropertyNames() {
-    return Collections.emptySet();
+    if (fullyLoadedBean) {
+      return null;
+    }
+    final Set<String> props = new LinkedHashSet<>();
+    for (int i = 0; i < loaded.length; i++) {
+      if (loaded[i]) {
+        props.add(property(i));
+      }
+    }
+    return props;
   }
 
   @Override
@@ -370,13 +372,10 @@ public class InterceptReadOnly implements EntityBeanIntercept {
   }
 
   @Override
-  public StringBuilder loadedPropertyKey() {
-    return null;
-  }
-
-  @Override
   public boolean[] loaded() {
-    return new boolean[0];
+    final boolean[] ret = new boolean[loaded.length];
+    System.arraycopy(loaded, 0, ret, 0, ret.length);
+    return ret;
   }
 
   @Override
@@ -401,7 +400,7 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public void initialisedMany(int propertyIndex) {
-
+    loaded[propertyIndex] = true;
   }
 
   @Override
@@ -416,12 +415,14 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public void preGetter(int propertyIndex) {
-
+    if (!loaded[propertyIndex]) {
+      throw new LazyInitialisationException("Property not loaded: " + property(propertyIndex));
+    }
   }
 
   @Override
   public void preSetterMany(boolean interceptField, int propertyIndex, Object oldValue, Object newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
@@ -436,57 +437,57 @@ public class InterceptReadOnly implements EntityBeanIntercept {
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, Object oldValue, Object newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, boolean oldValue, boolean newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, int oldValue, int newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, long oldValue, long newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, double oldValue, double newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, float oldValue, float newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, short oldValue, short newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, char oldValue, char newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, byte oldValue, byte newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, char[] oldValue, char[] newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override
   public void preSetter(boolean intercept, int propertyIndex, byte[] oldValue, byte[] newValue) {
-
+    throw new UnmodifiableEntityException("Attempting to modify " + property(propertyIndex));
   }
 
   @Override

@@ -12,12 +12,13 @@ import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Country;
 import org.tests.model.basic.ResetBasicData;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestQueryWithCache extends BaseTestCase {
+class TestQueryWithCache extends BaseTestCase {
 
   @Test
-  public void testCountryDeploy() {
+  void testCountryDeploy() {
 
     ResetBasicData.reset();
 
@@ -50,15 +51,13 @@ public class TestQueryWithCache extends BaseTestCase {
     Country nz4 = DB.find(Country.class).setId("NZ").setAutoTune(false).setUseCache(false)
       .findOne();
 
-    assertTrue(nz2 == nz2b);
-    assertTrue(nz2 == nz3);
-    assertTrue(nz3 != nz4);
-
+    assertThat(nz2).isNotSameAs(nz2b); // Changed behaviour with unmodifiable
+    assertThat(nz2).isNotSameAs(nz3); // Changed behaviour with unmodifiable
+    assertThat(nz3).isNotSameAs(nz4);
   }
 
   @Test
-  public void testSkipCache() {
-
+  void testSkipCache() {
     ResetBasicData.reset();
 
     DB.find(Country.class, "NZ");

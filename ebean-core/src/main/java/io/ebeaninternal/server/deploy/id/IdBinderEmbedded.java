@@ -3,7 +3,6 @@ package io.ebeaninternal.server.deploy.id;
 import io.ebean.bean.EntityBean;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpressionBind;
-import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.core.DefaultSqlUpdate;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
@@ -324,7 +323,7 @@ public final class IdBinderEmbedded implements IdBinder {
 
   @Override
   public Object read(DbReadContext ctx) throws SQLException {
-    final EntityBean embId = idDesc.createEntityBean();
+    final EntityBean embId = idDesc.createEntityBean2(ctx.unmodifiable());
     boolean nullValue = true;
     for (BeanProperty prop : props) {
       final Object value = prop.read(ctx);

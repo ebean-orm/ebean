@@ -3,11 +3,7 @@ package io.ebeaninternal.json;
 import io.ebean.ModifyAwareType;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Map that is wraps an underlying map for the purpose of detecting changes.
@@ -49,6 +45,11 @@ public final class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, S
   @Override
   public int hashCode() {
     return map.hashCode();
+  }
+
+  @Override
+  public Map<K, V> freeze() {
+    return Collections.unmodifiableMap(map);
   }
 
   @Override

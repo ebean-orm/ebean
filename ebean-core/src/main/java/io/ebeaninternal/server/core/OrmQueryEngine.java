@@ -25,9 +25,9 @@ public interface OrmQueryEngine {
   <T> T findId(OrmQueryRequest<T> request);
 
   /**
-   * Execute the findList, findSet, findMap query returning an appropriate BeanCollection.
+   * Execute the findList, findSet, findMap query returning an appropriate Collection.
    */
-  <T> BeanCollection<T> findMany(OrmQueryRequest<T> request);
+  <T> Object findMany(OrmQueryRequest<T> request);
 
   /**
    * Execute the findSingleAttributeCollection query.

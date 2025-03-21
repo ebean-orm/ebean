@@ -2,11 +2,11 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.*;
 import io.ebean.bean.BeanCollection;
+import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
 import io.ebean.common.BeanMap;
-import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.text.json.JsonReadOptions;
@@ -546,7 +546,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (orderBy != null && !orderBy.isEmpty()) {
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
     }
-    return cacheBeans;
+    return query.isUnmodifiable() ? Collections.unmodifiableList(cacheBeans) : cacheBeans;
   }
 
   @Override
@@ -565,7 +565,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     for (T bean : cacheBeans) {
       map.put((K) property.pathGet(bean), bean);
     }
-    return map;
+    return query.isUnmodifiable() ? Collections.unmodifiableMap(map) : map;
   }
 
   private ElPropertyValue mapProperty() {
@@ -583,7 +583,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (orderBy != null && !orderBy.isEmpty()) {
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
     }
-    return new LinkedHashSet<>(cacheBeans);
+    var set = new LinkedHashSet<>(cacheBeans);
+    return query.isUnmodifiable() ? Collections.unmodifiableSet(set) : set;
   }
 
   @Override
@@ -600,9 +601,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     //
     CacheIdLookup<T> idLookup = query.cacheIdLookup();
     if (idLookup != null) {
-      BeanCacheResult<T> cacheResult = beanDescriptor.cacheIdLookup(persistenceContext, idLookup.idValues());
+      BeanCacheResult<T> cacheResult = beanDescriptor.cacheIdLookup(persistenceContext, query.isUnmodifiable(), idLookup.idValues());
       // adjust the query (IN clause) based on the cache hits
       this.cacheBeans = idLookup.removeHits(cacheResult);
+      if (query.isUnmodifiable()) {
+        unmodifiableFreeze(cacheBeans);
+      }
       return idLookup.allHits();
     }
     if (!beanDescriptor.isNaturalKeyCaching()) {
@@ -613,7 +617,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       NaturalKeySet naturalKeySet = data.buildKeys();
       if (naturalKeySet != null) {
         // use the natural keys to lookup Ids to then hit the bean cache
-        BeanCacheResult<T> cacheResult = beanDescriptor.naturalKeyLookup(persistenceContext, naturalKeySet.keys());
+        BeanCacheResult<T> cacheResult = beanDescriptor.naturalKeyLookup(persistenceContext, query.isUnmodifiable(), naturalKeySet.keys());
         // adjust the query (IN clause) based on the cache hits
         this.cacheBeans = data.removeHits(cacheResult);
         return data.allHits();
@@ -639,31 +643,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       return null;
     }
 
-    Object cached = beanDescriptor.queryCacheGet(cacheKey);
-    if (cached != null && isAuditReads() && readAuditQueryType()) {
-      if (cached instanceof BeanCollection) {
-        // raw sql can't use L2 cache so normal queries only in here
-        Collection<T> actualDetails = ((BeanCollection<T>) cached).actualDetails();
-        List<Object> ids = new ArrayList<>(actualDetails.size());
-        for (T bean : actualDetails) {
-          ids.add(beanDescriptor.idForJson(bean));
-        }
-        beanDescriptor.readAuditMany(queryPlanKey.partialKey(), "l2-query-cache", ids);
-      }
-    }
-    if (Boolean.FALSE.equals(query.isReadOnly())) {
-      // return shallow copies if readonly is explicitly set to false
-      if (cached instanceof BeanCollection) {
-        cached = ((BeanCollection<?>) cached).shallowCopy();
-      } else if (cached instanceof List) {
-        cached = new CopyOnFirstWriteList<>((List<?>) cached);
-      } else if (cached instanceof Set) {
-        cached = new LinkedHashSet<>((Set<?>) cached);
-      } else if (cached instanceof Map) {
-        cached = new LinkedHashMap<>((Map<?, ?>) cached);
-      }
-    }
-    return cached;
+    return beanDescriptor.queryCacheGet(cacheKey);
   }
 
   /**
@@ -778,6 +758,32 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public void clearContext() {
     if (!transaction.isAutoPersistUpdates()) {
       beanDescriptor.contextClear(transaction.persistenceContext());
+    }
+  }
+
+  public void unmodifiableFreeze(Collection<T> beans) {
+    if (query.isUnmodifiable()) {
+      if (beans != null) {
+        for (T bean : beans) {
+          beanDescriptor.freeze((EntityBean) bean);
+        }
+      }
+    }
+  }
+
+  public void unmodifiableFreeze(BeanCollection<T> beanCollection) {
+    if (query.isUnmodifiable()) {
+      if (beanCollection != null) {
+        for (T bean : beanCollection.actualDetails()) {
+          beanDescriptor.freeze((EntityBean) bean);
+        }
+      }
+    }
+  }
+
+  public void unmodifiableFreeze(EntityBean bean) {
+    if (query.isUnmodifiable() && bean != null) {
+      beanDescriptor.freeze(bean);
     }
   }
 }

@@ -388,9 +388,13 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   SELF setUseDocStore(boolean useDocStore);
 
   /**
-   * When set to true when you want the returned beans to be read only.
+   * When set to true when you want the returned beans to be unmodifiable read only.
+   * <p>
+   * This means that the returning graph can't be mutated via setters, all the collections
+   * are unmodifiable collections, lazy loading is disabled and that the query uses
+   * {@link PersistenceContextScope#QUERY}.
    */
-  SELF setReadOnly(boolean readOnly);
+  SELF setUnmodifiable(boolean unmodifiable);
 
   /**
    * Set a timeout on this query.

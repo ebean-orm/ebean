@@ -509,7 +509,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
-  public Query<T> setReadOnly(boolean readOnly) {
+  public Query<T> setUnmodifiable(boolean unmodifiable) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 

@@ -7,6 +7,8 @@ import java.sql.SQLException;
 
 public interface DataReader {
 
+  boolean unmodifiable();
+
   void close() throws SQLException;
 
   boolean next() throws SQLException;

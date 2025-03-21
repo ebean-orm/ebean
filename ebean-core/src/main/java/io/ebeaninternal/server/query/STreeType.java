@@ -100,6 +100,11 @@ public interface STreeType {
   void postLoad(Object localBean);
 
   /**
+   * Freeze the properties of the entity.
+   */
+  void freeze(EntityBean entityBean);
+
+  /**
    * Return the base table to use given the temporalMode.
    */
   String baseTable(SpiQuery.TemporalMode temporalMode);

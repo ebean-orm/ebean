@@ -205,8 +205,8 @@ public class CQueryPlan implements SpiQueryPlan {
     return new DQueryPlanOutput(beanType(), name, hash, sql, profileLocation, bind, planString);
   }
 
-  public DataReader createDataReader(ResultSet rset) {
-    return new RsetDataReader(dataTimeZone, rset);
+  public DataReader createDataReader(boolean unmodifiable, ResultSet rset) {
+    return new RsetDataReader(unmodifiable, dataTimeZone, rset);
   }
 
   /**
