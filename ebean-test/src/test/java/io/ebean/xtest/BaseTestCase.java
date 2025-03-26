@@ -1,5 +1,6 @@
 package io.ebean.xtest;
 
+import io.avaje.config.Config;
 import io.ebean.CacheMode;
 import io.ebean.DB;
 import io.ebean.Database;
@@ -71,6 +72,12 @@ public abstract class BaseTestCase {
       String propsFile = System.getProperty("props.file");
       System.out.println("BaseTestCase: -Dprops.file=" + propsFile); // help debug CI
       // First try, if we get the default server. If this fails, all tests will fail.
+      String dsName = Config.getNullable("datasource.default");
+      System.out.println("config: datasource.default " + dsName);
+      System.out.println("config: username " + Config.getNullable("datasource." + dsName + ".username"));
+      System.out.println("config: password " + Config.getNullable("datasource." + dsName + ".password"));
+      System.out.println("config: url " + Config.getNullable("datasource." + dsName + ".url"));
+
       DB.getDefault();
     } catch (Throwable e) {
       logger.error("Fatal error while getting ebean-server. Exiting...", e);
