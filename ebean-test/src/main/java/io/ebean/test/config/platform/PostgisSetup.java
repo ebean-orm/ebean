@@ -49,7 +49,7 @@ class PostgisSetup implements PlatformSetup {
     }
     config.setExtensions("hstore,pgcrypto,postgis");
     config.setDockerContainerName("ut_postgis");
-    config.setDockerVersion("14-3.2");
+    config.setDockerVersion("16-3.5");
     return config.getDockerProperties();
   }
 
