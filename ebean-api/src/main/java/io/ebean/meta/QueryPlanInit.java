@@ -81,8 +81,8 @@ public class QueryPlanInit {
    * Return the threshold in micros to use for the given hash.
    */
   public long thresholdMicros(String hash) {
-    long threshold = hashes.get(hash);
-    return threshold < 1 ? defaultThresholdMicros : threshold;
+    Long threshold = hashes.get(hash);
+    return threshold == null || threshold < 1 ? defaultThresholdMicros : threshold;
   }
 
   /**

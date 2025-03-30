@@ -36,6 +36,7 @@ class QueryPlanInitTest {
     assertThat(init.includeHash("xJunk")).isFalse();
     assertThat(init.includeHash("xOne")).isTrue();
     assertThat(init.includeHash("xTwo")).isTrue();
+    assertThat(init.thresholdMicros("xJunk")).isEqualTo(1000L);
     assertThat(init.thresholdMicros("xOne")).isEqualTo(1000L);
     assertThat(init.thresholdMicros("xTwo")).isEqualTo(2000L);
   }
