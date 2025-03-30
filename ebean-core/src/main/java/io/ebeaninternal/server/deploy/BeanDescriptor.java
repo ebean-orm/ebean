@@ -1455,7 +1455,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (request.includeHash(queryPlan.hash())) {
-        queryPlan.queryPlanInit(request.thresholdMicros());
+        queryPlan.queryPlanInit(request.thresholdMicros(queryPlan.hash()));
         list.add(queryPlan.createMeta(null, null));
       }
     }
