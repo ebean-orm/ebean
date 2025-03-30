@@ -232,6 +232,15 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public void setOverwriteGeneratedProperties(boolean overwriteGeneratedProperties) {
+  }
+
+  @Override
+  public boolean isOverwriteGeneratedProperties() {
+    return true;
+  }
+
+  @Override
   public void setSkipCache(boolean skipCache) {
   }
 
