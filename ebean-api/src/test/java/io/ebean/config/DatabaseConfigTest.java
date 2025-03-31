@@ -84,6 +84,7 @@ class DatabaseConfigTest {
     props.setProperty("queryPlan.capturePeriodSecs", "42");
     props.setProperty("queryPlan.captureMaxTimeMillis", "560");
     props.setProperty("queryPlan.captureMaxCount", "7");
+    props.setProperty("queryPlan.explain", "explain (verbose)");
 
     config.loadFromProperties(props);
 
@@ -129,15 +130,18 @@ class DatabaseConfigTest {
     assertEquals(42, settings.getQueryPlanCapturePeriodSecs());
     assertEquals(560, settings.getQueryPlanCaptureMaxTimeMillis());
     assertEquals(7, settings.getQueryPlanCaptureMaxCount());
+    assertEquals("explain (verbose)", settings.getQueryPlanExplain());
 
     assertThat(settings.getMappingLocations()).containsExactly("classpath:/foo","bar");
 
     config.persistBatch(PersistBatch.NONE)
       .persistBatchOnCascade(PersistBatch.NONE)
       .lengthCheck(LengthCheck.ON)
-      .lengthCheck(LengthCheck.UTF8);
+      .lengthCheck(LengthCheck.UTF8)
+      .queryPlanExplain("explain (buffers)");
 
 
+    assertThat(config.settings().getQueryPlanExplain()).isEqualTo("explain (buffers)");
     Properties props1 = new Properties();
     props1.setProperty("ebean.persistBatch", "ALL");
     props1.setProperty("ebean.persistBatchOnCascade", "ALL");
@@ -182,6 +186,7 @@ class DatabaseConfigTest {
     assertEquals(600, config.getQueryPlanCapturePeriodSecs());
     assertEquals(10000L, config.getQueryPlanCaptureMaxTimeMillis());
     assertEquals(10, config.getQueryPlanCaptureMaxCount());
+    assertThat(config.getQueryPlanExplain()).isNull();
     assertThat(config.getLengthCheck()).isEqualTo(LengthCheck.OFF);
     assertTrue(config.isIncludeLabelInSql());
 

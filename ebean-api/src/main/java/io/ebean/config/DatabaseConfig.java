@@ -481,6 +481,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    * Time to live for query plans - defaults to 5 minutes.
    */
   private int queryPlanTTLSeconds = 60 * 5;
+  private String queryPlanExplain;
 
   /**
    * Set to true to globally disable L2 caching (typically for performance testing).
@@ -2151,6 +2152,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     queryPlanCapturePeriodSecs = p.getLong("queryPlan.capturePeriodSecs", queryPlanCapturePeriodSecs);
     queryPlanCaptureMaxTimeMillis = p.getLong("queryPlan.captureMaxTimeMillis", queryPlanCaptureMaxTimeMillis);
     queryPlanCaptureMaxCount = p.getInt("queryPlan.captureMaxCount", queryPlanCaptureMaxCount);
+    queryPlanExplain = p.get("queryPlan.explain", queryPlanExplain);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     localOnlyL2Cache = p.getBoolean("localOnlyL2Cache", localOnlyL2Cache);
@@ -2400,6 +2402,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public int getQueryPlanTTLSeconds() {
     return queryPlanTTLSeconds;
+  }
+
+  @Override
+  public String getQueryPlanExplain() {
+    return queryPlanExplain;
+  }
+
+  @Override
+  public DatabaseBuilder queryPlanExplain(String queryPlanExplain) {
+    this.queryPlanExplain = queryPlanExplain;
+    return this;
   }
 
   @Override
