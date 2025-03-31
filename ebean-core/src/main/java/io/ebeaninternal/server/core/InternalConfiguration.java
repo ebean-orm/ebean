@@ -598,7 +598,7 @@ public final class InternalConfiguration {
       case ORACLE:
         return new QueryPlanLoggerOracle();
       case POSTGRES:
-        return new QueryPlanLoggerExplain(explain(config, "explain (analyze, costs, verbose, buffers, format json) "));
+        return new QueryPlanLoggerExplain(explain(config, "explain (analyze, costs, verbose, buffers) "));
       case YUGABYTE:
         return new QueryPlanLoggerExplain(explain(config,"explain (analyze, buffers, dist) "));
       default:
