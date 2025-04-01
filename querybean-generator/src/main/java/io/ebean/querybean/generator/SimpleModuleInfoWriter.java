@@ -88,7 +88,7 @@ class SimpleModuleInfoWriter {
       for (Set<String> value : processingContext.getOtherDbEntities().values()) {
         allEntities.addAll(value);
       }
-
+      allEntities.addAll(processingContext.getMappedSuper());
       if (!allEntities.isEmpty()) {
         FileObject jfo = processingContext.createNativeImageWriter(factoryPackage + ".ebean-entity");
         if (jfo != null) {
