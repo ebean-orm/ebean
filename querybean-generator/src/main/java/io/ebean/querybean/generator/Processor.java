@@ -75,7 +75,15 @@ public class Processor extends AbstractProcessor implements Constants {
       generateQueryBeans(element);
       count++;
     }
+    for (Element element : roundEnv.getElementsAnnotatedWith(processingContext.mappedSuperclassAnnotation())) {
+      addMappedSuperclasses(element);
+    }
     return count;
+  }
+
+  private void addMappedSuperclasses(Element element) {
+    String fullName = ((TypeElement)element).getQualifiedName().toString();
+    processingContext.addMappedSuper(fullName);
   }
 
   private void processOthers(RoundEnvironment round) {

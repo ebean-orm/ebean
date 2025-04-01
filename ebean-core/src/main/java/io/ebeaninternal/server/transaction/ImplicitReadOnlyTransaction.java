@@ -13,6 +13,7 @@ import io.ebeaninternal.server.persist.BatchControl;
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,6 +58,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   private SpiPersistenceContext persistenceContext;
   private Object tenantId;
   private Map<String, Object> userObjects;
+  private final Instant startTime = Instant.now();
   private final long startNanos;
   private ProfileLocation profileLocation;
 
@@ -88,9 +90,8 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public long startNanoTime() {
-    // not used on read only transaction
-    return startNanos;
+  public Instant startTime() {
+    return startTime;
   }
 
   @Override

@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
@@ -125,7 +124,8 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       } else if (!oneToOneExported) {
         importedId = createImportedId(this, targetDescriptor, tableJoin);
         if (importedId == null) {
-          throw new IllegalStateException("Missing  @Id property on " + targetDescriptor);
+          throw new PersistenceException("Cannot find imported id for " + fullName() + " from " + targetDescriptor
+          + ". If using native-image, possibly missing reflect-config for the Id property.");
         }
         if (importedId.isScalar()) {
           // limit JoinColumn mapping to the @Id / primary key

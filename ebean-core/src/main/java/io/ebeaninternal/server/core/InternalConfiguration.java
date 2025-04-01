@@ -514,25 +514,30 @@ public final class InternalConfiguration {
       return QueryPlanManager.NOOP;
     }
     long threshold = config.getQueryPlanThresholdMicros();
-    return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.platform()), extraMetrics);
+    return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.platform(), config), extraMetrics);
   }
 
   /**
    * Returns the logger to log query plans for the given platform.
    */
-  QueryPlanLogger queryPlanLogger(Platform platform) {
+  QueryPlanLogger queryPlanLogger(Platform platform, DatabaseBuilder.Settings config) {
     switch (platform.base()) {
       case SQLSERVER:
         return new QueryPlanLoggerSqlServer();
       case ORACLE:
         return new QueryPlanLoggerOracle();
       case POSTGRES:
-        return new QueryPlanLoggerExplain("explain (analyze, buffers) ");
+        return new QueryPlanLoggerExplain(explain(config, "explain (analyze, costs, verbose, buffers) "));
       case YUGABYTE:
-        return new QueryPlanLoggerExplain("explain (analyze, buffers, dist) ");
+        return new QueryPlanLoggerExplain(explain(config,"explain (analyze, buffers, dist) "));
       default:
-        return new QueryPlanLoggerExplain("explain ");
+        return new QueryPlanLoggerExplain(explain(config,"explain "));
     }
+  }
+
+  private static String explain(DatabaseBuilder.Settings config, String defaultExplain) {
+    String explain = config.getQueryPlanExplain();
+    return explain == null ? defaultExplain : explain + ' ';
   }
 
   /**

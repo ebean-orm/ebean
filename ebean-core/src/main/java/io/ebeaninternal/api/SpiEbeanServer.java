@@ -330,6 +330,8 @@ public interface SpiEbeanServer extends SpiServer, BeanCollectionLoader {
 
   <T> FutureList<T> findFutureList(SpiQuery<T> query);
 
+  <K, T> FutureMap<K, T> findFutureMap(SpiQuery<T> query);
+
   <T> PagedList<T> findPagedList(SpiQuery<T> query);
 
   <T> Set<T> findSet(SpiQuery<T> query);

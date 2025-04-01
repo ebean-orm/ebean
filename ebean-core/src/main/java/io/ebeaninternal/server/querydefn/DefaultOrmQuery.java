@@ -1537,6 +1537,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final <K> FutureMap<K, T> findFutureMap() {
+    return server.findFutureMap(this);
+  }
+
+  @Override
   public final FutureRowCount<T> findFutureCount() {
     return server.findFutureCount(this);
   }

@@ -15,6 +15,7 @@ import jakarta.persistence.PersistenceException;
 import jakarta.persistence.RollbackException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -82,6 +83,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private final boolean skipCacheAfterWrite;
   private ProfileStream profileStream;
   private ProfileLocation profileLocation;
+  private final Instant startTime = Instant.now();
   private final long startNanos;
   private boolean autoPersistUpdates;
 
@@ -132,8 +134,8 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public final long startNanoTime() {
-    return startNanos;
+  public final Instant startTime() {
+    return startTime;
   }
 
   @Override

@@ -1,29 +1,29 @@
 package io.ebeaninternal.server.query;
 
-import io.ebean.FutureList;
+import io.ebean.FutureMap;
 import io.ebean.Query;
 import io.ebean.Transaction;
-
 import jakarta.persistence.PersistenceException;
-import java.util.List;
+
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Default implementation for FutureList.
+ * Default implementation for FutureMap.
  */
-public final class QueryFutureList<T> extends BaseFuture<List<T>> implements FutureList<T> {
+public final class QueryFutureMap<K, T> extends BaseFuture<Map<K, T>> implements FutureMap<K, T> {
 
-  private final CallableQueryList<T> call;
+  private final CallableQueryMap<K, T> call;
 
-  public QueryFutureList(CallableQueryList<T> call) {
+  public QueryFutureMap(CallableQueryMap<K, T> call) {
     super(new FutureTask<>(call));
     this.call = call;
   }
 
-  public FutureTask<List<T>> futureTask() {
+  public FutureTask<Map<K, T>> futureTask() {
     return futureTask;
   }
 
@@ -39,7 +39,7 @@ public final class QueryFutureList<T> extends BaseFuture<List<T>> implements Fut
   }
 
   @Override
-  public List<T> getUnchecked() {
+  public Map<K, T> getUnchecked() {
     try {
       return get();
 
@@ -54,7 +54,7 @@ public final class QueryFutureList<T> extends BaseFuture<List<T>> implements Fut
   }
 
   @Override
-  public List<T> getUnchecked(long timeout, TimeUnit unit) throws TimeoutException {
+  public Map<K, T> getUnchecked(long timeout, TimeUnit unit) throws TimeoutException {
     try {
       return get(timeout, unit);
 

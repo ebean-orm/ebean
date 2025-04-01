@@ -576,6 +576,11 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
+  public <K, T> FutureMap<K, T> findFutureMap(SpiQuery<T> query) {
+    return null;
+  }
+
+  @Override
   public <T> PagedList<T> findPagedList(SpiQuery<T> query) {
     return null;
   }

@@ -1175,62 +1175,47 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  private <T> SpiQuery<T> configureForFuture(SpiQuery<T> query) {
+    query.usingFuture();
+    if (query.transaction() == null) {
+      // use a current transaction if active
+      query.usingTransaction(currentServerTransaction());
+    }
+    return query;
+  }
+
   @Override
   public <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query) {
-    SpiQuery<T> copy = query.copy();
-    copy.usingFuture();
-    boolean createdTransaction = false;
-    SpiTransaction transaction = query.transaction();
-    if (transaction == null) {
-      transaction = currentServerTransaction();
-      if (transaction == null) {
-        transaction = (SpiTransaction) createTransaction();
-        createdTransaction = true;
-      }
-      copy.usingTransaction(transaction);
-    }
-    var queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<>(this, copy, createdTransaction));
+    SpiQuery<T> copy = configureForFuture(query.copy());
+    var queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<>(this, copy));
     backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
 
   @Override
   public <T> FutureIds<T> findFutureIds(SpiQuery<T> query) {
-    SpiQuery<T> copy = query.copy();
-    copy.usingFuture();
-    boolean createdTransaction = false;
-    SpiTransaction transaction = query.transaction();
-    if (transaction == null) {
-      transaction = currentServerTransaction();
-      if (transaction == null) {
-        transaction = (SpiTransaction) createTransaction();
-        createdTransaction = true;
-      }
-      copy.usingTransaction(transaction);
-    }
-    QueryFutureIds<T> queryFuture = new QueryFutureIds<>(new CallableQueryIds<>(this, copy, createdTransaction));
+    SpiQuery<T> copy = configureForFuture(query.copy());
+    final var queryFuture = new QueryFutureIds<T>(new CallableQueryIds<>(this, copy));
     backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
 
   @Override
   public <T> FutureList<T> findFutureList(SpiQuery<T> query) {
-    SpiQuery<T> spiQuery = query.copy();
-    spiQuery.usingFuture();
-    // FutureList query always run in it's own persistence content
+    SpiQuery<T> spiQuery = configureForFuture(query.copy());
+    // FutureList query always run in its own persistence content
     spiQuery.setPersistenceContext(new DefaultPersistenceContext());
-    // Create a new transaction solely to execute the findList() at some future time
-    boolean createdTransaction = false;
-    SpiTransaction transaction = query.transaction();
-    if (transaction == null) {
-      transaction = currentServerTransaction();
-      if (transaction == null) {
-        transaction = (SpiTransaction) createTransaction();
-        createdTransaction = true;
-      }
-      spiQuery.usingTransaction(transaction);
-    }
-    QueryFutureList<T> queryFuture = new QueryFutureList<>(new CallableQueryList<>(this, spiQuery, createdTransaction));
+    final var queryFuture = new QueryFutureList<T>(new CallableQueryList<>(this, spiQuery));
+    backgroundExecutor.execute(queryFuture.futureTask());
+    return queryFuture;
+  }
+
+  @Override
+  public <K, T> FutureMap<K, T> findFutureMap(SpiQuery<T> query) {
+    SpiQuery<T> spiQuery = configureForFuture(query.copy());
+    // FutureMap query always run in it's own persistence content
+    spiQuery.setPersistenceContext(new DefaultPersistenceContext());
+    final var queryFuture = new QueryFutureMap<K, T>(new CallableQueryMap<>(this, spiQuery));
     backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }

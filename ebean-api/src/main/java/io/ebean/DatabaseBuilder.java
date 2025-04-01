@@ -1976,6 +1976,11 @@ public interface DatabaseBuilder {
   DatabaseBuilder setQueryPlanTTLSeconds(int queryPlanTTLSeconds);
 
   /**
+   * Set the EXPLAIN (with options) to use for query plan capture.
+   */
+  DatabaseBuilder queryPlanExplain(String queryPlanExplain);
+
+  /**
    * Create a new PlatformConfig based of the one held but with overridden properties by reading
    * properties with the given path and prefix.
    * <p>
@@ -2979,6 +2984,11 @@ public interface DatabaseBuilder {
      * Return the time to live for ebean's internal query plan.
      */
     int getQueryPlanTTLSeconds();
+
+    /**
+     * Return the EXPLAIN (with options) to use for capturing query plans.
+     */
+    String getQueryPlanExplain();
 
     /**
      * Return mapping locations to search for xml mapping via class path search.

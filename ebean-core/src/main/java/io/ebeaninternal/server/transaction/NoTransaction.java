@@ -15,6 +15,7 @@ import io.ebeaninternal.server.persist.BatchControl;
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 
 /**
  * Placeholder for use with SUPPORTS and NEVER transactional when there really isn't a transaction.
@@ -54,9 +55,9 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public long startNanoTime() {
+  public Instant startTime() {
     // not used
-    return System.nanoTime();
+    return Instant.now();
   }
 
   @Override
