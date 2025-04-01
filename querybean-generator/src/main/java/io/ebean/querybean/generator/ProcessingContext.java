@@ -66,6 +66,7 @@ class ProcessingContext implements Constants {
    * Entity classes for the default database.
    */
   private final Set<String> dbEntities = new TreeSet<>();
+  private final Set<String> dbMappedSuper = new TreeSet<>();
 
   /**
    * Entity classes for non default databases.
@@ -102,6 +103,10 @@ class ProcessingContext implements Constants {
 
   TypeElement embeddableAnnotation() {
     return elementUtils.getTypeElement(EMBEDDABLE);
+  }
+
+  TypeElement mappedSuperclassAnnotation() {
+    return elementUtils.getTypeElement(MAPPED_SUPERCLASS);
   }
 
   TypeElement converterAnnotation() {
@@ -564,5 +569,13 @@ class ProcessingContext implements Constants {
 
   boolean isNameClash(String shortName) {
     return propertyTypeMap.isNameClash(shortName);
+  }
+
+  void addMappedSuper(String fullName) {
+    dbMappedSuper.add(fullName);
+  }
+
+  Set<String> getMappedSuper() {
+    return dbMappedSuper;
   }
 }
