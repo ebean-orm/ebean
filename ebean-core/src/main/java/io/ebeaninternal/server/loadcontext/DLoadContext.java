@@ -142,6 +142,14 @@ public final class DLoadContext implements LoadContext {
     ElPropertyValue elGetValue = rootDescriptor.elGetValue(props.getPath());
     boolean many = elGetValue.beanProperty().containsMany();
     registerSecondaryNode(many, props);
+    if (many && secondaryProperties != null) {
+      secondaryProperties.add(elGetValue.beanProperty());
+    }
+  }
+
+  @Override
+  public boolean includeSecondary(BeanPropertyAssocMany<?> many) {
+    return secondaryProperties != null && secondaryProperties.contains(many);
   }
 
   boolean isBeanCacheGet() {
