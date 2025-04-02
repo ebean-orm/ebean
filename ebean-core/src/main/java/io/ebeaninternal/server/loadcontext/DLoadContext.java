@@ -11,9 +11,7 @@ import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.sql.Timestamp;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Default implementation of LoadContext.
@@ -26,7 +24,7 @@ public final class DLoadContext implements LoadContext {
   private final Map<String, DLoadManyContext> manyMap = new HashMap<>();
   private final DLoadBeanContext rootBeanContext;
   private final Timestamp asOf;
-  private final Boolean readOnly;
+  private final boolean unmodifiable;
   private final CacheMode useBeanCache;
   private final int defaultBatchSize;
   private final boolean disableLazyLoading;
@@ -44,6 +42,7 @@ public final class DLoadContext implements LoadContext {
   private final PersistenceContext persistenceContext;
   private List<OrmQueryProperties> secQuery;
   private Object tenantId;
+  private final Set<BeanProperty> secondaryProperties;
 
   /**
    * Construct for use with JSON marshalling (doc store).
@@ -56,7 +55,7 @@ public final class DLoadContext implements LoadContext {
     this.defaultBatchSize = 100;
     this.useBeanCache = CacheMode.OFF;
     this.asOf = null;
-    this.readOnly = false;
+    this.unmodifiable = false;
     this.disableLazyLoading = false;
     this.includeSoftDeletes = false;
     this.relativePath = null;
@@ -64,6 +63,7 @@ public final class DLoadContext implements LoadContext {
     this.profileLocation = null;
     this.profilingListener = null;
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, null);
+    this.secondaryProperties = null;
   }
 
   private ObjectGraphOrigin initOrigin() {
@@ -81,12 +81,13 @@ public final class DLoadContext implements LoadContext {
     SpiQuery<?> query = request.query();
     this.asOf = query.getAsOf();
     this.includeSoftDeletes = query.isIncludeSoftDeletes() && query.mode() == SpiQuery.Mode.NORMAL;
-    this.readOnly = query.isReadOnly();
+    this.unmodifiable = query.isUnmodifiable();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.useBeanCache = query.beanCacheMode();
     this.profilingListener = query.profilingListener();
     this.planLabel = query.planLabel();
     this.profileLocation = query.profileLocation();
+    this.secondaryProperties = query.isUnmodifiable() ? new HashSet<>() : null;
 
     ObjectGraphNode parentNode = query.parentNode();
     if (parentNode != null) {
@@ -215,14 +216,6 @@ public final class DLoadContext implements LoadContext {
     return ebeanServer;
   }
 
-  /**
-   * Return the parent state which defines the sharedInstance and readOnly status
-   * which needs to be propagated to other beans and collections.
-   */
-  Boolean isReadOnly() {
-    return readOnly;
-  }
-
   @Override
   public PersistenceContext persistenceContext() {
     return persistenceContext;
@@ -302,9 +295,7 @@ public final class DLoadContext implements LoadContext {
    * Propagate the original query settings (draft, asOf etc) to the secondary queries.
    */
   void propagateQueryState(SpiQuery<?> query) {
-    if (readOnly != null) {
-      query.setReadOnly(readOnly);
-    }
+    query.setUnmodifiable(unmodifiable);
     query.setDisableLazyLoading(disableLazyLoading);
     query.asOf(asOf);
     if (includeSoftDeletes) {

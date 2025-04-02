@@ -748,9 +748,9 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   CacheMode queryCacheMode();
 
   /**
-   * Return true if the beans returned by this query should be read only.
+   * Return true if the beans returned by this query should be unmodifiable.
    */
-  Boolean isReadOnly();
+  boolean isUnmodifiable();
 
   /**
    * Return the query timeout.

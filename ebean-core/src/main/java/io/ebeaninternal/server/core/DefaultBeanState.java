@@ -4,6 +4,7 @@ import io.ebean.BeanState;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.InterceptReadOnly;
 
 import java.util.Map;
 import java.util.Set;
@@ -60,13 +61,8 @@ public final class DefaultBeanState implements BeanState {
   }
 
   @Override
-  public boolean isReadOnly() {
-    return intercept.isReadOnly();
-  }
-
-  @Override
-  public void setReadOnly(boolean readOnly) {
-    intercept.setReadOnly(readOnly);
+  public boolean isUnmodifiable() {
+    return intercept instanceof InterceptReadOnly;
   }
 
   @Override

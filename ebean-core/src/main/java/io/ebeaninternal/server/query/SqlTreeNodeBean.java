@@ -37,7 +37,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   final boolean readId;
   final boolean readIdNormal;
   final boolean disableLazyLoad;
-  final boolean readOnly;
+  final boolean unmodifiable;
   final String prefix;
   final Map<String, String> pathMap;
   final STreePropertyAssocMany lazyLoadParent;
@@ -89,7 +89,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     this.readId = !aggregationRoot && withId && desc.hasId();
     this.readIdNormal = readId && !temporalVersions;
     this.disableLazyLoad = common.disableLazyLoad() || !readIdNormal || desc.isRawSqlBased();
-    this.readOnly = common.readOnly();
+    this.unmodifiable = common.unmodifiable();
     this.partialObject = props.isPartialObject();
     this.properties = props.props();
     this.children = myChildren == null ? Collections.emptyList() : myChildren;

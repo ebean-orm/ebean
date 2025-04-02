@@ -1,8 +1,6 @@
 package io.ebeaninternal.server.cache;
 
-import io.ebean.bean.EntityBean;
-import io.ebean.bean.EntityBeanIntercept;
-import io.ebean.bean.PersistenceContext;
+import io.ebean.bean.*;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
@@ -22,10 +20,11 @@ public final class CachedBeanDataToBean {
     for (BeanProperty prop : desc.propertiesNonMany()) {
       loadProperty(bean, cacheBeanData, ebi, prop, context);
     }
+    final boolean addManyReferences = ebi instanceof InterceptReadWrite;
     for (BeanPropertyAssocMany<?> prop : desc.propertiesMany()) {
       if (prop.isElementCollection()) {
         loadProperty(bean, cacheBeanData, ebi, prop, context);
-      } else {
+      } else if (addManyReferences) {
         prop.createReferenceIfNull(bean);
       }
     }

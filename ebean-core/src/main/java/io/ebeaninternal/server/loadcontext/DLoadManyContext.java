@@ -216,7 +216,7 @@ final class DLoadManyContext extends DLoadBaseContext implements LoadManyContext
           BeanDescriptor<?> parentDesc = context.desc.descriptor(ownerBean.getClass());
           Object parentId = parentDesc.getId(ownerBean);
           final String parentKey = parentDesc.cacheKey(parentId);
-          if (parentDesc.cacheManyPropLoad(context.property, bc, parentKey, context.parent.isReadOnly())) {
+          if (parentDesc.cacheManyPropLoad(context.property, bc, parentKey)) {
             // we loaded the bean collection from cache so remove it from the buffer
             if (removeFromBuffer(bc)) {
               bc.setLoader(context.parent.server());

@@ -149,18 +149,6 @@ public interface EntityBeanIntercept extends Serializable {
   boolean isLoadedFromCache();
 
   /**
-   * Return true if the bean should be treated as readOnly. If a setter method
-   * is called when it is readOnly an Exception is thrown.
-   */
-  boolean isReadOnly();
-
-  /**
-   * Set the readOnly status. If readOnly then calls to setter methods through
-   * an exception.
-   */
-  void setReadOnly(boolean readOnly);
-
-  /**
    * Set the bean to be updated when persisted (for merge).
    */
   void setForceUpdate(boolean forceUpdate);
@@ -552,4 +540,9 @@ public interface EntityBeanIntercept extends Serializable {
    * Update the 'next' mutable info returning the content that was obtained via dirty detection.
    */
   String mutableNext(int propertyIndex);
+
+  /**
+   * Return true if this entity bean should be frozen. Used to handle recursive freezing.
+   */
+  boolean freeze();
 }

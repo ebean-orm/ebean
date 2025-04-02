@@ -16,4 +16,7 @@ public interface ModifyAwareType {
    */
   void setMarkedDirty(boolean markedDirty);
 
+  default Object freeze() {
+    return this; // throw new UnsupportedOperationException();
+  }
 }

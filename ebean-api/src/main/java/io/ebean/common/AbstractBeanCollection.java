@@ -17,7 +17,6 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
   private static final long serialVersionUID = 3365725236140187588L;
 
   protected final ReentrantLock lock = new ReentrantLock();
-  protected boolean readOnly;
   protected boolean disableLazyLoad;
   /**
    * The Database this is associated with. (used for lazy fetch).
@@ -55,7 +54,6 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     this.ebeanServerName = loader.name();
     this.ownerBean = ownerBean;
     this.propertyName = propertyName;
-    this.readOnly = ownerBean != null && ownerBean._ebean_getIntercept().isReadOnly();
   }
 
   @Override
@@ -101,22 +99,6 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     this.registeredWithLoadContext = true;
     this.loader = loader;
     this.ebeanServerName = loader.name();
-  }
-
-  @Override
-  public boolean isReadOnly() {
-    return readOnly;
-  }
-
-  @Override
-  public void setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-  }
-
-  void checkReadOnly() {
-    if (readOnly) {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
-    }
   }
 
   // ---------------------------------------------------------
@@ -212,14 +194,4 @@ abstract class AbstractBeanCollection<E> implements BeanCollection<E> {
     return modifyHolder != null && modifyHolder.wasTouched();
   }
 
-  /**
-   * Copies all relevant properties for a clone. See {@link #shallowCopy()}
-   */
-  protected void setFromOriginal(AbstractBeanCollection<E> other) {
-    this.disableLazyLoad = other.disableLazyLoad;
-    this.ebeanServerName = other.ebeanServerName;
-    this.loader = other.loader;
-    this.ownerBean = other.ownerBean;
-    this.propertyName = other.propertyName;
-  }
 }

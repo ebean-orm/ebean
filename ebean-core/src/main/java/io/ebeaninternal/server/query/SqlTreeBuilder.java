@@ -44,12 +44,12 @@ public final class SqlTreeBuilder {
    */
   private final boolean rawNoId;
   private final boolean disableLazyLoad;
-  private final boolean readOnly;
   private final SpiQuery.TemporalMode temporalMode;
   private final SqlTreeNode rootNode;
   private boolean sqlDistinct;
   private final boolean platformDistinctNoLobs;
   private final SqlTreeCommon common;
+  private final boolean unmodifiable;
 
   /**
    * Construct for RawSql query.
@@ -59,7 +59,7 @@ public final class SqlTreeBuilder {
     this.desc = request.descriptor();
     this.rawNoId = rawNoId;
     this.disableLazyLoad = request.query().isDisableLazyLoading();
-    this.readOnly = Boolean.TRUE.equals(request.query().isReadOnly());
+    this.unmodifiable = request.query().isUnmodifiable();
     this.query = null;
     this.subQuery = false;
     this.distinctOnPlatform = false;
@@ -71,7 +71,7 @@ public final class SqlTreeBuilder {
     this.manyWhereJoins = null;
     this.alias = null;
     this.ctx = null;
-    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, readOnly, null);
+    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, unmodifiable, null);
     this.rootNode = buildRootNode(desc);
   }
 
@@ -87,7 +87,7 @@ public final class SqlTreeBuilder {
     this.query = request.query();
     this.temporalMode = SpiQuery.TemporalMode.of(query);
     this.disableLazyLoad = query.isDisableLazyLoading();
-    this.readOnly = Boolean.TRUE.equals(query.isReadOnly());
+    this.unmodifiable = query.isUnmodifiable();
     this.subQuery = Type.SQ_EXISTS == query.type()
       || Type.SQ_EX == query.type()
       || Type.ID_LIST == query.type()
@@ -100,7 +100,7 @@ public final class SqlTreeBuilder {
     this.alias = new SqlTreeAlias(request.baseTableAlias(), temporalMode);
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
     this.platformDistinctNoLobs = builder.isPlatformDistinctNoLobs();
-    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, readOnly, includeJoin);
+    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, unmodifiable, includeJoin);
     this.rootNode = buildRootNode(desc);
     String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.historySupport(query);

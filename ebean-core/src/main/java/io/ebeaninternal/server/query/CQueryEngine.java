@@ -107,15 +107,9 @@ public final class CQueryEngine {
         if (collection instanceof List) {
           collection = (A) Collections.unmodifiableList((List<?>) collection);
           request.putToQueryCache(collection);
-          if (Boolean.FALSE.equals(request.query().isReadOnly())) {
-            collection = (A) new ArrayList<>(collection);
-          }
         } else if (collection instanceof Set) {
           collection = (A) Collections.unmodifiableSet((Set<?>) collection);
           request.putToQueryCache(collection);
-          if (Boolean.FALSE.equals(request.query().isReadOnly())) {
-            collection = (A) new LinkedHashSet<>(collection);
-          }
         }
       }
       return collection;
@@ -348,6 +342,7 @@ public final class CQueryEngine {
       if (request.isQueryCachePut()) {
         request.addDependentTables(cquery.dependentTables());
       }
+      request.unmodifiableFreeze(beanCollection);
       return beanCollection;
 
     } catch (SQLException e) {
@@ -377,6 +372,7 @@ public final class CQueryEngine {
         logFindBeanSummary(cquery);
       }
       request.executeSecondaryQueries(false);
+      request.unmodifiableFreeze(bean);
       return (T) bean;
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);

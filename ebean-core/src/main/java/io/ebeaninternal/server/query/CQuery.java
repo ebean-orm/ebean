@@ -43,6 +43,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   private final ReentrantLock lock = new ReentrantLock();
 
   private final boolean loadContextBean;
+  private final boolean unmodifiable;
 
   /**
    * The resultSet rows read.
@@ -151,8 +152,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   private final ProfilingListener profilingListener;
 
-  private final Boolean readOnly;
-
   private long profileOffset;
   private long startNano;
 
@@ -169,7 +168,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.queryMode = query.mode();
     this.loadContextBean = queryMode.isLoadContextBean() || query.getForUpdateLockType() != null;
     this.lazyLoadManyProperty = query.lazyLoadMany();
-    this.readOnly = query.isReadOnly();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.objectGraphNode = query.parentNode();
     this.profilingListener = query.profilingListener();
@@ -190,6 +188,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     } else {
       this.help = createHelp(request);
     }
+    this.unmodifiable = request.query().isUnmodifiable();
     this.collection = (help != null ? help.createEmptyNoParent() : null);
   }
 
@@ -217,17 +216,8 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   }
 
   @Override
-  public Boolean isReadOnly() {
-    return readOnly;
-  }
-
-  @Override
-  public void propagateState(Object e) {
-    if (Boolean.TRUE.equals(readOnly)) {
-      if (e instanceof EntityBean) {
-        ((EntityBean) e)._ebean_getIntercept().setReadOnly(true);
-      }
-    }
+  public boolean unmodifiable() {
+    return unmodifiable;
   }
 
   @Override
@@ -277,7 +267,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     if (resultSet == null) {
       return false;
     }
-    dataReader = queryPlan.createDataReader(resultSet);
+    dataReader = queryPlan.createDataReader(query.isUnmodifiable(), resultSet);
     return true;
   }
 
@@ -445,6 +435,14 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     return result;
   }
 
+  EntityBean nextBean() {
+    EntityBean bean = next();
+    if (unmodifiable) {
+      request.unmodifiableFreeze(bean);
+    }
+    return bean;
+  }
+
   EntityBean next() {
     hasNextCache = false;
     if (nextBean == null) {
@@ -569,6 +567,11 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
     request.loadContext().register(path(many.name()), many, bc);
+  }
+
+  @Override
+  public boolean includeSecondary(BeanPropertyAssocMany<?> many) {
+    return request.loadContext().includeSecondary(many);
   }
 
   /**

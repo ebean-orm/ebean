@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy;
 
 import com.fasterxml.jackson.core.JsonToken;
 import io.ebean.DataIntegrityException;
+import io.ebean.ModifyAwareType;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -1421,6 +1422,17 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
       }
     } else if (dbColumn != null) {
       desc.registerColumn(dbColumn, path);
+    }
+  }
+
+  /**
+   * Freeze mutable types (like DbArray).
+   */
+  public void freeze(EntityBean entityBean) {
+    Object value = getValue(entityBean);
+    if (value instanceof ModifyAwareType) {
+      ModifyAwareType bc = (ModifyAwareType) value;
+      setValue(entityBean, bc.freeze());
     }
   }
 }

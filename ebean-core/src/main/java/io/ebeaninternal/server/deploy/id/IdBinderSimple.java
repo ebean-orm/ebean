@@ -245,7 +245,8 @@ public final class IdBinderSimple implements IdBinder {
       idValue = scalarType.toBeanType(idValue);
     }
     if (bean != null) {
-      idProperty.setValueIntercept(bean, idValue);
+      // not using interception to support unmodifiable entities
+      idProperty.setValue(bean, idValue);
     }
     return idValue;
   }
