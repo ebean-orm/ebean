@@ -14,7 +14,7 @@ import java.sql.SQLException;
 abstract class AssocOneHelp {
 
   final BeanPropertyAssocOne<?> property;
-  private final BeanDescriptor<?> target;
+  protected final BeanDescriptor<?> target;
   private final String path;
 
   AssocOneHelp(BeanPropertyAssocOne<?> property) {
@@ -66,9 +66,8 @@ abstract class AssocOneHelp {
     if (existing != null) {
       return existing;
     }
-    boolean disableLazyLoading = ctx.isDisableLazyLoading();
-    Object ref = target.contextRef(pc, ctx.isReadOnly(), disableLazyLoading, id);
-    if (!disableLazyLoading) {
+    Object ref = target.contextRef(pc, id, ctx.unmodifiable(), ctx.isDisableLazyLoading());
+    if (!ctx.unmodifiable() && !ctx.isDisableLazyLoading()) {
       ctx.register(path, ((EntityBean) ref)._ebean_getIntercept());
     }
     return ref;
@@ -81,7 +80,6 @@ abstract class AssocOneHelp {
     Object val = read(ctx);
     if (bean != null) {
       property.setValue(bean, val);
-      ctx.propagateState(val);
     }
     return val;
   }

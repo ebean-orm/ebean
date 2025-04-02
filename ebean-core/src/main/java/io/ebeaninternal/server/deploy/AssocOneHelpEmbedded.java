@@ -32,7 +32,7 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
 
   @Override
   Object read(DataReader reader) throws SQLException {
-    EntityBean embeddedBean = property.targetDescriptor.createEntityBean();
+    EntityBean embeddedBean = property.targetDescriptor.createEntityBean2(reader.unmodifiable());
     boolean notNull = false;
     for (BeanProperty property : property.embeddedProps) {
       Object value = property.readSet(reader, embeddedBean);
@@ -53,7 +53,6 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
     if (bean != null) {
       // set back to the parent bean
       property.setValue(bean, dbVal);
-      ctx.propagateState(dbVal);
       return dbVal;
     } else {
       return null;
@@ -62,7 +61,7 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
 
   @Override
   Object read(DbReadContext ctx) throws SQLException {
-    EntityBean embeddedBean = property.targetDescriptor.createEntityBean();
+    EntityBean embeddedBean = property.targetDescriptor.createEntityBean2(ctx.unmodifiable());
     boolean notNull = false;
     for (BeanProperty property : property.embeddedProps) {
       Object value = property.readSet(ctx, embeddedBean);
@@ -70,12 +69,7 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
         notNull = true;
       }
     }
-    if (notNull) {
-      ctx.propagateState(embeddedBean);
-      return embeddedBean;
-    } else {
-      return null;
-    }
+    return notNull ? embeddedBean : null;
   }
 
   @Override

@@ -261,7 +261,7 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Try to load the bean collection from cache return true if successful.
    */
-  boolean manyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey, Boolean readOnly) {
+  boolean manyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey) {
     if (many.isElementCollection()) {
       // held as part of the bean cache so skip
       return false;
@@ -280,7 +280,7 @@ final class BeanDescriptorCacheHelp<T> {
     bc.checkEmptyLazyLoad();
     int i = 0;
     for (Object id : idList) {
-      final EntityBean ref = targetDescriptor.createReference(readOnly, id, persistenceContext);
+      final EntityBean ref = targetDescriptor.createReference(persistenceContext, id);
       if (many.hasOrderColumn()) {
         ref._ebean_getIntercept().setSortOrder(++i);
       }
@@ -344,7 +344,7 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Hit the bean cache with the given ids returning the hits.
    */
-  BeanCacheResult<T> cacheIdLookup(PersistenceContext context, Collection<?> ids) {
+  BeanCacheResult<T> cacheIdLookup(PersistenceContext context, boolean unmodifiable, Collection<?> ids) {
     Set<Object> keys = new HashSet<>(ids.size());
     for (Object id : ids) {
       keys.add(desc.cacheKey(id));
@@ -359,7 +359,7 @@ final class BeanDescriptorCacheHelp<T> {
     BeanCacheResult<T> result = new BeanCacheResult<>();
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
       CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
-      T bean = convertToBean(entry.getKey(), false, context, cachedBeanData);
+      T bean = convertToBean(entry.getKey(), unmodifiable, context, cachedBeanData);
       result.add(bean, desc.id(bean));
     }
     return result;
@@ -368,7 +368,7 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Use natural keys to hit the bean cache and return resulting hits.
    */
-  BeanCacheResult<T> naturalKeyLookup(PersistenceContext context, Set<Object> keys) {
+  BeanCacheResult<T> naturalKeyLookup(PersistenceContext context, boolean unmodifiable, Set<Object> keys) {
     if (context == null) {
       context = new DefaultPersistenceContext();
     }
@@ -399,7 +399,7 @@ final class BeanDescriptorCacheHelp<T> {
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
       Object id = entry.getKey();
       CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
-      T bean = convertToBean(id, false, context, cachedBeanData);
+      T bean = convertToBean(id, unmodifiable, context, cachedBeanData);
       Object naturalKey = reverseMap.get(id);
       result.add(bean, naturalKey);
     }
@@ -561,9 +561,9 @@ final class BeanDescriptorCacheHelp<T> {
     return (CachedBeanData) getBeanCache().get(key);
   }
 
-  T beanCacheGet(String key, Boolean readOnly, PersistenceContext context) {
-    T bean = beanCacheGetInternal(key, readOnly, context);
-    if (bean != null) {
+  T beanCacheGet(String key, boolean unmodifiable, PersistenceContext context) {
+    T bean = beanCacheGetInternal(key, unmodifiable, context);
+    if (bean != null && !unmodifiable) {
       setupContext(bean, context);
     }
     return bean;
@@ -572,7 +572,7 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Return a bean from the bean cache.
    */
-  private T beanCacheGetInternal(String key, Boolean readOnly, PersistenceContext context) {
+  private T beanCacheGetInternal(String key, boolean unmodifiable, PersistenceContext context) {
     CachedBeanData data = (CachedBeanData) getBeanCache().get(key);
     if (data == null) {
       if (beanLog.isLoggable(TRACE)) {
@@ -583,12 +583,12 @@ final class BeanDescriptorCacheHelp<T> {
     if (beanLog.isLoggable(TRACE)) {
       beanLog.log(TRACE, "   GET {0}({1}) - hit", cacheName, key);
     }
-    return convertToBean(key, readOnly, context, data);
+    return convertToBean(key, unmodifiable, context, data);
   }
 
   @SuppressWarnings("unchecked")
-  private T convertToBean(Object id, Boolean readOnly, PersistenceContext context, CachedBeanData data) {
-    if (cacheSharableBeans && !Boolean.FALSE.equals(readOnly)) {
+  private T convertToBean(Object id, boolean unmodifiable, PersistenceContext context, CachedBeanData data) {
+    if (cacheSharableBeans && unmodifiable) {
       Object bean = data.getSharableBean();
       if (bean != null) {
         if (beanLog.isLoggable(TRACE)) {
@@ -600,18 +600,18 @@ final class BeanDescriptorCacheHelp<T> {
         return (T) bean;
       }
     }
-    return (T) loadBean(id, readOnly, data, context);
+    return (T) loadBean(id, unmodifiable, data, context);
   }
 
   /**
    * Load the entity bean taking into account inheritance.
    */
-  private EntityBean loadBean(Object id, Boolean readOnly, CachedBeanData data, PersistenceContext context) {
+  private EntityBean loadBean(Object id, boolean unmodifiable, CachedBeanData data, PersistenceContext context) {
     String discValue = data.getDiscValue();
     if (discValue == null) {
-      return loadBeanDirect(id, readOnly, data, context);
+      return loadBeanDirect(id, unmodifiable, data, context);
     } else {
-      return rootDescriptor(discValue).cacheBeanLoadDirect(id, readOnly, data, context);
+      return rootDescriptor(discValue).cacheBeanLoadDirect(id, unmodifiable, data, context);
     }
   }
 
@@ -625,26 +625,22 @@ final class BeanDescriptorCacheHelp<T> {
   /**
    * Load the entity bean from cache data given this is the root bean type.
    */
-  EntityBean loadBeanDirect(Object id, Boolean readOnly, CachedBeanData data, PersistenceContext context) {
+  EntityBean loadBeanDirect(Object id, boolean unmodifiable, CachedBeanData data, PersistenceContext context) {
     id = desc.convertId(id);
-    EntityBean bean = null;
-    if (context == null) {
-      context = new DefaultPersistenceContext();
-    } else {
-      bean = (EntityBean) desc.contextGet(context, id);
-    }
+    EntityBean bean = context == null ? null : (EntityBean) desc.contextGet(context, id);;
     if (bean == null) {
-      bean = desc.createEntityBean();
+      bean = desc.createEntityBean2(unmodifiable);
       desc.setId(id, bean);
-      desc.contextPut(context, id, bean);
-
-      EntityBeanIntercept ebi = bean._ebean_getIntercept();
-      // Not using loadContext here so no batch lazy loading for these beans
-      ebi.setBeanLoader(desc.l2BeanLoader());
-      if (Boolean.TRUE.equals(readOnly)) {
-        ebi.setReadOnly(true);
+      if (!unmodifiable) {
+        if (context == null) {
+          context = new DefaultPersistenceContext();
+        }
+        desc.contextPut(context, id, bean);
+        EntityBeanIntercept ebi = bean._ebean_getIntercept();
+        ebi.setPersistenceContext(context);
+        // Not using loadContext here so no batch lazy loading for these beans
+        ebi.setBeanLoader(desc.l2BeanLoader());
       }
-      ebi.setPersistenceContext(context);
     }
 
     CachedBeanDataToBean.load(desc, bean, data, context);

@@ -8,7 +8,6 @@ import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.*;
 import io.ebean.bean.PersistenceContext.WithOption;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;
@@ -610,7 +609,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     InheritInfo inheritInfo = desc.inheritInfo();
     if (inheritInfo == null || inheritInfo.isConcrete()) {
-      return (T) desc.contextRef(pc, null, false, id);
+      return (T) desc.contextRef(pc, id);
     }
     return referenceFindOne(type, id, desc);
   }
@@ -994,7 +993,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return null;
     }
     // Hit the L2 bean cache
-    return desc.cacheBeanGet(id, query.isReadOnly(), pc);
+    return desc.cacheBeanGet(id, query.isUnmodifiable(), pc);
   }
 
   /**
@@ -1205,11 +1204,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, query);
     Object result = request.getFromQueryCache();
     if (result != null) {
-      if (Boolean.FALSE.equals(request.query().isReadOnly())) {
-        return new CopyOnFirstWriteList<>((List<A>) result);
-      } else {
-        return (List<A>) result;
-      }
+      return (List<A>) result;
     }
     try {
       request.initTransIfRequired();

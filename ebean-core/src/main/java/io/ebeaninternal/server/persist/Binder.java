@@ -401,7 +401,7 @@ public final class Binder {
     return new DataBind(dataTimeZone, stmt, connection);
   }
 
-  public DataReader createDataReader(ResultSet resultSet) {
-    return new RsetDataReader(dataTimeZone, resultSet);
+  public DataReader createDataReader(boolean unmodifiable, ResultSet resultSet) {
+    return new RsetDataReader(unmodifiable, dataTimeZone, resultSet);
   }
 }

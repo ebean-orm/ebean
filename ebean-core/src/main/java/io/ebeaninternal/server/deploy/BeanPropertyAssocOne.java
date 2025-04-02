@@ -667,6 +667,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
+  public void freeze(EntityBean entityBean) {
+    Object value = getValue(entityBean);
+    if (value instanceof EntityBean) {
+      targetDescriptor.freeze((EntityBean) value);
+    }
+  }
+
+  @Override
   public void setValue(EntityBean bean, Object value) {
     super.setValue(bean, value);
     if (!id && embedded && value instanceof EntityBean) {

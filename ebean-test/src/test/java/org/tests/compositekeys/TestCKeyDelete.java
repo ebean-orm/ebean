@@ -1,5 +1,6 @@
 package org.tests.compositekeys;
 
+import io.ebean.UnmodifiableEntityException;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.tests.model.basic.CKeyParentId;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -50,6 +52,14 @@ public class TestCKeyDelete extends BaseTestCase {
 
     List<CKeyParentId> ids = DB.find(CKeyParent.class).where().eq("id.oneKey", 101).findIds();
     assertThat(ids).hasSize(1);
+
+    List<CKeyParentId> idsUnmodifiable = DB.find(CKeyParent.class)
+      .setUnmodifiable(true)
+      .where().eq("id.oneKey", 101)
+      .findIds();
+    assertThat(idsUnmodifiable).hasSize(1);
+    assertThatThrownBy(() -> idsUnmodifiable.get(0).setOneKey(7))
+      .isInstanceOf(UnmodifiableEntityException.class);
 
     CKeyParentId foundId = ids.get(0);
     assertThat(foundId.getOneKey()).isEqualTo(101);

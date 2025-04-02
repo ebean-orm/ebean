@@ -23,14 +23,21 @@ public class RsetDataReader implements DataReader {
   static final int clobBufferSize = 512;
   static final int stringInitialSize = 512;
 
+  private final boolean unmodifiable;
   private final DataTimeZone dataTimeZone;
   private final ResultSet rset;
   protected int pos;
   private String json;
 
-  public RsetDataReader(DataTimeZone dataTimeZone, ResultSet rset) {
+  public RsetDataReader(boolean unmodifiable, DataTimeZone dataTimeZone, ResultSet rset) {
+    this.unmodifiable = unmodifiable;
     this.dataTimeZone = dataTimeZone;
     this.rset = rset;
+  }
+
+  @Override
+  public boolean unmodifiable() {
+    return unmodifiable;
   }
 
   @Override
