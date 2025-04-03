@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.11.0</version>
+    <version>16.0.0-beta1</version>
     <relativePath>../..</relativePath>
   </parent>
 
@@ -15,7 +15,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>14.11.0</version>
+      <version>16.0.0-beta1</version>
     </dependency>
 
     <dependency>
