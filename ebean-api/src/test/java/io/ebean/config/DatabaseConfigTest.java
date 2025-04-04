@@ -77,6 +77,8 @@ class DatabaseConfigTest {
     props.setProperty("readOnlyDatabase", "true");
     props.setProperty("lengthCheck", "ON");
     props.setProperty("includeLabelInSql", "false");
+    props.setProperty("lazyLoadBatchSize", "50");
+    props.setProperty("queryBatchSize", "60");
 
     props.setProperty("queryPlan.enable", "true");
     props.setProperty("queryPlan.thresholdMicros", "10000");
@@ -100,6 +102,8 @@ class DatabaseConfigTest {
     assertTrue(settings.readOnlyDatabase());
     assertFalse(settings.isIncludeLabelInSql());
     assertThat(settings.getLengthCheck()).isEqualTo(LengthCheck.ON);
+    assertThat(settings.getLazyLoadBatchSize()).isEqualTo(50);
+    assertThat(settings.getQueryBatchSize()).isEqualTo(60);
 
     assertTrue(settings.isIdGeneratorAutomatic());
     assertFalse(settings.getPlatformConfig().isCaseSensitiveCollation());
@@ -179,6 +183,8 @@ class DatabaseConfigTest {
     assertTrue(config.getPlatformConfig().isCaseSensitiveCollation());
     assertTrue(config.isAutoLoadModuleInfo());
     assertTrue(config.isLoadModuleInfo());
+    assertThat(config.getLazyLoadBatchSize()).isEqualTo(100);
+    assertThat(config.getQueryBatchSize()).isEqualTo(100);
 
     assertFalse(config.isQueryPlanEnable());
     assertEquals(Long.MAX_VALUE, config.getQueryPlanThresholdMicros());
@@ -197,6 +203,10 @@ class DatabaseConfigTest {
     assertTrue(config.isAutoPersistUpdates());
     config.setSkipDataSourceCheck(true);
     assertTrue(config.skipDataSourceCheck());
+    config.lazyLoadBatchSize(20);
+    assertThat(config.getLazyLoadBatchSize()).isEqualTo(20);
+    config.queryBatchSize(30);
+    assertThat(config.getQueryBatchSize()).isEqualTo(30);
   }
 
   @Test
