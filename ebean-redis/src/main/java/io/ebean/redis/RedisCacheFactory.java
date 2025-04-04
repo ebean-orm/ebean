@@ -281,7 +281,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
     public void invalidateKeys(String cacheKey, Set<Object> keySet) {
       try {
         sendMessage(messageInvalidateKeys(cacheKey, keySet));
-      } catch (IOException e) {
+      } catch (Exception e) {
         logger.log(ERROR, "failed to transmit invalidateKeys() message", e);
       }
     }
@@ -290,7 +290,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
     public void invalidateKey(String cacheKey, Object id) {
       try {
         sendMessage(messageInvalidateKey(cacheKey, id));
-      } catch (IOException e) {
+      } catch (Exception e) {
         logger.log(ERROR, "failed to transmit invalidateKeys() message", e);
       }
     }
@@ -299,7 +299,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
     public void invalidateClear(String cacheKey) {
       try {
         sendMessage(messageInvalidateClear(cacheKey));
-      } catch (IOException e) {
+      } catch (Exception e) {
         logger.log(ERROR, "failed to transmit invalidateKeys() message", e);
       }
     }
@@ -422,7 +422,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
               throw new IllegalStateException("Unexpected message type ? " + msgType);
           }
 
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (Exception e) {
           logger.log(ERROR, "failed to decode near cache message [" + SafeEncoder.encode(message) + "] for cache:" + cacheKey, e);
           if (cacheKey != null) {
             nearCacheInvalidateClear(cacheKey);
