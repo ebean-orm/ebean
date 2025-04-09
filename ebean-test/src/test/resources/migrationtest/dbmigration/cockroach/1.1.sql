@@ -174,6 +174,7 @@ update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 alter table "table" alter column textfield drop not null;
 alter table "table" add column "select" varchar;
 alter table "table" add column textfield2 varchar;
+alter table migtest_ckey_detail alter column something type varchar;
 alter table migtest_ckey_detail add column one_key integer;
 alter table migtest_ckey_detail add column two_key varchar(127);
 alter table migtest_ckey_parent add column assoc_id integer;

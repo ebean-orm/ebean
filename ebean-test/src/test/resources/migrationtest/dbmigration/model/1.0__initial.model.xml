@@ -7,7 +7,7 @@
         </createTable>
         <createTable name="migtest_ckey_detail" pkName="pk_migtest_ckey_detail">
             <column name="id" type="integer" primaryKey="true"/>
-            <column name="something" type="varchar"/>
+            <column name="something" type="varchar(255)"/>
         </createTable>
         <createTable name="migtest_ckey_parent" pkName="pk_migtest_ckey_parent">
             <column name="one_key" type="integer" primaryKey="true"/>
