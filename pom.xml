@@ -44,7 +44,7 @@
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.15.0</jackson.version>
     <h2database.version>2.2.220</h2database.version>
-    <ebean-persistence-api.version>3.0</ebean-persistence-api.version>
+    <ebean-persistence-api.version>3.1</ebean-persistence-api.version>
     <ebean-types.version>3.0</ebean-types.version>
 
     <ebean-annotation.version>8.4</ebean-annotation.version>

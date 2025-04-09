@@ -8,7 +8,7 @@ create table migtest_ckey_assoc (
 
 create table migtest_ckey_detail (
   id                            serial not null,
-  something                     varchar,
+  something                     varchar(255),
   constraint pk_migtest_ckey_detail primary key (id)
 );
 

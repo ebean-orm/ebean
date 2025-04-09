@@ -203,6 +203,7 @@ drop view table_with_history;
 alter table "table" alter column textfield drop not null;
 alter table "table" add column if not exists "select" varchar;
 alter table "table" add column if not exists textfield2 varchar;
+alter table migtest_ckey_detail alter column something type varchar using something::varchar;
 alter table migtest_ckey_detail add column if not exists one_key integer;
 alter table migtest_ckey_detail add column if not exists two_key varchar(127);
 alter table migtest_ckey_parent add column if not exists assoc_id integer;
