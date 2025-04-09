@@ -6,7 +6,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.11.0</version>
+    <version>16.0.0-rc1</version>
   </parent>
 
   <artifactId>test-kotlin</artifactId>
@@ -15,7 +15,7 @@
     <maven.compiler.source>11</maven.compiler.source>
     <maven.compiler.target>11</maven.compiler.target>
 
-    <ebean-maven-plugin.version>15.9.0</ebean-maven-plugin.version>
+    <ebean-maven-plugin.version>15.12.0</ebean-maven-plugin.version>
     <kotlin.version>1.9.22</kotlin.version>
     <jackson.version>2.16.1</jackson.version>
   </properties>
@@ -40,7 +40,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean</artifactId>
-      <version>14.11.0</version>
+      <version>16.0.0-rc1</version>
     </dependency>
 
     <dependency>
@@ -53,7 +53,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>14.11.0</version>
+      <version>16.0.0-rc1</version>
       <scope>test</scope>
     </dependency>
 
@@ -149,7 +149,7 @@
       <plugin>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-maven-plugin</artifactId>
-        <version>14.9.0</version>
+        <version>14.12.0</version>
         <executions>
           <execution>
             <id>main</id>

@@ -239,7 +239,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   /**
    * The default batch size for lazy loading
    */
-  private int lazyLoadBatchSize = 10;
+  private int lazyLoadBatchSize = 100;
 
   /**
    * The default batch size for 'query joins'.

@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>14.11.0</version>
+  <version>16.0.0-rc1</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -44,7 +44,7 @@
     <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
     <jackson.version>2.15.0</jackson.version>
     <h2database.version>2.2.220</h2database.version>
-    <ebean-persistence-api.version>3.0</ebean-persistence-api.version>
+    <ebean-persistence-api.version>3.1</ebean-persistence-api.version>
     <ebean-types.version>3.0</ebean-types.version>
 
     <ebean-annotation.version>8.4</ebean-annotation.version>
@@ -52,9 +52,9 @@
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>14.2.0</ebean-migration.version>
     <ebean-test-containers.version>7.7</ebean-test-containers.version>
-    <ebean-datasource.version>9.3</ebean-datasource.version>
-    <ebean-agent.version>14.11.0</ebean-agent.version>
-    <ebean-maven-plugin.version>14.11.0</ebean-maven-plugin.version>
+    <ebean-datasource.version>9.5</ebean-datasource.version>
+    <ebean-agent.version>14.12.0</ebean-agent.version>
+    <ebean-maven-plugin.version>14.12.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
     <maven-javadoc-plugin.version>3.10.1</maven-javadoc-plugin.version>
   </properties>
