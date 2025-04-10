@@ -160,6 +160,10 @@
           <id>github-release-migration</id>
           <url>https://maven.pkg.github.com/foconis/ebean-migration</url>
         </repository>
+        <repository>
+          <id>github-release-datasource</id>
+          <url>https://maven.pkg.github.com/foconis/ebean-datasource</url>
+        </repository>
       </repositories>
       <pluginRepositories>
         <pluginRepository>
