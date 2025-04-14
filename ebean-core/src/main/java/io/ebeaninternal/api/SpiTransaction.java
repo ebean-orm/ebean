@@ -105,6 +105,11 @@ public interface SpiTransaction extends Transaction {
   Boolean isUpdateAllLoadedProperties();
 
   /**
+   * Returns true, if generated properties are overwritten (default) or are only set, if they are null.
+   */
+  boolean isOverwriteGeneratedProperties();
+
+  /**
    * Return the batchSize specifically set for this transaction or 0.
    * <p>
    * Returning 0 implies to use the system wide default batch size.
