@@ -278,7 +278,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public @Nullable DataSource readOnlyDataSource() {
+  @Nullable
+  public DataSource readOnlyDataSource() {
     return transactionManager.readOnlyDataSource();
   }
 

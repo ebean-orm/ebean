@@ -260,7 +260,8 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   @Override
-  public final @Nullable DataSource readOnlyDataSource() {
+  @Nullable
+  public final DataSource readOnlyDataSource() {
     return dataSourceSupplier.readOnlyDataSource();
   }
 
