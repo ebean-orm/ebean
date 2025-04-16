@@ -10,7 +10,7 @@ public class StartDb2 {
       .user("unit")
       .password("unit")
       // to change collation, charset and other parameters like pagesize:
-      .configOptions("USING CODESET UTF-8 TERRITORY DE COLLATE USING IDENTITY PAGESIZE 32768")
+      .createOptions("USING CODESET UTF-8 TERRITORY DE COLLATE USING IDENTITY PAGESIZE 32768")
       .configOptions("USING STRING_UNITS CODEUNITS32")
       .build()
       .startWithDropCreate();
