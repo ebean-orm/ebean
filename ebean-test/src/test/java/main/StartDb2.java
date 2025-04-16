@@ -5,7 +5,7 @@ import io.ebean.test.containers.Db2Container;
 public class StartDb2 {
 
   public static void main(String[] args) {
-    Db2Container.builder("11.5.6.0a")
+    Db2Container.builder("11.5.9.0")
       .dbName("unit")
       .user("unit")
       .password("unit")
