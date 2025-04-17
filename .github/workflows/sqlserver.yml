@@ -34,5 +34,5 @@ jobs:
         path:
           ~/.m2
         key: build-${{ env.cache-name }}
-    - name: sqlserver 2017
-      run: mvn -T 8 clean test -Dprops.file=testconfig/ebean-sqlserver17.properties
+    - name: sqlserver 2022
+      run: mvn -T 8 clean test -Dprops.file=testconfig/ebean-sqlserver.properties
