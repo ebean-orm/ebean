@@ -46,9 +46,9 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
 
       DB.save(u1);
 
-      queryOrExpression(r2.getRoleid());
+      queryOrExpression(r2.getRoleId());
 
-      queryDisjunction(r2.getRoleid());
+      queryDisjunction(r2.getRoleId());
 
       Query<MUser> query = DB.find(MUser.class)
         .where().disjunction()
@@ -66,19 +66,19 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
     }
   }
 
-  private void queryDisjunction(Integer roleid) {
+  private void queryDisjunction(Integer roleId) {
 
     Query<MUser> query = DB.find(MUser.class)
       .where().or()
       .eq("userName", "user0B")
-      .eq("roles.roleid", roleid)
+      .eq("roles.roleId", roleId)
       .endOr().query();
 
     query.findList();
 
     String sql = sqlOf(query);
     assertSqlOuterJoins(sql);
-    assertThat(sql).contains("where (t0.user_name = ? or u1.roleid = ?)");
+    assertThat(sql).contains("where (t0.user_name = ? or u1.role_id = ?)");
   }
 
   @Test
@@ -101,7 +101,7 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
     Query<MUser> query = DB.find(MUser.class)
       .where().or(
         Expr.eq("userName", "user0B"),
-        Expr.eq("roles.roleid", roleid)
+        Expr.eq("roles.roleId", roleid)
       )
       .query();
 
@@ -109,12 +109,12 @@ public class TestDisjunctWhereOuterJoin extends BaseTestCase {
 
     String sql = sqlOf(query);
     assertSqlOuterJoins(sql);
-    assertThat(sql).contains("where (t0.user_name = ? or u1.roleid = ?)");
+    assertThat(sql).contains("where (t0.user_name = ? or u1.role_id = ?)");
   }
 
   private void assertSqlOuterJoins(String sql) {
     assertThat(sql).contains("select distinct");
     assertThat(sql).contains("left join mrole_muser u1z_ on u1z_.muser_userid = t0.userid");
-    assertThat(sql).contains("left join mrole u1 on u1.roleid = u1z_.mrole_roleid");
+    assertThat(sql).contains("left join mrole u1 on u1.role_id = u1z_.mrole_role_id");
   }
 }
