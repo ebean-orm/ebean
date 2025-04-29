@@ -5,7 +5,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.0.0-rc1</version>
+    <version>16.0.0-RC2</version>
   </parent>
 
   <artifactId>test-java16</artifactId>
@@ -18,7 +18,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-h2</artifactId>
-      <version>16.0.0-rc1</version>
+      <version>16.0.0-RC2</version>
     </dependency>
 
     <dependency>
@@ -30,14 +30,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>16.0.0-rc1</version>
+      <version>16.0.0-RC2</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
-      <version>16.0.0-rc1</version>
+      <version>16.0.0-RC2</version>
       <scope>provided</scope>
     </dependency>
 
@@ -46,15 +46,21 @@
     <plugins>
 
       <plugin>
-        <groupId>io.repaint.maven</groupId>
-        <artifactId>tiles-maven-plugin</artifactId>
-        <version>2.40</version>
-        <extensions>true</extensions>
-        <configuration>
-          <tiles>
-            <tile>io.ebean.tile:enhancement:14.10.0</tile>
-          </tiles>
-        </configuration>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-maven-plugin</artifactId>
+        <version>${ebean-maven-plugin.version}</version>
+        <executions>
+          <execution>
+            <id>test</id>
+            <phase>process-test-classes</phase>
+            <configuration>
+              <transformArgs>debug=0</transformArgs>
+            </configuration>
+            <goals>
+              <goal>testEnhance</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
 
     </plugins>

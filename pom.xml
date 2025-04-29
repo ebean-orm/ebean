@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>16.0.0-rc1</version>
+  <version>16.0.0-RC2</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -17,6 +17,7 @@
   <url>https://ebean.io/</url>
 
   <scm>
+    <url>https://github.com/ebean-orm/ebean</url>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
     <tag>HEAD</tag>
   </scm>
@@ -38,10 +39,10 @@
   </developers>
 
   <properties>
-    <nexus.staging.stagingRepositoryId>ebeanCore</nexus.staging.stagingRepositoryId>
-    <nexus.staging.keepStagingRepositoryOnFailure>true</nexus.staging.keepStagingRepositoryOnFailure>
-    <nexus.staging.skipStagingRepositoryClose>true</nexus.staging.skipStagingRepositoryClose>
-    <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>
+<!--    <nexus.staging.stagingRepositoryId>ebeanCore</nexus.staging.stagingRepositoryId>-->
+<!--    <nexus.staging.keepStagingRepositoryOnFailure>true</nexus.staging.keepStagingRepositoryOnFailure>-->
+<!--    <nexus.staging.skipStagingRepositoryClose>true</nexus.staging.skipStagingRepositoryClose>-->
+<!--    <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>-->
     <jackson.version>2.15.0</jackson.version>
     <h2database.version>2.2.220</h2database.version>
     <ebean-persistence-api.version>3.1</ebean-persistence-api.version>
@@ -56,7 +57,6 @@
     <ebean-agent.version>14.12.0</ebean-agent.version>
     <ebean-maven-plugin.version>14.12.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
-    <maven-javadoc-plugin.version>3.10.1</maven-javadoc-plugin.version>
   </properties>
 
   <dependencies>
@@ -100,6 +100,7 @@
     <module>composites</module>
     <module>ebean-jackson-mapper</module>
     <module>ebean-spring-txn</module>
+    <module>kotlin-querybean-generator</module>
   </modules>
 
   <profiles>
