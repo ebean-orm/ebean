@@ -32,6 +32,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
   private final boolean readIdNormal;
   private final boolean disableLazyLoad;
   private final boolean unmodifiable;
+  private final boolean loadListReferences;
   private final InheritInfo inheritInfo;
   final String prefix;
   private final Map<String, String> pathMap;
@@ -55,6 +56,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
     this.readIdNormal = readId && !temporalVersions;
     this.disableLazyLoad = node.disableLazyLoad;
     this.unmodifiable = node.unmodifiable;
+    this.loadListReferences = !unmodifiable && !disableLazyLoad;
     this.partialObject = node.partialObject;
     this.properties = node.properties;
     this.pathMap = node.pathMap;
@@ -301,7 +303,7 @@ class SqlTreeLoadBean implements SqlTreeLoad {
       boolean forceNewReference = queryMode == Mode.REFRESH_BEAN;
       for (STreePropertyAssocMany many : localDesc.propsMany()) {
         if (many != loadingChildProperty) {
-          if (!unmodifiable || ctx.includeSecondary(many.asMany())) {
+          if (loadListReferences || ctx.includeSecondary(many.asMany())) {
             // create a proxy for the many (deferred fetching)
             BeanCollection<?> ref = many.createReference(localBean, forceNewReference);
             if (ref != null) {

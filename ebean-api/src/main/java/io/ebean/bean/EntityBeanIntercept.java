@@ -382,11 +382,6 @@ public interface EntityBeanIntercept extends Serializable {
   void loadBean(int loadProperty);
 
   /**
-   * Invoke the lazy loading. This method is synchronised externally.
-   */
-  void loadBeanInternal(int loadProperty, BeanLoader loader);
-
-  /**
    * Called when a BeanCollection is initialised automatically.
    */
   void initialisedMany(int propertyIndex);

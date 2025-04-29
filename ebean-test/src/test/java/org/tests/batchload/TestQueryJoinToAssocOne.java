@@ -1,5 +1,6 @@
 package org.tests.batchload;
 
+import io.ebean.LazyInitialisationException;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
@@ -16,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestQueryJoinToAssocOne extends BaseTestCase {
 
@@ -91,15 +93,15 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     Order order = l0.get(0);
     // normally invokes lazy loading
-    order.getOrderDate();
+    assertThrows(LazyInitialisationException.class, order::getOrderDate);
 
     List<OrderDetail> details = order.getDetails();
     OrderDetail orderDetail = details.get(0);
     // normally invokes lazy loading
-    orderDetail.getShipQty();
+    assertThrows(LazyInitialisationException.class, orderDetail::getShipQty);
 
     // normally invokes lazy loading
-    order.getShipments().size();
+    assertThrows(LazyInitialisationException.class, order::getShipments);
 
     List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(2);
@@ -129,13 +131,11 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     Order order = l0.get(0);
     // try to invoke lazy loading on the bean
-    assertThat(order.getCustomer()).isNull();
-    assertThat(order.getCretime()).isNull();
+    assertThrows(LazyInitialisationException.class, order::getCustomer);
+    assertThrows(LazyInitialisationException.class, order::getCretime);
 
     // try to invoke lazy loading on the OneToMany ...
-    List<OrderDetail> details = order.getDetails();
-    assertThat(details).isEmpty();
-    assertThat(details.size()).isEqualTo(0);
+    assertThrows(LazyInitialisationException.class, order::getDetails);
 
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
@@ -163,7 +163,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
       .setId(tenant.getId())
       .findOne();
 
-    assertThat(found.getRoles().size()).isEqualTo(0);
+    assertThrows(LazyInitialisationException.class, found::getRoles);
 
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
@@ -189,7 +189,7 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
       .findOne();
 
     // normally invokes lazy loading
-    assertThat(found.getRoles().size()).isEqualTo(0);
+    assertThrows(LazyInitialisationException.class, found::getRoles);
 
     // only 1 query ... no lazy loading query
     List<String> sql = LoggedSql.stop();
@@ -217,12 +217,12 @@ public class TestQueryJoinToAssocOne extends BaseTestCase {
 
     Order order = l0.get(0);
     // normally invokes lazy loading
-    order.getOrderDate();
+    assertThrows(LazyInitialisationException.class, order::getOrderDate);
 
     List<OrderDetail> details = order.getDetails();
     OrderDetail orderDetail = details.get(0);
     // normally invokes lazy loading
-    orderDetail.getShipQty();
+    assertThrows(LazyInitialisationException.class, orderDetail::getShipQty);
 
     List<String> loggedSql = LoggedSql.stop();
     assertThat(loggedSql).hasSize(1);

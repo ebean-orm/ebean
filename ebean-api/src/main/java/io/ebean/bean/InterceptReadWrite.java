@@ -2,6 +2,7 @@ package io.ebean.bean;
 
 import io.ebean.DB;
 import io.ebean.Database;
+import io.ebean.LazyInitialisationException;
 import io.ebean.ValuePair;
 
 import jakarta.persistence.EntityNotFoundException;
@@ -59,7 +60,7 @@ public final class InterceptReadWrite extends InterceptBase {
   private EntityBean embeddedOwner;
   private int embeddedOwnerIndex;
   /**
-   * One of NEW, REF, UPD.
+   * One of NEW, REFERENCE, LOADED.
    */
   private int state;
   private boolean forceUpdate;
@@ -645,6 +646,9 @@ public final class InterceptReadWrite extends InterceptBase {
   public void loadBean(int loadProperty) {
     lock.lock();
     try {
+      if (disableLazyLoad) {
+        throw new LazyInitialisationException("Property not loaded: " + property(loadProperty));
+      }
       if (beanLoader == null) {
         final Database database = DB.byName(ebeanServerName);
         if (database == null) {
@@ -668,8 +672,7 @@ public final class InterceptReadWrite extends InterceptBase {
     }
   }
 
-  @Override
-  public void loadBeanInternal(int loadProperty, BeanLoader loader) {
+  private void loadBeanInternal(int loadProperty, BeanLoader loader) {
     if ((flags[loadProperty] & FLAG_LOADED_PROP) != 0) {
       // race condition where multiple threads calling preGetter concurrently
       return;
@@ -771,7 +774,7 @@ public final class InterceptReadWrite extends InterceptBase {
   @Override
   public void preGetter(int propertyIndex) {
     preGetterCallback(propertyIndex);
-    if (state == STATE_NEW || disableLazyLoad) {
+    if (state == STATE_NEW) {
       return;
     }
     if (!isLoadedProperty(propertyIndex)) {
