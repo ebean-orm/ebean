@@ -92,7 +92,6 @@
     <module>ebean-ddl-generator</module>
     <module>ebean-test</module>
     <module>querybean-generator</module>
-    <module>kotlin-querybean-generator</module>
     <module>ebean-querybean</module>
     <module>ebean-postgis-types</module>
     <module>ebean-net-postgis-types</module>
@@ -112,6 +111,15 @@
       <properties>
         <h2database.version>1.4.199</h2database.version>
       </properties>
+    </profile>
+    <profile>
+      <id>jdkKotlin</id>
+      <activation>
+        <jdk>[11,21]</jdk>
+      </activation>
+      <modules>
+        <module>kotlin-querybean-generator</module>
+      </modules>
     </profile>
     <profile>
       <id>default</id>
