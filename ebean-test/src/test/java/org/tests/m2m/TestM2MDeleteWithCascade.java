@@ -39,7 +39,7 @@ public class TestM2MDeleteWithCascade extends BaseTestCase {
     assertNull(notThere);
 
     List<Object> roleIds = new ArrayList<>();
-    Collections.addAll(roleIds, r0.getRoleid(), r1.getRoleid());
+    Collections.addAll(roleIds, r0.getRoleId(), r1.getRoleId());
 
     int rc = DB.find(MRole.class).where().idIn(roleIds).findCount();
 

@@ -80,8 +80,8 @@ public class TestTextJsonUpdateCascade extends TransactionalTestCase {
     jsonContext.toJson(u0);
 
     String s = "{\"userid\":" + u0.getUserid()
-      + ",\"userName\":\"userj1\", \"roles\":[{\"roleid\":" + r2.getRoleid() + "},{\"roleid\":"
-      + r3.getRoleid() + "}]} ";
+      + ",\"userName\":\"userj1\", \"roles\":[{\"roleid\":" + r2.getRoleId() + "},{\"roleid\":"
+      + r3.getRoleId() + "}]} ";
 
     MUser updMUser = jsonContext.toBean(MUser.class, s);
 

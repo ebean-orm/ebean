@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
+import org.jspecify.annotations.Nullable;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -25,6 +27,7 @@ public interface DataSourceSupplier {
    * This can return null meaning that no read only DataSource (with autoCommit)
    * is available for use so normal transactions with explicit commit should be used.
    */
+  @Nullable
   DataSource readOnlyDataSource();
 
   /**

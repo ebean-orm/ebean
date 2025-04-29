@@ -10,6 +10,7 @@ import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
 import io.ebean.config.CurrentTenantProvider;
 import io.ebean.config.dbplatform.DatabasePlatform;
+import io.ebean.datasource.DataSourcePool;
 import io.ebean.event.changelog.ChangeLogListener;
 import io.ebean.event.changelog.ChangeLogPrepare;
 import io.ebean.event.changelog.ChangeSet;
@@ -27,6 +28,8 @@ import io.ebeaninternal.server.profile.TimedProfileLocation;
 import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
 
 import jakarta.persistence.PersistenceException;
+import org.jspecify.annotations.Nullable;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -241,6 +244,7 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   @Override
+  @Nullable
   public final DataSource readOnlyDataSource() {
     return dataSourceSupplier.readOnlyDataSource();
   }

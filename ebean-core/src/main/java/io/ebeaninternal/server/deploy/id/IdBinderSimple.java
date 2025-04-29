@@ -264,6 +264,6 @@ public final class IdBinderSimple implements IdBinder {
 
   @Override
   public String idNullOr(String prefix, String filterManyExpression) {
-    return "(${" + prefix + "}" + idProperty.name() + " is null or (" + filterManyExpression + "))";
+    return "(${" + prefix + "}" + idProperty.dbColumn() + " is null or (" + filterManyExpression + "))";
   }
 }

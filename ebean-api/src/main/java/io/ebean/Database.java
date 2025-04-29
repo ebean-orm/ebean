@@ -137,6 +137,7 @@ public interface Database {
   /**
    * Return the associated read only DataSource for this Database instance (can be null).
    */
+  @Nullable
   DataSource readOnlyDataSource();
 
   /**
