@@ -39,10 +39,6 @@
   </developers>
 
   <properties>
-<!--    <nexus.staging.stagingRepositoryId>ebeanCore</nexus.staging.stagingRepositoryId>-->
-<!--    <nexus.staging.keepStagingRepositoryOnFailure>true</nexus.staging.keepStagingRepositoryOnFailure>-->
-<!--    <nexus.staging.skipStagingRepositoryClose>true</nexus.staging.skipStagingRepositoryClose>-->
-<!--    <nexus.staging.autoReleaseAfterClose>false</nexus.staging.autoReleaseAfterClose>-->
     <jackson.version>2.15.0</jackson.version>
     <h2database.version>2.2.220</h2database.version>
     <ebean-persistence-api.version>3.1</ebean-persistence-api.version>
