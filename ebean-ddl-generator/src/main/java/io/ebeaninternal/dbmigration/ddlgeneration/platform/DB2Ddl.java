@@ -202,8 +202,10 @@ public class DB2Ddl extends PlatformDdl {
         }
       }
       if (requiresReorg) {
-        ret.add(newRawCommand("call sysproc.admin_cmd('reorg table " + tableName() + "')"));
+        ret.add(newRawCommand("call sysproc.admin_cmd('reorg table " + tableName() + " ${reorgArgs}')"));
+        //ret.add(newRawCommand("-- runstats@" + tableName()));
       }
+
       return ret;
     }
 
