@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +41,7 @@ public class DbMigrationTest extends BaseTestCase {
   private void runScript(String scriptName) {
     URL url = getClass().getResource("/migrationtest/dbmigration/" + server().platform().name().toLowerCase() + "/" + scriptName);
     assert url != null : scriptName +  " not found for platform [" + server().platform().name().toLowerCase() + "]";
-    server().script().run(url);
+    server().script().run(url, Map.of("reorgArgs", "use tempspace1 resetdictionary"));
   }
 
   @IgnorePlatform({
