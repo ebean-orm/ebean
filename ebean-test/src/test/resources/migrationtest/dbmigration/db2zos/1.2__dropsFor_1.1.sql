@@ -6,13 +6,13 @@ alter table migtest_e_basic drop column description_file;
 alter table migtest_e_basic drop column old_boolean;
 alter table migtest_e_basic drop column old_boolean2;
 alter table migtest_e_basic drop column eref_id;
-call sysproc.admin_cmd('reorg table migtest_e_basic');
+call sysproc.admin_cmd('reorg table migtest_e_basic ${reorgArgs}');
 alter table migtest_e_history2 drop column obsolete_string1;
 alter table migtest_e_history2 drop column obsolete_string2;
-call sysproc.admin_cmd('reorg table migtest_e_history2');
+call sysproc.admin_cmd('reorg table migtest_e_history2 ${reorgArgs}');
 alter table migtest_e_history2_history drop column obsolete_string1;
 alter table migtest_e_history2_history drop column obsolete_string2;
-call sysproc.admin_cmd('reorg table migtest_e_history2_history');
+call sysproc.admin_cmd('reorg table migtest_e_history2_history ${reorgArgs}');
 -- apply post alter
 alter table migtest_e_history2 add versioning use history table migtest_e_history2_history;
 drop table "migtest_QuOtEd";
