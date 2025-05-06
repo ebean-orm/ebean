@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.8.1-FOC9-SNAPSHOT</version>
+    <version>14.8.1-FOC9</version>
   </parent>
 
   <artifactId>ebean-core-type</artifactId>
@@ -16,7 +16,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>14.8.1-FOC9-SNAPSHOT</version>
+      <version>14.8.1-FOC9</version>
     </dependency>
 
     <dependency>
