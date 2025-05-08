@@ -44,6 +44,11 @@ public interface ImportedId {
   void dmlAppend(GenerateDmlRequest request);
 
   /**
+   * Append column and type for Insert (ClickHouse).
+   */
+  void dmlType(GenerateDmlRequest request);
+
+  /**
    * Bind the value from the bean.
    */
   Object bind(BindableRequest request, EntityBean bean) throws SQLException;
