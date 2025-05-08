@@ -275,24 +275,30 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       } else {
         // @WhenModified set without invoking interception
         Object oldVal = prop.getValue(entityBean);
-        Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
-        prop.setValueChanged(entityBean, value);
-        intercept.setOldValue(prop.propertyIndex(), oldVal);
+        if (transaction == null || transaction.isOverwriteGeneratedProperties() || oldVal == null) { // version handled above
+          Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
+          prop.setValueChanged(entityBean, value);
+          intercept.setOldValue(prop.propertyIndex(), oldVal);
+        }
       }
     }
   }
 
   private void onFailedUpdateUndoGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
-      Object oldVal = intercept.origValue(prop.propertyIndex());
-      prop.setValue(entityBean, oldVal);
+      if (transaction == null || transaction.isOverwriteGeneratedProperties() || prop.isVersion()) {
+        Object oldVal = intercept.origValue(prop.propertyIndex());
+        prop.setValue(entityBean, oldVal);
+      }
     }
   }
 
   private void onInsertGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenInsert()) {
-      Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
-      prop.setValueChanged(entityBean, value);
+      if (transaction == null || transaction.isOverwriteGeneratedProperties() || prop.isVersion() || prop.getValue(entityBean) == null) {
+        Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
+        prop.setValueChanged(entityBean, value);
+      }
     }
   }
 
