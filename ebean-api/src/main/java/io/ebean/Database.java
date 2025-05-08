@@ -1509,4 +1509,8 @@ public interface Database {
    */
   void truncate(Class<?>... beanTypes);
 
+  /**
+   * RunDdl manually. This can be used if 'db.ddl.run=false' is set and you plan to run DDL manually.
+   */
+  void runDdl();
 }
