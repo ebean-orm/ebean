@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.transaction;
 
+import io.ebean.bean.ClassContextTracker;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiBeanType;
 import io.ebeaninternal.api.SpiBeanTypeManager;
@@ -8,7 +9,12 @@ import io.ebeaninternal.api.SpiPersistenceContext;
 import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -219,6 +225,7 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     return typeCache.computeIfAbsent(rootType, k -> new ClassContext(k, queue));
   }
 
+
   private static class ClassContext {
 
     private final Map<Object, Object> map = new HashMap<>();
@@ -227,10 +234,12 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
     private Set<Object> deleteSet;
     private boolean useReferences;
     private int weakCount;
+    private int threshold = 0;
 
     private ClassContext(Class<?> rootType, ReferenceQueue<Object> queue) {
       this.rootType = rootType;
       this.queue = queue;
+      this.threshold = ClassContextTracker.INSTANCE.getThreshold(rootType);
     }
 
     /**
@@ -287,6 +296,9 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
         // when a BeanRef is replaced, its expunge() must NOT remove an entry
         ((BeanRef) existing).setReplaced();
         weakCount--;
+      }
+      if (threshold != -1 && map.size() > threshold) {
+        threshold = ClassContextTracker.INSTANCE.log(rootType, map.size(), threshold);
       }
     }
 
