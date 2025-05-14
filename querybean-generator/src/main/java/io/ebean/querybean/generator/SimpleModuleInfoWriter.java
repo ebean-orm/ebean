@@ -105,6 +105,13 @@ class SimpleModuleInfoWriter {
             writer.write(entity);
             writer.write("\", \"allDeclaredConstructors\": true, \"allDeclaredFields\": true}");
           }
+          if (processingContext.hasOtherClasses()) {
+            for (String otherClass : processingContext.getOtherClasses()) {
+              writer.write(",\n  {\"name\": \"");
+              writer.write(otherClass);
+              writer.write("\", \"allDeclaredConstructors\": true}");
+            }
+          }
           writer.write("\n]\n");
           writer.write("\n");
           writer.close();
