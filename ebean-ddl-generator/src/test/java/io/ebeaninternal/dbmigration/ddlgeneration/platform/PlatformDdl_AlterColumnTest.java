@@ -136,7 +136,7 @@ public class PlatformDdl_AlterColumnTest {
       + "alter table mytab alter column acol set data type varchar(50);\n"
       + "alter table mytab alter column acol set default 'hi';\n"
       + "alter table mytab alter column acol set not null;\n"
-      + "call sysproc.admin_cmd('reorg table mytab');\n");
+      + "call sysproc.admin_cmd('reorg table mytab ${reorgArgs}');\n");
 
     //
     alter.setCurrentNotnull(Boolean.TRUE);
@@ -176,7 +176,7 @@ public class PlatformDdl_AlterColumnTest {
     softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "alter table mytab alter column acol drop default;\n"
       + "alter table mytab alter column acol drop not null;\n"
-      + "call sysproc.admin_cmd('reorg table mytab');\n");
+      + "call sysproc.admin_cmd('reorg table mytab ${reorgArgs}');\n");
 
   }
 
@@ -218,7 +218,7 @@ public class PlatformDdl_AlterColumnTest {
       + "alter table mytab alter column acol set data type varchar(20);\n"
       // Note, this reorg may be not necessary when only length attribute is alterd
       // but this is currently not implemented.
-      + "call sysproc.admin_cmd('reorg table mytab');\n");
+      + "call sysproc.admin_cmd('reorg table mytab ${reorgArgs}');\n");
 
     alter.setType("bigint");
     sql = alterColumn(pgDdl, alter);
@@ -277,7 +277,7 @@ public class PlatformDdl_AlterColumnTest {
     sql = alterColumn(db2Ddl, alter);
     softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "alter table mytab alter column acol set not null;\n"
-      + "call sysproc.admin_cmd('reorg table mytab');\n");
+      + "call sysproc.admin_cmd('reorg table mytab ${reorgArgs}');\n");
 
   }
 
@@ -321,7 +321,7 @@ public class PlatformDdl_AlterColumnTest {
     sql = alterColumn(db2Ddl, alter);
     softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
       + "alter table mytab alter column acol drop not null;\n"
-      + "call sysproc.admin_cmd('reorg table mytab');\n");
+      + "call sysproc.admin_cmd('reorg table mytab ${reorgArgs}');\n");
   }
 
   @Test
