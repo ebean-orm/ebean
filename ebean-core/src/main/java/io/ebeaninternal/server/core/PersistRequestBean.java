@@ -1439,4 +1439,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public InsertOptions insertOptions() {
     return insertOptions;
   }
+
+  public BeanPersistController controller() {
+    return controller;
+  }
+
 }

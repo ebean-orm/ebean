@@ -1,5 +1,7 @@
 package io.ebean.event;
 
+import java.util.List;
+
 /**
  * Used to enhance or override the default bean persistence mechanism.
  * <p>
@@ -67,6 +69,11 @@ public interface BeanPersistController {
   boolean preInsert(BeanPersistRequest<?> request);
 
   /**
+   * Prior to the insert perform some action. You can modify the beans in this step.
+   */
+  void preInsert(List<BeanPersistRequest<?>> requests);
+
+  /**
    * Prior to the update perform some action. Return true if you want the
    * default functionality to continue.
    * <p>
@@ -75,6 +82,11 @@ public interface BeanPersistController {
    * </p>
    */
   boolean preUpdate(BeanPersistRequest<?> request);
+
+  /**
+   * Prior to the update perform some action. You can modify the beans in this step.
+   */
+  void preUpdate(List<BeanPersistRequest<?>> requests);
 
   /**
    * Prior to the delete perform some action. Return true if you want the
@@ -87,15 +99,31 @@ public interface BeanPersistController {
   boolean preDelete(BeanPersistRequest<?> request);
 
   /**
+   * Prior to the delete perform some action. You can modify the beans in this step.
+   */
+  void preDelete(List<BeanPersistRequest<?>> requests);
+
+  /**
    * Prior to a soft delete perform some action. Return true if you want the
    * default functionality to continue.
    */
   boolean preSoftDelete(BeanPersistRequest<?> request);
 
   /**
+   * Prior to a soft delete perform some action. You can modify the beans in this step.
+   */
+  void preSoftDelete(List<BeanPersistRequest<?>> requests);
+
+  /**
    * Prior to a delete by id perform some action.
    */
+  @Deprecated
   void preDelete(BeanDeleteIdRequest request);
+
+  /**
+   * Prior to a delete by id perform some action. You can collect the ids in this step.
+   */
+  void preDelete(BeanDeleteIdsRequest request);
 
   /**
    * Called after the insert was performed.

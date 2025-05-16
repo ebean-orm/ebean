@@ -3,13 +3,12 @@ package io.ebean.event;
 import io.ebean.Database;
 import io.ebean.Transaction;
 
+import java.util.List;
+
 /**
- * A request to delete a bean by Id value.
- *
- * @deprecated use BeanDeleteIdsRequest instead.
+ * A request to delete beans by Id values.
  */
-@Deprecated
-public interface BeanDeleteIdRequest {
+public interface BeanDeleteIdsRequest {
 
   /**
    * Return the DB processing the request.
@@ -29,6 +28,6 @@ public interface BeanDeleteIdRequest {
   /**
    * Returns the Id value of the bean being deleted.
    */
-  Object id();
+  List<Object> ids();
 
 }

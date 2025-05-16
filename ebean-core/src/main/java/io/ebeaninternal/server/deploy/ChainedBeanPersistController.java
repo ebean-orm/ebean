@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.event.BeanDeleteIdRequest;
+import io.ebean.event.BeanDeleteIdsRequest;
 import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistRequest;
 
@@ -136,6 +137,13 @@ public final class ChainedBeanPersistController implements BeanPersistController
   }
 
   @Override
+  public void preDelete(List<BeanPersistRequest<?>> requests) {
+    for (BeanPersistController controller : chain) {
+      controller.preDelete(requests);
+    }
+  }
+
+  @Override
   public boolean preSoftDelete(BeanPersistRequest<?> request) {
     for (BeanPersistController controller : chain) {
       if (!controller.preSoftDelete(request)) {
@@ -146,7 +154,19 @@ public final class ChainedBeanPersistController implements BeanPersistController
   }
 
   @Override
+  public void preSoftDelete(List<BeanPersistRequest<?>> requests) {
+    for (BeanPersistController controller : chain) {
+      controller.preSoftDelete(requests);
+    }
+  }
+
+  @Override
   public void preDelete(BeanDeleteIdRequest request) {
+    throw new AbstractMethodError();
+  }
+
+  @Override
+  public void preDelete(BeanDeleteIdsRequest request) {
     for (BeanPersistController controller : chain) {
       controller.preDelete(request);
     }
@@ -163,6 +183,13 @@ public final class ChainedBeanPersistController implements BeanPersistController
   }
 
   @Override
+  public void preInsert(List<BeanPersistRequest<?>> requests) {
+    for (BeanPersistController controller : chain) {
+      controller.preInsert(requests);
+    }
+  }
+
+  @Override
   public boolean preUpdate(BeanPersistRequest<?> request) {
     for (BeanPersistController controller : chain) {
       if (!controller.preUpdate(request)) {
@@ -170,6 +197,13 @@ public final class ChainedBeanPersistController implements BeanPersistController
       }
     }
     return true;
+  }
+
+  @Override
+  public void preUpdate(List<BeanPersistRequest<?>> requests) {
+    for (BeanPersistController controller : chain) {
+      controller.preUpdate(requests);
+    }
   }
 
   /**

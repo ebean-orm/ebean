@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.persist;
 
+import io.ebean.event.BeanPersistController;
+import io.ebean.event.BeanPersistRequest;
 import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.core.PersistRequest;
 import io.ebeaninternal.server.core.PersistRequestBean;
@@ -11,7 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controls the batch ordering of persist requests.
@@ -228,6 +232,7 @@ public final class BatchControl {
     transaction.setFlushOnQuery(false);
     // disable flush on query due transaction callbacks
     try {
+      prepareBatch(list);
       for (int i = 0; i < list.size(); i++) {
         if (i % batchSize == 0) {
           // hit the batch size so flush
@@ -239,6 +244,51 @@ public final class BatchControl {
     } finally {
       transaction.setFlushOnQuery(old);
     }
+  }
+
+  /**
+   * Notifies the extended BeanPersistBatchControllers, that they can prepare the batch.
+   */
+  private void prepareBatch(ArrayList<PersistRequest> list) {
+    Map<PersistRequest.Type, Map<BeanPersistController, List<BeanPersistRequest<?>>>> controllers = null;
+    for (PersistRequest request : list) {
+      if (request instanceof PersistRequestBean<?>) {
+        PersistRequestBean<?> persistRequest = (PersistRequestBean<?>) request;
+        BeanPersistController controller = persistRequest.controller();
+        if (controller instanceof BeanPersistController) {
+          if (controllers == null) {
+            controllers = new LinkedHashMap<>();
+          }
+          controllers
+            .computeIfAbsent(persistRequest.type(), k -> new LinkedHashMap<>())
+            .computeIfAbsent((BeanPersistController) controller, k -> new ArrayList<>())
+            .add(persistRequest);
+        }
+      }
+    }
+    if (controllers == null) {
+      return;
+    }
+    controllers.forEach((type, map) -> {
+      switch (type) {
+        case INSERT:
+          map.forEach(BeanPersistController::preInsert);
+          break;
+        case UPDATE:
+          map.forEach(BeanPersistController::preUpdate);
+          break;
+        case DELETE:
+          map.forEach(BeanPersistController::preDelete);
+          break;
+        case DELETE_SOFT:
+          map.forEach(BeanPersistController::preSoftDelete);
+          break;
+        default:
+          throw new RuntimeException("Invalid type " + type);
+      }
+    });
+
+
   }
 
   public void flushOnCommit() throws BatchedSqlException {
