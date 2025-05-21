@@ -398,7 +398,10 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    * This is general will result in a number of batched PreparedStatements executing.
    */
   @Override
-  public void flush() {
+  public void flush(boolean resetPc) {
+    if (resetPc) {
+      persistenceContext = new DefaultPersistenceContext();
+    }
   }
 
   /**

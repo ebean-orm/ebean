@@ -320,8 +320,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void flush() throws PersistenceException {
-    transaction.flush();
+  public void flush(boolean resetPc) throws PersistenceException {
+    transaction.flush(resetPc);
   }
 
   @Override

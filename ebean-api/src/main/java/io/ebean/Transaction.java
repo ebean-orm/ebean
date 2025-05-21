@@ -521,7 +521,11 @@ public interface Transaction extends AutoCloseable {
    * <li>A getter method is called on a batched bean</li>
    * </ul>
    */
-  void flush() throws PersistenceException;
+  void flush(boolean resetPc) throws PersistenceException;
+
+  default void flush() throws PersistenceException {
+    flush(false);
+  }
 
   /**
    * Return the underlying Connection object.

@@ -251,7 +251,14 @@ public final class DB {
    * </ul>
    */
   public static void flush() {
-    currentTransaction().flush();
+    flush(false);
+  }
+
+  /**
+   * Flushes the transaction and also resets the persistenceContext.
+   */
+  public static void flush(boolean resetPc) {
+    currentTransaction().flush(resetPc);
   }
 
   /**

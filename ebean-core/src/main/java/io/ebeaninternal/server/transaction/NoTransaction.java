@@ -298,7 +298,7 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void flush() throws PersistenceException {
+  public void flush(boolean resetPc) throws PersistenceException {
   }
 
   @Override

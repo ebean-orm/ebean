@@ -665,8 +665,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    * </p>
    */
   @Override
-  public final void flush() {
+  public final void flush(boolean resetPc) {
     internalBatchFlush();
+    if (resetPc) {
+      persistenceContext = new DefaultPersistenceContext();
+    }
   }
 
   /**
