@@ -297,8 +297,8 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
         ((BeanRef) existing).setReplaced();
         weakCount--;
       }
-      if (threshold != -1 && map.size() > threshold) {
-        threshold = ClassContextTracker.INSTANCE.log(rootType, map.size(), threshold);
+      if (threshold != -1 && (map.size() - weakCount) > threshold) {
+        threshold = ClassContextTracker.INSTANCE.log(rootType, (map.size() - weakCount), threshold);
       }
     }
 

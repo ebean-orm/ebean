@@ -2,6 +2,7 @@ package io.ebean;
 
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.bean.PersistenceContext;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.config.DocStoreConfig;
 
@@ -569,4 +570,14 @@ public interface Transaction extends AutoCloseable {
   default Transaction root() {
     return this;
   }
+
+  /**
+   * Return the persistence context associated with this transaction.
+   * <p>
+   * You may wish to hold onto this and set it against another transaction
+   * later. This is along the lines of 'extended persistence context'
+   * behaviour.
+   */
+  PersistenceContext persistenceContext();
+
 }
