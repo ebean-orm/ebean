@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.0.0-RC2</version>
+    <version>16.0.0-RC3</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>16.0.0-RC2</version>
+      <version>16.0.0-RC3</version>
       <scope>provided</scope>
     </dependency>
 
