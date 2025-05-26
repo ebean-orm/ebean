@@ -79,6 +79,7 @@ class DatabaseConfigTest {
     props.setProperty("includeLabelInSql", "false");
     props.setProperty("lazyLoadBatchSize", "50");
     props.setProperty("queryBatchSize", "60");
+    props.setProperty("shutdownHook", "false");
 
     props.setProperty("queryPlan.enable", "true");
     props.setProperty("queryPlan.thresholdMicros", "10000");
@@ -100,6 +101,7 @@ class DatabaseConfigTest {
     assertTrue(settings.isLoadModuleInfo());
     assertTrue(settings.skipDataSourceCheck());
     assertTrue(settings.readOnlyDatabase());
+    assertFalse(settings.shutdownHook());
     assertFalse(settings.isIncludeLabelInSql());
     assertThat(settings.getLengthCheck()).isEqualTo(LengthCheck.ON);
     assertThat(settings.getLazyLoadBatchSize()).isEqualTo(50);
@@ -172,6 +174,7 @@ class DatabaseConfigTest {
     DatabaseBuilder.Settings config = new DatabaseConfig().settings();
     assertTrue(config.isIdGeneratorAutomatic());
     assertTrue(config.isDefaultServer());
+    assertTrue(config.shutdownHook());
     assertFalse(config.isAutoPersistUpdates());
     assertFalse(config.skipDataSourceCheck());
 
@@ -196,6 +199,8 @@ class DatabaseConfigTest {
     assertThat(config.getLengthCheck()).isEqualTo(LengthCheck.OFF);
     assertTrue(config.isIncludeLabelInSql());
 
+    config.shutdownHook(false);
+    assertFalse(config.shutdownHook());
     config.setLoadModuleInfo(false);
     assertFalse(config.isAutoLoadModuleInfo());
     assertFalse(config.isLoadModuleInfo());

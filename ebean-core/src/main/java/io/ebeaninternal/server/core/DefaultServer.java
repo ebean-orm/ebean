@@ -162,8 +162,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.scriptRunner = new DScriptRunner(this);
 
     configureServerPlugins();
-    // Register with the JVM Shutdown hook
-    ShutdownManager.registerDatabase(this);
+    if (this.config.shutdownHook() && "true".equalsIgnoreCase(System.getProperty("ebean.registerShutdownHook", "true"))) {
+      // register with the JVM Shutdown hook
+      ShutdownManager.registerDatabase(this);
+    }
   }
 
   /**

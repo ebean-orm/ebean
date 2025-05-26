@@ -1063,6 +1063,11 @@ public interface DatabaseBuilder {
   DatabaseBuilder readOnlyDatabase(boolean readOnlyDatabase);
 
   /**
+   * Set to false such that the instance does not register a JVM shutdown hook.
+   */
+  DatabaseBuilder shutdownHook(boolean shutdownHook);
+
+  /**
    * Set a DataSource.
    */
   default DatabaseBuilder dataSource(DataSource dataSource) {
@@ -2642,6 +2647,11 @@ public interface DatabaseBuilder {
      * and use readOnly=true and autoCommit=true.
      */
     boolean readOnlyDatabase();
+
+    /**
+     * Return if a JVM shutdown hook should be registered.
+     */
+    boolean shutdownHook();
 
     /**
      * Return the DataSource.
