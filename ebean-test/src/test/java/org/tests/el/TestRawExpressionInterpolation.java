@@ -6,10 +6,10 @@ import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
-public class TestUnderscoreParam extends BaseTestCase {
+class TestRawExpressionInterpolation extends BaseTestCase {
 
   @Test
-  public void test() {
+  void test() {
 
     Query<Customer> query = DB.find(Customer.class)
       .where().raw("name like ?", "Rob%")
@@ -19,6 +19,13 @@ public class TestUnderscoreParam extends BaseTestCase {
 
     assertSql(query).contains("where t0.name like ?");
 
+    Query<Customer> query2 = DB.find(Customer.class)
+      .where().raw("? like concat('%', name, '%')", "Rob")
+      .query();
+
+    query2.findList();
+
+    assertSql(query2).contains("where ? like concat('%', t0.name, '%')");
   }
 
 }

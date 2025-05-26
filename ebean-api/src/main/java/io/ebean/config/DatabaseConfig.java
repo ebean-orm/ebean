@@ -299,6 +299,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private boolean skipDataSourceCheck;
 
   private boolean readOnlyDatabase;
+  private boolean shutdownHook = true;
 
   /**
    * The data source (if programmatically provided).
@@ -1308,6 +1309,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
+  public DatabaseBuilder shutdownHook(boolean shutdownHook) {
+    this.shutdownHook = shutdownHook;
+    return this;
+  }
+
+  @Override
+  public boolean shutdownHook() {
+    return shutdownHook;
+  }
+
+  @Override
   public DataSource getDataSource() {
     return dataSource;
   }
@@ -2067,6 +2079,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     loadDataSourceSettings(p);
 
     defaultServer = p.getBoolean("defaultServer", defaultServer);
+    shutdownHook = p.getBoolean("shutdownHook", shutdownHook);
     readOnlyDatabase = p.getBoolean("readOnlyDatabase", readOnlyDatabase);
     autoPersistUpdates = p.getBoolean("autoPersistUpdates", autoPersistUpdates);
     loadModuleInfo = p.getBoolean("loadModuleInfo", loadModuleInfo);

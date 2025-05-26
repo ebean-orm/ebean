@@ -97,8 +97,7 @@ public final class ShutdownManager {
   private static void registerShutdownHook() {
     lock.lock();
     try {
-      String value = System.getProperty("ebean.registerShutdownHook");
-      if (value == null || !value.trim().equalsIgnoreCase("false")) {
+      if ("true".equalsIgnoreCase(System.getProperty("ebean.registerShutdownHook", "true"))) {
         Runtime.getRuntime().addShutdownHook(shutdownHook);
       }
     } catch (IllegalStateException ex) {
