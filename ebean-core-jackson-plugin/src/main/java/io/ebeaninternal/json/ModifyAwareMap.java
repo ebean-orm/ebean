@@ -1,13 +1,16 @@
 package io.ebeaninternal.json;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+
 import io.ebean.ModifyAwareType;
 
-import java.io.Serializable;
-import java.util.*;
-
-/**
- * Map that is wraps an underlying map for the purpose of detecting changes.
- */
+/** Map that is wraps an underlying map for the purpose of detecting changes. */
 public final class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, Serializable {
 
   private static final long serialVersionUID = 1;
@@ -34,11 +37,11 @@ public final class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, S
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o instanceof ModifyAwareMap) {
-      ModifyAwareMap<?,?> that = (ModifyAwareMap<?,?>) o;
+      ModifyAwareMap<?, ?> that = (ModifyAwareMap<?, ?>) o;
       return Objects.equals(map, that.map);
     }
     if (!(o instanceof Map)) return false;
-    Map<?,?> that = (Map<?,?>) o;
+    Map<?, ?> that = (Map<?, ?>) o;
     return Objects.equals(map, that);
   }
 
@@ -112,7 +115,6 @@ public final class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, S
     map.putAll(m);
   }
 
-
   @Override
   public void clear() {
     if (!map.isEmpty()) {
@@ -135,5 +137,4 @@ public final class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, S
   public Set<Map.Entry<K, V>> entrySet() {
     return new ModifyAwareSet<>(this, map.entrySet());
   }
-
 }

@@ -1,8 +1,8 @@
 package io.ebeaninternal.json;
 
-import io.ebean.ModifyAwareType;
-
 import java.io.Serializable;
+
+import io.ebean.ModifyAwareType;
 
 /**
  * Detects when content has been modified and as such needs to be persisted (included in an update).
@@ -22,5 +22,4 @@ public final class ModifyAwareFlag implements ModifyAwareType, Serializable {
   public void setMarkedDirty(boolean markedDirty) {
     this.markedDirty = markedDirty;
   }
-
 }

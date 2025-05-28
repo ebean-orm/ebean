@@ -1,13 +1,15 @@
 package io.ebeaninternal.json;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Set;
+
 import io.ebean.ModifyAwareType;
 
-import java.io.Serializable;
-import java.util.*;
-
-/**
- * Wraps a Set for the purposes of detecting modifications.
- */
+/** Wraps a Set for the purposes of detecting modifications. */
 public final class ModifyAwareSet<E> implements Set<E>, ModifyAwareType, Serializable {
 
   private static final long serialVersionUID = 1;
@@ -15,16 +17,12 @@ public final class ModifyAwareSet<E> implements Set<E>, ModifyAwareType, Seriali
   private final ModifyAwareType owner;
   private final Set<E> set;
 
-  /**
-   * Create as top level with it's own ModifyAwareOwner instance wrapping the given Set.
-   */
+  /** Create as top level with it's own ModifyAwareOwner instance wrapping the given Set. */
   public ModifyAwareSet(Set<E> underlying) {
     this(new ModifyAwareFlag(), underlying);
   }
 
-  /**
-   * Create with an Owner that is notified of modifications.
-   */
+  /** Create with an Owner that is notified of modifications. */
   public ModifyAwareSet(ModifyAwareType owner, Set<E> underlying) {
     this.owner = owner;
     this.set = underlying;

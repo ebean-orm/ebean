@@ -1,10 +1,5 @@
 package io.ebeaninternal.json;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import io.ebean.ModifyAwareType;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
@@ -13,6 +8,12 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonToken;
+
+import io.ebean.ModifyAwareType;
 
 final class EJsonReader {
 
@@ -117,7 +118,7 @@ final class EJsonReader {
   EJsonReader(JsonParser parser, boolean modifyAware) {
     this.parser = parser;
     this.modifyAware = modifyAware;
-    this.modifyAwareOwner = (modifyAware) ? new ModifyAwareFlag() : null;
+    this.modifyAwareOwner = modifyAware ? new ModifyAwareFlag() : null;
   }
 
   private void startArray() {
@@ -192,12 +193,9 @@ final class EJsonReader {
     return currentContext.getValue();
   }
 
-  /**
-   * Process the JsonToken for objects and arrays.
-   */
+  /** Process the JsonToken for objects and arrays. */
   private void processJsonToken(JsonToken token) throws IOException {
     switch (token) {
-
       case START_ARRAY:
         startArray();
         break;
@@ -273,7 +271,7 @@ final class EJsonReader {
     }
   }
 
-  private static abstract class Context {
+  private abstract static class Context {
     Context next;
 
     abstract void popContext(Context temp);
@@ -364,5 +362,4 @@ final class EJsonReader {
       // not expected
     }
   }
-
 }
