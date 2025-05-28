@@ -97,6 +97,7 @@
     <module>ebean-jackson-mapper</module>
     <module>ebean-spring-txn</module>
     <module>kotlin-querybean-generator</module>
+    <module>ebean-core-jackson-plugin</module>
   </modules>
 
   <profiles>

@@ -1,18 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
+    <artifactId>ebean-parent</artifactId>
     <version>16.0.0-RC3</version>
   </parent>
-
-  <artifactId>ebean-core</artifactId>
-  <packaging>jar</packaging>
-
-  <name>ebean core</name>
-  <description>ebean core module</description>
-  <url>https://ebean.io/</url>
-
+  <artifactId>ebean-core-jackson-plugin</artifactId>
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
     <tag>HEAD</tag>
@@ -22,12 +15,6 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>16.0.0-RC3</version>
-    </dependency>
-
-    <dependency>
-      <groupId>io.ebean</groupId>
-      <artifactId>ebean-core-jackson-plugin</artifactId>
       <version>16.0.0-RC3</version>
     </dependency>
 
