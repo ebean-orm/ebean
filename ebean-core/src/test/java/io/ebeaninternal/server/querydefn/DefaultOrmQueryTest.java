@@ -1,7 +1,8 @@
 package io.ebeaninternal.server.querydefn;
 
 
-import io.ebean.*;
+import io.ebean.CacheMode;
+import io.ebean.DB;
 import io.ebeaninternal.api.BindValuesKey;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.OrmQueryRequest;
@@ -139,7 +140,7 @@ public class DefaultOrmQueryTest extends BaseExpressionTest {
   }
 
   private BindValuesKey bindKey(DefaultOrmQuery<Order> query) {
-    BindValuesKey key = new BindValuesKey();
+    BindValuesKey key = new BindValuesKey(spiEbeanServer());
     query.queryBindKey(key);
     return key;
   }

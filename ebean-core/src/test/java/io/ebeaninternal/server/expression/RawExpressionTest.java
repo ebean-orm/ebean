@@ -70,7 +70,7 @@ public class RawExpressionTest extends BaseExpressionTest {
   }
 
   private BindValuesKey bindKey(RawExpression query) {
-    BindValuesKey bindValuesKey = new BindValuesKey();
+    BindValuesKey bindValuesKey = new BindValuesKey(spiEbeanServer());
     query.queryBindKey(bindValuesKey);
     return bindValuesKey;
   }
