@@ -1,5 +1,7 @@
 package io.ebeaninternal.api;
 
+import io.ebean.bean.EntityBean;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,10 +15,23 @@ public final class BindValuesKey {
 
   private final List<Object> values = new ArrayList<>();
 
+  private final SpiEbeanServer server;
+
+  public BindValuesKey(SpiEbeanServer server) {
+    this.server = server;
+  }
+
   /**
    * Add a bind value.
    */
   public BindValuesKey add(Object value) {
+    if (value instanceof EntityBean) {
+      // Only interested in id to keep the memory footprint low
+      Object id = server.beanId(value);
+      if (id != null) {
+        value = id;
+      }
+    }
     values.add(value);
     return this;
   }
