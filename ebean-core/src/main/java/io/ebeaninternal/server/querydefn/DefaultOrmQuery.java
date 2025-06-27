@@ -1239,7 +1239,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final HashQuery queryHash() {
     // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
-    BindValuesKey bindKey = new BindValuesKey();
+    BindValuesKey bindKey = new BindValuesKey(server);
     queryBindKey(bindKey);
     return new HashQuery(queryPlanKey, bindKey, dtoType);
   }

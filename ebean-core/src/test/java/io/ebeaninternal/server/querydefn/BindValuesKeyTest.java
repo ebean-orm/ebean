@@ -1,19 +1,20 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebeaninternal.api.BindValuesKey;
+import io.ebeaninternal.server.deploy.BaseTest;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class BindValuesKeyTest {
+public class BindValuesKeyTest extends BaseTest {
 
   @Test
   public void update_with_null() {
 
-    BindValuesKey hash = new BindValuesKey();
+    BindValuesKey hash = new BindValuesKey(spiEbeanServer());
     hash.add(1).add(null).add("hello");
 
-    BindValuesKey hash2 = new BindValuesKey();
+    BindValuesKey hash2 = new BindValuesKey(spiEbeanServer());
     hash2.add(1).add(null).add("hello");
 
     assertThat(hash).isEqualTo(hash2);
@@ -22,13 +23,13 @@ public class BindValuesKeyTest {
   @Test
   public void notEqual() {
 
-    BindValuesKey hash = new BindValuesKey();
+    BindValuesKey hash = new BindValuesKey(spiEbeanServer());
     hash.add(1).add(null).add("hello");
 
-    BindValuesKey hash2 = new BindValuesKey();
+    BindValuesKey hash2 = new BindValuesKey(spiEbeanServer());
     hash2.add(1).add("hello");
 
-    BindValuesKey hash3 = new BindValuesKey();
+    BindValuesKey hash3 = new BindValuesKey(spiEbeanServer());
     hash2.add(1).add(null);
 
     assertThat(hash).isNotEqualTo(hash2);
