@@ -7,7 +7,6 @@ import jakarta.persistence.Id;
  * Class with @Cache(enableQueryCache = true)
  *
  * @author Jonas Fr&ouml;hler, FOCONIS AG
- *
  */
 @Entity
 public class MemleakChild {
