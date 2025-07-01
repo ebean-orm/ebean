@@ -1,7 +1,6 @@
 package io.ebeaninternal.api;
 
 import io.ebean.bean.EntityBean;
-
 import java.util.ArrayList;
 import java.util.List;
 

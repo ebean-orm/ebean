@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
@@ -20,10 +22,8 @@ import io.ebeaninternal.server.expression.SimpleExpression;
 import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
-import jakarta.persistence.PersistenceException;
-import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
+import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.*;
