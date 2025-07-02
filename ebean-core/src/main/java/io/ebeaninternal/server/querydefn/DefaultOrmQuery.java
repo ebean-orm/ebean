@@ -1447,6 +1447,21 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   private Query<T> fetchInternal(String path, String properties, FetchConfig config) {
+    // look at all One Props, see if we can select only the ID of one?
+    for (BeanPropertyAssocOne<?> beanPropertyAssocOne : beanDescriptor.propertiesOne()) {
+      if(beanPropertyAssocOne.name().equals(path)) {
+        // only if we select the ID do we prevent the join, otherwise we need something from the other table anyway...
+        if(beanPropertyAssocOne.targetIdProperty().equals(properties)) {
+          if (detail.hasSelectClause()) {
+            //detail.select(path); // here I would overwrite the previous select...
+            detail.addSelect(path);
+          } else {
+            detail.select(path);
+          }
+          return this;
+        }
+      }
+    }
     detail.fetch(path, properties, config);
     return this;
   }

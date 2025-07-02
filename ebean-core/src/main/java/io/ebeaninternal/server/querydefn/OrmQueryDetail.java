@@ -129,6 +129,11 @@ public final class OrmQueryDetail implements Serializable {
     baseProps = new OrmQueryProperties(null, properties, null);
   }
 
+  // TODO: we need a function to extend the previous select. This is just a sketch
+  public void addSelect(String properties) {
+    baseProps.addSelect(properties);
+  }
+
   /**
    * Set select properties that are already parsed.
    */
