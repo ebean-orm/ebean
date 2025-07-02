@@ -155,7 +155,12 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
 
   private void executeAndCheckRowCounts() throws SQLException {
     try {
-      results = pstmt.executeBatch();
+      try {
+        results = pstmt.executeBatch();
+      } catch (SQLException ex) {
+        list.forEach(BatchPostExecute::onFailedUpdateUndoGeneratedProperties);
+        throw ex;
+      }
       if (transaction.isLogSql()) {
         transaction.logSql(" -- executeBatch() size:{0} sql:{1}", results.length, sql);
       }

@@ -284,7 +284,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
-  private void onFailedUpdateUndoGeneratedProperties() {
+  public void onFailedUpdateUndoGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
       if (transaction == null || transaction.isOverwriteGeneratedProperties() || prop.isVersion()) {
         Object oldVal = intercept.origValue(prop.propertyIndex());
