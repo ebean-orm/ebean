@@ -47,9 +47,9 @@ public interface BatchPostExecute {
   void addTimingBatch(long startNanos, int batch);
 
   /**
-   * Undos generated properties.
+   * Tries to undo the request.
    */
-  default void onFailedUpdateUndoGeneratedProperties() {
+  default void undo() {
 
   }
 }

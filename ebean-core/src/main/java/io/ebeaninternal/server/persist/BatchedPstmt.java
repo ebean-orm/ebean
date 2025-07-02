@@ -117,7 +117,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
     }
     postExecute();
     addTimingMetrics();
-    list.clear();
+    list.clear(); // CHECKME: This list may cause problems when undo is done on multiple batches.
     transaction.profileEvent(this);
   }
 
@@ -155,12 +155,7 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
 
   private void executeAndCheckRowCounts() throws SQLException {
     try {
-      try {
-        results = pstmt.executeBatch();
-      } catch (SQLException ex) {
-        list.forEach(BatchPostExecute::onFailedUpdateUndoGeneratedProperties);
-        throw ex;
-      }
+      results = pstmt.executeBatch();
       if (transaction.isLogSql()) {
         transaction.logSql(" -- executeBatch() size:{0} sql:{1}", results.length, sql);
       }
@@ -175,6 +170,11 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
       closeInputStreams();
     }
   }
+
+  public void undo() {
+    list.forEach(BatchPostExecute::undo);
+  }
+
 
   private void getGeneratedKeys() throws SQLException {
     if (DB2_HACK.getGeneratedKeys(pstmt, list)) {
@@ -220,4 +220,5 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
       inputStreams = null;
     }
   }
+
 }

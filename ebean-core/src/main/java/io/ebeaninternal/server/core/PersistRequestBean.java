@@ -126,6 +126,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private List<SaveMany> saveMany;
   private InsertOptions insertOptions;
+  private BeanProperty[] dirtyGenerated;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, int flags) {
@@ -262,6 +263,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   private void onUpdateGeneratedProperties() {
+    dirtyGenerated = beanDescriptor.propertiesGenUpdate();
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
       GeneratedProperty generatedProperty = prop.generatedProperty();
       if (prop.isVersion()) {
@@ -282,19 +284,31 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
-  public void onFailedUpdateUndoGeneratedProperties() {
-    for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
-      Object oldVal = intercept.origValue(prop.propertyIndex());
-      prop.setValue(entityBean, oldVal);
-    }
-  }
-
   private void onInsertGeneratedProperties() {
+    dirtyGenerated = beanDescriptor.propertiesGenInsert();
     for (BeanProperty prop : beanDescriptor.propertiesGenInsert()) {
       Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
       prop.setValueChanged(entityBean, value);
     }
   }
+
+  /**
+   * Undos the update of generated properties.
+   */
+  @Override
+  public void undo() {
+    if (dirtyGenerated != null) {
+      // Do an undo once, and undo only modified properties.
+      for (BeanProperty prop : dirtyGenerated) {
+        if (!prop.isVersion() || isLoadedProperty(prop)) {
+          Object oldVal = intercept.origValue(prop.propertyIndex());
+          prop.setValue(entityBean, oldVal);
+        }
+      }
+      dirtyGenerated = null;
+    }
+  }
+
 
   /**
    * If using batch on cascade flush if required.
@@ -809,7 +823,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void checkRowCount(int rowCount) {
     if (rowCount != 1 && rowCount != Statement.SUCCESS_NO_INFO) {
       if (ConcurrencyMode.VERSION == concurrencyMode) {
-        onFailedUpdateUndoGeneratedProperties();
         throw new OptimisticLockException("Data has changed. updated row count " + rowCount, null, bean);
       } else if (rowCount == 0 && type == Type.UPDATE) {
         throw new EntityNotFoundException("No rows updated");
