@@ -107,36 +107,36 @@ public class TestInsertDuplicateKey extends BaseTestCase {
   @Test
   public void insert_duplicateKey_retry() {
     Document doc1 = new Document();
-    doc1.setTitle("KeyABC");
+    doc1.setTitle("Key1ABC");
     doc1.setBody("one");
     doc1.save();
 
     Document doc2 = new Document();
-    doc2.setTitle("KeyABC");
+    doc2.setTitle("Key1ABC");
     doc2.setBody("clashes with doc1");
     Long version = doc2.getVersion();
     assertThrows(DuplicateKeyException.class, doc2::save);
     assertEquals(version, doc2.getVersion());
 
-    doc2.setTitle("KeyABCD");
+    doc2.setTitle("Key1ABCD");
 
     doc2.save();
 
-    doc1.setTitle("KeyABCD");
+    doc1.setTitle("Key1ABCD");
     assertThrows(DuplicateKeyException.class, doc1::save);
-    doc1.setTitle("KeyABCDE");
+    doc1.setTitle("Key1ABCDE");
     doc1.save();
   }
 
   @Test
   public void insert_duplicateKey_retryWithBatch() {
     Document doc1 = new Document();
-    doc1.setTitle("KeyABC");
+    doc1.setTitle("Key2ABC");
     doc1.setBody("one");
     doc1.save();
 
     Document doc2 = new Document();
-    doc2.setTitle("KeyABC");
+    doc2.setTitle("Key2ABC");
     doc2.setBody("clashes with doc1");
     Long version = doc2.getVersion();
     try (Transaction tx = DB.beginTransaction()) {
@@ -146,13 +146,13 @@ public class TestInsertDuplicateKey extends BaseTestCase {
     }
     assertEquals(version, doc2.getVersion());
 
-    doc2.setTitle("KeyABCD");
+    doc2.setTitle("Key2ABCD");
 
     doc2.save();
 
-    doc1.setTitle("KeyABCD");
+    doc1.setTitle("Key2ABCD");
     assertThrows(DuplicateKeyException.class, doc1::save);
-    doc1.setTitle("KeyABCDE");
+    doc1.setTitle("Key2ABCDE");
     try (Transaction tx = DB.beginTransaction()) {
       tx.setBatchMode(true);
       doc1.save();
