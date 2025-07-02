@@ -45,4 +45,11 @@ public interface BatchPostExecute {
    * Add timing metrics for batch persist.
    */
   void addTimingBatch(long startNanos, int batch);
+
+  /**
+   * Tries to undo the request.
+   */
+  default void undo() {
+
+  }
 }
