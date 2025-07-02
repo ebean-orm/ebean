@@ -4,10 +4,10 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.8.1-FOC15</version>
+    <version>14.8.1-FOC16-SNAPSHOT</version>
   </parent>
 
-  <version>14.8.2-RC16</version>
+  <version>14.8.2-RC17-SNAPSHOT</version>
   <name>querybean generator</name>
   <artifactId>querybean-generator</artifactId>
   <description>Querybean generator</description>
