@@ -45,4 +45,11 @@ public interface BatchPostExecute {
    * Add timing metrics for batch persist.
    */
   void addTimingBatch(long startNanos, int batch);
+
+  /**
+   * Undos generated properties.
+   */
+  default void onFailedUpdateUndoGeneratedProperties() {
+
+  }
 }

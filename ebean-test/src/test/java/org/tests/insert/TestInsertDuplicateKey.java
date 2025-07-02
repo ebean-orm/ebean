@@ -2,6 +2,7 @@ package org.tests.insert;
 
 import io.ebean.DB;
 import io.ebean.DuplicateKeyException;
+import io.ebean.Transaction;
 import io.ebean.annotation.Transactional;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,7 @@ import org.tests.model.draftable.Document;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestInsertDuplicateKey extends BaseTestCase {
@@ -99,5 +101,62 @@ public class TestInsertDuplicateKey extends BaseTestCase {
     doc0.setTitle("ThisIsAThirdUniqueKey");
     doc0.setBody("insertTheBatch_duplicateKey_catchAndContinue-1");
     doc0.save();
+  }
+
+
+  @Test
+  public void insert_duplicateKey_retry() {
+    Document doc1 = new Document();
+    doc1.setTitle("KeyABC");
+    doc1.setBody("one");
+    doc1.save();
+
+    Document doc2 = new Document();
+    doc2.setTitle("KeyABC");
+    doc2.setBody("clashes with doc1");
+    Long version = doc2.getVersion();
+    assertThrows(DuplicateKeyException.class, doc2::save);
+    assertEquals(version, doc2.getVersion());
+
+    doc2.setTitle("KeyABCD");
+
+    doc2.save();
+
+    doc1.setTitle("KeyABCD");
+    assertThrows(DuplicateKeyException.class, doc1::save);
+    doc1.setTitle("KeyABCDE");
+    doc1.save();
+  }
+
+  @Test
+  public void insert_duplicateKey_retryWithBatch() {
+    Document doc1 = new Document();
+    doc1.setTitle("KeyABC");
+    doc1.setBody("one");
+    doc1.save();
+
+    Document doc2 = new Document();
+    doc2.setTitle("KeyABC");
+    doc2.setBody("clashes with doc1");
+    Long version = doc2.getVersion();
+    try (Transaction tx = DB.beginTransaction()) {
+      tx.setBatchMode(true);
+      doc2.save();
+      assertThrows(DuplicateKeyException.class, tx::commit);
+    }
+    assertEquals(version, doc2.getVersion());
+
+    doc2.setTitle("KeyABCD");
+
+    doc2.save();
+
+    doc1.setTitle("KeyABCD");
+    assertThrows(DuplicateKeyException.class, doc1::save);
+    doc1.setTitle("KeyABCDE");
+    try (Transaction tx = DB.beginTransaction()) {
+      tx.setBatchMode(true);
+      doc1.save();
+      tx.commit();
+    }
   }
 }

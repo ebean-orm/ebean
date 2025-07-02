@@ -74,6 +74,7 @@ final class DmlBeanPersister implements BeanPersister {
       if (request.transaction().isLogSummary()) {
         request.transaction().logSummary(msg);
       }
+      request.onFailedUpdateUndoGeneratedProperties();
       throw dbPlatform.translate(msg, e);
     } finally {
       if (!batched) {
