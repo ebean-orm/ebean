@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.8.1-FOC14</version>
+    <version>14.8.1-FOC15-SNAPSHOT</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -15,14 +15,14 @@
 
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
-    <tag>ebean-parent-14.8.1-FOC14</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <dependencies>
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>14.8.1-FOC14</version>
+      <version>14.8.1-FOC15-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>14.8.1-FOC14</version>
+      <version>14.8.1-FOC15-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -159,21 +159,21 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>14.8.1-FOC14</version>
+      <version>14.8.1-FOC15-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>14.8.1-FOC14</version>
+      <version>14.8.1-FOC15-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlserver</artifactId>
-      <version>14.8.1-FOC14</version>
+      <version>14.8.1-FOC15-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
