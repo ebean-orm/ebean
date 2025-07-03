@@ -87,7 +87,7 @@ public final class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
     this.allProperties = response.allProperties;
-    this.included = response.included;
+    this.included = response.included; // modifiable
     if (fetchConfig != null) {
       this.fetchConfig = fetchConfig;
       this.cache = fetchConfig.isCache();
@@ -104,7 +104,7 @@ public final class OrmQueryProperties implements Serializable {
   OrmQueryProperties(String path, Set<String> included, FetchConfig fetchConfig) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    this.included = included;
+    this.included = (included == null) ? null : new LinkedHashSet<>(included);
     this.allProperties = false;
     this.fetchConfig = fetchConfig;
     this.cache = fetchConfig.isCache();
@@ -114,7 +114,7 @@ public final class OrmQueryProperties implements Serializable {
     this.path = path;
     this.parentPath = SplitName.parent(path);
     this.allProperties = other.allProperties;
-    this.included = other.included;
+    this.included = (other.included == null) ? null : new LinkedHashSet<>(other.included);
     this.fetchConfig = fetchConfig;
     this.cache = fetchConfig.isCache();
   }
