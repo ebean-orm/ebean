@@ -191,7 +191,7 @@ public final class OrmQueryProperties implements Serializable {
    * Adjust filterMany expressions for inclusion in main query.
    */
   public void filterManyInline() {
-    if (filterMany != null){
+    if (filterMany != null) {
       filterMany.prefixProperty(path);
     }
   }
@@ -431,4 +431,15 @@ public final class OrmQueryProperties implements Serializable {
     builder.append('}');
   }
 
+  boolean includesExactly(String property) {
+    return included != null
+      && included.size() == 1
+      && included.contains(property);
+  }
+
+  void addInclude(String prop) {
+    if (!allProperties) {
+      included.add(prop);
+    }
+  }
 }

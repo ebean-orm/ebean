@@ -6,10 +6,11 @@ import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQueryManyJoin;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
-
 import jakarta.persistence.PersistenceException;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -343,6 +344,30 @@ public final class OrmQueryDetail implements Serializable {
     boolean fetchJoinFirstMany = allowOne;
 
     sortFetchPaths(beanDescriptor, addIds);
+
+    ArrayList<Map.Entry<String, OrmQueryProperties>> entries = new ArrayList<>(fetchPaths.entrySet());
+    ListIterator<Map.Entry<String, OrmQueryProperties>> it = entries.listIterator(entries.size());
+    while (it.hasPrevious()) {
+      Map.Entry<String, OrmQueryProperties> entry = it.previous();
+      String path = entry.getKey();
+      ElPropertyValue el = beanDescriptor.elGetValue(path);
+      if (el != null && el.beanProperty() instanceof BeanPropertyAssocOne) {
+        OrmQueryProperties prop = entry.getValue();
+        if (prop.includesExactly(el.beanProperty().descriptor().idName())) {
+          OrmQueryProperties parent = prop.getParentPath() == null ? baseProps : fetchPaths.get(prop.getParentPath());
+          if (parent.hasProperties()) {
+            // move the fetch to the parent path
+            parent.addInclude(el.beanProperty().name());
+            it.remove();
+          }
+        }
+      }
+    }
+    if (fetchPaths.size() != entries.size()) {
+      fetchPaths = new LinkedHashMap<>();
+      entries.forEach(entry -> fetchPaths.put(entry.getKey(), entry.getValue()));
+    }
+
     List<FetchEntry> pairs = sortByFetchPreference(beanDescriptor);
 
     for (FetchEntry pair : pairs) {
