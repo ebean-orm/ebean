@@ -5,11 +5,13 @@ import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQueryManyJoin;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
-
 import jakarta.persistence.PersistenceException;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -327,6 +329,41 @@ public final class OrmQueryDetail implements Serializable {
   }
 
   /**
+   * After sorting, we try to convert id only fetches of a bean into a select of the parent bean.
+   */
+  private void convertIdFetches(BeanDescriptor<?> desc, Set<String> nonRemovable) {
+    String[] paths = fetchPaths.keySet().toArray(new String[0]);
+    int i = paths.length;
+    // iterate backwards - otherwise we might detect id only fetches, which are later converted
+    while (i-- > 0) {
+      String path = paths[i];
+      ElPropertyDeploy el = desc.elPropertyDeploy(path);
+      OrmQueryProperties prop = fetchPaths.get(path);
+      if (nonRemovable.contains(path)) {
+        // do not remove
+      } else if (el == null) {
+        throw new PersistenceException("Invalid fetch path " + path + " from " + desc.fullName());
+      } else if (el.beanProperty() instanceof BeanPropertyAssocOne) {
+        BeanPropertyAssocOne assoc = (BeanPropertyAssocOne) el.beanProperty();
+        if (assoc.hasForeignKeyConstraint()) {
+          // check, if we have exactly the ID selected and convert these fetches to a select of the parent bean
+          if (prop.includesExactly(assoc.descriptor().idName())) {
+            OrmQueryProperties parentProp = prop.getParentPath() == null ? baseProps : fetchPaths.get(prop.getParentPath());
+            if (parentProp.hasProperties()) {
+              parentProp.addInclude(assoc.name());
+              fetchPaths.remove(path);
+              prop = null;
+            }
+          }
+        }
+      }
+      if (prop != null && prop.getParentPath() != null) {
+        nonRemovable.add(prop.getParentPath());
+      }
+    }
+  }
+
+  /**
    * Mark 'fetch joins' to 'many' properties over to 'query joins' where needed.
    *
    * @return The fetch join many property or null
@@ -343,6 +380,8 @@ public final class OrmQueryDetail implements Serializable {
     boolean fetchJoinFirstMany = allowOne;
 
     sortFetchPaths(beanDescriptor, addIds);
+
+    convertIdFetches(beanDescriptor, new HashSet<>());
     List<FetchEntry> pairs = sortByFetchPreference(beanDescriptor);
 
     for (FetchEntry pair : pairs) {

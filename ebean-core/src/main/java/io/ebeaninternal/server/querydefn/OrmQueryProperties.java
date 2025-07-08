@@ -87,7 +87,7 @@ public final class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
     this.allProperties = response.allProperties;
-    this.included = response.included;
+    this.included = response.included; // modifiable
     if (fetchConfig != null) {
       this.fetchConfig = fetchConfig;
       this.cache = fetchConfig.isCache();
@@ -104,7 +104,7 @@ public final class OrmQueryProperties implements Serializable {
   OrmQueryProperties(String path, Set<String> included, FetchConfig fetchConfig) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    this.included = included;
+    this.included = (included == null) ? null : new LinkedHashSet<>(included);
     this.allProperties = false;
     this.fetchConfig = fetchConfig;
     this.cache = fetchConfig.isCache();
@@ -114,7 +114,7 @@ public final class OrmQueryProperties implements Serializable {
     this.path = path;
     this.parentPath = SplitName.parent(path);
     this.allProperties = other.allProperties;
-    this.included = other.included;
+    this.included = (other.included == null) ? null : new LinkedHashSet<>(other.included);
     this.fetchConfig = fetchConfig;
     this.cache = fetchConfig.isCache();
   }
@@ -191,7 +191,7 @@ public final class OrmQueryProperties implements Serializable {
    * Adjust filterMany expressions for inclusion in main query.
    */
   public void filterManyInline() {
-    if (filterMany != null){
+    if (filterMany != null) {
       filterMany.prefixProperty(path);
     }
   }
@@ -431,4 +431,15 @@ public final class OrmQueryProperties implements Serializable {
     builder.append('}');
   }
 
+  boolean includesExactly(String property) {
+    return included != null
+      && included.size() == 1
+      && included.contains(property);
+  }
+
+  void addInclude(String prop) {
+    if (!allProperties) {
+      included.add(prop);
+    }
+  }
 }

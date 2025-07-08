@@ -95,7 +95,7 @@ public class TestLazyForeignKeys extends BaseTestCase {
     List<MainEntityRelation> list = query.findList();
     assertEquals(1, list.size());
 
-    assertSql(query).contains("t0.id, t0.attr1, t0.id1, t0.id2, t1.id, t2.id");
+    assertSql(query).isEqualTo("select t0.id, t0.attr1, t0.id1, t0.id2, t1.id, t2.id from main_entity_relation t0 left join main_entity t1 on t1.id = t0.id1 left join main_entity t2 on t2.id = t0.id2");
 
     MainEntityRelation rel1 = list.get(0);
     assertEquals("ent1", rel1.getEntity1().getId());
