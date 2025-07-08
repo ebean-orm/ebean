@@ -331,28 +331,34 @@ public final class OrmQueryDetail implements Serializable {
   /**
    * After sorting, we try to convert id only fetches of a bean into a select of the parent bean.
    */
-  private void convertIdFetches(BeanDescriptor<?> desc) {
+  private void convertIdFetches(BeanDescriptor<?> desc, Set<String> nonRemovable) {
     String[] paths = fetchPaths.keySet().toArray(new String[0]);
     int i = paths.length;
     // iterate backwards - otherwise we might detect id only fetches, which are later converted
     while (i-- > 0) {
       String path = paths[i];
       ElPropertyDeploy el = desc.elPropertyDeploy(path);
-      if (el == null) {
+      OrmQueryProperties prop = fetchPaths.get(path);
+      if (nonRemovable.contains(path)) {
+        // do not remove
+      } else if (el == null) {
         throw new PersistenceException("Invalid fetch path " + path + " from " + desc.fullName());
       } else if (el.beanProperty() instanceof BeanPropertyAssocOne) {
         BeanPropertyAssocOne assoc = (BeanPropertyAssocOne) el.beanProperty();
         if (assoc.hasForeignKeyConstraint()) {
-          OrmQueryProperties prop = fetchPaths.get(path);
           // check, if we have exactly the ID selected and convert these fetches to a select of the parent bean
           if (prop.includesExactly(assoc.descriptor().idName())) {
             OrmQueryProperties parentProp = prop.getParentPath() == null ? baseProps : fetchPaths.get(prop.getParentPath());
             if (parentProp.hasProperties()) {
               parentProp.addInclude(assoc.name());
               fetchPaths.remove(path);
+              prop = null;
             }
           }
         }
+      }
+      if (prop != null && prop.getParentPath() != null) {
+        nonRemovable.add(prop.getParentPath());
       }
     }
   }
@@ -375,7 +381,7 @@ public final class OrmQueryDetail implements Serializable {
 
     sortFetchPaths(beanDescriptor, addIds);
 
-    convertIdFetches(beanDescriptor);
+    convertIdFetches(beanDescriptor, new HashSet<>());
     List<FetchEntry> pairs = sortByFetchPreference(beanDescriptor);
 
     for (FetchEntry pair : pairs) {
