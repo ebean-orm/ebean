@@ -24,6 +24,6 @@ interface Constants {
   String METAINF_MANIFEST = "META-INF/ebean-generated-info.mf";
   String METAINF_SERVICES_MODULELOADER = "META-INF/services/io.ebean.config.EntityClassRegister";
 
-  String AVAJE_LANG_NULLABLE = "io.avaje.lang.Nullable";
+  String AVAJE_LANG_NULLABLE = "org.jspecify.annotations.Nullable";
   String JAVA_COLLECTION = "java.util.Collection";
 }
