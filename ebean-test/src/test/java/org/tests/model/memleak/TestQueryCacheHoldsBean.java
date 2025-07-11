@@ -23,4 +23,15 @@ public class TestQueryCacheHoldsBean extends BaseTestCase {
         .findOne();
     }
   }
+
+  @Test
+  void queryCacheHoldsBean() {
+    var query = DB.find(MemleakParent.class)
+      .where().eq("id", 989898)
+      .eq("child", DB.reference(MemleakChild.class, 4534535))
+      .setUseQueryCache(true);
+
+    query.findOne();
+    query.findOne();
+  }
 }

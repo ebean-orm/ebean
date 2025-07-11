@@ -25,7 +25,7 @@ public final class BindValuesKey {
    */
   public BindValuesKey add(Object value) {
     if (value instanceof EntityBean) {
-      // Only interested in id to keep the memory footprint low
+      // only interested in id to keep the memory footprint low
       Object id = server.beanId(value);
       if (id != null) {
         value = id;
@@ -44,6 +44,5 @@ public final class BindValuesKey {
   public int hashCode() {
     return values.hashCode();
   }
-
 
 }
