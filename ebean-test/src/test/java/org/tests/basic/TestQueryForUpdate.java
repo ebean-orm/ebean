@@ -2,10 +2,13 @@ package org.tests.basic;
 
 import io.ebean.*;
 import io.ebean.annotation.Platform;
+import io.ebean.annotation.TxIsolation;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.EBasic;
 import org.tests.model.basic.Order;
@@ -17,6 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryForUpdate extends BaseTestCase {
+
+  private static final Logger log = LoggerFactory.getLogger(TestQueryForUpdate.class);
 
   @Test
   public void testForUpdate() {
@@ -41,6 +46,52 @@ public class TestQueryForUpdate extends BaseTestCase {
     }
   }
 
+
+  @ForPlatform(Platform.YUGABYTE)
+  @Test
+  void concurrentForUpdate() throws InterruptedException {
+    ResetBasicData.reset();
+
+    Database db = DB.getDefault();
+    Thread t1 = new Thread() {
+      @Override
+      public void run() {
+        try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
+          log.info("(Y)Thread: before find");
+          DB.find(Customer.class)
+            .usingTransaction(transaction)
+            .forUpdate()
+            .findList();
+
+          log.info("(Y)Thread: after find");
+          try {
+            Thread.sleep(3000);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+          log.info("(Y)Thread: done");
+        }
+      }
+    };
+
+    t1.start();
+    Thread.sleep(300);
+
+    long start = System.currentTimeMillis();
+    try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
+      log.info("(Y)Main: before find");
+      DB.find(Customer.class)
+        .usingTransaction(transaction)
+        .forUpdate()
+        .findList();
+
+      log.info("(Y)Main: after find");
+    }
+
+    long exeMillis = System.currentTimeMillis() - start;
+    assertThat(exeMillis).isGreaterThan(2500);
+  }
+
   @Test
   public void testConcurrentForUpdate() throws InterruptedException {
 
@@ -49,45 +100,46 @@ public class TestQueryForUpdate extends BaseTestCase {
     Thread t1 = new Thread() {
       @Override
       public void run() {
-        try (final Transaction transaction = DB.beginTransaction()) {
-          System.out.println("Thread: before find");
+        try (final Transaction transaction = DB.createTransaction()) {
+          log.info("Thread: before find");
           DB.find(Customer.class)
+            .usingTransaction(transaction)
             .forUpdate()
            // .orderBy().desc("1") // this would help by the locks in DB2
             .findList();
 
-          System.out.println("Thread: after find");
+          log.info("Thread: after find");
           try {
             Thread.sleep(3000);
           } catch (InterruptedException e) {
             throw new RuntimeException(e);
           }
-          System.out.println("Thread: done");
+          log.info("Thread: done");
         }
       }
     };
 
     t1.start();
 
-    Thread.sleep(100);
+    Thread.sleep(300);
 
     long start = System.currentTimeMillis();
     try (final Transaction transaction = DB.beginTransaction()) {
       if (isH2()) {
         DB.sqlUpdate("SET LOCK_TIMEOUT 5000").execute();
       }
-      System.out.println("Main: before find");
+      log.info("Main: before find");
       DB.find(Customer.class)
+        .usingTransaction(transaction)
         .forUpdate()
         //.orderBy().desc("1") // this would help by the locks in DB2
         .findList();
 
-      System.out.println("Main: after find");
+      log.info("Main: after find");
     }
 
-    start = System.currentTimeMillis() - start;
-
-    assertThat(start).isGreaterThan(2800);
+    long exeMillis = System.currentTimeMillis() - start;
+    assertThat(exeMillis).isGreaterThan(2500);
 
   }
 
