@@ -2,6 +2,7 @@ package org.tests.basic;
 
 import io.ebean.*;
 import io.ebean.annotation.Platform;
+import io.ebean.annotation.TxIsolation;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.ForPlatform;
@@ -45,56 +46,52 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
 // Nah, nothing to do with repeatable read here
-//  @ForPlatform(Platform.YUGABYTE)
-//  @Test
-//  void concurrentForUpdate() throws InterruptedException {
-//    ResetBasicData.reset();
-//
-//    Database db = DB.getDefault();
-//    Thread t1 = new Thread() {
-//      @Override
-//      public void run() {
-//        try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
-//          log2.info("(REPEATABLE_READ) Thread: before find");
-//          List<Country> list = DB.find(Country.class)
-//            .usingTransaction(transaction)
-//            .forUpdate()
-//            .findList();
-//
-//          Country first = list.get(0);
-//          db.markAsDirty(first);
-//          db.save(first, transaction);
-//
-//          log2.info("(REPEATABLE_READ) Thread: after find - size:{}", list.size());
-//          try {
-//            Thread.sleep(3000);
-//          } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//          }
-//          log2.info("(REPEATABLE_READ) Thread: done");
-//        }
-//      }
-//    };
-//
-//    t1.start();
-//    Thread.sleep(300);
-//
-//    long start = System.currentTimeMillis();
-//    try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
-//      log2.info("(REPEATABLE_READ) Main: before find, should wait ...");
-//      DB.find(Country.class)
-//        .usingTransaction(transaction)
-//        .forUpdate()
-//        .findList();
-//
-//      log2.info("(REPEATABLE_READ) Main: complete");
-//    }
-//
-//    long exeMillis = System.currentTimeMillis() - start;
-//    assertThat(exeMillis).isGreaterThan(2500);
-//  }
+  @ForPlatform(Platform.YUGABYTE)
+  @Test
+  void concurrentForUpdate() throws InterruptedException {
+    ResetBasicData.reset();
 
-  @IgnorePlatform(Platform.YUGABYTE) // ignore this for yugabyte and see if everything else passes
+    Database db = DB.getDefault();
+    Thread t1 = new Thread() {
+      @Override
+      public void run() {
+        try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
+          log2.info("(REPEATABLE_READ) Thread: before find");
+          List<Country> list = DB.find(Country.class)
+            .usingTransaction(transaction)
+            .forUpdate()
+            .findList();
+
+          try {
+            log2.info("(REPEATABLE_READ) Thread: after find - size:{}, hold locks for some time", list.size());
+            Thread.sleep(500);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+          log2.info("(REPEATABLE_READ) Thread: done, release locks");
+        }
+      }
+    };
+
+    t1.start();
+    Thread.sleep(100);
+
+    long start = System.currentTimeMillis();
+    try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
+      log2.info("(REPEATABLE_READ) Main: before find, should wait for locks to be released...");
+      DB.find(Country.class)
+        .usingTransaction(transaction)
+        .forUpdate()
+        .findList();
+
+      log2.info("(REPEATABLE_READ) Main: complete");
+    }
+
+    long exeMillis = System.currentTimeMillis() - start;
+    assertThat(exeMillis).isGreaterThan(300);
+  }
+
+//  @IgnorePlatform(Platform.YUGABYTE) // ignore this for yugabyte and see if everything else passes
   @Test
   public void testConcurrentForUpdate() throws InterruptedException {
     ResetBasicData.reset();
@@ -115,18 +112,18 @@ public class TestQueryForUpdate extends BaseTestCase {
         db.save(first, transaction);
 
         try {
-          log.info("Thread: after find - rows locked:{}, hold for 3 seconds", list.size());
-          Thread.sleep(3000);
+          log.info("Thread: after find - rows locked:{}, hold for 700ms", list.size());
+          Thread.sleep(600); // 3000
         } catch (InterruptedException e) {
           throw new RuntimeException(e);
         }
-        log.info("Thread: done");
+        log.info("Thread: done, releasing locks");
       } // transaction ended here via try-with-resources
     });
 
     t1.start();
 
-    Thread.sleep(300);
+    Thread.sleep(100);
 
     long start = System.currentTimeMillis();
     try (final Transaction transaction = db.beginTransaction()) { // second transaction
@@ -146,7 +143,7 @@ public class TestQueryForUpdate extends BaseTestCase {
     long exeMillis = System.currentTimeMillis() - start;
     assertThat(exeMillis)
       .describedAs("select for update expected to wait")
-      .isGreaterThan(2500);
+      .isGreaterThan(400); // 2500
   }
 
   @Test
