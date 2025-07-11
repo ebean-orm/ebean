@@ -57,19 +57,23 @@ public class TestQueryForUpdate extends BaseTestCase {
       @Override
       public void run() {
         try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
-          log.info("(Y)Thread: before find");
-          DB.find(Customer.class)
+          log.info("(REPEATABLE_READ)Thread: before find");
+          List<Customer> list = DB.find(Customer.class)
             .usingTransaction(transaction)
             .forUpdate()
             .findList();
 
-          log.info("(Y)Thread: after find");
+          Customer first = list.get(0);
+          db.markAsDirty(first);
+          db.save(first, transaction);
+
+          log.info("(REPEATABLE_READ)Thread: after find");
           try {
             Thread.sleep(3000);
           } catch (InterruptedException e) {
             throw new RuntimeException(e);
           }
-          log.info("(Y)Thread: done");
+          log.info("(REPEATABLE_READ)Thread: done");
         }
       }
     };
@@ -79,13 +83,13 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     long start = System.currentTimeMillis();
     try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
-      log.info("(Y)Main: before find");
+      log.info("(REPEATABLE_READ)Main: before find");
       DB.find(Customer.class)
         .usingTransaction(transaction)
         .forUpdate()
         .findList();
 
-      log.info("(Y)Main: after find");
+      log.info("(REPEATABLE_READ)Main: after find");
     }
 
     long exeMillis = System.currentTimeMillis() - start;
