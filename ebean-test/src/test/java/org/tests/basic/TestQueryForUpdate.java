@@ -114,15 +114,14 @@ public class TestQueryForUpdate extends BaseTestCase {
         db.markAsDirty(first);
         db.save(first, transaction);
 
-        log.info("Thread: after find - size:{}", list.size());
         try {
-          // hold onto the locks for 3 seconds, and then end the transaction
+          log.info("Thread: after find - rows locked:{}, hold for 3 seconds", list.size());
           Thread.sleep(3000);
         } catch (InterruptedException e) {
           throw new RuntimeException(e);
         }
         log.info("Thread: done");
-      }
+      } // transaction ended here via try-with-resources
     });
 
     t1.start();
@@ -130,11 +129,11 @@ public class TestQueryForUpdate extends BaseTestCase {
     Thread.sleep(300);
 
     long start = System.currentTimeMillis();
-    try (final Transaction transaction = db.beginTransaction()) {
+    try (final Transaction transaction = db.beginTransaction()) { // second transaction
       if (isH2()) {
         DB.sqlUpdate("SET LOCK_TIMEOUT 5000").execute();
       }
-      log.info("Main: before find, should wait ...");
+      log.info("Main: before find, should wait (blocked by other thread) ...");
       DB.find(Customer.class)
         .usingTransaction(transaction)
         .forUpdate()
@@ -142,10 +141,12 @@ public class TestQueryForUpdate extends BaseTestCase {
         .findList();
 
       log.info("Main: complete");
-    }
+    } // end second transaction
 
     long exeMillis = System.currentTimeMillis() - start;
-    assertThat(exeMillis).isGreaterThan(2500);
+    assertThat(exeMillis)
+      .describedAs("select for update expected to wait")
+      .isGreaterThan(2500);
   }
 
   @Test

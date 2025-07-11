@@ -1,13 +1,16 @@
 package org.tests.el;
 
+import io.ebean.annotation.Platform;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
 class TestRawExpressionInterpolation extends BaseTestCase {
 
+  @IgnorePlatform(Platform.ORACLE)
   @Test
   void test() {
 
