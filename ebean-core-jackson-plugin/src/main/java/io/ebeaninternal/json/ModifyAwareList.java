@@ -1,17 +1,13 @@
 package io.ebeaninternal.json;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Objects;
-
 import io.ebean.ModifyAwareType;
 
-/** Modify aware wrapper of a list. */
+import java.io.Serializable;
+import java.util.*;
+
+/**
+ * Modify aware wrapper of a list.
+ */
 public final class ModifyAwareList<E> implements List<E>, ModifyAwareType, Serializable {
 
   private static final long serialVersionUID = 1;
@@ -196,7 +192,9 @@ public final class ModifyAwareList<E> implements List<E>, ModifyAwareType, Seria
     return new ModifyAwareList<>(owner, list.subList(fromIndex, toIndex));
   }
 
-  /** Create an return a modify aware Set. */
+  /**
+   * Create an return a modify aware Set.
+   */
   public ModifyAwareSet<E> asSet() {
     return new ModifyAwareSet<>(owner, new LinkedHashSet<>(list));
   }

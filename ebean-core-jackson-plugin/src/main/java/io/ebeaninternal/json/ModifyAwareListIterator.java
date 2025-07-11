@@ -1,10 +1,12 @@
 package io.ebeaninternal.json;
 
-import java.util.ListIterator;
-
 import io.ebean.ModifyAwareType;
 
-/** Modify aware wrapper of a ListIterator. */
+import java.util.ListIterator;
+
+/**
+ * Modify aware wrapper of a ListIterator.
+ */
 public final class ModifyAwareListIterator<E> implements ListIterator<E> {
 
   final ModifyAwareType owner;

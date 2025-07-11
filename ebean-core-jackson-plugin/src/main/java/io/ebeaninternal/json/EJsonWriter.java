@@ -1,5 +1,8 @@
 package io.ebeaninternal.json;
 
+import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.core.JsonGenerator;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -11,13 +14,17 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-
 final class EJsonWriter {
 
-  /** Base jsonFactory implementation used when it is not passed in. */
+  /**
+   * Base jsonFactory implementation used when it is not passed in.
+   */
   static final JsonFactory jsonFactory = new JsonFactory();
+  private final JsonGenerator jsonGenerator;
+
+  private EJsonWriter(JsonGenerator jsonGenerator) {
+    this.jsonGenerator = jsonGenerator;
+  }
 
   static String write(Object object) throws IOException {
     StringWriter writer = new StringWriter(200);
@@ -36,15 +43,8 @@ final class EJsonWriter {
     new EJsonWriter(jsonGenerator).writeJson(object);
   }
 
-  static void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator)
-      throws IOException {
+  static void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator) throws IOException {
     new EJsonWriter(jsonGenerator).writeCollection(null, collection);
-  }
-
-  private final JsonGenerator jsonGenerator;
-
-  private EJsonWriter(JsonGenerator jsonGenerator) {
-    this.jsonGenerator = jsonGenerator;
   }
 
   private void writeJson(Object object) {

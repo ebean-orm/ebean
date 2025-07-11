@@ -1,8 +1,8 @@
 package io.ebeaninternal.json;
 
-import java.io.Serializable;
-
 import io.ebean.ModifyAwareType;
+
+import java.io.Serializable;
 
 /**
  * Detects when content has been modified and as such needs to be persisted (included in an update).

@@ -1,16 +1,13 @@
 package io.ebeaninternal.json;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-
 import io.ebean.ModifyAwareType;
 
-/** Map that is wraps an underlying map for the purpose of detecting changes. */
+import java.io.Serializable;
+import java.util.*;
+
+/**
+ * Map that is wraps an underlying map for the purpose of detecting changes.
+ */
 public final class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, Serializable {
 
   private static final long serialVersionUID = 1;

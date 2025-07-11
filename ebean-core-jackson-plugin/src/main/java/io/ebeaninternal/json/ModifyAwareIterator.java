@@ -1,10 +1,12 @@
 package io.ebeaninternal.json;
 
-import java.util.Iterator;
-
 import io.ebean.ModifyAwareType;
 
-/** Wraps an iterator for the purposes of detecting modifications. */
+import java.util.Iterator;
+
+/**
+ * Wraps an iterator for the purposes of detecting modifications.
+ */
 public final class ModifyAwareIterator<E> implements Iterator<E> {
 
   private final ModifyAwareType owner;

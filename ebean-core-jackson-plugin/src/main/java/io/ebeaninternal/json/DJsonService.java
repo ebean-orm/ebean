@@ -43,8 +43,7 @@ public final class DJsonService implements SpiJsonService {
    * Write the collection as json array to the jsonGenerator.
    */
   @Override
-  public void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator)
-    throws IOException {
+  public void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator) throws IOException {
     EJsonWriter.writeCollection(collection, jsonGenerator);
   }
 
