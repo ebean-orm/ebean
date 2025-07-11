@@ -27,7 +27,7 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
-      <artifactId>ebean-core-jackson-plugin</artifactId>
+      <artifactId>ebean-core-json</artifactId>
       <version>16.0.0-RC3</version>
     </dependency>
 

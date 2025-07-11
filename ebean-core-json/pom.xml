@@ -5,7 +5,7 @@
     <artifactId>ebean-parent</artifactId>
     <version>16.0.0-RC3</version>
   </parent>
-  <artifactId>ebean-core-jackson-plugin</artifactId>
+  <artifactId>ebean-core-json</artifactId>
   <scm>
     <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
     <tag>HEAD</tag>
