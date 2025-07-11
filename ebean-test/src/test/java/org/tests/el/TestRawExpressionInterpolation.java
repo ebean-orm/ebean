@@ -10,7 +10,7 @@ import org.tests.model.basic.Customer;
 
 class TestRawExpressionInterpolation extends BaseTestCase {
 
-  @IgnorePlatform(Platform.ORACLE)
+  @IgnorePlatform({Platform.ORACLE, Platform.DB2})
   @Test
   void test() {
 

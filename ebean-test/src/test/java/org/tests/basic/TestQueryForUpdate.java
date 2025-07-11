@@ -19,8 +19,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryForUpdate extends BaseTestCase {
 
-  private static final Logger log = LoggerFactory.getLogger("testConcurrentForUpdate");
-  private static final Logger log2 = LoggerFactory.getLogger("repeatableRead");
+  private static final Logger log = LoggerFactory.getLogger(TestQueryForUpdate.class);
 
   @Test
   public void testForUpdate() {
@@ -45,7 +44,7 @@ public class TestQueryForUpdate extends BaseTestCase {
     }
   }
 
-// Nah, nothing to do with repeatable read here
+  // Nah, nothing to do with repeatable read here
   @ForPlatform(Platform.YUGABYTE)
   @Test
   void concurrentForUpdate() throws InterruptedException {
@@ -56,19 +55,19 @@ public class TestQueryForUpdate extends BaseTestCase {
       @Override
       public void run() {
         try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
-          log2.info("(REPEATABLE_READ) Thread: before find");
+          log.info("(REPEATABLE_READ) Thread: before find");
           List<Country> list = DB.find(Country.class)
             .usingTransaction(transaction)
             .forUpdate()
             .findList();
 
           try {
-            log2.info("(REPEATABLE_READ) Thread: after find - size:{}, hold locks for some time", list.size());
+            log.info("(REPEATABLE_READ) Thread: after find - size:{}, hold locks for some time", list.size());
             Thread.sleep(500);
           } catch (InterruptedException e) {
             throw new RuntimeException(e);
           }
-          log2.info("(REPEATABLE_READ) Thread: done, release locks");
+          log.info("(REPEATABLE_READ) Thread: done, release locks");
         }
       }
     };
@@ -78,13 +77,13 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     long start = System.currentTimeMillis();
     try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
-      log2.info("(REPEATABLE_READ) Main: before find, should wait for locks to be released...");
+      log.info("(REPEATABLE_READ) Main: before find, should wait for locks to be released...");
       DB.find(Country.class)
         .usingTransaction(transaction)
         .forUpdate()
         .findList();
 
-      log2.info("(REPEATABLE_READ) Main: complete");
+      log.info("(REPEATABLE_READ) Main: complete");
     }
 
     long exeMillis = System.currentTimeMillis() - start;
@@ -103,13 +102,7 @@ public class TestQueryForUpdate extends BaseTestCase {
         List<Customer> list = DB.find(Customer.class)
           .usingTransaction(transaction)
           .forUpdate()
-          // .orderBy().desc("1") // this would help by the locks in DB2
           .findList();
-
-        // yugabyte: performing an update does not change the behaviour
-        Customer first = list.get(0);
-        db.markAsDirty(first);
-        db.save(first, transaction);
 
         try {
           log.info("Thread: after find - rows locked:{}, hold for 700ms", list.size());
