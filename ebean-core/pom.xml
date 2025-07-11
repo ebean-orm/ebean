@@ -27,6 +27,12 @@
 
     <dependency>
       <groupId>io.ebean</groupId>
+      <artifactId>ebean-core-json</artifactId>
+      <version>16.0.0-RC3</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-runner</artifactId>
       <version>${ebean-ddl-runner.version}</version>
     </dependency>

@@ -14,9 +14,8 @@ public final class ModifyAwareIterator<E> implements Iterator<E> {
 
   /**
    * Create with an Owner and the underlying Iterator this wraps.
-   * <p>
-   * The owner is notified of the removals.
-   * </p>
+   *
+   * <p>The owner is notified of the removals.
    */
   public ModifyAwareIterator(ModifyAwareType owner, Iterator<E> it) {
     this.owner = owner;
@@ -38,5 +37,4 @@ public final class ModifyAwareIterator<E> implements Iterator<E> {
     owner.setMarkedDirty(true);
     it.remove();
   }
-
 }

@@ -34,11 +34,11 @@ public final class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, S
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o instanceof ModifyAwareMap) {
-      ModifyAwareMap<?,?> that = (ModifyAwareMap<?,?>) o;
+      ModifyAwareMap<?, ?> that = (ModifyAwareMap<?, ?>) o;
       return Objects.equals(map, that.map);
     }
     if (!(o instanceof Map)) return false;
-    Map<?,?> that = (Map<?,?>) o;
+    Map<?, ?> that = (Map<?, ?>) o;
     return Objects.equals(map, that);
   }
 
@@ -112,7 +112,6 @@ public final class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, S
     map.putAll(m);
   }
 
-
   @Override
   public void clear() {
     if (!map.isEmpty()) {
@@ -135,5 +134,4 @@ public final class ModifyAwareMap<K, V> implements Map<K, V>, ModifyAwareType, S
   public Set<Map.Entry<K, V>> entrySet() {
     return new ModifyAwareSet<>(this, map.entrySet());
   }
-
 }

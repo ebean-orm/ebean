@@ -22,5 +22,4 @@ public final class ModifyAwareFlag implements ModifyAwareType, Serializable {
   public void setMarkedDirty(boolean markedDirty) {
     this.markedDirty = markedDirty;
   }
-
 }

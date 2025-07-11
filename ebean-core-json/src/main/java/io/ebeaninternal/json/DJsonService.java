@@ -8,11 +8,7 @@ import io.ebean.service.SpiJsonService;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.Collection;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Utility that converts between JSON content and simple java Maps/Lists.
@@ -52,8 +48,8 @@ public final class DJsonService implements SpiJsonService {
   }
 
   /**
-   * Parse the json and return as a Map additionally specifying if the returned map should
-   * be modify aware meaning that it can detect when it has been modified.
+   * Parse the json and return as a Map additionally specifying if the returned map should be modify
+   * aware meaning that it can detect when it has been modified.
    */
   @Override
   public Map<String, Object> parseObject(String json, boolean modifyAware) throws IOException {
@@ -94,9 +90,8 @@ public final class DJsonService implements SpiJsonService {
 
   /**
    * Parse the json and return as a Map taking a JsonParser and a starting token.
-   * <p>
-   * Used when the first token is checked to see if the value is null prior to calling this.
-   * </p>
+   *
+   * <p>Used when the first token is checked to see if the value is null prior to calling this.
    */
   @Override
   public Map<String, Object> parseObject(JsonParser parser, JsonToken token) throws IOException {
