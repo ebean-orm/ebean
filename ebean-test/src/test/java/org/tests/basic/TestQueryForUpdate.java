@@ -97,16 +97,21 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     ResetBasicData.reset();
 
+    Database db = DB.getDefault();
     Thread t1 = new Thread() {
       @Override
       public void run() {
-        try (final Transaction transaction = DB.createTransaction()) {
+        try (final Transaction transaction = db.createTransaction()) {
           log.info("Thread: before find");
-          DB.find(Customer.class)
+          List<Customer> list = DB.find(Customer.class)
             .usingTransaction(transaction)
             .forUpdate()
-           // .orderBy().desc("1") // this would help by the locks in DB2
+            // .orderBy().desc("1") // this would help by the locks in DB2
             .findList();
+
+          Customer first = list.get(0);
+          db.markAsDirty(first);
+          db.save(first, transaction);
 
           log.info("Thread: after find");
           try {
@@ -124,7 +129,7 @@ public class TestQueryForUpdate extends BaseTestCase {
     Thread.sleep(300);
 
     long start = System.currentTimeMillis();
-    try (final Transaction transaction = DB.beginTransaction()) {
+    try (final Transaction transaction = db.beginTransaction()) {
       if (isH2()) {
         DB.sqlUpdate("SET LOCK_TIMEOUT 5000").execute();
       }
