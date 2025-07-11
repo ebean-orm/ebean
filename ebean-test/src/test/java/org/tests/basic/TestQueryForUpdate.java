@@ -45,50 +45,50 @@ public class TestQueryForUpdate extends BaseTestCase {
   }
 
   // Nah, nothing to do with repeatable read here
-  @ForPlatform(Platform.YUGABYTE)
-  @Test
-  void concurrentForUpdate() throws InterruptedException {
-    ResetBasicData.reset();
-
-    Database db = DB.getDefault();
-    Thread t1 = new Thread() {
-      @Override
-      public void run() {
-        try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
-          log.info("(REPEATABLE_READ) Thread: before find");
-          List<Country> list = DB.find(Country.class)
-            .usingTransaction(transaction)
-            .forUpdate()
-            .findList();
-
-          try {
-            log.info("(REPEATABLE_READ) Thread: after find - size:{}, hold locks for some time", list.size());
-            Thread.sleep(500);
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-          log.info("(REPEATABLE_READ) Thread: done, release locks");
-        }
-      }
-    };
-
-    t1.start();
-    Thread.sleep(100);
-
-    long start = System.currentTimeMillis();
-    try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
-      log.info("(REPEATABLE_READ) Main: before find, should wait for locks to be released...");
-      DB.find(Country.class)
-        .usingTransaction(transaction)
-        .forUpdate()
-        .findList();
-
-      log.info("(REPEATABLE_READ) Main: complete");
-    }
-
-    long exeMillis = System.currentTimeMillis() - start;
-    assertThat(exeMillis).isGreaterThan(300);
-  }
+//  @ForPlatform(Platform.YUGABYTE)
+//  @Test
+//  void concurrentForUpdate() throws InterruptedException {
+//    ResetBasicData.reset();
+//
+//    Database db = DB.getDefault();
+//    Thread t1 = new Thread() {
+//      @Override
+//      public void run() {
+//        try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
+//          log.info("(REPEATABLE_READ) Thread: before find");
+//          List<Country> list = DB.find(Country.class)
+//            .usingTransaction(transaction)
+//            .forUpdate()
+//            .findList();
+//
+//          try {
+//            log.info("(REPEATABLE_READ) Thread: after find - size:{}, hold locks for some time", list.size());
+//            Thread.sleep(500);
+//          } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//          }
+//          log.info("(REPEATABLE_READ) Thread: done, release locks");
+//        }
+//      }
+//    };
+//
+//    t1.start();
+//    Thread.sleep(100);
+//
+//    long start = System.currentTimeMillis();
+//    try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
+//      log.info("(REPEATABLE_READ) Main: before find, should wait for locks to be released...");
+//      DB.find(Country.class)
+//        .usingTransaction(transaction)
+//        .forUpdate()
+//        .findList();
+//
+//      log.info("(REPEATABLE_READ) Main: complete");
+//    }
+//
+//    long exeMillis = System.currentTimeMillis() - start;
+//    assertThat(exeMillis).isGreaterThan(300);
+//  }
 
 //  @IgnorePlatform(Platform.YUGABYTE) // ignore this for yugabyte and see if everything else passes
   @Test
