@@ -342,6 +342,15 @@ public final class OrmQueryProperties implements Serializable {
     return included == null || included.contains(propName);
   }
 
+  // TODO: we need a function to extend the previous select. This is just a sketch
+  public void addSelect(String prop) {
+    // This isn't 100% correct either. Included is final, so if it was initialized to null, that means we haven't had a select yet --> we can't extend it anymore?
+    // But perhaps we've already checked this case with the hasSelectClause in fetchInternal
+    if(included != null) {
+      included.add(prop);
+    }
+  }
+
   /**
    * Mark this path as needing to be a query join.
    */
