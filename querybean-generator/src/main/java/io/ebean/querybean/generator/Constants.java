@@ -4,6 +4,7 @@ interface Constants {
 
   String AT_GENERATED = "@io.ebean.typequery.Generated(\"io.ebean.querybean.generator\")";
   String AT_TYPEQUERYBEAN = "@io.ebean.typequery.TypeQueryBean(\"v1\")";
+  String TYPEQUERYBEAN = "io.ebean.typequery.TypeQueryBean";
   String GENERATED = "io.ebean.typequery.Generated";
 
   String ONE_TO_MANY = "jakarta.persistence.OneToMany";
