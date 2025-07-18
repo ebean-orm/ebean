@@ -195,4 +195,8 @@ public final class PersistRequestUpdateSql extends PersistRequest {
     }
   }
 
+  @Override
+  public Object identifier() {
+    return bindLog; // CHECKME: Would we leak internal states here?
+  }
 }

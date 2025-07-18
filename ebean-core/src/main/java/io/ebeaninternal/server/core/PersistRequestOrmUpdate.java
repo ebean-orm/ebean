@@ -106,4 +106,9 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
       }
     }
   }
+
+  @Override
+  public Object identifier() {
+    return bindLog;
+  }
 }

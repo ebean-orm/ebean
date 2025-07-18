@@ -1455,4 +1455,8 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     return controller;
   }
 
+  @Override
+  public Object identifier() {
+    return beanDescriptor.id(bean);
+  }
 }

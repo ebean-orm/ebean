@@ -133,4 +133,9 @@ public final class PersistRequestCallableSql extends PersistRequest {
       }
     }
   }
+
+  @Override
+  public Object identifier() {
+    return bindLog;
+  }
 }

@@ -52,4 +52,11 @@ public interface BatchPostExecute {
   default void undo() {
 
   }
+  /*
+   * An identifier.
+   * <p>
+   * This is used in BatchedSqlException for debugging.
+   */
+  Object identifier();
+
 }

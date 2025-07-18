@@ -1,12 +1,12 @@
 package org.tests.batchinsert;
 
-import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Transaction;
-import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.Transactional;
+import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
@@ -14,6 +14,8 @@ import org.tests.model.basic.UTMaster;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 //import static org.assertj.core.api.Assertions.assertThat;
 //import static org.junit.jupiter.api.Assertions.assertNull;
@@ -64,6 +66,30 @@ public class TestBatchInsertSimple extends BaseTestCase {
       // the save is 'batched' and does not execute immediately
       // ... it now acts more like 'merge/persist'
       master.save();
+    }
+  }
+
+  @Test
+  public void testBatchCollision() {
+
+    UTMaster m1 = new UTMaster();
+    m1.setId(1000);
+    m1.save();
+
+
+    try (Transaction transaction = DB.beginTransaction()) {
+      transaction.setBatchMode(true);
+
+      UTMaster m2 = new UTMaster();
+      m2.setId(1000);
+      m2.save();
+      UTMaster m3 = new UTMaster();
+      m3.setId(1001);
+      m3.save();
+      // we expect the IDs of the affected models to make debugging easier.
+      assertThatThrownBy(transaction::commit)
+        .hasMessageContaining("Error when batch flush on: [1000, 1001], sql: insert into ut_master");
+
     }
   }
 
