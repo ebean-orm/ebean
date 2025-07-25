@@ -112,7 +112,6 @@ public class EBasic {
   @NotNull
   String indextest7;
 
-  @DbMigration(preAlter = "--")
   @DbDefault("0")
   @NotNull
   Integer defaultTest;

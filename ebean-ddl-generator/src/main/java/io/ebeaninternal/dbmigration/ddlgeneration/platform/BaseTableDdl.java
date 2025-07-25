@@ -751,7 +751,9 @@ public class BaseTableDdl implements TableDdl {
           alterHistoryColumn.setColumnName(alter.getColumnName());
           // ignore default value (not needed on history tables)
           alterHistoryColumn.setCurrentType(alter.getCurrentType());
+          alterHistoryColumn.setCurrentDefaultValue(alter.getCurrentDefaultValue());
           alterHistoryColumn.setType(alter.getType());
+          alterHistoryColumn.setDefaultValue(alter.getDefaultValue());
           if (syncExact) {
             alterHistoryColumn.setCurrentNotnull(alter.isCurrentNotnull());
             alterHistoryColumn.setNotnull(alter.isNotnull());
