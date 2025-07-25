@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.8.1-FOC18-SNAPSHOT</version>
+    <version>14.8.1-FOC18</version>
   </parent>
 
   <name>ebean test</name>
@@ -33,20 +33,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>14.8.1-FOC18-SNAPSHOT</version>
+      <version>14.8.1-FOC18</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>14.8.1-FOC18-SNAPSHOT</version>
+      <version>14.8.1-FOC18</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>14.8.1-FOC18-SNAPSHOT</version>
+      <version>14.8.1-FOC18</version>
     </dependency>
 
     <dependency>
@@ -149,14 +149,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-mapper</artifactId>
-      <version>14.8.1-FOC18-SNAPSHOT</version>
+      <version>14.8.1-FOC18</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>14.8.1-FOC18-SNAPSHOT</version>
+      <version>14.8.1-FOC18</version>
       <scope>test</scope>
     </dependency>
 
