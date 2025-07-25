@@ -89,6 +89,11 @@ public class EBasic {
   @Size(max=127)
   String indextest6;
 
+  @Index(unique = true)
+  @Size(max=127)
+  @NotNull
+  String indextest7;
+
   @NotNull
   @DbDefault("23") // required for revert
   int user_id;
