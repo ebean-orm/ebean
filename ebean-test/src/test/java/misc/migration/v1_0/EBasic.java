@@ -94,6 +94,9 @@ public class EBasic {
   @NotNull
   String indextest7;
 
+  @DbDefault("0")
+  Integer defaultTest;
+
   @NotNull
   int user_id;
 
