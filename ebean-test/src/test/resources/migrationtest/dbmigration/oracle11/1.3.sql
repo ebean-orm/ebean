@@ -136,6 +136,7 @@ alter table migtest_e_basic modify status2 not null;
 alter table migtest_e_basic modify a_lob varchar2(255);
 alter table migtest_e_basic modify a_lob default 'X';
 alter table migtest_e_basic modify a_lob not null;
+alter table migtest_e_basic modify default_test null;
 alter table migtest_e_basic modify user_id default 23;
 alter table migtest_e_basic modify user_id not null;
 alter table migtest_e_basic add description_file blob;

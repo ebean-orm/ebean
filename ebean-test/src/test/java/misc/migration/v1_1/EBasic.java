@@ -112,6 +112,10 @@ public class EBasic {
   @NotNull
   String indextest7;
 
+  @DbDefault("0")
+  @NotNull
+  Integer defaultTest;
+
   @NotNull
   @DbDefault("0")
   Progress progress;

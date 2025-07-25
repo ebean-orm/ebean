@@ -63,6 +63,7 @@ create table migtest_e_basic (
   old_boolean                   boolean default false not null,
   old_boolean2                  boolean,
   eref_id                       integer,
+  default_test                  integer default 0,
   user_id                       integer not null,
   status                        varchar(1),
   status2                       varchar(1) default 'N' not null,

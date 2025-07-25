@@ -74,6 +74,7 @@ create table migtest_e_basic (
   indextest5                    varchar(127),
   indextest6                    varchar(127),
   indextest7                    varchar(127) not null,
+  default_test                  integer default 0,
   user_id                       integer not null,
   constraint uq_migtest_e_basic_indextest2 unique (indextest2),
   constraint uq_migtest_e_basic_indextest6 unique (indextest6),

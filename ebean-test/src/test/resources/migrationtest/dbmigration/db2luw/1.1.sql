@@ -251,6 +251,8 @@ update migtest_e_basic set status = 'A' where status is null;
 -- db2 does not support parial null indices :( - so we have to clean;
 update migtest_e_basic set status = 'N' where id = 1;
 
+update migtest_e_basic set default_test = 0 where default_test is null;
+
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_E_BASIC','USERSPACE1','USERSPACE1','USERSPACE1','','','','','','MOVE');
 
@@ -282,6 +284,7 @@ alter table migtest_e_basic alter column status2 drop default;
 alter table migtest_e_basic alter column status2 drop not null;
 alter table migtest_e_basic alter column a_lob drop default;
 alter table migtest_e_basic alter column a_lob drop not null;
+alter table migtest_e_basic alter column default_test set not null;
 alter table migtest_e_basic alter column user_id drop not null;
 alter table migtest_e_basic add column new_string_field varchar(255) default 'foo''bar' not null;
 alter table migtest_e_basic add column new_boolean_field boolean default true not null;
@@ -301,6 +304,7 @@ alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;
 alter table migtest_e_history2 add column new_column varchar(20);
 call sysproc.admin_cmd('reorg table migtest_e_history2 ${reorgArgs}');
+alter table migtest_e_history2_history alter column test_string set default 'unknown';
 alter table migtest_e_history2_history alter column test_string set not null;
 alter table migtest_e_history2_history add column test_string2 varchar(255);
 alter table migtest_e_history2_history add column test_string3 varchar(255) default 'unknown' not null;
@@ -316,6 +320,7 @@ alter table migtest_e_history6 alter column test_number1 set default 42;
 alter table migtest_e_history6 alter column test_number1 set not null;
 alter table migtest_e_history6 alter column test_number2 drop not null;
 call sysproc.admin_cmd('reorg table migtest_e_history6 ${reorgArgs}');
+alter table migtest_e_history6_history alter column test_number1 set default 42;
 alter table migtest_e_history6_history alter column test_number1 set not null;
 alter table migtest_e_history6_history alter column test_number2 drop not null;
 call sysproc.admin_cmd('reorg table migtest_e_history6_history ${reorgArgs}');

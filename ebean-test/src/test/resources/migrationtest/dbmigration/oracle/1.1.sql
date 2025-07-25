@@ -218,6 +218,8 @@ update migtest_e_basic set status = 'A' where status is null;
 
 -- rename all collisions;
 
+update migtest_e_basic set default_test = 0 where default_test is null;
+
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 
 -- NOTE: table has @History - special migration may be necessary
@@ -239,6 +241,7 @@ alter table migtest_e_basic modify status2 default null;
 alter table migtest_e_basic modify status2 null;
 alter table migtest_e_basic modify a_lob default null;
 alter table migtest_e_basic modify a_lob null;
+alter table migtest_e_basic modify default_test not null;
 alter table migtest_e_basic modify user_id null;
 alter table migtest_e_basic add new_string_field varchar2(255) default 'foo''bar' not null;
 alter table migtest_e_basic add new_boolean_field number(1) default 1 not null;

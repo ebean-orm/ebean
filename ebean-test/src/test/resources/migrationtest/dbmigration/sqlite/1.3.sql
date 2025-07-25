@@ -63,6 +63,7 @@ update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 -- not supported: alter table migtest_e_basic alter column a_lob varchar(255);
 -- not supported: alter table migtest_e_basic alter column a_lob set default 'X';
 -- not supported: alter table migtest_e_basic alter column a_lob set not null;
+-- not supported: alter table migtest_e_basic alter column default_test set null;
 -- not supported: alter table migtest_e_basic alter column user_id set default 23;
 -- not supported: alter table migtest_e_basic alter column user_id set not null;
 alter table migtest_e_basic add column description_file blob;

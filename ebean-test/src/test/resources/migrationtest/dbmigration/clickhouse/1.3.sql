@@ -38,6 +38,7 @@ alter table migtest_e_basic alter column status2 set not null;
 alter table migtest_e_basic alter column a_lob String;
 alter table migtest_e_basic alter column a_lob set default 'X';
 alter table migtest_e_basic alter column a_lob set not null;
+alter table migtest_e_basic alter column default_test set null;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
 alter table migtest_e_basic add column description_file blob;
