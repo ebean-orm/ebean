@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.8.1-FOC19-SNAPSHOT</version>
+    <version>14.8.1-FOC19</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -14,7 +14,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>14.8.1-FOC19-SNAPSHOT</version>
+      <version>14.8.1-FOC19</version>
       <scope>provided</scope>
     </dependency>
 
