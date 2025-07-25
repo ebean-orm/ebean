@@ -8,8 +8,8 @@ import io.ebeaninternal.server.persist.BatchedPstmt;
 import io.ebeaninternal.server.persist.BatchedPstmtHolder;
 import io.ebeaninternal.server.persist.dmlbind.BindableRequest;
 import io.ebeaninternal.server.bind.DataBind;
-
 import jakarta.persistence.OptimisticLockException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -86,6 +86,9 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
     final long startNanos = System.nanoTime();
     try {
       return execute();
+    } catch (Throwable t) {
+      persistRequest.undo();
+      throw t;
     } finally {
       persistRequest.addTimingNoBatch(startNanos);
     }

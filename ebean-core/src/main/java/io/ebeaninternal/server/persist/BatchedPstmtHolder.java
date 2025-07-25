@@ -119,6 +119,7 @@ public final class BatchedPstmtHolder {
         loadBack(copyMap);
       }
     } catch (BatchedSqlException e) {
+      copy.forEach(BatchedPstmt::undo);
       closeStatements(copy);
       throw e;
     }
