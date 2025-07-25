@@ -267,6 +267,7 @@ alter table migtest_e_basic alter column a_lob set inline length 500;
 -- ignored options for migtest_e_basic.a_lob: compact=true, logged=true;
 alter table migtest_e_basic alter column a_lob set default 'X';
 alter table migtest_e_basic alter column a_lob set not null;
+alter table migtest_e_basic alter column default_test drop not null;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
 alter table migtest_e_basic add column description_file blob(64M);

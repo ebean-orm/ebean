@@ -65,6 +65,7 @@ create table migtest_e_basic (
   indextest5                    String,
   indextest6                    String,
   indextest7                    String,
+  default_test                  UInt32 default 0,
   user_id                       UInt32
 ) ENGINE = Log();
 

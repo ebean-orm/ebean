@@ -57,6 +57,7 @@
             <column name="indextest5" type="varchar(127)"/>
             <column name="indextest6" type="varchar(127)"/>
             <column name="indextest7" type="varchar(127)" notnull="true"/>
+            <column name="default_test" type="integer" defaultValue="0"/>
             <column name="user_id" type="integer" notnull="true"/>
             <uniqueConstraint name="uq_migtest_e_basic_indextest2" columnNames="indextest2" oneToOne="false" nullableColumns="indextest2"/>
             <uniqueConstraint name="uq_migtest_e_basic_indextest6" columnNames="indextest6" oneToOne="false" nullableColumns="indextest6"/>

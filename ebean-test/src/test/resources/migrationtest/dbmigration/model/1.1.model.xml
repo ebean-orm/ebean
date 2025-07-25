@@ -45,6 +45,11 @@
             </before>
         </alterColumn>
         <alterColumn columnName="a_lob" tableName="migtest_e_basic" currentType="db2;clob(16K) inline length 500 not logged;varchar" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true"/>
+        <alterColumn columnName="default_test" tableName="migtest_e_basic" currentType="integer" notnull="true" currentNotnull="false">
+            <before>
+                <ddl>--</ddl>
+            </before>
+        </alterColumn>
         <alterColumn columnName="user_id" tableName="migtest_e_basic" currentType="integer" notnull="false" currentNotnull="true" references="migtest_e_user.id" foreignKeyName="fk_migtest_e_basic_user_id" foreignKeyIndex="ix_migtest_e_basic_user_id">
             <before>
                 <ddl>insert into migtest_e_user (id) select distinct user_id from migtest_e_basic</ddl>

@@ -251,6 +251,8 @@ update migtest_e_basic set status = 'A' where status is null;
 -- db2 does not support parial null indices :( - so we have to clean;
 update migtest_e_basic set status = 'N' where id = 1;
 
+--;
+
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 CALL SYSPROC.ADMIN_MOVE_TABLE(CURRENT_SCHEMA,'MIGTEST_E_BASIC','USERSPACE1','USERSPACE1','USERSPACE1','','','','','','MOVE');
 
@@ -282,6 +284,7 @@ alter table migtest_e_basic alter column status2 drop default;
 alter table migtest_e_basic alter column status2 drop not null;
 alter table migtest_e_basic alter column a_lob drop default;
 alter table migtest_e_basic alter column a_lob drop not null;
+alter table migtest_e_basic alter column default_test set not null;
 alter table migtest_e_basic alter column user_id drop not null;
 alter table migtest_e_basic add column new_string_field varchar(255) default 'foo''bar' not null;
 alter table migtest_e_basic add column new_boolean_field boolean default true not null;

@@ -167,6 +167,8 @@ update migtest_e_basic set status = 'A' where status is null;
 
 -- rename all collisions;
 
+--;
+
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 
 alter table migtest_e_history alter column test_string TYPE bigint USING (test_string::integer);
@@ -214,6 +216,7 @@ alter table migtest_e_basic alter column status2 drop default;
 alter table migtest_e_basic alter column status2 drop not null;
 alter table migtest_e_basic alter column a_lob drop default;
 alter table migtest_e_basic alter column a_lob drop not null;
+alter table migtest_e_basic alter column default_test set not null;
 alter table migtest_e_basic alter column user_id drop not null;
 alter table migtest_e_basic add column if not exists new_string_field varchar(255) default 'foo''bar' not null;
 alter table migtest_e_basic add column if not exists new_boolean_field boolean default true not null;

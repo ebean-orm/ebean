@@ -218,6 +218,8 @@ update migtest_e_basic set status = 'A' where status is null;
 
 -- rename all collisions;
 
+--;
+
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 
 -- NOTE: table has @History - special migration may be necessary
@@ -241,6 +243,7 @@ alter table migtest_ckey_parent add (assoc_id integer);
 alter table migtest_e_basic alter (status nvarchar(1) default 'A' not null,
    status2 nvarchar(127) default null,
    a_lob nvarchar(255) default null,
+   default_test integer not null,
    user_id integer);
 alter table migtest_e_basic add (new_string_field nvarchar(255) default 'foo''bar' not null,
    new_boolean_field boolean default true not null,

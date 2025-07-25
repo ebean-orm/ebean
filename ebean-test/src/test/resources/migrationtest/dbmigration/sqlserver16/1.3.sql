@@ -78,6 +78,7 @@ alter table migtest_e_basic add default 'N' for status2;
 EXEC usp_ebean_drop_default_constraint migtest_e_basic, a_lob;
 alter table migtest_e_basic alter column a_lob varchar(255) not null;
 alter table migtest_e_basic add default 'X' for a_lob;
+alter table migtest_e_basic alter column default_test integer;
 EXEC usp_ebean_drop_default_constraint migtest_e_basic, user_id;
 alter table migtest_e_basic alter column user_id integer not null;
 alter table migtest_e_basic add default 23 for user_id;

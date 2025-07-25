@@ -76,6 +76,7 @@ create table migtest_e_basic (
   indextest5                    varchar(127),
   indextest6                    varchar(127),
   indextest7                    varchar(127) not null,
+  default_test                  integer default 0,
   user_id                       integer not null,
   constraint ck_migtest_e_basic_status check ( status in ('N','A','I')),
   constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I')),

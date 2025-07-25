@@ -135,6 +135,7 @@ alter table migtest_e_basic alter (status nvarchar(1) default null,
    status2 nclob not null);
 alter table migtest_e_basic alter (status2 nvarchar(1) default 'N' not null,
    a_lob nvarchar(255) default 'X' not null,
+   default_test integer,
    user_id integer default 23 not null);
 alter table migtest_e_basic add (description_file blob,
    old_boolean boolean default false not null,

@@ -10,6 +10,7 @@
         <alterColumn columnName="status2" tableName="migtest_e_basic" type="varchar(1)" currentType="varchar(127)" defaultValue="'N'" notnull="true" currentNotnull="false" checkConstraint="check ( status2 in ('N','A','I'))" checkConstraintName="ck_migtest_e_basic_status2"/>
         <alterColumn columnName="description" tableName="migtest_e_basic" dropUnique="uq_migtest_e_basic_description"/>
         <alterColumn columnName="a_lob" tableName="migtest_e_basic" type="db2;clob(16K) inline length 500 compact;varchar" currentType="db2;clob(16K) inline length 500 not logged;varchar" defaultValue="'X'" notnull="true" currentNotnull="false"/>
+        <alterColumn columnName="default_test" tableName="migtest_e_basic" currentType="integer" notnull="false" currentNotnull="true"/>
         <alterColumn columnName="user_id" tableName="migtest_e_basic" currentType="integer" defaultValue="23" notnull="true" currentNotnull="false" dropForeignKey="fk_migtest_e_basic_user_id" dropForeignKeyIndex="ix_migtest_e_basic_user_id"/>
         <addColumn tableName="migtest_e_basic">
             <column name="description_file" type="db2;blob(64M);blob"/>

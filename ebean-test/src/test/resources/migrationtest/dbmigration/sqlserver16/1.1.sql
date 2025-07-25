@@ -166,6 +166,8 @@ update migtest_e_basic set status = 'A' where status is null;
 
 -- rename all collisions;
 
+--;
+
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 
 -- NOTE: table has @History - special migration may be necessary
@@ -205,6 +207,7 @@ EXEC usp_ebean_drop_default_constraint migtest_e_basic, status2;
 alter table migtest_e_basic alter column status2 varchar(127);
 EXEC usp_ebean_drop_default_constraint migtest_e_basic, a_lob;
 alter table migtest_e_basic alter column a_lob varchar(255);
+alter table migtest_e_basic alter column default_test integer not null;
 alter table migtest_e_basic alter column user_id integer;
 alter table migtest_e_basic add new_string_field varchar(255) default 'foo''bar' not null;
 alter table migtest_e_basic add new_boolean_field bit default 1 not null;
