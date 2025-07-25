@@ -42,9 +42,9 @@ public class PlatformDdl_dropUniqueConstraintTest {
         + "$$", sql);
     sql = sqlServerDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals(
-          "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('mytab','U') AND name = 'uq_name') drop index uq_name ON mytab;\n"
-            + "IF OBJECT_ID('uq_name', 'UQ') IS NOT NULL alter table mytab drop constraint uq_name",
-        sql);
+            "IF OBJECT_ID('uq_name', 'UQ') IS NOT NULL alter table mytab drop constraint uq_name;\n"
+        + "IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('mytab','U') AND name = 'uq_name') drop index uq_name ON mytab",
+      sql);
 
     sql = mysqlDdl.alterTableDropUniqueConstraint("mytab", "uq_name");
     assertEquals("alter table mytab drop index uq_name", sql);

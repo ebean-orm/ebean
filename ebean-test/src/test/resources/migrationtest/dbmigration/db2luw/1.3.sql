@@ -212,6 +212,13 @@ end if;
 end$$;
 delimiter $$
 begin
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_MIGTEST_E_BASIC_INDEXTEST7') then
+  prepare stmt from 'drop index ix_migtest_e_basic_indextest7';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
 if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'IX_TABLE_TEXTFIELD2') then
   prepare stmt from 'drop index ix_table_textfield2';
   execute stmt;
@@ -295,6 +302,7 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
 create unique index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) exclude null keys;
 create unique index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) exclude null keys;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest7 unique  (indextest7);
 alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';

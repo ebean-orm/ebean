@@ -4,6 +4,7 @@ alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status;
 alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status2;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest7;
 alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
 -- apply changes
 create table drop_main (

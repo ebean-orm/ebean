@@ -125,15 +125,15 @@ public class DbMigrationTest extends BaseTestCase {
       // Add column is also not implemented. So exit here
       return;
     } else if (isOracle() || isHana()) {
-      SqlUpdate update = server().sqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1)");
+      SqlUpdate update = server().sqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id, indextest7) values (1, :false, 1, 'foo')");
       update.setParameter("false", false);
       assertThat(server().execute(update)).isEqualTo(1);
 
-      update = server().sqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (2, :true, 1)");
+      update = server().sqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id, indextest7) values (2, :true, 1, 'bar')");
       update.setParameter("true", true);
       assertThat(server().execute(update)).isEqualTo(1);
     } else {
-      SqlUpdate update = server().sqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id) values (1, :false, 1), (2, :true, 1)");
+      SqlUpdate update = server().sqlUpdate("insert into migtest_e_basic (id, old_boolean, user_id, indextest7) values (1, :false, 1, 'foo'), (2, :true, 1, 'bar')");
       update.setParameter("false", false);
       update.setParameter("true", true);
 

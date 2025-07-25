@@ -34,6 +34,13 @@ delimiter $$
 do
 begin
 declare exit handler for sql_error_code 397 begin end;
+exec 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest7';
+end;
+$$;
+delimiter $$
+do
+begin
+declare exit handler for sql_error_code 397 begin end;
 exec 'alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status';
 end;
 $$;
@@ -332,4 +339,5 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 -- explicit index "ix_migtest_e_basic_indextest3" for single column "indextest3" of table "migtest_e_basic" is not necessary;
 -- explicit index "ix_migtest_e_basic_indextest6" for single column "indextest6" of table "migtest_e_basic" is not necessary;
+-- explicit index "ix_migtest_e_basic_indextest7" for single column "indextest7" of table "migtest_e_basic" is not necessary;
 -- explicit index "ix_table_textfield2" for single column "textfield2" of table ""table"" is not necessary;

@@ -100,10 +100,10 @@ public class SqlServerDdl extends PlatformDdl {
   @Override
   public String alterTableDropUniqueConstraint(String tableName, String uniqueConstraintName) {
     StringBuilder sb = new StringBuilder();
-    sb.append(dropIndex(uniqueConstraintName, tableName)).append(";\n");
-
     sb.append(ifObjectExists(maxConstraintName(uniqueConstraintName), UNIQUE_CONSTRAINT))
-        .append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName));
+      .append(super.alterTableDropUniqueConstraint(tableName, uniqueConstraintName)).append(";\n");
+
+    sb.append(dropIndex(uniqueConstraintName, tableName));
     return sb.toString();
   }
 

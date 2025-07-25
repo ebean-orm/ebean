@@ -73,6 +73,7 @@ create table migtest_e_basic (
   indextest4                    varchar(127),
   indextest5                    varchar(127),
   indextest6                    varchar(127),
+  indextest7                    varchar(127) not null,
   user_id                       integer not null,
   constraint ck_migtest_e_basic_status check ( status in ('N','A','I')),
   constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I')),
@@ -209,6 +210,7 @@ alter table migtest_e_history6 add period system_time (sys_period_start,sys_peri
 -- apply post alter
 create unique index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) exclude null keys;
 create unique index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) exclude null keys;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest7 unique  (indextest7);
 create table migtest_e_history2_history as (select * from migtest_e_history2) with no data;
 alter table migtest_e_history2 add versioning use history table migtest_e_history2_history;
 create table migtest_e_history3_history as (select * from migtest_e_history3) with no data;

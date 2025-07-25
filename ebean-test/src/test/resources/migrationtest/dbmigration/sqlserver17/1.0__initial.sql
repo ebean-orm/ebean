@@ -81,6 +81,7 @@ create table migtest_e_basic (
   indextest4                    nvarchar(127),
   indextest5                    nvarchar(127),
   indextest6                    nvarchar(127),
+  indextest7                    nvarchar(127) not null,
   user_id                       integer not null,
   constraint ck_migtest_e_basic_status check ( status in ('N','A','I')),
   constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I')),
@@ -205,6 +206,7 @@ create sequence migtest_oto_master_seq as bigint start with 1;
 -- apply post alter
 create unique nonclustered index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) where indextest2 is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) where indextest6 is not null;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest7 unique  (indextest7);
 alter table migtest_e_history2
     add sys_periodFrom datetime2 GENERATED ALWAYS AS ROW START NOT NULL DEFAULT SYSUTCDATETIME(),
         sys_periodTo   datetime2 GENERATED ALWAYS AS ROW END   NOT NULL DEFAULT '9999-12-31T23:59:59.9999999',

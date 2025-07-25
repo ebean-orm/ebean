@@ -4,6 +4,7 @@ alter table migtest_fk_cascade drop foreign key fk_migtest_fk_cascade_one_id;
 alter table migtest_fk_set_null drop foreign key fk_migtest_fk_set_null_one_id;
 alter table migtest_e_basic drop index uq_migtest_e_basic_indextest2;
 alter table migtest_e_basic drop index uq_migtest_e_basic_indextest6;
+alter table migtest_e_basic drop index uq_migtest_e_basic_indextest7;
 drop index ix_migtest_e_basic_indextest1 on migtest_e_basic;
 drop index ix_migtest_e_basic_indextest5 on migtest_e_basic;
 drop index ix_migtest_quoted_status1 on `migtest_QuOtEd`;
@@ -246,4 +247,5 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index ix_migtest_e_basic_indextest7 on migtest_e_basic (indextest7);
 create index ix_table_textfield2 on `table` (textfield2);

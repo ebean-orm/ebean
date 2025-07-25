@@ -22,6 +22,7 @@ alter table migtest_mtm_m_migtest_mtm_c drop foreign key fk_migtest_mtm_m_migtes
 alter table migtest_mtm_m_phone_numbers drop foreign key fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id;
 drop index ix_migtest_e_basic_indextest3 on migtest_e_basic;
 drop index ix_migtest_e_basic_indextest6 on migtest_e_basic;
+drop index ix_migtest_e_basic_indextest7 on migtest_e_basic;
 drop index ix_table_textfield2 on `table`;
 -- apply changes
 create table `migtest_QuOtEd` (
@@ -83,6 +84,7 @@ alter table migtest_e_history6_history modify test_number1 integer;
 -- apply post alter
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
 alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest7 unique  (indextest7);
 alter table migtest_e_history comment = '';
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 lock tables migtest_e_history2 write;

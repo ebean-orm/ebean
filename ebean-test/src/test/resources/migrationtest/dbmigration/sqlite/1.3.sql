@@ -25,6 +25,7 @@
 -- not supported: alter table migtest_mtm_m_phone_numbers drop constraint if exists fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id;
 drop index if exists ix_migtest_e_basic_indextest3;
 drop index if exists ix_migtest_e_basic_indextest6;
+drop index if exists ix_migtest_e_basic_indextest7;
 drop index if exists ix_table_textfield2;
 -- apply changes
 create table "migtest_QuOtEd" (
@@ -81,6 +82,7 @@ alter table migtest_e_history2 add column obsolete_string2 varchar(255);
 -- not supported: alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
 -- not supported: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
 -- not supported: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
+-- not supported: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest7 unique  (indextest7);
 -- not supported: alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 -- foreign keys and indices
 -- not supported: alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade on update restrict;

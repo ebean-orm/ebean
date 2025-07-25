@@ -107,6 +107,11 @@ public class EBasic {
   @Size(max=127)
   String indextest6;
 
+  @Index(unique = false)
+  @Size(max=127)
+  @NotNull
+  String indextest7;
+
   @NotNull
   @DbDefault("0")
   Progress progress;
