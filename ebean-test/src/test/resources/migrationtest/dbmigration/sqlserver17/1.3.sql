@@ -30,6 +30,7 @@ IF OBJECT_ID('fk_migtest_mtm_m_migtest_mtm_c_migtest_mtm_c', 'F') IS NOT NULL al
 IF OBJECT_ID('fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id', 'F') IS NOT NULL alter table migtest_mtm_m_phone_numbers drop constraint fk_migtest_mtm_m_phone_numbers_migtest_mtm_m_id;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest3') drop index ix_migtest_e_basic_indextest3 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest6') drop index ix_migtest_e_basic_indextest6 ON migtest_e_basic;
+IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('migtest_e_basic','U') AND name = 'ix_migtest_e_basic_indextest7') drop index ix_migtest_e_basic_indextest7 ON migtest_e_basic;
 IF EXISTS (SELECT name FROM sys.indexes WHERE object_id = OBJECT_ID('"table"','U') AND name = 'ix_table_textfield2') drop index ix_table_textfield2 ON "table";
 -- apply changes
 create table [migtest_QuOtEd] (
@@ -102,6 +103,7 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
 create unique nonclustered index uq_migtest_e_basic_indextest2 on migtest_e_basic(indextest2) where indextest2 is not null;
 create unique nonclustered index uq_migtest_e_basic_indextest6 on migtest_e_basic(indextest6) where indextest6 is not null;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest7 unique  (indextest7);
 alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 -- foreign keys and indices
 alter table migtest_fk_cascade add constraint fk_migtest_fk_cascade_one_id foreign key (one_id) references migtest_fk_cascade_one (id) on delete cascade;

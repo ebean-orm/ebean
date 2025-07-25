@@ -58,6 +58,20 @@ end if;
 end$$;
 delimiter $$
 begin
+if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'UQ_MIGTEST_E_BASIC_INDEXTEST7' and ucase(tabname) = 'MIGTEST_E_BASIC') then
+  prepare stmt from 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest7';
+  execute stmt;
+end if;
+end$$
+delimiter $$
+begin
+if exists (select indname from syscat.indexes where indschema = current_schema and ucase(indname) = 'UQ_MIGTEST_E_BASIC_INDEXTEST7') then
+  prepare stmt from 'drop index uq_migtest_e_basic_indextest7';
+  execute stmt;
+end if;
+end$$;
+delimiter $$
+begin
 if exists (select constname from syscat.tabconst where tabschema = current_schema and ucase(constname) = 'CK_MIGTEST_E_ENUM_TEST_STATUS' and ucase(tabname) = 'MIGTEST_E_ENUM') then
   prepare stmt from 'alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status';
   execute stmt;
@@ -374,4 +388,5 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index ix_migtest_e_basic_indextest7 on migtest_e_basic (indextest7);
 create index ix_table_textfield2 on "table" (textfield2);

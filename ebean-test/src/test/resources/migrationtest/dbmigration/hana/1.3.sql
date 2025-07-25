@@ -89,6 +89,13 @@ delimiter $$
 do
 begin
 declare exit handler for sql_error_code 261 begin end;
+exec 'drop index ix_migtest_e_basic_indextest7';
+end;
+$$;
+delimiter $$
+do
+begin
+declare exit handler for sql_error_code 261 begin end;
 exec 'drop index ix_table_textfield2';
 end;
 $$;
@@ -151,6 +158,7 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
 -- cannot create unique index "uq_migtest_e_basic_indextest2" on table "migtest_e_basic" with nullable columns;
 -- cannot create unique index "uq_migtest_e_basic_indextest6" on table "migtest_e_basic" with nullable columns;
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest7 unique  (indextest7);
 alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';

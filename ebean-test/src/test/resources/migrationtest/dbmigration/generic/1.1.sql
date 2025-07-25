@@ -6,6 +6,7 @@ alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status;
 alter table migtest_e_basic drop constraint if exists ck_migtest_e_basic_status2;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest2;
 alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest6;
+alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest7;
 alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_status;
 drop index if exists ix_migtest_e_basic_indextest1;
 drop index if exists ix_migtest_e_basic_indextest5;
@@ -257,4 +258,5 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index ix_migtest_e_basic_indextest7 on migtest_e_basic (indextest7);
 create index ix_table_textfield2 on "table" (textfield2);

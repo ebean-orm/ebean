@@ -73,11 +73,13 @@ create table migtest_e_basic (
   indextest4                    varchar2(127),
   indextest5                    varchar2(127),
   indextest6                    varchar2(127),
+  indextest7                    varchar2(127) not null,
   user_id                       number(10) not null,
   constraint ck_migtest_e_basic_status check ( status in ('N','A','I')),
   constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I')),
   constraint uq_migtest_e_basic_indextest2 unique (indextest2),
   constraint uq_migtest_e_basic_indextest6 unique (indextest6),
+  constraint uq_migtest_e_basic_indextest7 unique (indextest7),
   constraint pk_migtest_e_basic primary key (id)
 );
 

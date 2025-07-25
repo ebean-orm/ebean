@@ -97,6 +97,7 @@ alter table migtest_mtm_m_migtest_mtm_c drop constraint fk_mgtst_mtm_m_mgtst_mt_
 alter table migtest_mtm_m_phone_numbers drop constraint fk_mgtst_mtm_m_phn_nmbr_s8neid;
 drop index ix_migtest_e_basic_indextest3;
 drop index ix_migtest_e_basic_indextest6;
+drop index ix_migtest_e_basic_indextest7;
 drop index ix_table_textfield2;
 -- apply changes
 create table "migtest_QuOtEd" (
@@ -154,6 +155,7 @@ alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( sta
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest2 unique  (indextest2);
 -- NOT YET IMPLEMENTED: alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest6 unique  (indextest6);
+alter table migtest_e_basic add constraint uq_migtest_e_basic_indextest7 unique  (indextest7);
 alter table migtest_e_enum add constraint ck_migtest_e_enum_test_status check ( test_status in ('N','A','I'));
 comment on column migtest_e_history.test_string is '';
 comment on table migtest_e_history is '';

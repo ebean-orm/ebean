@@ -47,6 +47,16 @@ declare
   expected_error exception;
   pragma exception_init(expected_error, -2443);
 begin
+  execute immediate 'alter table migtest_e_basic drop constraint uq_migtest_e_basic_indextest7';
+exception
+  when expected_error then null;
+end;
+$$;
+delimiter $$
+declare
+  expected_error exception;
+  pragma exception_init(expected_error, -2443);
+begin
   execute immediate 'alter table migtest_e_enum drop constraint ck_migtest_e_enum_test_status';
 exception
   when expected_error then null;
@@ -302,4 +312,5 @@ alter table migtest_oto_child add constraint fk_migtest_oto_child_master_id fore
 
 create index ix_migtest_e_basic_indextest3 on migtest_e_basic (indextest3);
 create index ix_migtest_e_basic_indextest6 on migtest_e_basic (indextest6);
+create index ix_migtest_e_basic_indextest7 on migtest_e_basic (indextest7);
 create index ix_table_textfield2 on "table" (textfield2);

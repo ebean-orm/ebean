@@ -23,6 +23,7 @@
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest5" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest5"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="indextest2" oneToOne="false" nullableColumns="indextest2"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="indextest6" oneToOne="false" nullableColumns="indextest6"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest7" tableName="migtest_e_basic" columnNames="indextest7" oneToOne="false" nullableColumns=""/>
         <alterTable name="migtest_e_basic" tablespace="db2;TSTABLES;" indexTablespace="db2;INDEXTS;" lobTablespace="db2;TSTABLES;"/>
         <alterColumn columnName="test_status" tableName="migtest_e_enum" checkConstraint="check ( test_status in ('N','A','I'))" checkConstraintName="ck_migtest_e_enum_test_status"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history" withHistory="true" comment="DROP COMMENT"/>
@@ -71,6 +72,7 @@
         <createIndex indexName="ix_migtest_oto_master_lowername" tableName="migtest_oto_master" columns="lower(name)" unique="true" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest3" tableName="migtest_e_basic"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest6" tableName="migtest_e_basic"/>
+        <dropIndex indexName="ix_migtest_e_basic_indextest7" tableName="migtest_e_basic"/>
         <dropIndex indexName="ix_table_textfield2" tableName="&quot;table&quot;"/>
     </changeSet>
     <changeSet type="pendingDrops">

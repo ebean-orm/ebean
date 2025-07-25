@@ -63,6 +63,7 @@
         </addColumn>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest2" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest2"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns="indextest6"/>
+        <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest7" tableName="migtest_e_basic" columnNames="DROP CONSTRAINT" nullableColumns=""/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_status_indextest1" tableName="migtest_e_basic" columnNames="status,indextest1" oneToOne="false" nullableColumns="indextest1"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_name" tableName="migtest_e_basic" columnNames="name" oneToOne="false" nullableColumns="name"/>
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest4" tableName="migtest_e_basic" columnNames="indextest4" oneToOne="false" nullableColumns="indextest4"/>
@@ -213,6 +214,7 @@
         </addColumn>
         <createIndex indexName="ix_migtest_e_basic_indextest3" tableName="migtest_e_basic" columns="indextest3"/>
         <createIndex indexName="ix_migtest_e_basic_indextest6" tableName="migtest_e_basic" columns="indextest6"/>
+        <createIndex indexName="ix_migtest_e_basic_indextest7" tableName="migtest_e_basic" columns="indextest7"/>
         <createIndex indexName="ix_table_textfield2" tableName="&quot;table&quot;" columns="textfield2"/>
         <createIndex indexName="ix_migtest_oto_child_name" tableName="migtest_oto_child" columns="name" platforms="POSTGRES"/>
         <dropIndex indexName="ix_migtest_e_basic_indextest1" tableName="migtest_e_basic"/>
