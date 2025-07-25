@@ -161,7 +161,7 @@ update migtest_e_basic set status = 'A' where status is null;
 
 -- rename all collisions;
 
---;
+update migtest_e_basic set default_test = 0 where default_test is null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 
@@ -198,7 +198,7 @@ alter table migtest_ckey_parent add column assoc_id integer;
 alter table migtest_e_basic modify status varchar(1) not null default 'A';
 alter table migtest_e_basic modify status2 varchar(127);
 alter table migtest_e_basic modify a_lob varchar(255);
-alter table migtest_e_basic modify default_test integer not null;
+alter table migtest_e_basic modify default_test integer not null default 0;
 alter table migtest_e_basic modify user_id integer;
 alter table migtest_e_basic add column new_string_field varchar(255) default 'foo''bar' not null;
 alter table migtest_e_basic add column new_boolean_field tinyint(1) default 1 not null;

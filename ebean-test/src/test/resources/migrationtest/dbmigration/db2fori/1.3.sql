@@ -280,6 +280,7 @@ alter table migtest_e_history2 alter column test_string drop not null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
 call sysproc.admin_cmd('reorg table migtest_e_history2 ${reorgArgs}');
+alter table migtest_e_history2_history alter column test_string drop default;
 alter table migtest_e_history2_history alter column test_string drop not null;
 alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string2 varchar(255);
@@ -293,7 +294,9 @@ alter table migtest_e_history6 alter column test_number1 drop not null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
 call sysproc.admin_cmd('reorg table migtest_e_history6 ${reorgArgs}');
+alter table migtest_e_history6_history alter column test_number1 drop default;
 alter table migtest_e_history6_history alter column test_number1 drop not null;
+alter table migtest_e_history6_history alter column test_number2 set default 7;
 alter table migtest_e_history6_history alter column test_number2 set not null;
 call sysproc.admin_cmd('reorg table migtest_e_history6_history ${reorgArgs}');
 -- apply post alter

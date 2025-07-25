@@ -54,7 +54,7 @@ update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 alter table migtest_e_basic modify status varchar(1);
 alter table migtest_e_basic modify status2 varchar(1) not null default 'N';
 alter table migtest_e_basic modify a_lob varchar(255) not null default 'X';
-alter table migtest_e_basic modify default_test integer;
+alter table migtest_e_basic modify default_test integer default 0;
 alter table migtest_e_basic modify user_id integer not null default 23;
 alter table migtest_e_basic add column description_file longblob;
 alter table migtest_e_basic add column old_boolean tinyint(1) default 0 not null;

@@ -135,7 +135,7 @@ alter table migtest_e_basic alter (status nvarchar(1) default null,
    status2 nclob not null);
 alter table migtest_e_basic alter (status2 nvarchar(1) default 'N' not null,
    a_lob nvarchar(255) default 'X' not null,
-   default_test integer,
+   default_test integer default 0,
    user_id integer default 23 not null);
 alter table migtest_e_basic add (description_file blob,
    old_boolean boolean default false not null,
@@ -144,7 +144,7 @@ alter table migtest_e_basic add (description_file blob,
 alter table migtest_e_history2 alter (test_string nvarchar(255) default null);
 alter table migtest_e_history2 add (obsolete_string1 nvarchar(255),
    obsolete_string2 nvarchar(255));
-alter table migtest_e_history2_history alter (test_string nvarchar(255));
+alter table migtest_e_history2_history alter (test_string nvarchar(255) default null);
 alter table migtest_e_history2_history add (obsolete_string1 nvarchar(255),
    obsolete_string2 nvarchar(255));
 alter table migtest_e_history4 alter (test_number decimal);
@@ -153,7 +153,7 @@ alter table migtest_e_history4_history alter (test_number decimal);
 alter table migtest_e_history4_history alter (test_number integer);
 alter table migtest_e_history6 alter (test_number1 integer default null,
    test_number2 integer default 7 not null);
-alter table migtest_e_history6_history alter (test_number1 integer);
+alter table migtest_e_history6_history alter (test_number1 integer default null);
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status2 check ( status2 in ('N','A','I'));

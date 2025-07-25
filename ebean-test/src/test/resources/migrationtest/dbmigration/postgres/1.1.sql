@@ -167,7 +167,7 @@ update migtest_e_basic set status = 'A' where status is null;
 
 -- rename all collisions;
 
---;
+update migtest_e_basic set default_test = 0 where default_test is null;
 
 insert into migtest_e_user (id) select distinct user_id from migtest_e_basic;
 

@@ -82,6 +82,7 @@ alter table migtest_e_history2 alter column test_string drop default;
 alter table migtest_e_history2 alter column test_string set null;
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);
+alter table migtest_e_history2_history alter column test_string drop default;
 alter table migtest_e_history2_history alter column test_string set null;
 alter table migtest_e_history2_history add column obsolete_string1 varchar(255);
 alter table migtest_e_history2_history add column obsolete_string2 varchar(255);
@@ -91,6 +92,7 @@ alter table migtest_e_history6 alter column test_number1 drop default;
 alter table migtest_e_history6 alter column test_number1 set null;
 alter table migtest_e_history6 alter column test_number2 set default 7;
 alter table migtest_e_history6 alter column test_number2 set not null;
+alter table migtest_e_history6_history alter column test_number1 drop default;
 alter table migtest_e_history6_history alter column test_number1 set null;
 -- apply post alter
 alter table migtest_e_basic add constraint ck_migtest_e_basic_status check ( status in ('N','A','I'));
