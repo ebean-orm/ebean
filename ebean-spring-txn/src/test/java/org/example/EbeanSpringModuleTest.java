@@ -117,6 +117,24 @@ public class EbeanSpringModuleTest {
     logger.info("nonTransactional find user1:{} user2:{}", user, user2);
   }
 
+  public void testLoad() {
+	  User user = new User();
+	  user.setName("TestLoad");
+	  userService.save(user);
+	  
+	  logger.info("Saved new User");
+	  assertThat(user.getOid()).isGreaterThan(0);
+
+	  User found = DB.find(User.class, user.getOid());
+
+	  user.setName("TestLoad2");
+	  
+	  userService.save(user);
+	  
+	  found = DB.find(User.class, user.getOid());
+	  
+	  assertThat(user.getName()).equals(found.getName());
+  }
   /**
    * Return the user service.
    */
