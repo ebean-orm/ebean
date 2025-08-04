@@ -37,12 +37,14 @@ public final class CQueryEngine {
   private final CQueryBuilder queryBuilder;
   private final CQueryHistorySupport historySupport;
   private final DatabasePlatform dbPlatform;
+  private final boolean autoCommitFalseOnFindIterate;
 
   public CQueryEngine(DatabaseBuilder.Settings config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
     this.dbPlatform = dbPlatform;
     this.defaultFetchSizeFindEach = config.getJdbcFetchSizeFindEach();
     this.defaultFetchSizeFindList = config.getJdbcFetchSizeFindList();
     this.forwardOnlyHintOnFindIterate = dbPlatform.forwardOnlyHintOnFindIterate();
+    this.autoCommitFalseOnFindIterate = dbPlatform.autoCommitFalseOnFindIterate();
     this.historySupport = new CQueryHistorySupport(dbPlatform.historySupport(), asOfTableMapping, config.getAsOfSysPeriod());
     this.queryBuilder = new CQueryBuilder(config, dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
   }
@@ -184,6 +186,9 @@ public final class CQueryEngine {
       if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
         // query has been cancelled already
         return null;
+      }
+      if (autoCommitFalseOnFindIterate) {
+        request.setAutoCommitOnFindIterate();
       }
       if (request.logSql()) {
         logSql(cquery);

@@ -362,4 +362,14 @@ public interface SpiTransaction extends Transaction {
    * Set the transaction to be inactive via external transaction manager.
    */
   void deactivateExternal();
+
+  /**
+   * Set autocommit to false for a findIterate query.
+   * <p>
+   * This is done for specific platforms that need it, in order to make
+   * use cursors to stream a large or unbounded query result to the client.
+   */
+  default void setAutoCommitOnFindIterate() {
+    throw new UnsupportedOperationException();
+  }
 }
