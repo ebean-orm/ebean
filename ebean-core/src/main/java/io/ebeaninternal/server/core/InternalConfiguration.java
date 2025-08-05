@@ -301,12 +301,12 @@ public final class InternalConfiguration {
   }
 
   DtoQueryEngine createDtoQueryEngine() {
-    return new DtoQueryEngine(binder, config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList());
+    return new DtoQueryEngine(binder, config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList(), databasePlatform.autoCommitFalseOnFindIterate());
   }
 
   RelationalQueryEngine createRelationalQueryEngine() {
     return new DefaultRelationalQueryEngine(binder, config.getDatabaseBooleanTrue(), config.getPlatformConfig().getDbUuid().useBinaryOptimized(),
-      config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList());
+      config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList(), databasePlatform.autoCommitFalseOnFindIterate());
   }
 
   OrmQueryEngine createOrmQueryEngine() {
