@@ -25,26 +25,32 @@ class TransactionFactoryTenant extends TransactionFactory {
 
   @Override
   public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
-    return create(false, tenantId);
+    Connection connection = null;
+    try {
+      if (tenantId == null) {
+        tenantId = tenantProvider.currentId();
+      }
+      connection = dataSourceSupplier.readOnlyConnection(tenantId, useMaster);
+      return new ImplicitReadOnlyTransaction(manager, connection, tenantId);
+
+    } catch (PersistenceException ex) {
+      JdbcClose.close(connection);
+      throw ex;
+
+    } catch (SQLException ex) {
+      throw new PersistenceException(ex);
+    }
   }
 
   @Override
   public final SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
-    SpiTransaction t = create(explicit, null);
-    return setIsolationLevel(t, explicit, isolationLevel);
-  }
-
-  private SpiTransaction create(boolean explicit, Object tenantId) {
     Connection connection = null;
     try {
-      if (tenantId == null) {
-        // tenantId not set (by lazy loading) so get current tenantId
-        tenantId = tenantProvider.currentId();
-      }
+      Object tenantId = tenantProvider.currentId();
       connection = dataSourceSupplier.connection(tenantId);
       SpiTransaction transaction = manager.createTransaction(explicit, connection);
       transaction.setTenantId(tenantId);
-      return transaction;
+      return setIsolationLevel(transaction, isolationLevel);
 
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);
