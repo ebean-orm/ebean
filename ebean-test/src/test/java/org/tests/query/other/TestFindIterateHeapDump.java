@@ -50,8 +50,10 @@ public class TestFindIterateHeapDump extends BaseTestCase {
     // Intentionally not iterating through the iterator to
     final AtomicInteger counter = new AtomicInteger();
 
-    server.findDto(EBasicDto.class, "select id, status, name, description from e_basic")
-      .findStream().forEach(bean -> {
+    server.sqlQuery("select id, status, name, description from e_basic")
+        .findEach(bean -> {
+//    server.findDto(EBasicDto.class, "select id, status, name, description from e_basic")
+//      .findStream().forEach(bean -> {
 //    server.find(EBasic.class)
 //      .findEach(bean -> {
 //    server.find(EBasic.class)
@@ -60,15 +62,15 @@ public class TestFindIterateHeapDump extends BaseTestCase {
 //      .findEach(bean -> {
         int count = counter.incrementAndGet();
         if (count == 10) {
-          dumpHeap("dump-initial.snapshot.hprof", true);
+          dumpHeap("s1-dump-initial.snapshot.hprof", true);
         }
 
         if (count == (200_000 - 100)) {
-          dumpHeap("dump-end.snapshot.hprof", true);
+          dumpHeap("s1-dump-end.snapshot.hprof", true);
         }
       });
 
-    String fileName = "dump.snapshot.hprof";
+    String fileName = "s1-dump.snapshot.hprof";
     File file = new File(fileName);
     if (file.exists()) {
       file.delete();

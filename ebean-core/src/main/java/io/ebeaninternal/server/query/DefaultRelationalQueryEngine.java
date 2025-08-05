@@ -15,6 +15,8 @@ import io.ebeaninternal.server.core.RowReader;
 import io.ebeaninternal.server.persist.Binder;
 
 import jakarta.persistence.PersistenceException;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -28,15 +30,18 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   private final Binder binder;
   private final String dbTrueValue;
   private final boolean binaryOptimizedUUID;
+  private final boolean autoCommitFalseOnFindIterate;
   private final TimedMetricMap timedMetricMap;
   private final int defaultFetchSizeFindEach;
   private final int defaultFetchSizeFindList;
 
   public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue, boolean binaryOptimizedUUID,
-                                      int defaultFetchSizeFindEach, int defaultFetchSizeFindList) {
+                                      int defaultFetchSizeFindEach, int defaultFetchSizeFindList,
+                                      boolean autoCommitFalseOnFindIterate) {
     this.binder = binder;
     this.dbTrueValue = dbTrueValue == null ? "true" : dbTrueValue;
     this.binaryOptimizedUUID = binaryOptimizedUUID;
+    this.autoCommitFalseOnFindIterate = autoCommitFalseOnFindIterate;
     this.timedMetricMap = MetricFactory.get().createTimedMetricMap("sql.query.");
     this.defaultFetchSizeFindEach = defaultFetchSizeFindEach;
     this.defaultFetchSizeFindList = defaultFetchSizeFindList;
@@ -61,13 +66,20 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
     return "Query threw SQLException:" + msg + " Query was:" + sql;
   }
 
+  private <T> void prepareForIterate(RelationalQueryRequest request) throws SQLException {
+    if (defaultFetchSizeFindEach > 0) {
+      request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
+    }
+    if (autoCommitFalseOnFindIterate) {
+      request.setAutoCommitOnFindIterate();
+    }
+    request.executeSql(binder, SpiQuery.Type.ITERATE);
+  }
+
   @Override
   public void findEach(RelationalQueryRequest request, RowConsumer consumer) {
     try {
-      if (defaultFetchSizeFindEach > 0) {
-        request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
-      }
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      prepareForIterate(request);
       request.mapEach(consumer);
       request.logSummary();
 
@@ -82,10 +94,7 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   @Override
   public <T> void findEach(RelationalQueryRequest request, RowReader<T> reader, Predicate<T> consumer) {
     try {
-      if (defaultFetchSizeFindEach > 0) {
-        request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
-      }
-      request.executeSql(binder, SpiQuery.Type.ITERATE);
+      prepareForIterate(request);
       while (request.next()) {
         if (!consumer.test(reader.read())) {
           break;

@@ -306,7 +306,7 @@ public final class InternalConfiguration {
 
   RelationalQueryEngine createRelationalQueryEngine() {
     return new DefaultRelationalQueryEngine(binder, config.getDatabaseBooleanTrue(), config.getPlatformConfig().getDbUuid().useBinaryOptimized(),
-      config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList());
+      config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList(), databasePlatform.autoCommitFalseOnFindIterate());
   }
 
   OrmQueryEngine createOrmQueryEngine() {
