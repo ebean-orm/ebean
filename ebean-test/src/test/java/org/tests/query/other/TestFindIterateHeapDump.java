@@ -6,7 +6,8 @@ import io.ebean.DB;
 import io.ebean.Database;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.EBasic;
+// import org.tests.model.basic.EBasic;
+import org.tests.query.cancel.EBasicDto;
 
 import javax.management.MBeanServer;
 import java.io.File;
@@ -49,10 +50,14 @@ public class TestFindIterateHeapDump extends BaseTestCase {
     // Intentionally not iterating through the iterator to
     final AtomicInteger counter = new AtomicInteger();
 
-    server.find(EBasic.class)
-      // .setBufferFetchSizeHint(10)
-      // .findStream().forEach(bean -> {
-      .findEach(bean -> {
+    server.findDto(EBasicDto.class, "select id, status, name, description from e_basic")
+      .findStream().forEach(bean -> {
+//    server.find(EBasic.class)
+//      .findEach(bean -> {
+//    server.find(EBasic.class)
+//       .setBufferFetchSizeHint(10)
+//       .findStream().forEach(bean -> {
+//      .findEach(bean -> {
         int count = counter.incrementAndGet();
         if (count == 10) {
           dumpHeap("dump-initial.snapshot.hprof", true);

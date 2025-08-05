@@ -301,7 +301,7 @@ public final class InternalConfiguration {
   }
 
   DtoQueryEngine createDtoQueryEngine() {
-    return new DtoQueryEngine(binder, config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList());
+    return new DtoQueryEngine(binder, config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList(), databasePlatform.autoCommitFalseOnFindIterate());
   }
 
   RelationalQueryEngine createRelationalQueryEngine() {
