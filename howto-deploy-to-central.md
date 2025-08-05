@@ -27,7 +27,7 @@ mvs
 
 ## deploy javax
 mvn -T 4 clean package
-mvn -T 4 deploy -pl '!composites,!platforms' -Pcentral -DskipTests -DskipStagingRepositoryClose=true -DstagingProgressTimeoutMinutes=9
+mvn -T 4 deploy -pl '!composites,!platforms' -Pcentral -DskipTests
 
 ## checkout / cleanup
 git checkout .
@@ -45,7 +45,7 @@ mvs
 
 ## build and deploy 15.x
 mvn -T 4 clean package
-mvn -T 4 deploy -pl '!composites,!platforms' -Pcentral -DskipTests -DskipStagingRepositoryClose=true -DstagingProgressTimeoutMinutes=9
+mvn -T 4 deploy -pl '!composites,!platforms' -Pcentral -DskipTests
 
 ```
 
