@@ -20,6 +20,11 @@ final class EJsonWriter {
    * Base jsonFactory implementation used when it is not passed in.
    */
   static final JsonFactory jsonFactory = new JsonFactory();
+  private final JsonGenerator jsonGenerator;
+
+  private EJsonWriter(JsonGenerator jsonGenerator) {
+    this.jsonGenerator = jsonGenerator;
+  }
 
   static String write(Object object) throws IOException {
     StringWriter writer = new StringWriter(200);
@@ -40,12 +45,6 @@ final class EJsonWriter {
 
   static void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator) throws IOException {
     new EJsonWriter(jsonGenerator).writeCollection(null, collection);
-  }
-
-  private final JsonGenerator jsonGenerator;
-
-  private EJsonWriter(JsonGenerator jsonGenerator) {
-    this.jsonGenerator = jsonGenerator;
   }
 
   private void writeJson(Object object) {
@@ -210,5 +209,4 @@ final class EJsonWriter {
     }
     jsonGenerator.writeEndObject();
   }
-
 }

@@ -734,4 +734,10 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       beanDescriptor.freeze(bean);
     }
   }
+
+  public void setAutoCommitOnFindIterate() {
+    if (createdTransaction) {
+      transaction.setAutoCommitOnFindIterate();
+    }
+  }
 }

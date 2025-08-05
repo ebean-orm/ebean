@@ -27,6 +27,7 @@ module io.ebean.core {
   requires io.ebean.types;
 
   requires static io.avaje.jsr305x;
+  requires static io.ebean.core.json;
   requires static com.fasterxml.jackson.annotation;
   requires static com.fasterxml.jackson.core;
   requires static com.fasterxml.jackson.databind;
@@ -41,7 +42,6 @@ module io.ebean.core {
 
   exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.postgis.types;
   exports io.ebeaninternal.api.json to io.ebean.test;
-  exports io.ebeaninternal.json to io.ebean.test;
   exports io.ebeaninternal.server.autotune to io.ebean.autotune;
   exports io.ebeaninternal.server.core to io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.core.bootup to io.ebean.test;
@@ -70,7 +70,6 @@ module io.ebean.core {
     io.ebeaninternal.server.query.DFetchGroupService,
     io.ebeaninternal.server.profile.DProfileLocationFactory,
     io.ebeaninternal.server.rawsql.DRawSqlService,
-    io.ebeaninternal.server.profile.DMetricFactory,
-    io.ebeaninternal.json.DJsonService;
+    io.ebeaninternal.server.profile.DMetricFactory;
 
 }

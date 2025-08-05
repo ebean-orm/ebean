@@ -8,15 +8,23 @@ import io.ebean.ModifyAwareType;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 final class EJsonReader {
 
   static final JsonFactory json = new JsonFactory();
+  private final JsonParser parser;
+  private final boolean modifyAware;
+  private final ModifyAwareFlag modifyAwareOwner;
+  private int depth;
+  private Stack stack;
+  private Context currentContext;
+
+  EJsonReader(JsonParser parser, boolean modifyAware) {
+    this.parser = parser;
+    this.modifyAware = modifyAware;
+    this.modifyAwareOwner = modifyAware ? new ModifyAwareFlag() : null;
+  }
 
   @SuppressWarnings("unchecked")
   static Map<String, Object> parseObject(String json, boolean modifyAware) throws IOException {
@@ -102,24 +110,6 @@ final class EJsonReader {
     return new EJsonReader(parser, modifyAware).parseJson(token);
   }
 
-  private final JsonParser parser;
-
-  private final boolean modifyAware;
-
-  private final ModifyAwareFlag modifyAwareOwner;
-
-  private int depth;
-
-  private Stack stack;
-
-  private Context currentContext;
-
-  EJsonReader(JsonParser parser, boolean modifyAware) {
-    this.parser = parser;
-    this.modifyAware = modifyAware;
-    this.modifyAwareOwner = (modifyAware) ? new ModifyAwareFlag() : null;
-  }
-
   private void startArray() {
     depth++;
     stack.push(currentContext);
@@ -197,7 +187,6 @@ final class EJsonReader {
    */
   private void processJsonToken(JsonToken token) throws IOException {
     switch (token) {
-
       case START_ARRAY:
         startArray();
         break;
@@ -273,16 +262,16 @@ final class EJsonReader {
     }
   }
 
-  private static abstract class Context {
+  private abstract static class Context {
     Context next;
 
     abstract void popContext(Context temp);
 
     abstract Object getValue();
 
-    abstract void setKey(String key);
-
     abstract void setValue(Object value);
+
+    abstract void setKey(String key);
 
     abstract void setValueNull();
   }
@@ -312,13 +301,13 @@ final class EJsonReader {
     }
 
     @Override
-    void setKey(String key) {
-      this.key = key;
+    void setValue(Object value) {
+      map.put(key, value);
     }
 
     @Override
-    void setValue(Object value) {
-      map.put(key, value);
+    void setKey(String key) {
+      this.key = key;
     }
 
     @Override
@@ -364,5 +353,4 @@ final class EJsonReader {
       // not expected
     }
   }
-
 }

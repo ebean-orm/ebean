@@ -36,6 +36,8 @@ public class Processor extends AbstractProcessor implements Constants {
     annotations.add(CONVERTER);
     annotations.add(EBEAN_COMPONENT);
     annotations.add(MODULEINFO);
+    annotations.add(TYPEQUERYBEAN);
+    annotations.add(GENERATED);
     return annotations;
   }
 
