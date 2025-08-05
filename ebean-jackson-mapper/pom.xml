@@ -3,18 +3,19 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.0.0-RC3</version>
+    <version>16.0.0-RC4</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>ebean-jackson-mapper</artifactId>
+  <name>ebean-jackson-mapper</name>
 
   <dependencies>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>16.0.0-RC3</version>
+      <version>16.0.0-RC4</version>
       <scope>provided</scope>
     </dependency>
 

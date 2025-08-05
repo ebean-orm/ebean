@@ -4,10 +4,11 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.0.0-RC3</version>
+    <version>16.0.0-RC4</version>
   </parent>
 
   <artifactId>platforms</artifactId>
+  <name>platforms</name>
   <packaging>pom</packaging>
 
   <modules>

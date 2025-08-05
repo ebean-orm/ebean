@@ -4,18 +4,19 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.0.0-RC3</version>
+    <version>16.0.0-RC4</version>
     <relativePath>../..</relativePath>
   </parent>
 
   <artifactId>ebean-platform-db2</artifactId>
+  <name>ebean-platform-db2</name>
 
   <dependencies>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>16.0.0-RC3</version>
+      <version>16.0.0-RC4</version>
     </dependency>
 
   </dependencies>
