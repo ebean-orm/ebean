@@ -183,12 +183,12 @@ public final class CQueryEngine {
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
+      if (autoCommitFalseOnFindIterate) {
+        request.setAutoCommitOnFindIterate();
+      }
       if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
         // query has been cancelled already
         return null;
-      }
-      if (autoCommitFalseOnFindIterate) {
-        request.setAutoCommitOnFindIterate();
       }
       if (request.logSql()) {
         logSql(cquery);

@@ -30,57 +30,44 @@ public class TestFindIterateHeapDump extends BaseTestCase {
    */
   @Disabled
   @Test
-  public void test() {
-
+  void test() {
     Database server = DB.getDefault();
 
-//    Transaction transaction = server.beginTransaction();
-//    try {
+//    String desc = "0123456789".repeat(20);
+//    try (Transaction transaction = server.beginTransaction()){
 //      transaction.setBatchMode(true);
-//      transaction.setBatchSize(20);
-//      for (int i = 0; i < 20000; i++) {
+//      transaction.setBatchSize(100);
+//      for (int i = 0; i < 200_000; i++) {
 //        EBasic dumbModel = new EBasic();
 //        dumbModel.setName("Goodbye now");
+//        dumbModel.setDescription(desc);
 //        server.save(dumbModel);
 //      }
 //      transaction.commit();
-//
-//    } finally {
-//      transaction.end();
-//    }
-//
-//    if (true) {
-//      return;
 //    }
 
     // Intentionally not iterating through the iterator to
-
     final AtomicInteger counter = new AtomicInteger();
 
     server.find(EBasic.class)
+      // .setBufferFetchSizeHint(10)
+      // .findStream().forEach(bean -> {
       .findEach(bean -> {
-
         int count = counter.incrementAndGet();
-        if (count == 1) {
-          dumpHeap("heap-dump13-initial.snapshot", true);
+        if (count == 10) {
+          dumpHeap("dump-initial.snapshot.hprof", true);
+        }
+
+        if (count == (200_000 - 100)) {
+          dumpHeap("dump-end.snapshot.hprof", true);
         }
       });
 
-    // try {
-    // while (iterate.hasNext()) {
-    // EBasic eBasic = iterate.next();
-    // eBasic.getDescription();
-    // }
-    // } finally {
-    // iterate.close();
-    // }
-
-    String fileName = "heap-dump13.snapshot";
-
+    String fileName = "dump.snapshot.hprof";
     File file = new File(fileName);
-    if (file.exists())
+    if (file.exists()) {
       file.delete();
-
+    }
     dumpHeap(fileName, true);
   }
 
