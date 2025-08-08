@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.8.1-FOC20-SNAPSHOT</version>
+    <version>14.8.1-FOC20</version>
   </parent>
 
   <artifactId>ebean-spring-txn</artifactId>
@@ -28,7 +28,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>14.8.1-FOC20-SNAPSHOT</version>
+      <version>14.8.1-FOC20</version>
       <scope>provided</scope>
     </dependency>
 
@@ -77,7 +77,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>14.8.1-FOC20-SNAPSHOT</version>
+      <version>14.8.1-FOC20</version>
       <scope>test</scope>
     </dependency>
 
