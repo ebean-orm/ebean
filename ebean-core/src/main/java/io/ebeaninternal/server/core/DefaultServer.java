@@ -987,6 +987,13 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (query.parentNode() == null) {
       query.setOrigin(createCallOrigin());
     }
+    if (query.tenantId() != null && currentTenantProvider != null) {
+      Object currentTenant = currentTenantProvider.currentId();
+      if (!Objects.equals(query.tenantId(), currentTenant)) {
+        //throw new UnsupportedOperationException();
+        log.log(WARNING, "Performing query for tenant {0}, while current tenant is {1}", query.tenantId(), currentTenant, new Throwable());
+      }
+    }
     return new OrmQueryRequest<>(this, queryEngine, query, transaction);
   }
 
