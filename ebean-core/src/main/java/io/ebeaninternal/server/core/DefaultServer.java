@@ -55,6 +55,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.MessageFormat;
 import java.time.Clock;
 import java.util.*;
 import java.util.concurrent.Callable;
@@ -991,7 +992,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       Object currentTenant = currentTenantProvider.currentId();
       if (!Objects.equals(query.tenantId(), currentTenant)) {
         //throw new UnsupportedOperationException();
-        log.log(WARNING, "Performing query for tenant {0}, while current tenant is {1}", query.tenantId(), currentTenant, new Throwable());
+        log.log(WARNING,
+          MessageFormat.format("Performing query for tenant {0}, while current tenant is {1}", query.tenantId(), currentTenant),
+          new Throwable());
       }
     }
     return new OrmQueryRequest<>(this, queryEngine, query, transaction);
