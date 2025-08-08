@@ -4,7 +4,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.8.1-FOC21-SNAPSHOT</version>
+    <version>14.8.1-FOC22-SNAPSHOT</version>
   </parent>
 
   <artifactId>test-java16</artifactId>
@@ -17,7 +17,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-h2</artifactId>
-      <version>14.8.1-FOC21-SNAPSHOT</version>
+      <version>14.8.1-FOC22-SNAPSHOT</version>
     </dependency>
 
     <dependency>
@@ -29,7 +29,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>14.8.1-FOC21-SNAPSHOT</version>
+      <version>14.8.1-FOC22-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
 
