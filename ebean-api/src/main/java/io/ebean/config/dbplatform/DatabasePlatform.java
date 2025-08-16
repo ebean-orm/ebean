@@ -200,10 +200,19 @@ public class DatabasePlatform {
 
   protected SqlExceptionTranslator exceptionTranslator = new SqlCodeTranslator();
 
+  protected InsertSqlSyntaxExtension insertSqlSyntaxExtension = new StandardInsertSqlSyntax();
+
   /**
    * Instantiates a new database platform.
    */
   public DatabasePlatform() {
+  }
+
+  /**
+   * Return the Insert SQL syntax helper.
+   */
+  public InsertSqlSyntaxExtension insertSqlSyntaxExtension() {
+    return insertSqlSyntaxExtension;
   }
 
   /**
