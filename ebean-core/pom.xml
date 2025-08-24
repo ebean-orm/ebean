@@ -3,7 +3,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.0.0-RC4</version>
+    <version>16.0.0</version>
   </parent>
 
   <artifactId>ebean-core</artifactId>
@@ -22,13 +22,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>16.0.0-RC4</version>
+      <version>16.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-json</artifactId>
-      <version>16.0.0-RC4</version>
+      <version>16.0.0</version>
     </dependency>
 
     <dependency>
@@ -52,7 +52,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>16.0.0-RC4</version>
+      <version>16.0.0</version>
     </dependency>
 
     <dependency>
@@ -165,21 +165,21 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>16.0.0-RC4</version>
+      <version>16.0.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-postgres</artifactId>
-      <version>16.0.0-RC4</version>
+      <version>16.0.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-sqlserver</artifactId>
-      <version>16.0.0-RC4</version>
+      <version>16.0.0</version>
       <scope>test</scope>
     </dependency>
 
