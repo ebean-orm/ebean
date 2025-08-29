@@ -40,12 +40,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   /**
    * Construct for Text root expression list - this handles implicit Bool Should, Must etc.
    */
-  public DefaultExpressionList(Query<T> query) {
-    this(query, query.getExpressionFactory(), null, new ArrayList<>(), true);
-  }
-
-  public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
-    this(query, query.getExpressionFactory(), parentExprList, new ArrayList<>());
+  public DefaultExpressionList(Query<T> query, boolean textRoot) {
+    this(query, query.getExpressionFactory(), null, new ArrayList<>(), textRoot);
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
