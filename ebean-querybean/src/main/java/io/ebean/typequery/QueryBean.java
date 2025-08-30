@@ -121,7 +121,7 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   /** Construct for FilterMany */
   protected QueryBean(ExpressionList<T> filter) {
     this.query = null;
-    this.root = null;
+    this.root = (R) this;
     this.whereStack = new ArrayStack<>();
     whereStack.push(filter);
   }
