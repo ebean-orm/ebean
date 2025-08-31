@@ -8,14 +8,13 @@ import jakarta.persistence.Id;
 public class MTJOrder {
 
   @Id
-  Long id;
+  private long id;
 
   @Column(name = "org_id")
-  Long orgId;
+  private long orgId;
 
   @Column
-  String other;
-
+  private String other;
 
   public Long id() {
     return id;

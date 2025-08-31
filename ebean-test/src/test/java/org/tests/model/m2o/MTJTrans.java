@@ -6,17 +6,17 @@ import jakarta.persistence.*;
 public class MTJTrans {
 
   @Id
-  Long id;
+  private long id;
 
   @Column(name = "org_id")
-  Long orgId;
+  private long orgId;
 
   @ManyToOne
   @JoinColumns({
-    @JoinColumn(name = "org_id", referencedColumnName = "org_id", insertable = false, updatable = false),
+    @JoinColumn(name = "org_id", referencedColumnName = "org_id"), // extra join column, not strictly needed
     @JoinColumn(name = "order_id", referencedColumnName = "id")
   })
-  MTJOrder order;
+  private MTJOrder order;
 
   public Long id() {
     return id;
