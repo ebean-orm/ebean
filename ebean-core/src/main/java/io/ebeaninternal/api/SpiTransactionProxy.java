@@ -195,13 +195,13 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void registerDeleteBean(Integer hash) {
-    transaction.registerDeleteBean(hash);
+  public void registerDeleteBean(Class<?> type, Object id) {
+    transaction.registerDeleteBean(type, id);
   }
 
   @Override
-  public boolean isRegisteredDeleteBean(Integer hash) {
-    return transaction.isRegisteredDeleteBean(hash);
+  public boolean isRegisteredDeleteBean(Class<?> type, Object id) {
+    return transaction.isRegisteredDeleteBean(type, id);
   }
 
   @Override
