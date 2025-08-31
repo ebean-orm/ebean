@@ -133,6 +133,10 @@ public final class TableJoin {
     return table;
   }
 
+//  public boolean multiColumn() {
+//    return columns.length > 1;
+//  }
+
   public void addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx, String predicate) {
     String[] names = SplitName.split(prefix);
     String a1 = ctx.tableAlias(names[0]);

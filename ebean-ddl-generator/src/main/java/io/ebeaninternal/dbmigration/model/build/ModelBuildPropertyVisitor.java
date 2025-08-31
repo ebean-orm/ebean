@@ -195,7 +195,7 @@ public class ModelBuildPropertyVisitor extends BaseTablePropertyVisitor {
       String dbCol = column.getLocalDbColumn();
       BeanProperty importedProperty = p.findMatchImport(dbCol);
       if (importedProperty == null) {
-        throw new RuntimeException("Imported BeanProperty not found?");
+        continue;
       }
       String columnDefn = ctx.getColumnDefn(importedProperty, true);
       String refColumn = importedProperty.dbColumn();
