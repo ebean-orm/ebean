@@ -694,7 +694,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public <T> Junction<T> conjunction(Query<T> query) {
-    return new JunctionExpression<>(Junction.Type.AND, query, query.where());
+    return new JunctionExpression<>(Junction.Type.AND, query, this, query.where());
   }
 
   /**
@@ -702,7 +702,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public <T> Junction<T> disjunction(Query<T> query) {
-    return new JunctionExpression<>(Junction.Type.OR, query, query.where());
+    return new JunctionExpression<>(Junction.Type.OR, query, this, query.where());
   }
 
   /**
@@ -710,7 +710,7 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public <T> Junction<T> conjunction(Query<T> query, ExpressionList<T> parent) {
-    return new JunctionExpression<>(Junction.Type.AND, query, parent);
+    return new JunctionExpression<>(Junction.Type.AND, query, this, parent);
   }
 
   /**
@@ -718,14 +718,14 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public <T> Junction<T> disjunction(Query<T> query, ExpressionList<T> parent) {
-    return new JunctionExpression<>(Junction.Type.OR, query, parent);
+    return new JunctionExpression<>(Junction.Type.OR, query, this, parent);
   }
 
   /**
    * Return a list of expressions that are wrapped by NOT.
    */
   public <T> Junction<T> junction(Junction.Type type, Query<T> query) {
-    return new JunctionExpression<>(type, query, query.where());
+    return new JunctionExpression<>(type, query, this, query.where());
   }
 
   /**
@@ -733,6 +733,6 @@ public class DefaultExpressionFactory implements SpiExpressionFactory {
    */
   @Override
   public <T> Junction<T> junction(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
-    return new JunctionExpression<>(type, query, parent);
+    return new JunctionExpression<>(type, query, this, parent);
   }
 }

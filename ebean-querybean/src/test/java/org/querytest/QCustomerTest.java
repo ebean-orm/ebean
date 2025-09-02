@@ -378,6 +378,20 @@ public class QCustomerTest {
   }
 
   @Test
+  void filterManyOr() {
+    var q = new QCustomer()
+      .contacts.filterMany(c ->
+        c.or()
+          .firstName.startsWith("R")
+          .lastName.startsWith("R")
+          .endOr())
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or ((t1.first_name like ? escape'|' or t1.last_name like ? escape'|'))) order by t0.id");
+  }
+
+  @Test
   public void testIdIn() {
 
     List<Integer> ids = new ArrayList<>();

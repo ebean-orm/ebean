@@ -179,7 +179,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public void registerDeleteBean(Integer persistingBean) {
+  public void registerDeleteBean(Class<?> type, Object id) {
     throw new IllegalStateException(notExpectedMessage);
   }
 
@@ -187,7 +187,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
    * Return true if this is a bean that has already been saved/deleted.
    */
   @Override
-  public boolean isRegisteredDeleteBean(Integer persistingBean) {
+  public boolean isRegisteredDeleteBean(Class<?> type, Object id) {
     return false;
   }
 

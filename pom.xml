@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>16.0.0</version>
+  <version>16.0.1</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -47,11 +47,11 @@
     <ebean-annotation.version>8.4</ebean-annotation.version>
     <ebean-ddl-runner.version>2.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
-    <ebean-migration.version>14.2.0</ebean-migration.version>
+    <ebean-migration.version>14.3.0</ebean-migration.version>
     <ebean-test-containers.version>7.14</ebean-test-containers.version>
     <ebean-datasource.version>10.1</ebean-datasource.version>
-    <ebean-agent.version>14.12.0</ebean-agent.version>
-    <ebean-maven-plugin.version>14.12.0</ebean-maven-plugin.version>
+    <ebean-agent.version>16.0.1</ebean-agent.version>
+    <ebean-maven-plugin.version>16.0.1</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
@@ -67,7 +67,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.13</version>
       <scope>test</scope>
     </dependency>
 
@@ -96,13 +96,18 @@
     <module>composites</module>
     <module>ebean-jackson-mapper</module>
     <module>ebean-spring-txn</module>
-    <module>kotlin-querybean-generator</module>
     <module>ebean-core-json</module>
   </modules>
 
   <profiles>
     <profile>
+      <id>ea</id>
+    </profile>
+    <profile>
       <id>central</id>
+      <modules>
+        <module>kotlin-querybean-generator</module>
+      </modules>
     </profile>
     <profile>
       <id>h2v1</id>
@@ -125,6 +130,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>kotlin-querybean-generator</module>
         <module>tests</module>
       </modules>
     </profile>

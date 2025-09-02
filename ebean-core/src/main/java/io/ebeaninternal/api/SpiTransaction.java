@@ -64,12 +64,12 @@ public interface SpiTransaction extends Transaction {
    * <p>
    * This is to handle bi-directional relationships where both sides Cascade.
    */
-  void registerDeleteBean(Integer hash);
+  void registerDeleteBean(Class<?> type, Object id);
 
   /**
    * Return true if this is a bean that has already been saved/deleted.
    */
-  boolean isRegisteredDeleteBean(Integer hash);
+  boolean isRegisteredDeleteBean(Class<?> type, Object id);
 
   /**
    * Unregister the persisted beans. Expected after persisting top level beans

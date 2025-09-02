@@ -372,14 +372,15 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
     }
     TableJoinColumn[] cols = join.columns();
     if (!idProp.isEmbedded()) {
-      // simple single scalar id
-      if (cols.length != 1) {
-        CoreLog.log.log(ERROR, "No Imported Id column for {0} in table {1}", idProp, join.getTable());
-        return null;
-      } else {
-        BeanProperty[] idProps = {idProp};
-        return createImportedScalar(owner, cols[0], idProps, others);
+      // simple single scalar id, match on the foreign column, allow extra TableJoinColumn for #3664
+      String matchColumn = idProp.dbColumn();
+      for (TableJoinColumn col : cols) {
+        if (matchColumn.equals(col.getForeignDbColumn())) {
+          return createImportedScalar(owner, col, new BeanProperty[]{idProp}, others);
+        }
       }
+      CoreLog.log.log(ERROR, "No Imported Id column for {0} in table {1}", idProp, join.getTable());
+      return null;
     } else {
       // embedded id
       BeanPropertyAssocOne<?> embProp = (BeanPropertyAssocOne<?>) idProp;

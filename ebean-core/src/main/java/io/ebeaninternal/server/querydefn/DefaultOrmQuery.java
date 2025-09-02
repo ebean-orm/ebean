@@ -1805,7 +1805,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final ExpressionList<T> where() {
     if (whereExpressions == null) {
-      whereExpressions = new DefaultExpressionList<>(this, null);
+      whereExpressions = new DefaultExpressionList<>(this);
     }
     return whereExpressions;
   }
@@ -1826,7 +1826,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final ExpressionList<T> having() {
     if (havingExpressions == null) {
-      havingExpressions = new DefaultExpressionList<>(this, null);
+      havingExpressions = new DefaultExpressionList<>(this);
     }
     return havingExpressions;
   }

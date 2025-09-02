@@ -56,7 +56,6 @@ public class TestCarWheelIud extends BaseTestCase {
     Car car2 = DB.find(Car.class, car.getId());
 
     DB.delete(car2);
-
   }
 
   @Test

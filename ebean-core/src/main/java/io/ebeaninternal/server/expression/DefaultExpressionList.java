@@ -30,8 +30,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     return new DefaultExpressionList<>(q, null, null, null);
   }
 
-  public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
-    this(query, query.getExpressionFactory(), parentExprList, new ArrayList<>());
+  public DefaultExpressionList(Query<T> query) {
+    this(query, query.getExpressionFactory(), null, new ArrayList<>());
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {

@@ -46,10 +46,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * The unique id used for logging summary.
    */
   private Object idValue;
-  /**
-   * Hash value used to handle cascade delete both ways in a relationship.
-   */
-  private Integer beanHash;
   private boolean statelessUpdate;
   private boolean notifyCache;
   /**
@@ -252,7 +248,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private void onFailedUpdateUndoGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
       Object oldVal = intercept.origValue(prop.propertyIndex());
-      prop.setValue(entityBean, oldVal);
+      if (oldVal != null) {
+        prop.setValue(entityBean, oldVal);
+      }
     }
   }
 
@@ -473,34 +471,17 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
-  /**
-   * The hash used to register the bean with the transaction.
-   * <p>
-   * Takes into account the class type and id value.
-   */
-  private Integer beanHash() {
-    if (beanHash == null) {
-      Object id = beanDescriptor.getId(entityBean);
-      int hc = 92821 * bean.getClass().getName().hashCode();
-      if (id != null) {
-        hc += id.hashCode();
-      }
-      beanHash = hc;
-    }
-    return beanHash;
-  }
-
   public void registerDeleteBean() {
-    Integer hash = beanHash();
-    transaction.registerDeleteBean(hash);
+    final Object id = beanDescriptor.id(entityBean);
+    transaction.registerDeleteBean(beanDescriptor.type(), id);
   }
 
   public boolean isRegisteredForDeleteBean() {
     if (transaction == null) {
       return false;
     } else {
-      Integer hash = beanHash();
-      return transaction.isRegisteredDeleteBean(hash);
+      final Object id = beanDescriptor.id(entityBean);
+      return transaction.isRegisteredDeleteBean(beanDescriptor.type(), id);
     }
   }
 
@@ -697,7 +678,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void checkRowCount(int rowCount) {
     if (rowCount != 1 && rowCount != Statement.SUCCESS_NO_INFO) {
       if (ConcurrencyMode.VERSION == concurrencyMode) {
-        onFailedUpdateUndoGeneratedProperties();
+        if (type == Type.UPDATE) {
+          onFailedUpdateUndoGeneratedProperties();
+        }
         throw new OptimisticLockException("Data has changed. updated row count " + rowCount, null, bean);
       } else if (rowCount == 0 && type == Type.UPDATE) {
         throw new EntityNotFoundException("No rows updated");
