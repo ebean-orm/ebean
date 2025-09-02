@@ -13,6 +13,7 @@ import org.example.domain.otherpackage.ValidEmail;
 import org.example.domain.query.QContact;
 import org.example.domain.query.QCustomer;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
@@ -389,6 +390,23 @@ public class QCustomerTest {
 
     q.findList();
     assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or ((t1.first_name like ? escape'|' or t1.last_name like ? escape'|'))) order by t0.id");
+  }
+
+  @Test
+  @DisplayName("Retain filterMany expression when select fetchGroup applied after filterMany")
+  void filterManyBeforeSelectFetchGroup_expect_filterManyExpressionRetained() {
+    var fetchGroup = QCustomer.forFetchGroup()
+      .select(name)
+      .contacts.fetch(QContact.Alias.email)
+      .buildFetchGroup();
+
+    var q = new QCustomer()
+      .contacts.filterMany(c -> c.firstName.startsWith("R"))
+      .select(fetchGroup)
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).contains(" t0.id, t0.name, t1.id, t1.email from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? escape'|')) order by t0.id");
   }
 
   @Test
