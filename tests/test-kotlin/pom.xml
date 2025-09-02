@@ -73,7 +73,7 @@
       <plugin>
         <groupId>org.jetbrains.kotlin</groupId>
         <artifactId>kotlin-maven-plugin</artifactId>
-        <version>${kotlin.version}</version>
+        <version>2.2.10</version>
         <configuration>
           <jvmTarget>${maven.compiler.target}</jvmTarget>
         </configuration>

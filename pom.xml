@@ -96,13 +96,18 @@
     <module>composites</module>
     <module>ebean-jackson-mapper</module>
     <module>ebean-spring-txn</module>
-    <module>kotlin-querybean-generator</module>
     <module>ebean-core-json</module>
   </modules>
 
   <profiles>
     <profile>
+      <id>ea</id>
+    </profile>
+    <profile>
       <id>central</id>
+      <modules>
+        <module>kotlin-querybean-generator</module>
+      </modules>
     </profile>
     <profile>
       <id>h2v1</id>
@@ -125,6 +130,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>kotlin-querybean-generator</module>
         <module>tests</module>
       </modules>
     </profile>

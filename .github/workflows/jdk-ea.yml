@@ -37,5 +37,5 @@ jobs:
     - name: Maven version
       run: mvn --version
     - name: Build with Maven
-      run: mvn -T 8 test
+      run: mvn test -Pea
 
