@@ -105,6 +105,9 @@
     </profile>
     <profile>
       <id>central</id>
+      <modules>
+        <module>kotlin-querybean-generator</module>
+      </modules>
     </profile>
     <profile>
       <id>h2v1</id>
