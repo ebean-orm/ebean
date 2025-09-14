@@ -14,4 +14,9 @@ public interface SpiBeanType {
    * or removals from the collection.
    */
   boolean isToManyDirty(EntityBean bean);
+
+  /**
+   * returns the ID of the bean.
+   */
+  Object getId(EntityBean bean);
 }
