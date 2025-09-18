@@ -13,9 +13,18 @@ import java.sql.SQLException;
 abstract class TransactionFactory {
 
   final TransactionManager manager;
+  private final boolean autoCommitMode;
 
   TransactionFactory(TransactionManager manager) {
     this.manager = manager;
+    this.autoCommitMode = manager.isAutoCommitMode();
+  }
+
+  /**
+   * Return a new transaction.
+   */
+  SpiTransaction createTransaction(boolean explicit, Connection connection) {
+    return autoCommitMode ? new JdbcAutoCommitTransaction(explicit, connection, manager) : new JdbcTransaction(explicit, connection, manager);
   }
 
   /**

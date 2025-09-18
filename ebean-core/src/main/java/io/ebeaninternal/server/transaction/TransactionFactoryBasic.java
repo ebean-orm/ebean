@@ -39,7 +39,7 @@ class TransactionFactoryBasic extends TransactionFactory {
     Connection connection = null;
     try {
       connection = dataSource.getConnection();
-      SpiTransaction t = manager.createTransaction(explicit, connection);
+      SpiTransaction t = createTransaction(explicit, connection);
       return setIsolationLevel(t, isolationLevel);
     } catch (PersistenceException ex) {
       JdbcClose.close(connection);

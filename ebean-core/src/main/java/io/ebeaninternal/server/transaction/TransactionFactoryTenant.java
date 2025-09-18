@@ -48,7 +48,7 @@ class TransactionFactoryTenant extends TransactionFactory {
     try {
       Object tenantId = tenantProvider.currentId();
       connection = dataSourceSupplier.connection(tenantId);
-      SpiTransaction transaction = manager.createTransaction(explicit, connection);
+      SpiTransaction transaction = createTransaction(explicit, connection);
       transaction.setTenantId(tenantId);
       return setIsolationLevel(transaction, isolationLevel);
 
