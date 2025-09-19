@@ -35,7 +35,7 @@ final class SqlTreeAlias {
   void addManyWhereJoins(Set<String> manyWhereJoins) {
     if (manyWhereJoins != null) {
       for (String include : manyWhereJoins) {
-        addPropertyJoin(include, manyWhereJoinProps);
+        addPropertyJoin(include, manyWhereJoinProps, null);
       }
     }
   }
@@ -56,18 +56,22 @@ final class SqlTreeAlias {
         if (desc.isEmbeddedPath(propJoin)) {
           addEmbeddedPropertyJoin(propJoin);
         } else {
-          addPropertyJoin(propJoin, joinProps);
+          addPropertyJoin(propJoin, joinProps, desc);
         }
       }
     }
   }
-
-  private void addPropertyJoin(String include, TreeSet<String> set) {
-    if (set.add(include)) {
-      String[] split = SplitName.split(include);
-      if (split[0] != null) {
-        addPropertyJoin(split[0], set);
-      }
+  
+  private void addPropertyJoin(String include, TreeSet<String> set, STreeType desc) {
+    if (include == null) {
+      return;
+    }
+    String[] split = SplitName.split(include);
+    if (desc != null && desc.isEmbeddedPath(include)) {
+      addEmbeddedPropertyJoin(include);
+      addPropertyJoin(split[0], set, desc);
+    } else if (set.add(include)) {
+      addPropertyJoin(split[0], set, desc);
     }
   }
 
