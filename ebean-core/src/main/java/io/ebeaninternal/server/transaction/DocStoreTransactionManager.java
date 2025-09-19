@@ -20,7 +20,7 @@ public final class DocStoreTransactionManager extends TransactionManager {
 
   @Override
   public SpiTransaction createTransaction(boolean explicit, int isolationLevel) {
-    return createTransaction(explicit, null);
+    return new DocStoreOnlyTransaction(explicit, this);
   }
 
   @Override
@@ -28,8 +28,4 @@ public final class DocStoreTransactionManager extends TransactionManager {
     return new DocStoreOnlyTransaction(false, this);
   }
 
-  @Override
-  protected SpiTransaction createTransaction(boolean explicit, Connection c) {
-    return new DocStoreOnlyTransaction(explicit, this);
-  }
 }

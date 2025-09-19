@@ -90,13 +90,17 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   private final boolean skipCacheAfterWrite;
   DocStoreTransaction docStoreTxn;
-  private ProfileStream profileStream;
+  protected ProfileStream profileStream;
   private ProfileLocation profileLocation;
   private final Instant startTime = Instant.now();
   private final long startNanos;
   private boolean autoPersistUpdates;
 
   JdbcTransaction(boolean explicit, Connection connection, TransactionManager manager) {
+    this(false, explicit, connection, manager);
+  }
+
+  JdbcTransaction(boolean autoCommit, boolean explicit, Connection connection, TransactionManager manager) {
     try {
       this.active = true;
       this.explicit = explicit;
@@ -125,7 +129,9 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         this.onQueryOnlyCommit = true;
       }
 
-      checkAutoCommit(connection);
+      if (!autoCommit) {
+        checkAutoCommit(connection);
+      }
 
     } catch (Exception e) {
       throw new PersistenceException(e);
