@@ -718,7 +718,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.useQueryCache = useQueryCache;
     copy.unmodifiable = unmodifiable;
     if (detail != null) {
-      copy.detail = detail.copy();
+      copy.detail = detail.copy(null);
     }
     copy.temporalMode = temporalMode;
     copy.firstRow = firstRow;
@@ -1318,7 +1318,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Query<T> select(FetchGroup<T> fetchGroup) {
     if (fetchGroup != null) {
-      this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
+      this.detail = ((SpiFetchGroup<T>) fetchGroup).detail(detail);
     }
     return this;
   }

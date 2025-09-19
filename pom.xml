@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>16.0.1</version>
+  <version>16.1.0</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -48,10 +48,10 @@
     <ebean-ddl-runner.version>2.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>14.3.0</ebean-migration.version>
-    <ebean-test-containers.version>7.14</ebean-test-containers.version>
+    <ebean-test-containers.version>7.15</ebean-test-containers.version>
     <ebean-datasource.version>10.1</ebean-datasource.version>
-    <ebean-agent.version>16.0.1</ebean-agent.version>
-    <ebean-maven-plugin.version>16.0.1</ebean-maven-plugin.version>
+    <ebean-agent.version>16.1.0</ebean-agent.version>
+    <ebean-maven-plugin.version>16.1.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 

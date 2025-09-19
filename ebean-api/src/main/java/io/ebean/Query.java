@@ -1,6 +1,7 @@
 package io.ebean;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Object relational query for finding a List, Set, Map or single entity bean.
@@ -310,6 +311,7 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
   /**
    * Return the Id value.
    */
+  @Nullable
   Object getId();
 
   /**
@@ -429,11 +431,13 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
   /**
    * Return the "for update" wait mode to use.
    */
+  @Nullable
   LockWait getForUpdateLockWait();
 
   /**
    * Return the lock type (strength) to use with "for update".
    */
+  @Nullable
   LockType getForUpdateLockType();
 
   /**

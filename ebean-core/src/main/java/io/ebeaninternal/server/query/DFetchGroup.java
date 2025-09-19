@@ -15,8 +15,8 @@ final class DFetchGroup<T> implements SpiFetchGroup<T> {
   }
 
   @Override
-  public OrmQueryDetail detail() {
-    return detail.copy();
+  public OrmQueryDetail detail(OrmQueryDetail existing) {
+    return detail.copy(existing);
   }
 
   @Override

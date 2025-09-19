@@ -52,7 +52,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   @SuppressWarnings("rawtypes")
   @Override
   public Query<T> select(FetchGroup fetchGroup) {
-    this.detail = ((SpiFetchGroup) fetchGroup).detail();
+    this.detail = ((SpiFetchGroup) fetchGroup).detail(detail);
     return this;
   }
 
