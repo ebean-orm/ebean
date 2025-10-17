@@ -75,9 +75,10 @@ public class TestSubQuery extends BaseTestCase {
     Query<OrderDetail> debugSq = sq.copy();
     debugSq.findSingleAttribute();
     if (isPostgresCompatible()) {
+      // TODO
       assertThat(debugSq.getGeneratedSql()).isEqualTo("select t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id where t0.product_id = any(?)");
     } else {
-      assertSql(debugSq.getGeneratedSql()).isEqualTo("select t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id where t0.product_id in (?)");
+      assertSql(debugSq.getGeneratedSql()).isEqualTo("select t0.order_id from o_order_detail t0 where t0.product_id in (?)");
     }
 
     Query<Order> query = DB.find(Order.class).select("shipDate").where().isIn("id", sq).query();
