@@ -311,9 +311,11 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
         deleteSet = new HashSet<>();
       }
       deleteSet.add(id);
-      remove(id);
     }
 
+    private boolean isDeleted(EntityBean bean) {
+      return deleteSet != null && deleteSet.contains(rootType);
+    }
     /**
      * Add the dirty beans to the list.
      */
@@ -325,7 +327,12 @@ public final class DefaultPersistenceContext implements SpiPersistenceContext {
           if (value == null) continue;
         }
         EntityBean bean = (EntityBean) value;
-        if (bean._ebean_getIntercept().isDirty() || beanType.isToManyDirty(bean)) {
+        boolean deleted = false;
+        if (deleteSet != null) {
+          Object id = beanType.getId(bean);
+          deleted = id != null && deleteSet.contains(id);
+        }
+        if (!deleted && bean._ebean_getIntercept().isDirty() || beanType.isToManyDirty(bean)) {
           list.add(value);
         }
       }
