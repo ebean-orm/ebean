@@ -49,7 +49,7 @@ public class TestAggregationCount extends BaseTestCase {
     List<TEventOne> list = query.findList();
 
     String sql = sqlOf(query, 5);
-    assertThat(sql).contains("select t0.id, t0.name, t0.status, t0.version, t0.event_id from tevent_one t0");
+    assertThat(sql).contains("select t0.id, t0.name, t0.status, t0.event_id, t0.version from tevent_one t0");
 
     for (TEventOne eventOne : list) {
       // lazy loading on Aggregation properties
