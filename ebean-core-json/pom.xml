@@ -3,7 +3,7 @@
   <parent>
     <groupId>io.ebean</groupId>
     <artifactId>ebean-parent</artifactId>
-    <version>16.1.0</version>
+    <version>16.1.1</version>
   </parent>
   <artifactId>ebean-core-json</artifactId>
   <name>ebean-core-json</name>
@@ -16,7 +16,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>16.1.0</version>
+      <version>16.1.1</version>
     </dependency>
 
     <!-- Jackson core used internally by Ebean -->
