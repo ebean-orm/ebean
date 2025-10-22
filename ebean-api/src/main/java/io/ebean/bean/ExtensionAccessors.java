@@ -3,7 +3,11 @@ package io.ebean.bean;
 import io.ebean.bean.extend.EntityExtension;
 import io.ebean.bean.extend.ExtendableBean;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -195,6 +199,10 @@ public class ExtensionAccessors implements Iterable<ExtensionAccessor> {
     }
     if (pos < 0) {
       pos = -2 - pos;
+    }
+    while (pos + 1 < offsets.length && offsets[pos] == offsets[pos + 1]) {
+      // leere Accessors überspringen
+      pos++;
     }
     return accessors.get(pos);
   }
