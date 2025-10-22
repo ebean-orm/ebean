@@ -105,6 +105,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final long slowQueryMicros;
   private final SlowQueryListener slowQueryListener;
   private final boolean disableL2Cache;
+  private final AggregateFormulaContext formulaContext;
   private boolean shutdown;
 
   /**
@@ -120,6 +121,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.backgroundExecutor = config.getBackgroundExecutor();
     this.extraMetrics = config.getExtraMetrics();
     this.serverName = this.config.getName();
+    this.formulaContext = config.getConfig().aggregateFormulaContext();
     this.lazyLoadBatchSize = this.config.getLazyLoadBatchSize();
     this.cqueryEngine = config.getCQueryEngine();
     this.expressionFactory = config.getExpressionFactory();
@@ -851,6 +853,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     query.usingTransaction(transaction);
     query.setId(id);
     return findId(query);
+  }
+
+  @Override
+  public <T> STreeProperty createFormulaProperty(SpiBeanType desc, String formula, String path) {
+    return desc.formulaBuilder().create(formulaContext, formula, path);
   }
 
   <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, SpiQuery<T> query) {

@@ -321,6 +321,12 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
    * This means that the returning graph can't be mutated via setters, all the collections
    * are unmodifiable collections, lazy loading is disabled and that the query uses
    * {@link PersistenceContextScope#QUERY}.
+   * <p>
+   * Attempting to mutate an unmodifiable bean will throw a <code>UnmodifiableEntityException</code>.
+   * Attempting to load an unloaded property will throw a <code>LazyInitialisationException</code>
+   *
+   * @see LazyInitialisationException
+   * @see UnmodifiableEntityException
    */
   SELF setUnmodifiable(boolean unmodifiable);
 
@@ -369,6 +375,16 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
 
   /**
    * Set the {@link CacheMode} to use the query for executing this query.
+   * <p>
+   * Since version 16.x using the query bean will set the query to use unmodifiable (see
+   * {@link #setUnmodifiable(boolean)}) so the returned object graph is unmodifiable
+   * and safe to cache by the application.
+   * <p>
+   * Attempting to mutate an unmodifiable bean will throw a <code>UnmodifiableEntityException</code>.
+   * Attempting to load an unloaded property will throw a <code>LazyInitialisationException</code>
+   *
+   * @see LazyInitialisationException
+   * @see UnmodifiableEntityException
    */
   SELF setUseQueryCache(CacheMode cacheMode);
 

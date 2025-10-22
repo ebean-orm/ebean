@@ -699,11 +699,9 @@ public class DeployBeanDescriptor<T> {
    * Return the defaultSelectClause using FetchType.LAZY and FetchType.EAGER.
    */
   public String getDefaultSelectClause() {
-
     StringBuilder sb = new StringBuilder();
 
     boolean hasLazyFetch = false;
-
     for (DeployBeanProperty prop : propMap.values()) {
       if (!prop.isTransient() && !(prop instanceof DeployBeanPropertyAssocMany<?>)) {
         if (prop.isFetchEager()) {

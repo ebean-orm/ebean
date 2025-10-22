@@ -1,5 +1,6 @@
 package io.ebean.xtest.internal.api;
 
+import io.ebeaninternal.server.query.STreeProperty;
 import org.jspecify.annotations.NullMarked;
 import io.ebean.*;
 import io.ebean.annotation.Platform;
@@ -630,6 +631,11 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
 
   @Override
   public SqlRow findOne(SpiSqlQuery query) {
+    return null;
+  }
+
+  @Override
+  public <T> STreeProperty createFormulaProperty(SpiBeanType desc, String formula, String path) {
     return null;
   }
 

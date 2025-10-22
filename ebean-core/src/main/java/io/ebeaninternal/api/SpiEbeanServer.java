@@ -1,5 +1,6 @@
 package io.ebeaninternal.api;
 
+import io.ebeaninternal.server.query.STreeProperty;
 import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.bean.BeanCollectionLoader;
@@ -359,4 +360,6 @@ public interface SpiEbeanServer extends SpiServer, BeanCollectionLoader {
 
   @Nullable
   SqlRow findOne(SpiSqlQuery query);
+
+  <T> STreeProperty createFormulaProperty(SpiBeanType desc, String formula, String path);
 }
