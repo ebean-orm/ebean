@@ -684,6 +684,12 @@ public final class SqlTreeBuilder {
 
           SqlTreeNodeExtraJoin parentJoin = joinRegister.get(parentPropertyName);
           if (parentJoin == null) {
+            if (desc.isEmbeddedPath(parentPropertyName)) {
+              // digging in embedded property
+              // so we have to join parent property path
+              includeProp = parentPropertyName;
+              continue;
+            }
             // we need to create this the parent implicitly...
             parentJoin = createJoinLeaf(parentPropertyName);
           }

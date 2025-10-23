@@ -19,3 +19,9 @@ profiling/
 *.iws
 .idea/
 *uuid.state
+
+# Eclipse
+/**/.project
+/**/.classpath
+/**/.settings/
+/**/bin/
