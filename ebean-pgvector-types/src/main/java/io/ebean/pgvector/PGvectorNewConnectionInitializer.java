@@ -1,5 +1,6 @@
 package io.ebean.pgvector;
 
+import com.pgvector.PGbit;
 import com.pgvector.PGvector;
 import io.ebean.datasource.NewConnectionInitializer;
 
@@ -12,6 +13,7 @@ public class PGvectorNewConnectionInitializer implements NewConnectionInitialize
   public void preInitialize(Connection connection) {
     try {
       PGvector.registerTypes(connection);
+      PGbit.registerType(connection);
     } catch (SQLException e) {
       throw new RuntimeException(e);
     }
