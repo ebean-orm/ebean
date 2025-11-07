@@ -5,6 +5,7 @@ import com.pgvector.PGhalfvec;
 import com.pgvector.PGsparsevec;
 import com.pgvector.PGvector;
 import io.ebean.annotation.Cache;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
@@ -14,12 +15,16 @@ import jakarta.persistence.Table;
 public class CachedBean extends BaseEntity {
   String name;
 
+  @Column(length = 800)
   PGvector vector;
 
+  @Column(length = 200)
   PGsparsevec sparsevec;
 
+  @Column(length = 200)
   PGbit bit;
 
+  @Column(length = 200)
   PGhalfvec halfvec;
 
   public String getName() {
