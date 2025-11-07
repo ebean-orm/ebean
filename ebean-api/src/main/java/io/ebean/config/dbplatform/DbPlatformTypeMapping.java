@@ -46,6 +46,11 @@ public class DbPlatformTypeMapping {
   private static final DbPlatformType MULTILINESTRING = new DbPlatformType("multilinestring");
   private static final DbPlatformType MULTIPOLYGON = new DbPlatformType("multipolygon");
 
+  private static final DbPlatformType VECTOR=new DbPlatformType("vector", 2000, null);
+  private static final DbPlatformType VECTOR_HALF=new DbPlatformType("halfvec", 4000, null);
+  private static final DbPlatformType VECTOR_BIT=new DbPlatformType("bit", 64000, null);
+  private static final DbPlatformType VECTOR_SPARSE=new DbPlatformType("sparsevec", 1000, null);
+
   private final Map<DbType, DbPlatformType> typeMap = new EnumMap<>(DbType.class);
 
   /**
@@ -93,6 +98,10 @@ public class DbPlatformTypeMapping {
     put(DbType.MULTIPOINT, MULTIPOINT);
     put(DbType.MULTILINESTRING, MULTILINESTRING);
     put(DbType.MULTIPOLYGON, MULTIPOLYGON);
+    put(DbType.VECTOR, VECTOR);
+    put(DbType.VECTOR_HALF, VECTOR_HALF);
+    put(DbType.VECTOR_BIT, VECTOR_BIT);
+    put(DbType.VECTOR_SPARSE, VECTOR_SPARSE);
 
     if (logicalTypes) {
       // keep it logical for 2 layer DDL generation

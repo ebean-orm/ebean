@@ -69,7 +69,7 @@ module io.ebean.core {
   exports io.ebeaninternal.server.querydefn to io.ebean.autotune, io.ebean.querybean, io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.rawsql to io.ebean.test;
   exports io.ebeaninternal.server.json to io.ebean.test, io.ebean.elastic;
-  exports io.ebeaninternal.server.type to io.ebean.postgis, io.ebean.test, io.ebean.postgis.types;
+  exports io.ebeaninternal.server.type to io.ebean.postgis, io.ebean.test, io.ebean.postgis.types, io.ebean.pgvector;
   exports io.ebeaninternal.server.transaction to io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.k8scache;
   exports io.ebeaninternal.server.util to io.ebean.querybean;
 
