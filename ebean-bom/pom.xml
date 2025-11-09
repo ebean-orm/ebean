@@ -258,6 +258,18 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
+        <artifactId>ebean-pgvector</artifactId>
+        <version>16.1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
+        <artifactId>ebean-pgvector-types</artifactId>
+        <version>16.1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
         <artifactId>ebean-sqlite</artifactId>
         <version>16.1.1</version>
       </dependency>

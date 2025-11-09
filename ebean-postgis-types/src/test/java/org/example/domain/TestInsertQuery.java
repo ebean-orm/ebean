@@ -12,14 +12,13 @@ import org.postgis.Polygon;
 import java.sql.SQLException;
 import java.util.List;
 
-public class TestInsertQuery {
+class TestInsertQuery {
 
   /**
    * Not automated this test yet.
    */
   @Test
-  public void insert() throws SQLException {
-
+  void insert() throws SQLException {
 
     List<MyBean> list = DB.find(MyBean.class).findList();
     for (MyBean MyBean : list) {

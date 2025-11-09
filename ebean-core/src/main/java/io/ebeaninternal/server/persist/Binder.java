@@ -329,6 +329,13 @@ public final class Binder {
           geoTypeBinder.bind(b, dataType, data);
           break;
 
+        case DbPlatformType.VECTOR:
+        case DbPlatformType.VECTOR_HALF:
+        case DbPlatformType.VECTOR_BIT:
+        case DbPlatformType.VECTOR_SPARSE:
+          b.setObject(data);
+          break;
+
         case java.sql.Types.OTHER:
           b.setObject(data, dataType);
           break;
