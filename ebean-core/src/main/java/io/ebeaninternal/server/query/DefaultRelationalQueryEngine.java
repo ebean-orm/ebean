@@ -14,6 +14,7 @@ import io.ebeaninternal.server.core.RelationalQueryRequest;
 import io.ebeaninternal.server.core.RowReader;
 import io.ebeaninternal.server.persist.Binder;
 
+import jakarta.persistence.NonUniqueResultException;
 import jakarta.persistence.PersistenceException;
 
 import java.sql.SQLException;
@@ -160,13 +161,17 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
       T value = null;
       if (dataReader.next()) {
         value = scalarType.read(dataReader);
+        if (dataReader.next()) {
+          throw new NonUniqueResultException("Got more than 1 result for findSingleAttribute");
+        }
       }
       request.logSummary();
       return value;
 
+    } catch (NonUniqueResultException e) {
+      throw e;
     } catch (Exception e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
-
     } finally {
       request.close();
     }
