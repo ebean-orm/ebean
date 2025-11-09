@@ -5,7 +5,8 @@ import io.ebean.config.dbplatform.ExtraDbTypes;
 
 import java.sql.SQLException;
 
-public class ScalarTypePGhalfvec extends ScalarTypePGbase<PGhalfvec> {
+public final class ScalarTypePGhalfvec extends ScalarTypePGbase<PGhalfvec> {
+
   public ScalarTypePGhalfvec() {
     super(ExtraDbTypes.VECTOR_HALF, PGhalfvec.class);
   }

@@ -14,8 +14,8 @@ import java.sql.SQLException;
 import java.sql.Types;
 
 abstract class ScalarTypePGbase<T extends PGobject> implements ScalarType<T> {
-  private final int jdbcType;
 
+  private final int jdbcType;
   private final Class<T> cls;
 
   public ScalarTypePGbase(int jdbcType, Class<T> cls) {

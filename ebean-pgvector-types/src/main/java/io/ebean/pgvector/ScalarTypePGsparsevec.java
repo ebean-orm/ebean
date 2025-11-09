@@ -5,7 +5,8 @@ import io.ebean.config.dbplatform.ExtraDbTypes;
 
 import java.sql.SQLException;
 
-public class ScalarTypePGsparsevec extends ScalarTypePGbase<PGsparsevec> {
+public final class ScalarTypePGsparsevec extends ScalarTypePGbase<PGsparsevec> {
+
   public ScalarTypePGsparsevec() {
     super(ExtraDbTypes.VECTOR_SPARSE, PGsparsevec.class);
   }

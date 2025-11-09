@@ -5,25 +5,27 @@ import com.pgvector.PGvector;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TestCachedBean {
+class TestCachedBean {
+
   @Test
-  public void testCache() {
-    var v=new PGvector(TestInsertQuery.randomVector(800));
-    var b=new PGbit((TestInsertQuery.randomBitArray(200)));
-    CachedBean cb=new CachedBean();
+  void testCache() {
+    var v = new PGvector(TestInsertQuery.randomVector(800));
+    var b = new PGbit((TestInsertQuery.randomBitArray(200)));
+    CachedBean cb = new CachedBean();
     cb.setName("test");
     cb.setVector(v);
     cb.setBit(b);
     DB.insert(cb);
 
-    CachedBean r1=DB.find(CachedBean.class, cb.getId());
+    CachedBean r1 = DB.find(CachedBean.class, cb.getId());
     assertNotNull(r1);
     assertEquals(v, r1.getVector());
     assertEquals(b, r1.getBit());
 
-    CachedBean r2=DB.find(CachedBean.class, cb.getId());
+    CachedBean r2 = DB.find(CachedBean.class, cb.getId());
     assertNotNull(r2);
     assertEquals(v, r2.getVector());
     assertEquals(b, r2.getBit());

@@ -3,7 +3,8 @@ package io.ebean.pgvector;
 import com.pgvector.PGvector;
 import io.ebean.config.dbplatform.ExtraDbTypes;
 
-public class ScalarTypePGvector extends ScalarTypePGbase<PGvector> {
+public final class ScalarTypePGvector extends ScalarTypePGbase<PGvector> {
+
   public ScalarTypePGvector() {
     super(ExtraDbTypes.VECTOR, PGvector.class);
   }

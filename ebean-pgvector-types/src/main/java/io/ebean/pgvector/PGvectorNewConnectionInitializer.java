@@ -7,7 +7,7 @@ import io.ebean.datasource.NewConnectionInitializer;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class PGvectorNewConnectionInitializer implements NewConnectionInitializer {
+public final class PGvectorNewConnectionInitializer implements NewConnectionInitializer {
 
   @Override
   public void preInitialize(Connection connection) {

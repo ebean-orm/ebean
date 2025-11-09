@@ -5,7 +5,8 @@ import io.ebean.config.dbplatform.ExtraDbTypes;
 
 import java.sql.SQLException;
 
-public class ScalarTypePGbit extends ScalarTypePGbase<PGbit> {
+public final class ScalarTypePGbit extends ScalarTypePGbase<PGbit> {
+
   public ScalarTypePGbit() {
     super(ExtraDbTypes.VECTOR_BIT, PGbit.class);
   }

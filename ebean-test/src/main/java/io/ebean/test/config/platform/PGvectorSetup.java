@@ -2,7 +2,8 @@ package io.ebean.test.config.platform;
 
 import java.util.Properties;
 
-public class PGvectorSetup implements PlatformSetup {
+final class PGvectorSetup implements PlatformSetup {
+
   @Override
   public Properties setup(Config config) {
     int defaultPort = config.isUseDocker() ? 8432 : 5432;
