@@ -216,6 +216,9 @@ public final class DefaultTypeManager implements TypeManager {
       }
       found = checkInheritedTypes(type);
     }
+    if (found instanceof ScalarTypeClass) {
+      log.log(WARNING, "@Column mapping for type Class is deprecated. Please refer to https://ebean.io/docs/deprecated#class-mapping");
+    }
     return found != ScalarTypeNotFound.INSTANCE ? found : null; // Do not return ScalarTypeNotFound, otherwise checks will fail
   }
 
