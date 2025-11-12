@@ -6,6 +6,7 @@ import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.test.LoggedSql;
+import jakarta.persistence.NonUniqueResultException;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SqlQueryTests extends BaseTestCase {
@@ -83,6 +85,19 @@ class SqlQueryTests extends BaseTestCase {
     String sql2 = "select length(:val)";
     final Long val2 = DB.sqlQuery(sql2).setParameter("val", "NotVeryLong").mapToScalar(Long.class).findOne();
     assertThat(val2).isEqualTo(11);
+  }
+
+  @Test
+  void findSingleAttribute_whenMultipleRows_expect_NonUniqueResultException() {
+    ResetBasicData.reset();
+    String sql = "select id from o_order order by id desc";
+
+    assertThatThrownBy(() -> {
+      DB.sqlQuery(sql)
+        .mapToScalar(Long.class)
+        .findOne();
+    }).isInstanceOf(NonUniqueResultException.class)
+      .hasMessageContaining("Got more than 1 result for findSingleAttribute");
   }
 
   @Test
