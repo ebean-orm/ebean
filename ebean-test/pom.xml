@@ -12,8 +12,8 @@
   <artifactId>ebean-test</artifactId>
 
   <properties>
-    <bytebuddy.version>1.14.17</bytebuddy.version>
-    <assertj.version>3.26.0</assertj.version>
+    <bytebuddy.version>1.18.1</bytebuddy.version>
+    <assertj.version>3.27.6</assertj.version>
   </properties>
 
   <dependencies>
