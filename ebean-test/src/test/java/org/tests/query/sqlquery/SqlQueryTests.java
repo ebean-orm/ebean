@@ -389,6 +389,18 @@ class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
+  void findOne_mapper_when_notUnique() {
+    ResetBasicData.reset();
+
+    String sql = "select id, name, status from o_customer order by name desc";
+    assertThatThrownBy(() -> DB.sqlQuery(sql)
+      .mapTo(CUST_MAPPER)
+      .findOne())
+      .isInstanceOf(NonUniqueResultException.class)
+      .hasMessageContaining("Got more than 1 result for findOne");
+  }
+
+  @Test
   void findList_mapper() {
     ResetBasicData.reset();
 

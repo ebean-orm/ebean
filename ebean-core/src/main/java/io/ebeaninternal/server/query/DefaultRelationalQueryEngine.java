@@ -116,9 +116,14 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
     try {
       request.executeSql(binder, SpiQuery.Type.BEAN);
       T value = request.mapOne(mapper);
+      if (request.next()) {
+        throw new NonUniqueResultException("Got more than 1 result for findOne");
+      }
       request.logSummary();
       return value;
 
+    } catch (NonUniqueResultException e) {
+      throw e;
     } catch (Exception e) {
       throw new PersistenceException(errMsg(e.getMessage(), request.getSql()), e);
 
