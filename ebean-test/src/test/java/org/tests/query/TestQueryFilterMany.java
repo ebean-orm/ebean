@@ -6,6 +6,8 @@ import io.ebean.ExpressionList;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Building;
+import org.tests.model.basic.ClanQuest;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Order;
 import org.tests.model.basic.ResetBasicData;
@@ -228,6 +230,17 @@ public class TestQueryFilterMany extends BaseTestCase {
       .findOneOrEmpty();
 
     assertThat(customer).isPresent();
+  }
+
+  @Test
+  public void test_filterMany_excludedExplicitly() {
+    Optional<ClanQuest> quest = DB.find(ClanQuest.class)
+      .setId(1)
+      .fetch("clan", "buildings")
+      .filterMany("clan.buildings").eq("type", Building.CAFE)
+      .findOneOrEmpty();
+
+    assertThat(quest).isAbsent();
   }
 
   @Test

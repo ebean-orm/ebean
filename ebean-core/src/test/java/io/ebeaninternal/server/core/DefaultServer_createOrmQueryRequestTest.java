@@ -8,9 +8,6 @@ import io.ebean.Query;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Building;
-import org.tests.model.basic.Clan;
-import org.tests.model.basic.ClanQuest;
 import org.tests.model.basic.Order;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -343,20 +340,6 @@ public class DefaultServer_createOrmQueryRequestTest {
     OrmQueryDetail detail = queryRequest.query().detail();
 
     assertThat(detail.getFetchPaths()).containsExactly("customer", "customer.contacts");
-  }
-
-  @Test
-  public void test_filterMany_excludedExplicitly2() {
-    Query<ClanQuest> query = DB.find(ClanQuest.class)
-      .setId(1)
-      .fetch("clan", "buildings")
-      .filterMany("clan.buildings").eq("type", Building.CAFE)
-      .query();
-
-    OrmQueryRequest<ClanQuest> queryRequest = OrmQueryRequestTestHelper.queryRequest(query);
-    OrmQueryDetail detail = queryRequest.query().detail();
-
-    assertThat(detail.getFetchPaths()).containsExactly("clan", "clan.buildings");
   }
 
   private void assertSame(OrmQueryDetail detail1, OrmQueryDetail detail2) {
