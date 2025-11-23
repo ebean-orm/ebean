@@ -374,7 +374,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private ScalarType<?> createJsonObjectMapperType(DeployBeanProperty prop, int dbType, DocPropertyType docType) {
     if (jsonMapper == null) {
-      throw new IllegalArgumentException("Unsupported @DbJson mapping - Jackson ObjectMapper not present for " + prop);
+      throw new IllegalArgumentException("Unsupported @DbJson mapping - Missing dependency ebean-jackson-mapper? Jackson ObjectMapper not present for " + prop);
     }
     if (MutationDetection.DEFAULT == prop.getMutationDetection()) {
       prop.setMutationDetection(jsonManager.mutationDetection());
