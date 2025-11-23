@@ -13,6 +13,7 @@ public class Building extends Model {
   public int id;
   @Column(nullable = false)
   public String type;
+  @Column(name = "lvl")
   public int level;
   public final String name;
   @ManyToOne(optional = false)
