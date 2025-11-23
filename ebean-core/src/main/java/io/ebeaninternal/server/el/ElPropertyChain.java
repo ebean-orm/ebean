@@ -286,8 +286,4 @@ public final class ElPropertyChain implements ElPropertyValue {
     }
   }
 
-  @Override
-  public String idNullOr(String filterManyExpression) {
-    throw new UnsupportedOperationException();
-  }
 }
