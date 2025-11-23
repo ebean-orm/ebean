@@ -339,7 +339,6 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sqlList = LoggedSql.stop();
     assertEquals(1, sqlList.size());
-    assertThat(sqlList.get(0)).contains("left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id and t1.status in (?) order by t0.id");
     if (isPostgresCompatible()) {
       assertThat(sqlList.get(0)).contains("left join o_customer t2 on t2.id = t1.kcustomer_id and t1.status = any(?) order by t0.id");
     } else {
@@ -441,7 +440,7 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     assertThat(sql).hasSize(1);
     if (isSqlServer()) {
-      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id and (t1.first_name is not null and lower(t1.email) like ? order by t0.id; --bind(rob%)");
+      assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id and (t1.first_name is not null and lower(t1.email) like ?) order by t0.id; --bind(rob%)");
     } else {
       assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id and (t1.first_name is not null and lower(t1.email) like ? escape'|') order by t0.id; --bind(rob%)");
     }
