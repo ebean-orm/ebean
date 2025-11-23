@@ -45,5 +45,6 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {
     super.appendFrom(ctx, joinType.autoToOuter());
+    ctx.includeFilterMany();
   }
 }

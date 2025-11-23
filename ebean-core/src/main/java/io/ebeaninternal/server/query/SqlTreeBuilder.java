@@ -107,7 +107,7 @@ public final class SqlTreeBuilder {
     CQueryHistorySupport historySupport = builder.historySupport(query);
     CQueryDraftSupport draftSupport = builder.draftSupport(query);
     String colAlias = subQuery || rootNode.isSingleProperty() ? null : columnAliasPrefix;
-    this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, draftSupport, fromForUpdate);
+    this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, draftSupport, fromForUpdate, predicates.dbFilterManyJoin());
   }
 
   /**

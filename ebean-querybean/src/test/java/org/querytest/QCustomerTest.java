@@ -328,7 +328,7 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterMany */ t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? escape'|' and t1.email is not null)) order by t0.id");
+    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterMany */ t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id and t1.first_name like ? escape'|' and t1.email is not null order by t0.id");
   }
 
   @Test
@@ -340,7 +340,7 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterManySingle */ t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? escape'|')) order by t0.id");
+    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterManySingle */ t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id and t1.first_name like ? escape'|' order by t0.id");
   }
 
   @Test
@@ -375,7 +375,7 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? and t1.first_name like ? escape'|')) order by t0.id");
+    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id and t1.first_name like ? and t1.first_name like ? escape'|' order by t0.id");
   }
 
   @Test
@@ -389,7 +389,7 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or ((t1.first_name like ? escape'|' or t1.last_name like ? escape'|'))) order by t0.id");
+    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id and (t1.first_name like ? escape'|' or t1.last_name like ? escape'|') order by t0.id");
   }
 
   @Test
@@ -406,7 +406,7 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).contains(" t0.id, t0.name, t1.id, t1.email from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? escape'|')) order by t0.id");
+    assertThat(q.getGeneratedSql()).contains(" t0.id, t0.name, t1.id, t1.email from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id and t1.first_name like ? escape'|' order by t0.id");
   }
 
   @Test
