@@ -615,11 +615,6 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     return fetchOrderBy;
   }
 
-  @Override
-  public String idNullOr(String filterManyExpression) {
-    return targetIdBinder.idNullOr(name, filterManyExpression);
-  }
-
   /**
    * Return the order by for use when lazy loading the associated collection.
    */

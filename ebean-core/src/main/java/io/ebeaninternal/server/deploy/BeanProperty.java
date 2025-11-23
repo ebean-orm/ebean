@@ -494,11 +494,6 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   @Override
-  public String idNullOr(String filterManyExpression) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public void loadIgnore(DbReadContext ctx) {
     ctx.dataReader().incrementPos(1);
   }

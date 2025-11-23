@@ -35,7 +35,7 @@ public class TestQueryFilterManySimple extends BaseTestCase {
     list.get(0).getOrders().size();
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id where");
+    assertThat(sql.get(0)).contains("left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id and t1.status = ? and t1.order_date > ?");
     assertThat(sql.get(0)).contains("order by t0.id");
     if (isPostgresCompatible()) {
       assertThat(sql.get(1)).contains("from contact t0 where (t0.customer_id) = any(?) and t0.first_name is not null;");

@@ -149,4 +149,9 @@ public interface DbSqlContext {
    * as it was already added to the query.
    */
   boolean joinAdded();
+
+  /**
+   * Include the filter many predicates if specified into the JOIN clause.
+   */
+  void includeFilterMany();
 }

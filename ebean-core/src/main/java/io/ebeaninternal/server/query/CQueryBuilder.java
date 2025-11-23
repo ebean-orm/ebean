@@ -700,7 +700,7 @@ final class CQueryBuilder {
       appendHistoryAsOfPredicate();
       appendFindId();
       appendToWhere(predicates.dbWhere());
-      appendToWhere(predicates.dbFilterMany());
+      appendToWhere(predicates.dbFilterManyWhere());
       if (!query.isIncludeSoftDeletes()) {
         appendSoftDelete();
       }
