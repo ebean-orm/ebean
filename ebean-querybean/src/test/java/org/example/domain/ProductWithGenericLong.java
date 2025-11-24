@@ -9,7 +9,7 @@ import javax.validation.constraints.Size;
  * Product entity bean.
  */
 @Entity
-@Table(name = "o_product", schema = "foo")
+@Table(name = "long_product", schema = "foo")
 public class ProductWithGenericLong extends GenericBaseModel<Long> {
 
   @Size(max = 20)
