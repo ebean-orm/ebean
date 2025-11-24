@@ -51,7 +51,12 @@ public enum DbType {
   JSONB(ExtraDbTypes.JSONB),
   JSONCLOB(ExtraDbTypes.JSONClob),
   JSONBLOB(ExtraDbTypes.JSONBlob),
-  JSONVARCHAR(ExtraDbTypes.JSONVarchar);
+  JSONVARCHAR(ExtraDbTypes.JSONVarchar),
+
+  VECTOR(ExtraDbTypes.VECTOR),
+  VECTOR_HALF(ExtraDbTypes.VECTOR_HALF),
+  VECTOR_BIT(ExtraDbTypes.VECTOR_BIT),
+  VECTOR_SPARSE(ExtraDbTypes.VECTOR_SPARSE);
 
   private final int id;
 

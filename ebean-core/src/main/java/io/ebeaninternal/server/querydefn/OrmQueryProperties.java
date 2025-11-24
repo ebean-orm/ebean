@@ -171,8 +171,9 @@ public final class OrmQueryProperties implements Serializable {
     if (filterMany == null) {
       FilterExprPath exprPath = new FilterExprPath(path);
       SpiExpressionFactory queryEf = (SpiExpressionFactory) rootQuery.getExpressionFactory();
-      ExpressionFactory filterEf = queryEf.createExpressionFactory();// exprPath);
+      ExpressionFactory filterEf = queryEf.createExpressionFactory();
       filterMany = new FilterExpressionList(exprPath, filterEf, rootQuery);
+      // assuming conditions supported in JOIN, not setting markForQueryJoin = true
     }
     return filterMany;
   }
@@ -185,6 +186,13 @@ public final class OrmQueryProperties implements Serializable {
       return null;
     }
     return filterMany.trimPath(trimPath);
+  }
+
+  /**
+   * Return true if there is a filterMany and it should be included in the JOIN.
+   */
+  public boolean isFilterManyJoin() {
+    return filterMany != null && !markForQueryJoin;
   }
 
   /**

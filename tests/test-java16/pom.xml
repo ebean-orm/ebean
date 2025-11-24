@@ -5,7 +5,7 @@
   <parent>
     <artifactId>tests</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.0.1</version>
+    <version>16.2.0</version>
   </parent>
 
   <artifactId>test-java16</artifactId>
@@ -18,7 +18,7 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-h2</artifactId>
-      <version>16.0.1</version>
+      <version>16.2.0</version>
     </dependency>
 
     <dependency>
@@ -30,14 +30,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-test</artifactId>
-      <version>16.0.1</version>
+      <version>16.2.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>querybean-generator</artifactId>
-      <version>16.0.1</version>
+      <version>16.2.0</version>
       <scope>provided</scope>
     </dependency>
 

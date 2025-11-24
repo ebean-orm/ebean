@@ -617,6 +617,8 @@ public class DeployBeanProperty {
     this.dbRead = true;
     this.dbInsertable = false;
     this.dbUpdateable = false;
+    // aggregation by default not fetchEager
+    this.fetchEager = false;
   }
 
   /**

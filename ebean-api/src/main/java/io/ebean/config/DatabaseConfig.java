@@ -356,6 +356,8 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   private NamingConvention namingConvention = new UnderscoreNamingConvention();
 
+  private AggregateFormulaContext aggregateFormulaContext = AggregateFormulaContext.builder().build();
+
   /**
    * Behaviour of updates in JDBC batch to by default include all properties.
    */
@@ -1276,6 +1278,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public DatabaseConfig setNamingConvention(NamingConvention namingConvention) {
     this.namingConvention = namingConvention;
+    return this;
+  }
+
+  @Override
+  public AggregateFormulaContext aggregateFormulaContext() {
+    return aggregateFormulaContext;
+  }
+
+  @Override
+  public DatabaseConfig aggregateFormulaContext(AggregateFormulaContext aggregateFormulaContext) {
+    this.aggregateFormulaContext = aggregateFormulaContext;
     return this;
   }
 

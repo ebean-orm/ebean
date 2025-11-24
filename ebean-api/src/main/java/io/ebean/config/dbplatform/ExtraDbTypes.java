@@ -74,4 +74,24 @@ public interface ExtraDbTypes {
    */
   int MULTILINESTRING = 6007;
 
+  /**
+   * PGVector base type
+   */
+  int VECTOR = 7000;
+
+  /**
+   * PGVector half precision float type
+   */
+  int VECTOR_HALF = 7001;
+
+  /**
+   * PGVector binary type (bit)
+   */
+  int VECTOR_BIT = 7002;
+
+  /**
+   * PGVector sparse type
+   */
+  int VECTOR_SPARSE = 7003;
+
 }

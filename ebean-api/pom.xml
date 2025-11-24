@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.0.1</version>
+    <version>16.2.0</version>
   </parent>
 
   <name>ebean api</name>
@@ -35,7 +35,7 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>4.1</version>
+      <version>4.2</version>
     </dependency>
 
     <dependency>
