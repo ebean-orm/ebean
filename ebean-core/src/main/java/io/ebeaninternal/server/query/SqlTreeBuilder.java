@@ -227,7 +227,7 @@ public final class SqlTreeBuilder {
       alias.addJoin(queryDetail.getFetchPaths(), desc);
       alias.addJoin(predicates.predicateIncludes(), desc);
       alias.addJoin(formula2JoinIncludes, desc);
-      alias.addManyWhereJoins(manyWhereJoins.propertyNames());
+      alias.addManyWhereJoins(manyWhereJoins.propertyNames(), desc);
       // build set of table alias
       alias.buildAlias();
       predicates.parseTableAlias(alias);
@@ -809,6 +809,12 @@ public final class SqlTreeBuilder {
           if (selectIncludes.contains(parentPropertyName)) {
             // parent already handled by select
             return childJoin;
+          }
+          if (desc.isEmbeddedPath(parentPropertyName)) {
+            // digging in embedded property
+            // so we have to join parent property path
+            includeProp = parentPropertyName;
+            continue;
           }
 
           SqlTreeNodeExtraJoin parentJoin = joinRegister.get(parentPropertyName);
