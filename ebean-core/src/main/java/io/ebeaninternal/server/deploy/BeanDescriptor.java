@@ -2362,6 +2362,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       if (assocProp == null) {
         return null;
       }
+      // this method is an entry-point, although it introduces recursive calls via
+      // buildElPropertyValue -> createElPropertyValue -> buildElGetValue (back to here)
+      // it seams we can initialize ElPropertyChainBuilder at this point and skip further checks.
+      if (chain == null) {
+        chain = new ElPropertyChainBuilder(propName);
+      }
       String remainder = propName.substring(basePos + 1);
       return assocProp.buildElPropertyValue(propName, remainder, chain, propertyDeploy);
     }
@@ -2373,9 +2379,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     if (property == null) {
       throw new PersistenceException("No property found for [" + propName + "] in expression " + chain.expression());
     }
-    if (property.containsMany()) {
-      chain.setContainsMany();
-    }
+
     return chain.add(property).build();
   }
 
