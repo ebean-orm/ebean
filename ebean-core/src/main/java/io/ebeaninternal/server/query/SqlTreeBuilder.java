@@ -638,7 +638,7 @@ public final class SqlTreeBuilder {
 
         // find root of this extra join... linking back to the
         // parents (creating the tree) as it goes.
-        SqlTreeNodeExtraJoin root = findExtraJoinRoot(includeProp, extraJoin);
+        SqlTreeNodeExtraJoin root = findExtraJoinRoot(extraJoin);
         // register the root because these are the only ones we
         // return back.
         rootRegister.put(root.name(), root);
@@ -649,14 +649,6 @@ public final class SqlTreeBuilder {
      * Create a SqlTreeNodeExtraJoin, register and return it.
      */
     private SqlTreeNodeExtraJoin createJoinLeaf(String propertyName) {
-      if (propertyName == null) {
-        return null;
-      }
-      if (desc.isEmbeddedPath(propertyName)) {
-        // digging in embedded property
-        // so we have to join parent property path
-        return createJoinLeaf(SplitName.split(propertyName)[0]);
-      }
       ExtraJoin extra = desc.extraJoin(propertyName);
       if (extra == null) {
         return null;
@@ -674,7 +666,8 @@ public final class SqlTreeBuilder {
      * not specified and is implicitly created.
      * </p>
      */
-    private SqlTreeNodeExtraJoin findExtraJoinRoot(String includeProp, SqlTreeNodeExtraJoin childJoin) {
+    private SqlTreeNodeExtraJoin findExtraJoinRoot(SqlTreeNodeExtraJoin childJoin) {
+      String includeProp = childJoin.name();
       while (true) {
         int dotPos = includeProp.lastIndexOf('.');
         if (dotPos == -1) {
