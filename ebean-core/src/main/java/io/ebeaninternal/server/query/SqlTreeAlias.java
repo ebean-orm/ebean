@@ -4,6 +4,7 @@ import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiQuery;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -15,8 +16,7 @@ final class SqlTreeAlias {
 
   private final SpiQuery.TemporalMode temporalMode;
   private final TreeSet<String> joinProps = new TreeSet<>();
-  // embedded property as key, and true if many-where-property
-  private HashMap<String, Boolean> embeddedPropertyJoins;
+  private HashSet<String> embeddedPropertyJoins;
   private final TreeSet<String> manyWhereJoinProps = new TreeSet<>();
   private final HashMap<String, String> aliasMap = new HashMap<>();
   private final HashMap<String, String> manyWhereAliasMap = new HashMap<>();
@@ -35,39 +35,42 @@ final class SqlTreeAlias {
   void addManyWhereJoins(Set<String> manyWhereJoins, STreeType desc) {
     if (manyWhereJoins != null) {
       for (String include : manyWhereJoins) {
-        addPropertyJoin(include, manyWhereJoinProps, desc, true);
+        addPropertyJoin(include, manyWhereJoinProps, desc);
       }
     }
   }
 
-  private void addEmbeddedPropertyJoin(String embProp, Boolean isManyWhere) {
+  private boolean addEmbeddedPropertyJoin(String embProp) {
     if (embeddedPropertyJoins == null) {
-      embeddedPropertyJoins = new HashMap<>();
+      embeddedPropertyJoins = new HashSet<>();
     }
-    embeddedPropertyJoins.put(embProp, isManyWhere);
+    return embeddedPropertyJoins.add(embProp);
   }
 
   /**
    * Add joins.
    */
   public void addJoin(Set<String> propJoins, STreeType desc) {
-    if (propJoins != null) {
-      for (String propJoin : propJoins) {
-        addPropertyJoin(propJoin, joinProps, desc, false);
-      }
+    if (propJoins == null) {
+        return;
+    }
+    for (String propJoin : propJoins) {
+      addPropertyJoin(propJoin, joinProps, desc);
     }
   }
 
-  private void addPropertyJoin(String include, TreeSet<String> set, STreeType desc, Boolean isManyWhere) {
-    if (include == null) {
-      return;
-    }
-    String[] split = SplitName.split(include);
+  private void addPropertyJoin(String include, TreeSet<String> set, STreeType desc) {
+    boolean added = false;
     if (desc.isEmbeddedPath(include)) {
-      addEmbeddedPropertyJoin(include, isManyWhere);
-      addPropertyJoin(split[0], set, desc, isManyWhere);
-    } else if (set.add(include)) {
-      addPropertyJoin(split[0], set, desc, isManyWhere);
+      added = addEmbeddedPropertyJoin(include);
+    } else {
+      added = set.add(include);
+    }
+    if (added) {
+      String[] split = SplitName.split(include);
+      if (split[0] != null) {
+        addPropertyJoin(split[0], set, desc);
+      }
     }
   }
 
@@ -86,14 +89,11 @@ final class SqlTreeAlias {
 
   private void mapEmbeddedPropertyAlias() {
     if (embeddedPropertyJoins != null) {
-      for (Map.Entry<String,Boolean> propJoin : embeddedPropertyJoins.entrySet()) {
-        String[] split = SplitName.split(propJoin.getKey());
+      for (String propJoin : embeddedPropertyJoins) {
+        String[] split = SplitName.split(propJoin);
         // the table alias of the parent path
-        if (Boolean.TRUE.equals(propJoin.getValue())) {
-          manyWhereAliasMap.put(propJoin.getKey(), tableAliasManyWhere(split[0]));
-        } else {
-          aliasMap.put(propJoin.getKey(), tableAlias(split[0]));
-        }
+        String alias = tableAlias(split[0]);
+        aliasMap.put(propJoin, alias);
       }
     }
   }
