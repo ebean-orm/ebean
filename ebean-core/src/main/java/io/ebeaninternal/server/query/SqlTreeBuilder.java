@@ -653,6 +653,8 @@ public final class SqlTreeBuilder {
         return null;
       }
       if (desc.isEmbeddedPath(propertyName)) {
+        // digging in embedded property
+        // so we have to join parent property path
         return createJoinLeaf(SplitName.split(propertyName)[0]);
       }
       ExtraJoin extra = desc.extraJoin(propertyName);
@@ -685,12 +687,6 @@ public final class SqlTreeBuilder {
           if (selectIncludes.contains(parentPropertyName)) {
             // parent already handled by select
             return childJoin;
-          }
-          if (desc.isEmbeddedPath(parentPropertyName)) {
-            // digging in embedded property
-            // so we have to join parent property path
-            includeProp = parentPropertyName;
-            continue;
           }
 
           SqlTreeNodeExtraJoin parentJoin = joinRegister.get(parentPropertyName);
