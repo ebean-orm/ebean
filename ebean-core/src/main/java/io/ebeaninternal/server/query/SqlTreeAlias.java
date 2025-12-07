@@ -32,41 +32,44 @@ final class SqlTreeAlias {
   /**
    * Add joins to support where predicates
    */
-  void addManyWhereJoins(Set<String> manyWhereJoins) {
+  void addManyWhereJoins(Set<String> manyWhereJoins, STreeType desc) {
     if (manyWhereJoins != null) {
       for (String include : manyWhereJoins) {
-        addPropertyJoin(include, manyWhereJoinProps);
+        addPropertyJoin(include, manyWhereJoinProps, desc);
       }
     }
   }
 
-  private void addEmbeddedPropertyJoin(String embProp) {
+  private boolean addEmbeddedPropertyJoin(String embProp) {
     if (embeddedPropertyJoins == null) {
       embeddedPropertyJoins = new HashSet<>();
     }
-    embeddedPropertyJoins.add(embProp);
+    return embeddedPropertyJoins.add(embProp);
   }
 
   /**
    * Add joins.
    */
   public void addJoin(Set<String> propJoins, STreeType desc) {
-    if (propJoins != null) {
-      for (String propJoin : propJoins) {
-        if (desc.isEmbeddedPath(propJoin)) {
-          addEmbeddedPropertyJoin(propJoin);
-        } else {
-          addPropertyJoin(propJoin, joinProps);
-        }
-      }
+    if (propJoins == null) {
+        return;
+    }
+    for (String propJoin : propJoins) {
+      addPropertyJoin(propJoin, joinProps, desc);
     }
   }
 
-  private void addPropertyJoin(String include, TreeSet<String> set) {
-    if (set.add(include)) {
+  private void addPropertyJoin(String include, TreeSet<String> set, STreeType desc) {
+    boolean added = false;
+    if (desc.isEmbeddedPath(include)) {
+      added = addEmbeddedPropertyJoin(include);
+    } else {
+      added = set.add(include);
+    }
+    if (added) {
       String[] split = SplitName.split(include);
       if (split[0] != null) {
-        addPropertyJoin(split[0], set);
+        addPropertyJoin(split[0], set, desc);
       }
     }
   }
@@ -89,7 +92,7 @@ final class SqlTreeAlias {
       for (String propJoin : embeddedPropertyJoins) {
         String[] split = SplitName.split(propJoin);
         // the table alias of the parent path
-        String alias = tableAlias(split[0]);
+        String alias = tableAliasManyWhere(split[0]);
         aliasMap.put(propJoin, alias);
       }
     }
