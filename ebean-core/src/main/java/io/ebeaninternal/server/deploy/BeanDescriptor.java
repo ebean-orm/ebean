@@ -2868,9 +2868,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       BeanProperty beanProperty = elGetValue.beanProperty();
       if (beanProperty instanceof BeanPropertyAssoc<?>) {
         BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) beanProperty;
-        if (!assocProp.isEmbedded()) {
-          return new ExtraJoin(assocProp, elGetValue.containsMany());
-        }
+        return new ExtraJoin(assocProp, elGetValue.containsMany());
       }
     }
     return null;
