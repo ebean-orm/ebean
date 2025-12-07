@@ -362,7 +362,8 @@ public final class SqlTreeBuilder {
     // the 'select' part of the query. We may need to add other joins to
     // support the predicates or order by clauses.
 
-    // remove ManyWhereJoins from the predicateIncludes
+    // remove ManyWhereJoins from the predicateIncludes and orderByIncludes
+    predicates.orderByIncludes().removeAll(manyWhereJoins.propertyNames());
     predicateIncludes.removeAll(manyWhereJoins.propertyNames());
     predicateIncludes.addAll(predicates.orderByIncludes());
 
@@ -649,11 +650,15 @@ public final class SqlTreeBuilder {
      * Create a SqlTreeNodeExtraJoin, register and return it.
      */
     private SqlTreeNodeExtraJoin createJoinLeaf(String propertyName) {
+      SqlTreeNodeExtraJoin extraJoin = joinRegister.get(propertyName);
+      if (extraJoin != null) {
+        return extraJoin;
+      }
       ExtraJoin extra = desc.extraJoin(propertyName);
       if (extra == null) {
         return null;
       } else {
-        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
+        extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
         joinRegister.put(propertyName, extraJoin);
         return extraJoin;
       }
@@ -674,24 +679,25 @@ public final class SqlTreeBuilder {
           // no parent possible(parent is root)
           return childJoin;
 
-        } else {
-          // look in register ...
-          String parentPropertyName = includeProp.substring(0, dotPos);
-          if (selectIncludes.contains(parentPropertyName)) {
-            // parent already handled by select
-            return childJoin;
-          }
-
-          SqlTreeNodeExtraJoin parentJoin = joinRegister.get(parentPropertyName);
-          if (parentJoin == null) {
-            // we need to create this the parent implicitly...
-            parentJoin = createJoinLeaf(parentPropertyName);
-          }
-
-          parentJoin.addChild(childJoin);
-          childJoin = parentJoin;
-          includeProp = parentPropertyName;
         }
+        String parentPropertyName = includeProp.substring(0, dotPos);
+        if (desc.isEmbeddedPath(parentPropertyName)) {
+          // digging in embedded property
+          // so we have to join parent property path if any
+          includeProp = parentPropertyName;
+          continue;
+        }
+        // look in register ...
+        if (selectIncludes.contains(parentPropertyName)) {
+          // parent already handled by select
+          return childJoin;
+        }
+
+        SqlTreeNodeExtraJoin parentJoin = createJoinLeaf(parentPropertyName);
+
+        parentJoin.addChild(childJoin);
+        childJoin = parentJoin;
+        includeProp = parentPropertyName;
       }
     }
 
