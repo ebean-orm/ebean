@@ -649,14 +649,19 @@ public final class SqlTreeBuilder {
      * Create a SqlTreeNodeExtraJoin, register and return it.
      */
     private SqlTreeNodeExtraJoin createJoinLeaf(String propertyName) {
+      if (propertyName == null) {
+        return null;
+      }
+      if (desc.isEmbeddedPath(propertyName)) {
+        return createJoinLeaf(SplitName.split(propertyName)[0]);
+      }
       ExtraJoin extra = desc.extraJoin(propertyName);
       if (extra == null) {
         return null;
-      } else {
-        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
-        joinRegister.put(propertyName, extraJoin);
-        return extraJoin;
       }
+      SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
+      joinRegister.put(propertyName, extraJoin);
+      return extraJoin;
     }
 
     /**
