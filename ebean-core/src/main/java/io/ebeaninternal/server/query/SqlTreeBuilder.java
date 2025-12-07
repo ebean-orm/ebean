@@ -767,7 +767,7 @@ public final class SqlTreeBuilder {
 
         // find root of this extra join... linking back to the
         // parents (creating the tree) as it goes.
-        SqlTreeNodeExtraJoin root = findExtraJoinRoot(extraJoin);
+        SqlTreeNodeExtraJoin root = findExtraJoinRoot(includeProp, extraJoin);
         // register the root because these are the only ones we
         // return back.
         rootRegister.put(root.prefix(), root);
@@ -781,10 +781,11 @@ public final class SqlTreeBuilder {
       ExtraJoin extra = desc.extraJoin(propertyName);
       if (extra == null) {
         return null;
+      } else {
+        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
+        joinRegister.put(propertyName, extraJoin);
+        return extraJoin;
       }
-      SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
-      joinRegister.put(propertyName, extraJoin);
-      return extraJoin;
     }
 
     /**
@@ -795,8 +796,7 @@ public final class SqlTreeBuilder {
      * not specified and is implicitly created.
      * </p>
      */
-    private SqlTreeNodeExtraJoin findExtraJoinRoot(SqlTreeNodeExtraJoin childJoin) {
-      String includeProp = childJoin.name();
+    private SqlTreeNodeExtraJoin findExtraJoinRoot(String includeProp, SqlTreeNodeExtraJoin childJoin) {
       while (true) {
         int dotPos = includeProp.lastIndexOf('.');
         if (dotPos == -1) {
