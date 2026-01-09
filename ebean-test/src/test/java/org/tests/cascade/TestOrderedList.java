@@ -1,9 +1,14 @@
 package org.tests.cascade;
 
+import io.ebean.bean.BeanCollection;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Order;
+import org.tests.model.basic.OrderDetail;
+import org.tests.model.basic.Section;
+import org.tests.model.basic.SubSection;
 
 import java.util.Collections;
 import java.util.List;
@@ -146,6 +151,48 @@ public class TestOrderedList extends BaseTestCase {
 
     masterDb = DB.find(OmOrderedMaster.class, master.getId());
     assertThat(masterDb.getDetails()).containsExactly(detail3, detail1);
+
+  }
+
+  @Test
+  public void testModifyListenModeSet1() {
+    final OmOrderedMaster master = new OmOrderedMaster("Master");
+    final OmOrderedDetail detail1 = new OmOrderedDetail("Detail1");
+    DB.save(detail1);
+    DB.save(master);
+
+    master.getDetails().add(detail1);
+    System.out.println(((BeanCollection<?>) master.getDetails()).modifyListening()); // ALL
+
+    DB.save(master);
+
+    master.getDetails().clear();
+
+    DB.save(master);
+
+    OmOrderedMaster masterDb = DB.find(OmOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).isEmpty();
+
+  }
+
+  @Test
+  public void testModifyListenModeSet2() {
+    final Section master = new Section();
+    final SubSection detail1 = new SubSection();
+    DB.save(detail1);
+    DB.save(master);
+
+    master.getSubSections().add(detail1);
+    System.out.println(((BeanCollection<?>) master.getSubSections()).modifyListening()); // null
+
+    DB.save(master);
+
+    master.getSubSections().clear();
+
+    DB.save(master);
+
+    Section masterDb = DB.find(Section.class, master.getId());
+    assertThat(masterDb.getSubSections()).isEmpty();
 
   }
 
