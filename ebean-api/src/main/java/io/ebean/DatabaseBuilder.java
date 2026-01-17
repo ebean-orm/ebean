@@ -2098,6 +2098,11 @@ public interface DatabaseBuilder {
   DatabaseBuilder setQueryPlanEnable(boolean queryPlanEnable);
 
   /**
+   * Set platform specific query plan options.
+   */
+  public void setQueryPlanOptions(String queryPlanOptions);
+
+  /**
    * Set the query plan collection threshold in microseconds.
    * <p>
    * Queries executing slower than this will have bind values captured such that later
@@ -3093,6 +3098,11 @@ public interface DatabaseBuilder {
      * Return true if query plan capture is enabled.
      */
     boolean isQueryPlanEnable();
+
+    /**
+     * Returns platform specific query plan options.
+     */
+    public String getQueryPlanOptions();
 
     /**
      * Return the query plan collection threshold in microseconds.

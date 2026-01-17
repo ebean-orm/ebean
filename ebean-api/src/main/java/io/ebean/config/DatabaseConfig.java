@@ -516,6 +516,11 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private boolean queryPlanEnable;
 
   /**
+   * Additional platform specific options for query-plan generation.
+   */
+  private String queryPlanOptions;
+
+  /**
    * The default threshold in micros for collecting query plans.
    */
   private long queryPlanThresholdMicros = Long.MAX_VALUE;
@@ -2173,6 +2178,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     queryPlanTTLSeconds = p.getInt("queryPlanTTLSeconds", queryPlanTTLSeconds);
     slowQueryMillis = p.getLong("slowQueryMillis", slowQueryMillis);
     queryPlanEnable = p.getBoolean("queryPlan.enable", queryPlanEnable);
+    queryPlanOptions = p.get("queryPlan.options", queryPlanOptions);
     queryPlanThresholdMicros = p.getLong("queryPlan.thresholdMicros", queryPlanThresholdMicros);
     queryPlanCapture = p.getBoolean("queryPlan.capture", queryPlanCapture);
     queryPlanCapturePeriodSecs = p.getLong("queryPlan.capturePeriodSecs", queryPlanCapturePeriodSecs);
@@ -2500,6 +2506,25 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     return this;
   }
 
+  /**
+   * Returns platform specific query plan options.
+   */
+  @Override
+  public String getQueryPlanOptions() {
+    return queryPlanOptions;
+  }
+
+  /**
+   * Set platform specific query plan options.
+   */
+  @Override
+  public void setQueryPlanOptions(String queryPlanOptions) {
+    this.queryPlanOptions = queryPlanOptions;
+  }
+
+  /**
+   * Return the query plan collection threshold in microseconds.
+   */
   @Override
   public long getQueryPlanThresholdMicros() {
     return queryPlanThresholdMicros;
