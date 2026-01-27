@@ -5,10 +5,13 @@ import io.ebean.DatabaseFactory;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
 import io.ebean.DatabaseBuilder;
+import io.ebean.bean.PersistenceContext;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiPersistenceContext;
 import io.ebeaninternal.api.SpiTransaction;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ContactNote;
@@ -319,5 +322,21 @@ public class TestPersistenceContext extends BaseTestCase {
     System.out.println("Doing FindList, will hold all entries in memory. Expect OOM with -Xmx100m.");
     List<TestModel2> lst = DB.find(TestModel2.class).select("*").findList();
     System.out.println("Read " + lst.size() + " entries");
+  }
+
+  @Test
+  void testFindReferenceBean() {
+
+    ResetBasicData.reset();
+
+    BeanDescriptor<Customer> desc = (BeanDescriptor<Customer>) DB.getDefault().pluginApi().beanType(Customer.class);
+
+    // Fill bean cache
+    DB.find(Customer.class).setId(1).findOne();
+
+    PersistenceContext pc = new DefaultPersistenceContext();
+    desc.findReferenceBean(1, pc);
+
+    assertThat(pc.get(Customer.class, 1)).isNotNull();
   }
 }

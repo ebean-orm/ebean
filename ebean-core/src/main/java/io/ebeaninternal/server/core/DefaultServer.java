@@ -1030,7 +1030,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
       BeanDescriptor<T> desc = query.descriptor();
       Object id = desc.convertId(query.getId());
-      PersistenceContext pc = null;
+      PersistenceContext pc = query.persistenceContext();
       if (t != null && useTransactionPersistenceContext(query)) {
         // first look in the transaction scoped persistence context
         pc = t.persistenceContext();
