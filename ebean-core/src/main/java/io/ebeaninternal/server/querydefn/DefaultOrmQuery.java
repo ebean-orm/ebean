@@ -1475,8 +1475,8 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public Query<T> usingMaster() {
-    this.useMaster = true;
+  public Query<T> usingMaster(boolean useMaster) {
+    this.useMaster = useMaster;
     return this;
   }
 

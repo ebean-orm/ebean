@@ -234,5 +234,16 @@ public interface DtoQuery<T> extends CancelableQuery {
    * source. We use {@code usingMaster()} to instead ensure that the query is executed
    * against the master data source.
    */
-  DtoQuery<T> usingMaster();
+  default DtoQuery<T> usingMaster() {
+    return usingMaster(true);
+  }
+
+  /**
+   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
+   * data source can be used if defined.
+   *
+   * @see #usingMaster()
+   */
+  DtoQuery<T> usingMaster(boolean useMaster);
+
 }

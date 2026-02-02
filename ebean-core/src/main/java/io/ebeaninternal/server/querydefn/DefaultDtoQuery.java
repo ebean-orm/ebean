@@ -95,8 +95,8 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
-  public DtoQuery<T> usingMaster() {
-    this.useMaster = true;
+  public DtoQuery<T> usingMaster(boolean useMaster) {
+    this.useMaster = useMaster;
     return this;
   }
 
