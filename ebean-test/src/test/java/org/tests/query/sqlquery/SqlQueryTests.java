@@ -281,6 +281,28 @@ class SqlQueryTests extends BaseTestCase {
   }
 
   @Test
+  void queryUsingMaster_true() {
+    queryUsingMasterAsParameter(true);
+  }
+
+  @Test
+  void queryUsingMaster_false() {
+    queryUsingMasterAsParameter(false);
+  }
+
+  void queryUsingMasterAsParameter(boolean useMaster) {
+    ResetBasicData.reset();
+
+    String sql = "select id, name, status from o_customer where name is not null";
+    List<CustDto> custDtos = DB.sqlQuery(sql)
+      .usingMaster(useMaster)
+      .mapTo(CUST_MAPPER)
+      .findList();
+
+    assertThat(custDtos).isNotEmpty();
+  }
+
+  @Test
   void queryUsingConnection() throws SQLException {
     ResetBasicData.reset();
     boolean h2 = isH2();

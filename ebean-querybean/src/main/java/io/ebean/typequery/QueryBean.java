@@ -634,8 +634,8 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   }
 
   @Override
-  public final R usingMaster() {
-    query.usingMaster();
+  public R usingMaster(boolean useMaster) {
+    query.usingMaster(useMaster);
     return root;
   }
 

@@ -130,7 +130,17 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
    * source. We we use {@code usingMaster()} to instead ensure that the query is executed
    * against the master data source.
    */
-  SELF usingMaster();
+  default SELF usingMaster() {
+    return usingMaster(true);
+  }
+
+  /**
+   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
+   * data source can be used if defined.
+   *
+   * @see #usingMaster()
+   */
+  SELF usingMaster(boolean useMaster);
 
   /**
    * Set the base table to use for this query.

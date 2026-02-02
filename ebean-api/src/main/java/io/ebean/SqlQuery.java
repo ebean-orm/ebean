@@ -63,7 +63,17 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    * source. We use {@code usingMaster()} to instead ensure that the query is executed
    * against the master data source.
    */
-  SqlQuery usingMaster();
+  default SqlQuery usingMaster() {
+    return usingMaster(true);
+  }
+
+  /**
+   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
+   * data source can be used if defined.
+   *
+   * @see #usingMaster()
+   */
+  SqlQuery usingMaster(boolean useMaster);
 
   /**
    * Execute the query returning a list.

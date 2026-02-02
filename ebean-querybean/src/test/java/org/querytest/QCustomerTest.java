@@ -447,6 +447,22 @@ public class QCustomerTest {
   }
 
   @Test
+  public void usingMaster_true() {
+    new QCustomer()
+      .registered.isNull()
+      .usingMaster(true)
+      .findList();
+  }
+
+  @Test
+  public void usingMaster_false() {
+    new QCustomer()
+      .registered.isNull()
+      .usingMaster(false)
+      .findList();
+  }
+
+  @Test
   public void usingTransaction() {
     try (Transaction transaction = DB.getDefault().createTransaction()) {
 
