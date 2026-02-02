@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.2.0</version>
+    <version>16.2.1</version>
   </parent>
 
   <name>ebean bom</name>
@@ -89,25 +89,25 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-api</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-core</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-core-type</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
@@ -125,13 +125,13 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-jackson-mapper</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-ddl-generator</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
@@ -155,37 +155,37 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-querybean</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>querybean-generator</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>kotlin-querybean-generator</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-test</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-redis</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-spring-txn</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <!-- platforms -->
@@ -193,91 +193,91 @@
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-clickhouse</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-db2</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-h2</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-hana</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-mariadb</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-mysql</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-nuodb</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-oracle</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-postgres</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-postgis</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-postgis-types</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-pgvector</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-pgvector-types</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-sqlite</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
       <dependency>
         <groupId>io.ebean</groupId>
         <artifactId>ebean-sqlserver</artifactId>
-        <version>16.2.0</version>
+        <version>16.2.1</version>
       </dependency>
 
     </dependencies>

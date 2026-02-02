@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.2.0</version>
+    <version>16.2.1</version>
     <relativePath>../..</relativePath>
   </parent>
 
@@ -16,13 +16,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>16.2.0</version>
+      <version>16.2.1</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-mysql</artifactId>
-      <version>16.2.0</version>
+      <version>16.2.1</version>
     </dependency>
 
   </dependencies>
