@@ -123,8 +123,8 @@ class DbTypeMapTest {
     assertThat(dbTypeMap.lookup("varchar", true).renderType(20, 0)).isEqualTo("String");
     assertThat(dbTypeMap.lookup("timestamp", false).renderType(0, 0)).isEqualTo("DateTime");
     assertThat(dbTypeMap.lookup("localdatetime", false).renderType(0, 0)).isEqualTo("DateTime");
-    assertThat(dbTypeMap.lookup("json", false).renderType(0, 0)).isEqualTo("String");
-    assertThat(dbTypeMap.lookup("jsonb", false).renderType(0, 0)).isEqualTo("String");
+    assertThat(dbTypeMap.lookup("json", false).renderType(0, 0)).isEqualTo("JSON");
+    assertThat(dbTypeMap.lookup("jsonb", false).renderType(0, 0)).isEqualTo("JSON");
     assertThat(dbTypeMap.lookup("jsonclob", false).renderType(0, 0)).isEqualTo("String");
     assertThat(dbTypeMap.lookup("jsonblob", false).renderType(0, 0)).isEqualTo("blob");
     assertThat(dbTypeMap.lookup("jsonvarchar", false).renderType(200, 0)).isEqualTo("String");

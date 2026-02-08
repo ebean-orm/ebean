@@ -11,8 +11,8 @@ alter table migtest_e_enum drop constraint if exists ck_migtest_e_enum_test_stat
 -- apply changes
 create table "migtest_QuOtEd" (
   id                            String,
-  status1                       String,
-  status2                       String
+  status1                       Nullable(String),
+  status2                       Nullable(String)
 ) ENGINE = Log();
 
 create table migtest_e_ref (
@@ -41,8 +41,8 @@ alter table migtest_e_basic alter column a_lob set not null;
 alter table migtest_e_basic alter column user_id set default 23;
 alter table migtest_e_basic alter column user_id set not null;
 alter table migtest_e_basic add column description_file blob;
-alter table migtest_e_basic add column old_boolean UInt8 default 0;
-alter table migtest_e_basic add column old_boolean2 UInt8;
+alter table migtest_e_basic add column old_boolean Bool default false;
+alter table migtest_e_basic add column old_boolean2 Bool;
 alter table migtest_e_basic add column eref_id UInt32;
 alter table migtest_e_history2 alter column test_string drop default;
 alter table migtest_e_history2 alter column test_string set null;
