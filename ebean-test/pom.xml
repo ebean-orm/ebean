@@ -13,7 +13,7 @@
 
   <properties>
     <bytebuddy.version>1.18.1</bytebuddy.version>
-    <assertj.version>3.27.6</assertj.version>
+    <assertj.version>3.27.7</assertj.version>
   </properties>
 
   <dependencies>
