@@ -87,7 +87,8 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
     return manyJoin;
   }
 
-  public String name() {
+  @Override
+  public String prefix() {
     return prefix;
   }
 

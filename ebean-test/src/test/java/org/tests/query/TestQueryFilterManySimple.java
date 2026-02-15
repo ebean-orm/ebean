@@ -43,4 +43,19 @@ public class TestQueryFilterManySimple extends BaseTestCase {
       assertThat(sql.get(1)).contains("from contact t0 where (t0.customer_id) in (?) and t0.first_name is not null;");
     }
   }
+
+  @Test
+  void testNestedFilterMany() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
+    DB.find(Customer.class)
+      .fetch("orders")
+      .filterMany("orders").eq("customer.status", Customer.Status.NEW)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    assertThat(sql.get(0)).contains("from o_customer t0 left join o_order t1 on t1.kcustomer_id = t0.id and t1.order_date is not null left join o_customer t2 on t2.id = t1.kcustomer_id and t2.status = ? order by t0.id");
+  }
 }
