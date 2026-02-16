@@ -339,11 +339,6 @@ public interface SpiTransaction extends Transaction {
   boolean isNestedUseSavepoint();
 
   /**
-   * Return true if explicitly set to skip cache (ignores skipOnWrite).
-   */
-  boolean isSkipCacheExplicit();
-
-  /**
    * Fire pre commit processing/listeners.
    */
   void preCommit();
