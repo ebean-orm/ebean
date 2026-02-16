@@ -447,4 +447,21 @@ public class TestQueryFilterMany extends BaseTestCase {
       assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id and t1.first_name is not null and lower(t1.email) like ? order by t0.id; --bind(rob%)");
     }
   }
+
+  @Test
+  void testFilterManyWithNestedPathExpression() {
+    ResetBasicData.reset();
+    LoggedSql.start();
+
+    DB.find(Customer.class)
+      .select("id, name")
+      .fetch("contacts", "firstName, email")
+      .filterMany("contacts").eq("group.name", "DoesNotExist").isNotNull("cretime")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(1);
+    assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id left join contact_group t2 on t2.id = t1.group_id and t2.name = ? and t1.cretime is not null order by t0.id");
+  }
 }

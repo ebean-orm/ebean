@@ -75,16 +75,18 @@ public class TestOrderByWithDistinct extends BaseTestCase {
       assertSql(query).startsWith("select distinct on (t0.id, t2.name, t1.id) t0.id, t0.parent_id, t0.ref_id, t1.id, t1.parent_id, t1.ref_id, t2.name "
         + "from e_basic_tree t0 "
         + "left join e_basic_tree t1 on t1.parent_id = t0.id "
+        + "left join e_basic t2 on t2.id = t1.ref_id "
         + "join e_basic_tree u1 on u1.parent_id = t0.id "
-        + "join e_basic u2 on u2.id = u1.ref_id left "
-        + "join e_basic t2 on t2.id = t1.ref_id where u2.status = ? order by t0.id, t2.name");
+        + "join e_basic u2 on u2.id = u1.ref_id "
+        + "where u2.status = ? order by t0.id, t2.name");
     } else {
       assertSql(query).startsWith("select distinct t0.id, t0.parent_id, t0.ref_id, t1.id, t1.parent_id, t1.ref_id, t2.name "
         + "from e_basic_tree t0 "
         + "left join e_basic_tree t1 on t1.parent_id = t0.id "
+        + "left join e_basic t2 on t2.id = t1.ref_id "
         + "join e_basic_tree u1 on u1.parent_id = t0.id "
-        + "join e_basic u2 on u2.id = u1.ref_id left "
-        + "join e_basic t2 on t2.id = t1.ref_id where u2.status = ? order by t0.id, t2.name");
+        + "join e_basic u2 on u2.id = u1.ref_id "
+        + "where u2.status = ? order by t0.id, t2.name");
     }
   }
 

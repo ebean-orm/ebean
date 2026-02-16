@@ -150,11 +150,6 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
-  public boolean isSkipCacheExplicit() {
-    return false;
-  }
-
-  @Override
   public void setSkipCache(boolean skipCache) {
   }
 

@@ -369,10 +369,11 @@ public final class SqlTreeBuilder {
     IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes, predicateIncludes, manyWhereJoins, temporalMode);
     Collection<SqlTreeNodeExtraJoin> extraJoins = extraJoinDistill.getExtraJoinRootNodes();
     if (!extraJoins.isEmpty()) {
-      // add extra joins required to support predicates
-      // and/or order by clause
+      // add extra joins required to support predicates and/or order by clause
       for (SqlTreeNodeExtraJoin extraJoin : extraJoins) {
-        myList.add(extraJoin);
+        if (!addToParent(extraJoin, myList)) {
+          myList.add(extraJoin);
+        }
         if (extraJoin.isManyJoin()) {
           // as we are now going to join to the many then we need
           // to add the distinct to the sql query to stop duplicate
@@ -381,6 +382,20 @@ public final class SqlTreeBuilder {
         }
       }
     }
+  }
+
+  /**
+   * Return true if the extra join was added as a child to one of the nodes.
+   */
+  private boolean addToParent(SqlTreeNodeExtraJoin extraJoin, List<SqlTreeNode> myList) {
+    String parentPath = SplitName.split(extraJoin.prefix())[0];
+    for (SqlTreeNode maybeParent : myList) {
+      if (maybeParent.prefix().equals(parentPath)) {
+        maybeParent.addChild(extraJoin);
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -632,7 +647,7 @@ public final class SqlTreeBuilder {
         SqlTreeNodeExtraJoin root = findExtraJoinRoot(includeProp, extraJoin);
         // register the root because these are the only ones we
         // return back.
-        rootRegister.put(root.name(), root);
+        rootRegister.put(root.prefix(), root);
       }
     }
 
