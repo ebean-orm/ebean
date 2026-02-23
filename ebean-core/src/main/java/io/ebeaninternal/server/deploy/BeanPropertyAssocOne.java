@@ -210,17 +210,17 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
     if (embedded) {
-      BeanProperty embProp = embeddedPropsMap.get(remainder);
+      String embName = remainder;
+      int basePos = remainder.indexOf('.');
+      if (basePos > -1) {
+        embName = remainder.substring(0, basePos);
+      }
+      BeanProperty embProp = embeddedPropsMap.get(embName);
+
       if (embProp == null) {
-        String msg = "Embedded Property " + remainder + " not found in " + fullName();
+        String msg = "Embedded Property " + embName + " not found in " + fullName();
         throw new PersistenceException(msg);
       }
-      if (chain == null) {
-        chain = new ElPropertyChainBuilder(true, propName);
-      }
-      chain.add(this);
-      chain.setEmbedded(true);
-      return chain.add(embProp).build();
     }
     return createElPropertyValue(propName, remainder, chain, propertyDeploy);
   }

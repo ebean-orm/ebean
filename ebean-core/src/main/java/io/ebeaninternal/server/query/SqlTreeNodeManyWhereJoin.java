@@ -83,6 +83,9 @@ final class SqlTreeNodeManyWhereJoin implements SqlTreeNode {
    * intersection table if this is a ManyToMany node.
    */
   private void appendFromBaseTable(DbSqlContext ctx, SqlJoinType joinType) {
+    if (nodeBeanProp.isEmbedded()) {
+      return;
+    }
     String alias = ctx.tableAliasManyWhere(prefix);
     String parentAlias = ctx.tableAliasManyWhere(parentPrefix);
 

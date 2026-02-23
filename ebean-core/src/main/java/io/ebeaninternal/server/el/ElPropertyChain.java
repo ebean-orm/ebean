@@ -37,38 +37,32 @@ public final class ElPropertyChain implements ElPropertyValue {
   private final ScalarType<?> scalarType;
   private final ElPropertyValue lastElPropertyValue;
 
-  public ElPropertyChain(boolean containsMany, boolean embedded, String expression, ElPropertyValue[] chain) {
-    this.containsMany = containsMany;
+  public ElPropertyChain(String expression, boolean containsMany, ElPropertyValue chain[]) {
     this.chain = chain;
     this.expression = expression;
+    this.containsMany = containsMany;
+    
     int dotPos = expression.lastIndexOf('.');
     if (dotPos > -1) {
       this.name = expression.substring(dotPos + 1);
-      if (embedded) {
-        int embPos = expression.lastIndexOf('.', dotPos - 1);
-        this.prefix = embPos == -1 ? null : expression.substring(0, embPos);
-
-      } else {
-        this.prefix = expression.substring(0, dotPos);
-      }
+      this.prefix = expression.substring(0, dotPos);
     } else {
       this.prefix = null;
       this.name = expression;
     }
 
-    this.assocId = chain[chain.length - 1].isAssocId();
-
-    this.last = chain.length - 1;
-    this.lastBeanProperty = chain[chain.length - 1].beanProperty();
+    this.last = this.chain.length - 1;
+    this.lastElPropertyValue = this.chain[this.last];
+    this.assocId = this.lastElPropertyValue.isAssocId();
+    this.lastBeanProperty = lastElPropertyValue.beanProperty();
     if (lastBeanProperty != null) {
       this.scalarType = lastBeanProperty.scalarType();
     } else {
       // case for nested compound type (non-scalar)
       this.scalarType = null;
     }
-    this.lastElPropertyValue = chain[chain.length - 1];
-    this.placeHolder = placeHolder(prefix, lastElPropertyValue, false);
-    this.placeHolderEncrypted = placeHolder(prefix, lastElPropertyValue, true);
+    this.placeHolder = placeHolder(this.prefix, lastElPropertyValue, false);
+    this.placeHolderEncrypted = placeHolder(this.prefix, lastElPropertyValue, true);
   }
 
   @Override
