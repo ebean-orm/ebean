@@ -25,7 +25,7 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
   private final STreePropertyAssoc assocBeanProperty;
   private final SpiQuery.TemporalMode temporalMode;
   private final String prefix;
-  private final boolean manyJoin;
+  private boolean manyJoin;
   private final boolean pathContainsMany;
   private List<SqlTreeNode> children;
 
@@ -95,6 +95,9 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
   public void addChild(SqlTreeNode child) {
     if (children == null) {
       children = new ArrayList<>();
+    }
+    if (child.hasMany()) {
+      manyJoin = true;
     }
     children.add(child);
   }

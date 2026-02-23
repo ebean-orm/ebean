@@ -82,7 +82,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .orderBy().asc("order.totalAmount");
 
     shipQuery.findList();
-    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
+    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id, z_bt1.total_amount "
       + "from or_order_ship t0 "
       + "left join o_order t1 on t1.id = t0.order_id "
       + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
@@ -99,7 +99,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .where().isNotNull("order.totalAmount").query();
 
     shipQuery.findList();
-    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
+    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id "
       + "from or_order_ship t0 "
       + "left join o_order t1 on t1.id = t0.order_id "
       + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
@@ -313,7 +313,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0))
-      .contains("select t0.identifier from child_person t0")
+      .contains("select distinct t0.identifier from child_person t0")
       .contains("left join (select i2.parent_identifier")
       .contains("where coalesce(f2.child_age, 0) = ?");
   }
@@ -329,8 +329,8 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
-    assertThat(loggedSql.get(0)).contains("select count(*) from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
-    assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?");
+    assertThat(loggedSql.get(0)).contains("select count(*) from ( select distinct t0.identifier from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?)");
   }
 
   @Test
