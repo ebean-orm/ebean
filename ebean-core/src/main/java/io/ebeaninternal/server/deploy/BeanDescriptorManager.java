@@ -5,6 +5,7 @@ import io.ebean.DatabaseBuilder;
 import io.ebean.Model;
 import io.ebean.RawSqlBuilder;
 import io.ebean.annotation.ConstraintMode;
+import io.ebean.annotation.Platform;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.*;
@@ -632,6 +633,8 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   private void registerDescriptor(DeployBeanInfo<?> info) {
+    platformUsesColumnDefinitions(info);
+
     BeanDescriptor<?> desc = new BeanDescriptor<>(this, info.getDescriptor());
     descMap.put(desc.type().getName(), desc);
     if (desc.isDocStoreMapped()) {
@@ -640,6 +643,23 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     for (BeanPropertyAssocMany<?> many : desc.propertiesMany()) {
       if (many.isElementCollection()) {
         elementDescriptors.add(many.elementDescriptor());
+      }
+    }
+  }
+
+  private void platformUsesColumnDefinitions(DeployBeanInfo<?> info) {
+    if (databasePlatform.isPlatform(Platform.CLICKHOUSE) && !DbOffline.isGenerateMigration()) {
+      // ClickHouse uses column definition to optimise JDBC bulk inserts
+      DbPlatformTypeMapping typeMapping = databasePlatform.dbTypeMap();
+      for (DeployBeanProperty property : info.getDescriptor().propertiesAll()) {
+        if (property.getDbColumnDefn() == null) {
+          DbPlatformType dbPlatformType = typeMapping.get(property.getDbType());
+          String columnDefn = dbPlatformType.renderType(property.getDbLength(), property.getDbScale());
+          if (property.isNullable()) {
+            columnDefn = "Nullable(" + columnDefn + ")";
+          }
+          property.setDbColumnDefn(columnDefn);
+        }
       }
     }
   }

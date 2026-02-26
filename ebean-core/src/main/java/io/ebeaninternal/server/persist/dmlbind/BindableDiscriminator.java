@@ -40,6 +40,11 @@ public final class BindableDiscriminator implements Bindable {
   }
 
   @Override
+  public void dmlType(GenerateDmlRequest request) {
+    throw new IllegalArgumentException("Not supported");
+  }
+
+  @Override
   public void dmlBind(BindableRequest bindRequest, EntityBean bean) throws SQLException {
     bindRequest.bind(discValue, sqlType);
   }

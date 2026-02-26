@@ -29,6 +29,11 @@ final class BindableIdEmpty implements BindableId {
   }
 
   @Override
+  public void dmlType(GenerateDmlRequest request) {
+    // nothing
+  }
+
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) {
     // nothing
   }

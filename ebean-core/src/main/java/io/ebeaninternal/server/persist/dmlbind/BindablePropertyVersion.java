@@ -41,6 +41,11 @@ final class BindablePropertyVersion implements Bindable {
     request.appendColumn(prop.dbColumn());
   }
 
+  @Override
+  public void dmlType(GenerateDmlRequest request) {
+    request.appendColumnDefn(prop.dbColumn(), prop.dbColumnDefn());
+  }
+
   /**
    * Normal binding of a property value from the bean.
    */

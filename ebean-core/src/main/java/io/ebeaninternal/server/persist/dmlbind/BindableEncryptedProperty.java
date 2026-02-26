@@ -42,6 +42,11 @@ final class BindableEncryptedProperty implements Bindable {
   }
 
   @Override
+  public void dmlType(GenerateDmlRequest request) {
+    request.appendColumnDefn(prop.dbColumn(), prop.dbColumnDefn());
+  }
+
+  @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
     Object value = null;
     if (bean != null) {
