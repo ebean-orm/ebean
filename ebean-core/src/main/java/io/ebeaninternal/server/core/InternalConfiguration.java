@@ -627,6 +627,11 @@ public final class InternalConfiguration {
     }
 
     @Override
+    public void runDdl() {
+      CoreLog.log.log(ERROR, "Manual DDL run not possible");
+    }
+
+    @Override
     public void execute(boolean online) {
       if (online && ddlRun) {
         CoreLog.log.log(ERROR, "Configured to run DDL but ebean-ddl-generator is not in the classpath (or ebean-test in the test classpath?)");
