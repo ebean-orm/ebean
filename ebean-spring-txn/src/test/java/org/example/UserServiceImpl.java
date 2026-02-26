@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 /**
  * The Class UserServiceImpl.
  *
@@ -27,6 +29,13 @@ public class UserServiceImpl implements UserService, ApplicationContextAware {
      */
     @Autowired
     private Database ebeanServer;
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
+    public void insideTestRollback(long oid) {
+      User found = ebeanServer.find(User.class, oid);
+      assertThat(found.getName()).isEqualTo("rollback1");
+    }
 
     @Transactional(propagation = Propagation.REQUIRED, rollbackFor = Throwable.class)
     public void save(User user) {
