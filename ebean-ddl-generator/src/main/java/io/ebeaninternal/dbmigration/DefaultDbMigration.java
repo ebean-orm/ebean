@@ -1,6 +1,7 @@
 package io.ebeaninternal.dbmigration;
 
 import io.avaje.applog.AppLog;
+import io.avaje.classpath.scanner.core.Location;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
@@ -10,6 +11,7 @@ import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DatabasePlatformProvider;
 import io.ebean.dbmigration.DbMigration;
 import io.ebean.util.IOUtils;
+import io.ebean.util.StringHelper;
 import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
@@ -24,10 +26,7 @@ import io.ebeaninternal.extraddl.model.ExtraDdlXmlReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.ServiceLoader;
+import java.util.*;
 
 import static io.ebeaninternal.api.PlatformMatch.matchPlatform;
 import static java.lang.System.Logger.Level.*;
@@ -59,8 +58,8 @@ public class DefaultDbMigration implements DbMigration {
   private static final String initialVersion = "1.0";
   private static final String GENERATED_COMMENT = "THIS IS A GENERATED FILE - DO NOT MODIFY";
 
-  private final List<DatabasePlatformProvider> platformProviders = new ArrayList<>();
-  protected final boolean online;
+  private List<DatabasePlatformProvider> platformProviders = new ArrayList<>();
+  protected boolean online;
   private boolean logToSystemOut = true;
   protected SpiEbeanServer server;
   protected String pathToResources = "src/main/resources";
@@ -75,8 +74,10 @@ public class DefaultDbMigration implements DbMigration {
   protected List<Pair> platforms = new ArrayList<>();
   protected DatabaseBuilder.Settings databaseBuilder;
   protected DbConstraintNaming constraintNaming;
+  @Deprecated
   protected Boolean strictMode;
-  protected Boolean includeGeneratedFileComment;
+  protected boolean includeGeneratedFileComment;
+  @Deprecated
   protected String header;
   protected String applyPrefix = "";
   protected String version;
@@ -86,6 +87,9 @@ public class DefaultDbMigration implements DbMigration {
   private int lockTimeoutSeconds;
   protected boolean includeBuiltInPartitioning = true;
   protected boolean includeIndex;
+  protected boolean generate = false;
+  protected boolean generateInit = false;
+  private boolean keepLastInit = true;
 
   /**
    * Create for offline migration generation.
@@ -122,12 +126,66 @@ public class DefaultDbMigration implements DbMigration {
     if (constraintNaming == null) {
       this.constraintNaming = databaseBuilder.getConstraintNaming();
     }
+    if (databasePlatform == null) {
+      this.databasePlatform = databaseBuilder.getDatabasePlatform();
+    }
     Properties properties = config.getProperties();
     if (properties != null) {
-      PropertiesWrapper props = new PropertiesWrapper("ebean", config.getName(), properties, null);
+      PropertiesWrapper props = new PropertiesWrapper("ebean", config.getName(), properties, config.getClassLoadConfig());
       migrationPath = props.get("migration.migrationPath", migrationPath);
       migrationInitPath = props.get("migration.migrationInitPath", migrationInitPath);
       pathToResources = props.get("migration.pathToResources", pathToResources);
+      addForeignKeySkipCheck = props.getBoolean("migration.addForeignKeySkipCheck", addForeignKeySkipCheck);
+      applyPrefix = props.get("migration.applyPrefix", applyPrefix);
+      databasePlatform = props.createInstance(DatabasePlatform.class, "migration.databasePlatform", databasePlatform);
+      generatePendingDrop = props.get("migration.generatePendingDrop", generatePendingDrop);
+      includeBuiltInPartitioning = props.getBoolean("migration.includeBuiltInPartitioning", includeBuiltInPartitioning);
+      includeGeneratedFileComment = props.getBoolean("migration.includeGeneratedFileComment", includeGeneratedFileComment);
+      includeIndex = props.getBoolean("migration.includeIndex", includeIndex);
+      lockTimeoutSeconds = props.getInt("migration.lockTimeoutSeconds", lockTimeoutSeconds);
+      logToSystemOut = props.getBoolean("migration.logToSystemOut", logToSystemOut);
+      modelPath = props.get("migration.modelPath", modelPath);
+      modelSuffix = props.get("migration.modelSuffix", modelSuffix);
+      name = props.get("migration.name", name);
+      online = props.getBoolean("migration.online", online);
+      vanillaPlatform = props.getBoolean("migration.vanillaPlatform", vanillaPlatform);
+      version = props.get("migration.version", version);
+      generate = props.getBoolean("migration.generate", generate);
+      generateInit = props.getBoolean("migration.generateInit", generateInit);
+      // header & strictMode must be configured at DatabaseConfig level
+      parsePlatforms(props, config);
+    }
+  }
+
+  protected void parsePlatforms(PropertiesWrapper props, DatabaseBuilder.Settings config) {
+    String platforms = props.get("migration.platforms");
+    if (platforms == null || platforms.isEmpty()) {
+      return;
+    }
+    String[] tmp = StringHelper.splitNames(platforms);
+    for (String plat : tmp) {
+      DatabasePlatform dbPlatform;
+      String platformName = plat;
+      String platformPrefix = null;
+      int pos = plat.indexOf('=');
+      if (pos != -1) {
+        platformName = plat.substring(0, pos);
+        platformPrefix = plat.substring(pos + 1);
+      }
+
+      if (platformName.indexOf('.') == -1) {
+        // parse platform as enum value
+        Platform platform = Enum.valueOf(Platform.class, platformName.toUpperCase());
+        dbPlatform = platform(platform);
+      } else {
+        // parse platform as class
+        dbPlatform = (DatabasePlatform) config.getClassLoadConfig().newInstance(platformName);
+      }
+      if (platformPrefix == null) {
+        platformPrefix = dbPlatform.platform().name().toLowerCase();
+      }
+
+      addDatabasePlatform(dbPlatform, platformPrefix);
     }
   }
 
@@ -318,7 +376,18 @@ public class DefaultDbMigration implements DbMigration {
       }
 
       String pendingVersion = generatePendingDrop();
-      if (pendingVersion != null) {
+      if ("auto".equals(pendingVersion)) {
+        StringJoiner sj = new StringJoiner(",");
+        String diff = generateDiff(request);
+        if (diff != null) {
+          sj.add(diff);
+          request = createRequest(initMigration);
+        }
+        for (String pendingDrop : request.getPendingDrops()) {
+          sj.add(generatePendingDrop(request, pendingDrop));
+        }
+        return sj.length() == 0 ? null : sj.toString();
+      } else if (pendingVersion != null) {
         return generatePendingDrop(request, pendingVersion);
       } else {
         return generateDiff(request);
@@ -553,7 +622,7 @@ public class DefaultDbMigration implements DbMigration {
       return null;
     } else {
       if (!platforms.isEmpty()) {
-        writeExtraPlatformDdl(fullVersion, request.currentModel, dbMigration, request.migrationDir);
+        writeExtraPlatformDdl(fullVersion, request.currentModel, dbMigration, request.migrationDir, request.initMigration && keepLastInit);
 
       } else if (databasePlatform != null) {
         // writer needs the current model to provide table/column details for
@@ -633,12 +702,17 @@ public class DefaultDbMigration implements DbMigration {
   /**
    * Write any extra platform ddl.
    */
-  private void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath) throws IOException {
+  private void writeExtraPlatformDdl(String fullVersion, CurrentModel currentModel, Migration dbMigration, File writePath, boolean clear) throws IOException {
     DdlOptions options = new DdlOptions(addForeignKeySkipCheck);
     for (Pair pair : platforms) {
       DdlWrite writer = new DdlWrite(new MConfiguration(), currentModel.read(), options);
       PlatformDdlWriter platformWriter = createDdlWriter(pair.platform);
       File subPath = platformWriter.subPath(writePath, pair.prefix);
+      if (clear) {
+        for (File existing : subPath.listFiles()) {
+          existing.delete();
+        }
+      }
       platformWriter.processMigration(dbMigration, writer, subPath, fullVersion);
     }
   }
@@ -656,7 +730,7 @@ public class DefaultDbMigration implements DbMigration {
     if (file.exists()) {
       return false;
     }
-    String comment = Boolean.TRUE.equals(includeGeneratedFileComment) ? GENERATED_COMMENT : null;
+    String comment = includeGeneratedFileComment ? GENERATED_COMMENT : null;
     MigrationXmlWriter xmlWriter = new MigrationXmlWriter(comment);
     xmlWriter.write(dbMigration, file);
     return true;
@@ -674,11 +748,14 @@ public class DefaultDbMigration implements DbMigration {
       databasePlatform = server.databasePlatform();
     }
     if (databaseBuilder != null) {
+      // FIXME: StrictMode and header may be defined HERE and in DatabaseConfig.
+      //  We shoild change either DefaultDbMigration or databaseConfig, so that it is only
+      //  defined on one place
       if (strictMode != null) {
-        databaseBuilder.setDdlStrictMode(strictMode);
+        databaseBuilder.ddlStrictMode(strictMode);
       }
       if (header != null) {
-        databaseBuilder.setDdlHeader(header);
+        databaseBuilder.ddlHeader(header);
       }
     }
   }
@@ -748,15 +825,20 @@ public class DefaultDbMigration implements DbMigration {
    * Return the file path to write the xml and sql to.
    */
   File migrationDirectory(boolean initMigration) {
-    // path to src/main/resources in typical maven project
-    File resourceRootDir = new File(pathToResources);
-    if (!resourceRootDir.exists()) {
-      String msg = String.format("Error - path to resources %s does not exist. Absolute path is %s", pathToResources, resourceRootDir.getAbsolutePath());
-      throw new UnknownResourcePathException(msg);
-    }
-    String resourcePath = migrationPath(initMigration);
+    Location resourcePath = migrationPath(initMigration);
     // expect to be a path to something like - src/main/resources/dbmigration
-    File path = new File(resourceRootDir, resourcePath);
+    File path;
+    if (resourcePath.isClassPath()) {
+      // path to src/main/resources in typical maven project
+      File resourceRootDir = new File(pathToResources);
+      if (!resourceRootDir.exists()) {
+        String msg = String.format("Error - path to resources %s does not exist. Absolute path is %s", pathToResources, resourceRootDir.getAbsolutePath());
+        throw new UnknownResourcePathException(msg);
+      }
+      path = new File(resourceRootDir, resourcePath.path());
+    } else {
+      path = new File(resourcePath.path());
+    }
     if (!path.exists()) {
       if (!path.mkdirs()) {
         logInfo("Warning - Unable to ensure migration directory exists at %s", path.getAbsolutePath());
@@ -765,8 +847,9 @@ public class DefaultDbMigration implements DbMigration {
     return path;
   }
 
-  private String migrationPath(boolean initMigration) {
-    return initMigration ? migrationInitPath : migrationPath;
+  private Location migrationPath(boolean initMigration) {
+    // remove classpath: or filesystem: prefix
+    return new Location(initMigration ? migrationInitPath : migrationPath);
   }
 
   /**
