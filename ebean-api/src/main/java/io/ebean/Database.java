@@ -1074,12 +1074,21 @@ public interface Database {
    * @param bean The entity bean to check uniqueness on
    * @return a set of Properties if constraint validation was detected or empty list.
    */
-  Set<Property> checkUniqueness(Object bean);
+  default Set<Property> checkUniqueness(Object bean) {
+    return checkUniqueness(bean, null, false, true);
+  }
 
   /**
    * Same as {@link #checkUniqueness(Object)}. but with given transaction.
    */
-  Set<Property> checkUniqueness(Object bean, Transaction transaction);
+  default Set<Property> checkUniqueness(Object bean, Transaction transaction) {
+    return checkUniqueness(bean, transaction, false, true);
+  }
+
+  /**
+   * Same as {@link #checkUniqueness(Object)}. but with given transaction and extended search options.
+   */
+  Set<Property> checkUniqueness(Object bean, Transaction transaction, boolean useQueryCache, boolean skipClean);
 
   /**
    * Marks the entity bean as dirty.
