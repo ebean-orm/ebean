@@ -54,7 +54,7 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
   /**
    * Flag indicates that warning was logged.
    */
-  private static final byte FLAG_MUTABLE_WARN_LOGGED = 32;
+  private static final byte FLAG_MUTABLE_WARN_CHECKED = 32;
 
   private final ReentrantLock lock = new ReentrantLock();
   private transient NodeUsageCollector nodeUsageCollector;
@@ -231,14 +231,14 @@ public final class InterceptReadWrite extends InterceptBase implements EntityBea
     }
     if (mutableInfo != null) {
       for (int i = 0; i < mutableInfo.length; i++) {
-        if ((flags[i] & FLAG_MUTABLE_WARN_LOGGED) == FLAG_MUTABLE_WARN_LOGGED) {
+        if ((flags[i] & FLAG_MUTABLE_WARN_CHECKED) == FLAG_MUTABLE_WARN_CHECKED) {
            break; // do not check again and do NOT mark as dirty
         }
         if (mutableInfo[i] != null && !mutableInfo[i].isEqualToObject(value(i))) {
           if (readOnly) {
+            flags[i] |= FLAG_MUTABLE_WARN_CHECKED;
             log.log(WARNING, "Mutable object in {0}.{1} ({2}) changed. Not setting bean dirty, because it is readonly",
               owner.getClass().getName(), property(i), owner);
-            flags[i] |= FLAG_MUTABLE_WARN_LOGGED;
           } else {
             dirty = true;
           }
