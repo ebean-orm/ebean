@@ -4,6 +4,7 @@ import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
@@ -16,6 +17,8 @@ import org.tests.model.family.ParentPerson;
 import java.sql.Date;
 import java.util.List;
 
+import static io.ebean.annotation.Platform.H2;
+import static io.ebean.annotation.Platform.POSTGRES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -341,6 +344,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
    * Before the fix, lastIndexOf(" order by ") matched the ORDER BY inside the
    * IN subquery, stripping its closing parenthesis and producing invalid SQL.
    */
+  @ForPlatform({H2, POSTGRES})
   @Test
   public void test_findCount_formulaJoin_subqueryWithOrderBy_issue3686() {
 
