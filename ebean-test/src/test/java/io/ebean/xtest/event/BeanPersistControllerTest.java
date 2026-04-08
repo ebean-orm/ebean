@@ -151,13 +151,13 @@ public class BeanPersistControllerTest {
   private Database createDatabase(PersistAdapter persistAdapter) {
     DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2ebasicver");
+    config.setRegister(false);
+    config.setDefaultServer(false);
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.setDdlExtra(false);
 
-    config.setRegister(false);
-    config.setDefaultServer(false);
     config.addClass(EBasicVer.class);
     config.addClass(UTMaster.class);
     config.addClass(UTDetail.class);
