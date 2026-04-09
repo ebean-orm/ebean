@@ -270,7 +270,7 @@ final class CQueryBuilder {
         sql = wrapSelectCount(sql);
       } else if (wrap || query.isRawSql()) {
         // remove order by - mssql does not accept order by in subqueries
-        int pos = sql.lastIndexOf(" order by ");
+        int pos = lastTopLevelOrderBy(sql);
         if (pos != -1) {
           sql = sql.substring(0, pos);
         }
@@ -288,6 +288,27 @@ final class CQueryBuilder {
    */
   private <T> boolean includesAggregation(OrmQueryRequest<T> request, SpiQuery<T> query) {
     return request.descriptor().includesAggregation(query.detail());
+  }
+
+  /**
+   * Find the last " order by " that is not inside parentheses (i.e. not inside a subquery).
+   * Returns the position or -1 if not found.
+   */
+  static int lastTopLevelOrderBy(String sql) {
+    String target = " order by ";
+    int depth = 0;
+    int lastFound = -1;
+    for (int i = 0; i < sql.length(); i++) {
+      char c = sql.charAt(i);
+      if (c == '(') {
+        depth++;
+      } else if (c == ')') {
+        depth--;
+      } else if (depth == 0 && c == ' ' && sql.regionMatches(true, i, target, 0, target.length())) {
+        lastFound = i;
+      }
+    }
+    return lastFound;
   }
 
   private String wrapSelectCount(String sql) {

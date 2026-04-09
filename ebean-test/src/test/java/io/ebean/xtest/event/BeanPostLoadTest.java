@@ -52,13 +52,13 @@ public class BeanPostLoadTest extends BaseTestCase {
     DatabaseBuilder config = new DatabaseConfig();
 
     config.setName("h2ebasicver");
+    config.setRegister(false);
+    config.setDefaultServer(false);
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.setDdlExtra(false);
 
-    config.setRegister(false);
-    config.setDefaultServer(false);
     config.addClass(EBasicVer.class);
 
     config.add(postLoad);

@@ -51,6 +51,13 @@ public class DbPlatformTypeMapping {
   private static final DbPlatformType VECTOR_BIT = new DbPlatformType("bit", 64000, null);
   private static final DbPlatformType VECTOR_SPARSE = new DbPlatformType("sparsevec", 1000, null);
 
+  /**
+   * Timestamp with max precision of 15, and fallback to plain timestamp without precision defined.
+   */
+  private static final DbPlatformType TIMESTAMP =
+    new DbPlatformType("timestamp", 0, 15,
+      new DbPlatformType("timestamp", false));
+
   private final Map<DbType, DbPlatformType> typeMap = new EnumMap<>(DbType.class);
 
   /**
@@ -87,7 +94,8 @@ public class DbPlatformTypeMapping {
     put(DbType.ARRAY);
     put(DbType.DATE);
     put(DbType.TIME);
-    put(DbType.TIMESTAMP);
+    put(DbType.TIMESTAMP, TIMESTAMP);
+
     put(DbType.LONGVARBINARY);
     put(DbType.LONGVARCHAR);
     // most commonly real maps to db float
