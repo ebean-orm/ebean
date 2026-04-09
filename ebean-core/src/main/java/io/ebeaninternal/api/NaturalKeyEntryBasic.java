@@ -57,7 +57,6 @@ final class NaturalKeyEntryBasic implements NaturalKeyEntry {
     this.key = calculateKey(naturalKey);
   }
 
-
   private void load(List<NaturalKeyEq> eqList) {
     if (eqList != null) {
       for (NaturalKeyEq eq : eqList) {

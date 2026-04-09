@@ -135,14 +135,7 @@ public final class NaturalKeyQueryData<T> {
     // a findList() with an IN Map clause so we project
     // for every IN value a natural key combination
     for (Pairs.Entry entry : inPairs) {
-      String inProperty0 = null;
-      String inProperty1 = null;
-      if (properties.length == 2) {
-        inProperty0 = properties[0];
-        inProperty1 = properties[1];
-      }
-
-      set.add(new NaturalKeyEntryBasic(naturalKey, eqList, inProperty0, inProperty1, entry));
+      set.add(new NaturalKeyEntryBasic(naturalKey, eqList, properties[0], properties[1], entry));
     }
   }
 
@@ -150,8 +143,7 @@ public final class NaturalKeyQueryData<T> {
     for (Object[] inTuple : inTuples) {
       Map<String, Object> map = new HashMap<>();
       for (int i = 0; i < inTuple.length; i++) {
-        Object o = inTuple[i];
-        map.put(properties[i], o);
+        map.put(properties[i], inTuple[i]);
       }
       set.add(new NaturalKeyEntryBasic(naturalKey, eqList, map, inTuple));
     }
