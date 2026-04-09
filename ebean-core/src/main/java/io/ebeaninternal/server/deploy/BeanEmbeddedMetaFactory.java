@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.config.BeanNotRegisteredException;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 
+import io.ebeaninternal.server.deploy.parse.AnnotationParser;
 import jakarta.persistence.Column;
 import java.util.Map;
 
@@ -11,6 +12,8 @@ import java.util.Map;
  * such as the actual DB column name and table alias.
  */
 final class BeanEmbeddedMetaFactory {
+
+  private static final int COLUMN_LENGTH_UNSET = AnnotationParser.COLUMN_LENGTH_UNSET;
 
   /**
    * Create BeanProperties for embedded beans using the deployment specific DB column name and table alias.
@@ -58,7 +61,7 @@ final class BeanEmbeddedMetaFactory {
   }
 
   private static int dbLength(Column override, BeanProperty source) {
-    return (override != null && (override.length() != 0)) ? override.length() : source.dbLength();
+    return (override != null && (override.length() != COLUMN_LENGTH_UNSET)) ? override.length() : source.dbLength();
   }
 
   private static int dbScale(Column override, BeanProperty source) {

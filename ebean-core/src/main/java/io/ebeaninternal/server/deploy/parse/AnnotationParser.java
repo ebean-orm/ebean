@@ -5,10 +5,14 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
-
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -18,6 +22,11 @@ import java.util.UUID;
  * Base class for reading deployment annotations.
  */
 public abstract class AnnotationParser extends AnnotationBase {
+
+  /**
+   * The default/unset value for {@code @Column.length()}. Ebean API uses 0 and JPA uses 255.
+   */
+  public static final int COLUMN_LENGTH_UNSET = _ColumnProbeHolder.class.getAnnotation(_ColumnLengthProbe.class).value().length();
 
   final DeployBeanInfo<?> info;
   final DeployBeanDescriptor<?> descriptor;
@@ -98,7 +107,7 @@ public abstract class AnnotationParser extends AnnotationBase {
     prop.setUnique(columnAnn.unique());
     if (columnAnn.precision() > 0) {
       prop.setDbLength(columnAnn.precision());
-    } else if (columnAnn.length() != 0) {
+    } else if (columnAnn.length() != COLUMN_LENGTH_UNSET) {
       // set default 255 on DbTypeMap
       prop.setDbLength(columnAnn.length());
     }
@@ -132,4 +141,21 @@ public abstract class AnnotationParser extends AnnotationBase {
   protected String processFormula(String source) {
     return source == null ? null : source.replace("${dbTableName}", descriptor.getBaseTable());
   }
+
+  /**
+   * Probe annotation used solely to read the default value of {@code @Column.length()}.
+   */
+  @Retention(RetentionPolicy.RUNTIME)
+  @Target(ElementType.TYPE)
+  @interface _ColumnLengthProbe {
+    Column value() default @Column;
+  }
+
+  /**
+   * Holder so we can read a bare {@code @Column} instance.
+   */
+  @_ColumnLengthProbe
+  private static final class _ColumnProbeHolder {
+  }
+
 }
