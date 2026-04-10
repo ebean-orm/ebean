@@ -22,6 +22,7 @@ with Ebean's `DataSourceBuilder`. Follow every step in order. This is Step 2 of 
   | `db_user` | Database username |
   | `db_pass` | Database password |
   | `db_master_min_connections` | Minimum pool size (default: 1) |
+  | `db_master_initial_connections` | Initial pool size at startup — set high to pre-warm on pod start (see K8s note below) |
   | `db_master_max_connections` | Maximum pool size (default: 200) |
 
 ---
@@ -65,6 +66,7 @@ Database database() {
         .schema("myschema")                    // set to your target schema
         .applicationName("my-app")             // visible in pg_stat_activity
         .minConnections(Config.getInt("db_master_min_connections", 1))
+        .initialConnections(Config.getInt("db_master_initial_connections", 10))
         .maxConnections(Config.getInt("db_master_max_connections", 200));
 
     return Database.builder()
@@ -82,6 +84,35 @@ Database database() {
 | `schema` | The Postgres schema Ebean should use (omit if using `public`) |
 | `applicationName` | Shown in `pg_stat_activity.application_name`; helps with DB-side diagnostics |
 | `name("db")` | Logical Ebean database name; relevant if multiple Database instances exist |
+| `minConnections` | Connections kept open at all times; pool will not shrink below this |
+| `initialConnections` | Connections opened at startup; see K8s warm-up note below |
+| `maxConnections` | Hard upper limit on concurrent connections |
+
+### Connection pool sizing for Kubernetes (and similar orchestrated environments)
+
+When a pod starts in Kubernetes it will receive live traffic as soon as it passes
+readiness checks — often before the connection pool has had a chance to grow to handle
+the load. This can cause latency spikes on the first wave of requests while the pool
+expands one connection at a time.
+
+Use `initialConnections` to **pre-warm the pool at startup** so it is already sized
+for peak load when the pod goes live:
+
+```
+minConnections:     2    ← floor; pool will shrink back here when idle
+initialConnections: 20   ← opened at pod start, before first request arrives
+maxConnections:     50   ← hard ceiling
+```
+
+The lifecycle is:
+1. **Pod starts** — pool opens `initialConnections` connections immediately.
+2. **Pod receives traffic** — pool is already at capacity; no growth latency.
+3. **Traffic drops** — idle connections are closed; pool trims back toward `minConnections`.
+4. **Next traffic spike** — pool grows again up to `maxConnections` on demand.
+
+Set `initialConnections` to a value high enough that the pool does not need to grow
+during the first minute of live traffic. A common starting point is 50–75% of
+`maxConnections`.
 
 ---
 
@@ -98,6 +129,7 @@ Database database(Configuration config) {
     String user = config.get("db_user");
     String pass = config.get("db_pass");
     int    min  = config.getInt("db_master_min_connections", 1);
+    int    init = config.getInt("db_master_initial_connections", 10);
     int    max  = config.getInt("db_master_max_connections", 200);
 
     var dataSource = DataSourceBuilder.create()
@@ -108,6 +140,7 @@ Database database(Configuration config) {
         .schema("myschema")
         .applicationName("my-app")
         .minConnections(min)
+        .initialConnections(init)
         .maxConnections(max);
 
     return Database.builder()
@@ -144,6 +177,7 @@ Database database(Configuration config) {
     var masterDataSource = buildDataSource(user, pass)
         .url(masterUrl)
         .minConnections(config.getInt("db_master_min_connections", 1))
+        .initialConnections(config.getInt("db_master_initial_connections", 10))
         .maxConnections(config.getInt("db_master_max_connections", 50));
 
     var readOnlyDataSource = buildDataSource(user, pass)
@@ -179,6 +213,7 @@ private static DataSourceBuilder buildDataSource(String user, String pass) {
 | Key | Description | Default |
 |-----|-------------|---------|
 | `db_url_readonly` | JDBC URL for the read replica | — |
+| `db_master_initial_connections` | Initial master pool size at startup | 10 |
 | `db_readonly_min_connections` | Minimum pool size | 2 |
 | `db_readonly_initial_connections` | Initial pool size at startup | same as min |
 | `db_readonly_max_connections` | Maximum pool size | 20 |
