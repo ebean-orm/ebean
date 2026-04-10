@@ -270,6 +270,12 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
     }
 
     @Override
+    public TypeQuery<T> usingMaster(boolean useMaster) {
+      DefaultRelationalQuery.this.usingMaster(useMaster);
+      return this;
+    }
+
+    @Override
     public TypeQuery<T> usingTransaction(Transaction transaction) {
       transaction(transaction);
       return this;
@@ -306,6 +312,12 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
 
     Mapper(RowMapper<T> mapper) {
       this.mapper = mapper;
+    }
+
+    @Override
+    public TypeQuery<T> usingMaster(boolean useMaster) {
+      DefaultRelationalQuery.this.usingMaster(useMaster);
+      return this;
     }
 
     @Override
