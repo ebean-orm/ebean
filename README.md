@@ -81,6 +81,9 @@ or [github discussions](https://github.com/ebean-orm/ebean/discussions)
 ## Documentation
 Goto [https://ebean.io/docs/](https://ebean.io/docs/)
 
+## Guides
+Step-by-step guides for common tasks: [docs/guides/](docs/guides/README.md)
+
 ## Maven central
 [Maven central - g:io.ebean](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22io.ebean%22%20)
 
