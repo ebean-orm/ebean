@@ -10,7 +10,7 @@ existing Maven project. Complete the steps in order.
 | Step | Guide | Description |
 |------|-------|-------------|
 | 1 | [Maven POM setup](add-ebean-postgres-maven-pom.md) | Add Ebean dependencies, the enhancement plugin, and the querybean-generator annotation processor to `pom.xml` |
-| 2 | [Database configuration](add-ebean-postgres-database-config.md) | Configure the Ebean `Database` bean using `DataSourceBuilder` and `DatabaseConfig` with Avaje Inject |
+| 2 | [Database configuration](add-ebean-postgres-database-config.md) | Configure the Ebean `Database` bean using `DataSourceBuilder` and `DatabaseBuilder` with Avaje Inject |
 | 3 | [Test container setup](add-ebean-postgres-test-container.md) | Start a PostgreSQL (or PostGIS) Docker container for tests using `@TestScope @Factory` with Avaje Inject; covers image mirror, read-only datasource, and PostGIS variant |
 
 ## Entity beans
@@ -18,3 +18,9 @@ existing Maven project. Complete the steps in order.
 | Guide | Description |
 |-------|-------------|
 | [Lombok with Ebean entity beans](lombok-with-ebean-entity-beans.md) | Which Lombok annotations to use and avoid on entity beans; why `@Data` is incompatible with Ebean; how to use `@Getter` + `@Setter` + `@Accessors(chain = true)` |
+
+## Database migrations
+
+| Guide | Description |
+|-------|-------------|
+| [DB migration generation](add-ebean-db-migration-generation.md) | Add `GenerateDbMigration.java` to generate schema diff migrations offline; configure the migration runner; understand `.sql` and `.model.xml` output files; workflow for pending drops |

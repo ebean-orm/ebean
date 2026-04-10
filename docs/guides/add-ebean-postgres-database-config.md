@@ -53,7 +53,6 @@ Add the following `@Bean` method to the `@Factory` class. This creates an Ebean
 
 ```java
 import io.ebean.Database;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceBuilder;
 
 @Bean
@@ -68,7 +67,7 @@ Database database() {
         .minConnections(Config.getInt("db_master_min_connections", 1))
         .maxConnections(Config.getInt("db_master_max_connections", 200));
 
-    return new DatabaseConfig()
+    return Database.builder()
         .name("db")                            // logical name for this Database instance
         .dataSourceBuilder(dataSource)
         .build();
@@ -111,7 +110,7 @@ Database database(Configuration config) {
         .minConnections(min)
         .maxConnections(max);
 
-    return new DatabaseConfig()
+    return Database.builder()
         .name("db")
         .dataSourceBuilder(dataSource)
         .skipDataSourceCheck(true)
@@ -157,7 +156,7 @@ Database database(Configuration config) {
         .initialConnections(config.getInt("db_readonly_initial_connections", 10))
         .maxConnections(config.getInt("db_readonly_max_connections", 200));
 
-    return new DatabaseConfig()
+    return Database.builder()
         .name("db")
         .dataSourceBuilder(masterDataSource)
         .readOnlyDataSourceBuilder(readOnlyDataSource)
@@ -183,6 +182,32 @@ private static DataSourceBuilder buildDataSource(String user, String pass) {
 | `db_readonly_min_connections` | Minimum pool size | 2 |
 | `db_readonly_initial_connections` | Initial pool size at startup | same as min |
 | `db_readonly_max_connections` | Maximum pool size | 20 |
+
+---
+
+## Step 5 (Optional) — Enable the migration runner
+
+If the project uses Ebean's built-in DB migration runner to apply SQL migrations on
+startup, enable it on the `DatabaseBuilder`:
+
+```java
+return Database.builder()
+    .name("db")
+    .dataSourceBuilder(dataSource)
+    .runMigration(true)          // run pending migrations on startup
+    .build();
+```
+
+This is equivalent to setting `ebean.migration.run=true` in `application.properties`
+but is preferred because it keeps all database configuration in one place. To make it
+conditional (e.g. only in non-production environments):
+
+```java
+.runMigration(config.getBoolean("db.runMigrations", false))
+```
+
+See the DB migration generation guide (`add-ebean-db-migration-generation.md`) for
+full details on generating and managing migration files.
 
 ---
 
