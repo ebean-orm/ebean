@@ -24,3 +24,74 @@ existing Maven project. Complete the steps in order.
 | Guide | Description |
 |-------|-------------|
 | [DB migration generation](add-ebean-db-migration-generation.md) | Add `GenerateDbMigration.java` to generate schema diff migrations offline; configure the migration runner; understand `.sql` and `.model.xml` output files; workflow for pending drops |
+
+---
+
+## Helping AI agents find these guides
+
+AI coding agents can only follow these guides if they know they exist. Below are
+copy-paste snippets for the most common AI tooling configurations. Add whichever
+applies to your project.
+
+
+### Project `README.md` (universal — works with all AI tools)
+
+Add a section near the top of your project README:
+
+```markdown
+## AI Agent Instructions
+
+This project uses [Ebean ORM](https://ebean.io). Step-by-step guides for common
+Ebean tasks (Maven setup, database configuration, test containers, DB migrations,
+Lombok) are at:
+
+**https://github.com/ebean-orm/ebean/tree/main/docs/guides/**
+
+AI agents should fetch and follow the relevant guide before performing Ebean-related
+tasks.
+```
+
+### Why README is important
+
+Many AI agents (Copilot, Claude, Cursor, Aider) read the project `README.md`
+automatically as part of understanding the codebase. A visible link in README is the
+most universally effective way to ensure any agent working on your project will
+discover the guides without requiring tool-specific configuration files.
+
+------
+
+### GitHub Copilot — `.github/copilot-instructions.md`
+
+```markdown
+## Ebean ORM
+
+This project uses [Ebean ORM](https://ebean.io). Step-by-step guides for common
+tasks are at: https://github.com/ebean-orm/ebean/tree/main/docs/guides/
+
+Key guides (fetch and follow these when performing the relevant task):
+- Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/main/docs/guides/add-ebean-postgres-maven-pom.md
+- Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/main/docs/guides/add-ebean-postgres-database-config.md
+- Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/main/docs/guides/add-ebean-postgres-test-container.md
+- DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/main/docs/guides/add-ebean-db-migration-generation.md
+- Lombok with entity beans: https://raw.githubusercontent.com/ebean-orm/ebean/main/docs/guides/lombok-with-ebean-entity-beans.md
+```
+
+### Claude Code — `CLAUDE.md`
+
+Same content as above — Claude Code reads `CLAUDE.md` at the project root.
+
+### Cursor — `.cursor/rules/ebean.mdc`
+
+```markdown
+---
+description: Ebean ORM task guidance
+globs: ["**/*.java", "**/pom.xml"]
+alwaysApply: false
+---
+
+## Ebean ORM
+
+This project uses Ebean ORM. Before performing any Ebean-related task, fetch and
+follow the relevant step-by-step guide from:
+https://github.com/ebean-orm/ebean/tree/main/docs/guides/
+```
