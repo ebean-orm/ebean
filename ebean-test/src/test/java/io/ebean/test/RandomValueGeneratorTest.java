@@ -5,7 +5,7 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import org.junit.jupiter.api.Test;
-import org.multitenant.partition.MtTenant;
+import org.tests.cache.personinfo.PersonOther;
 import org.tests.model.basic.EBasic;
 
 import java.math.BigDecimal;
@@ -94,15 +94,15 @@ class RandomValueGeneratorTest extends BaseTestCase {
 
   @Test
   void generate_emailPropName_returnsEmailAddress() {
-    BeanDescriptor<MtTenant> descriptor = descriptor(MtTenant.class);
+    BeanDescriptor<PersonOther> descriptor = descriptor(PersonOther.class);
     BeanProperty emailProp = descriptor.findProperty("email");
 
-    assertThat(emailProp.dbLength()).isEqualTo(50);
+    assertThat(emailProp.dbLength()).isEqualTo(60);
     Object value = generator.generate(emailProp);
 
     assertThat(value).isInstanceOf(String.class);
     assertThat((String) value).contains("@domain.com");
-    assertThat((String) value).hasSizeLessThanOrEqualTo(50);
+    assertThat((String) value).hasSizeLessThanOrEqualTo(60);
   }
 
   @Test
