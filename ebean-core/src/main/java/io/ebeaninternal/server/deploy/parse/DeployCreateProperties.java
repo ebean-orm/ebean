@@ -11,6 +11,8 @@ import io.ebeaninternal.server.type.TypeManager;
 
 import jakarta.persistence.*;
 import java.lang.reflect.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -35,7 +37,7 @@ public final class DeployCreateProperties {
    * Create the appropriate properties for a bean.
    */
   public void createProperties(DeployBeanDescriptor<?> desc) {
-    createProperties(desc, desc.getBeanType(), 0);
+    createProperties(desc, desc.getBeanType(), 0, new HashMap<>());
     desc.sortProperties();
   }
 
@@ -64,7 +66,7 @@ public final class DeployCreateProperties {
    * properties the bean properties from Class. Some of these properties may not map to database
    * columns.
    */
-  private void createProperties(DeployBeanDescriptor<?> desc, Class<?> beanType, int level) {
+  private void createProperties(DeployBeanDescriptor<?> desc, Class<?> beanType, int level, Map<TypeVariable<?>, Class<?>> genericTypeMap) {
     if (beanType.equals(Model.class)) {
       // ignore all fields on model (_$dbName)
       return;
@@ -74,7 +76,7 @@ public final class DeployCreateProperties {
       for (int i = 0; i < fields.length; i++) {
         Field field = fields[i];
         if (!ignoreField(field)) {
-          DeployBeanProperty prop = createProp(desc, field, beanType);
+          DeployBeanProperty prop = createProp(desc, field, beanType, genericTypeMap);
           if (prop != null) {
             // set a order that gives priority to inherited properties
             // push Id/EmbeddedId up and CreatedTimestamp/UpdatedTimestamp down
@@ -95,7 +97,7 @@ public final class DeployCreateProperties {
       if (!superClass.equals(Object.class)) {
         // recursively add any properties in the inheritance hierarchy
         // up to the Object.class level...
-        createProperties(desc, superClass, level + 1);
+        createProperties(desc, superClass, level + 1, mapGenerics(beanType));
       }
     } catch (PersistenceException ex) {
       throw ex;
@@ -116,8 +118,10 @@ public final class DeployCreateProperties {
     return new DeployBeanPropertyAssocMany<>(desc, targetType, manyType);
   }
 
-  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field) {
-    Class<?> propertyType = field.getType();
+  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Map<TypeVariable<?>, Class<?>> genericTypeMap) {
+    Class<?> propertyType = field.getGenericType() instanceof TypeVariable<?>
+      ? genericTypeMap.get(field.getGenericType())
+      : field.getType();
     if (isSpecialScalarType(field)) {
       return new DeployBeanProperty(desc, propertyType, field.getGenericType());
     }
@@ -172,8 +176,8 @@ public final class DeployCreateProperties {
     return AnnotationUtil.has(field, Transient.class);
   }
 
-  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Class<?> beanType) {
-    DeployBeanProperty prop = createProp(desc, field);
+  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Class<?> beanType, Map<TypeVariable<?>, Class<?>> genericTypeMap) {
+    DeployBeanProperty prop = createProp(desc, field, genericTypeMap);
     if (prop == null) {
       // transient annotation on unsupported type
       return null;
@@ -222,6 +226,42 @@ public final class DeployCreateProperties {
       }
     }
     // if targetType is null, then must be set in annotations
+    return null;
+  }
+
+  private Map<TypeVariable<?>, Class<?>> mapGenerics(Class<?> clazz) {
+    Type genericSuperclass = clazz.getGenericSuperclass();
+    if (!(genericSuperclass instanceof ParameterizedType)) {
+      return new HashMap<>();
+    }
+
+    ParameterizedType parameterized = (ParameterizedType) genericSuperclass;
+    TypeVariable<?>[] typeVars = ((Class<?>) parameterized.getRawType()).getTypeParameters();
+    Type[] actualTypes = parameterized.getActualTypeArguments();
+
+    Map<TypeVariable<?>, Class<?>> typeMap = new HashMap<>();
+    for (int i = 0; i < typeVars.length; i++) {
+      Type actual = actualTypes[i];
+      Class<?> resolvedClass = resolveToClass(actual);
+      if (resolvedClass != null) {
+        typeMap.put(typeVars[i], resolvedClass);
+      } else {
+        // ignore
+      }
+    }
+    return typeMap;
+  }
+
+  private static Class<?> resolveToClass(Type type) {
+    if (type instanceof Class<?>) {
+      return (Class<?>) type;
+    } else if (type instanceof ParameterizedType) {
+      ParameterizedType pType = (ParameterizedType) type;
+      Type raw = pType.getRawType();
+      if (raw instanceof Class<?>) {
+        return (Class<?>) raw;
+      }
+    }
     return null;
   }
 }
