@@ -241,6 +241,20 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
       }
       // ensure, that every bean in the batch is in the persistence context.
       // this may happen, when bean was previously deleted, but the result is not yet committed.
+      List<Object> reincarnatedIds = ensureBatchInContext(ebi);
+      try {
+        context.desc.ebeanServer().loadBean(new LoadBeanRequest(this, ebi, context.hitCache));
+        batch.clear();
+      } finally {
+        if (reincarnatedIds != null) {
+          for (Object id : reincarnatedIds) {
+            context.desc.contextClear(persistenceContext, id);
+          }
+        }
+      }
+    }
+
+    private List<Object> ensureBatchInContext(EntityBeanIntercept ebi) {
       List<Object> reincarnatedIds = null;
       for (EntityBeanIntercept batchEbi : batch) {
         Object id = context.desc.getId(batchEbi.owner());
@@ -254,16 +268,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
           }
         }
       }
-      try {
-        context.desc.ebeanServer().loadBean(new LoadBeanRequest(this, ebi, context.hitCache));
-        batch.clear();
-      } finally {
-        if (reincarnatedIds != null) {
-          for (Object id : reincarnatedIds) {
-            context.desc.contextClear(persistenceContext, id);
-          }
-        }
-      }
+      return reincarnatedIds;
     }
   }
 
