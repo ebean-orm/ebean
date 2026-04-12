@@ -58,8 +58,8 @@ public final class DeployCreateProperties {
 
   private boolean ignoreField(Field field) {
     return Modifier.isStatic(field.getModifiers())
-        || Modifier.isTransient(field.getModifiers())
-        || ignoreFieldByName(field.getName());
+      || Modifier.isTransient(field.getModifiers())
+      || ignoreFieldByName(field.getName());
   }
 
   /**
@@ -67,11 +67,7 @@ public final class DeployCreateProperties {
    * map to database
    * columns.
    */
-  private void createProperties(
-      DeployBeanDescriptor<?> desc,
-      Class<?> beanType,
-      int level,
-      Map<TypeVariable<?>, Class<?>> genericTypeMap) {
+  private void createProperties(DeployBeanDescriptor<?> desc, Class<?> beanType, int level, Map<TypeVariable<?>, Class<?>> genericTypeMap) {
     if (beanType.equals(Model.class)) {
       // ignore all fields on model (_$dbName)
       return;
@@ -123,13 +119,10 @@ public final class DeployCreateProperties {
     return new DeployBeanPropertyAssocMany<>(desc, targetType, manyType);
   }
 
-  private DeployBeanProperty createProp(
-      DeployBeanDescriptor<?> desc,
-      Field field,
-      Map<TypeVariable<?>, Class<?>> genericTypeMap) {
+  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Map<TypeVariable<?>, Class<?>> genericTypeMap) {
     Class<?> propertyType = field.getGenericType() instanceof TypeVariable<?>
-        ? genericTypeMap.get(field.getGenericType())
-        : field.getType();
+      ? genericTypeMap.get(field.getGenericType())
+      : field.getType();
     if (isSpecialScalarType(field)) {
       return new DeployBeanProperty(desc, propertyType, field.getGenericType());
     }
@@ -143,8 +136,7 @@ public final class DeployCreateProperties {
           // not supporting this field (generic type used)
           return null;
         }
-        CoreLog.internal.log(WARNING,
-            "Could not find parameter type (via reflection) on " + desc.getFullName() + " " + field.getName());
+        CoreLog.internal.log(WARNING, "Could not find parameter type (via reflection) on " + desc.getFullName() + " " + field.getName());
       }
       return createManyType(desc, targetType, manyType);
     }
@@ -160,8 +152,7 @@ public final class DeployCreateProperties {
       return new DeployBeanProperty(desc, propertyType, null, null);
     }
     if (AnnotationUtil.has(field, Convert.class)) {
-      throw new IllegalStateException("No AttributeConverter registered for type " + propertyType + " at "
-          + desc.getFullName() + "." + field.getName());
+      throw new IllegalStateException("No AttributeConverter registered for type " + propertyType + " at " + desc.getFullName() + "." + field.getName());
     }
     try {
       return new DeployBeanPropertyAssocOne<>(desc, propertyType);
@@ -176,21 +167,17 @@ public final class DeployCreateProperties {
    */
   private boolean isSpecialScalarType(Field field) {
     return (AnnotationUtil.has(field, DbJson.class))
-        || (AnnotationUtil.has(field, DbJsonB.class))
-        || (AnnotationUtil.has(field, DbArray.class))
-        || (AnnotationUtil.has(field, DbMap.class))
-        || (AnnotationUtil.has(field, UnmappedJson.class));
+      || (AnnotationUtil.has(field, DbJsonB.class))
+      || (AnnotationUtil.has(field, DbArray.class))
+      || (AnnotationUtil.has(field, DbMap.class))
+      || (AnnotationUtil.has(field, UnmappedJson.class));
   }
 
   private boolean isTransientField(Field field) {
     return AnnotationUtil.has(field, Transient.class);
   }
 
-  private DeployBeanProperty createProp(
-      DeployBeanDescriptor<?> desc,
-      Field field,
-      Class<?> beanType,
-      Map<TypeVariable<?>, Class<?>> genericTypeMap) {
+  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Class<?> beanType, Map<TypeVariable<?>, Class<?>> genericTypeMap) {
     DeployBeanProperty prop = createProp(desc, field, genericTypeMap);
     if (prop == null) {
       // transient annotation on unsupported type
@@ -204,8 +191,7 @@ public final class DeployCreateProperties {
   }
 
   /**
-   * Determine the type of the List,Set or Map. Not been set explicitly so
-   * determine this from
+   * Determine the type of the List,Set or Map. Not been set explicitly so determine this from
    * ParameterizedType.
    */
   private Class<?> determineTargetType(Field field) {
