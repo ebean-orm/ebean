@@ -17,6 +17,7 @@ existing Maven project. Complete the steps in order.
 
 | Guide | Description |
 |-------|-------------|
+| [Entity Bean Creation](entity-bean-creation.md) | How to generate clean, idiomatic Ebean entity beans for AI agents; patterns and anti-patterns; minimal boilerplate without getters/setters; decision tree for code generation |
 | [Lombok with Ebean entity beans](lombok-with-ebean-entity-beans.md) | Which Lombok annotations to use and avoid on entity beans; why `@Data` is incompatible with Ebean; how to use `@Getter` + `@Setter` + `@Accessors(chain = true)` |
 
 ## Testing
