@@ -368,6 +368,14 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   interface TypeQuery<T> {
 
     /**
+     * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
+     * data source can be used if defined.
+     *
+     * @see SqlQuery#usingMaster(boolean)
+     */
+    TypeQuery<T> usingMaster(boolean useMaster);
+
+    /**
      * Execute the query using the given transaction.
      */
     TypeQuery<T> usingTransaction(Transaction transaction);
