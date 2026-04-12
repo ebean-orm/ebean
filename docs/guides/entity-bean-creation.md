@@ -31,6 +31,58 @@ Before writing entity code, remember:
 
 ---
 
+## Naming Conventions: The D* (Domain) Prefix Pattern
+
+Entity beans represent internal domain/persistence model details. It's a common best practice in Ebean projects to use the **D* prefix** (D for Domain) for entity class names.
+
+**Why use D* prefix?**
+
+1. **Avoid name clashes with DTOs** - Your public API may have `Customer` (DTO), but your entity is `DCustomer` (Domain). They're clearly different.
+2. **Signal intent clearly** - The D prefix immediately tells developers "this is an internal domain class, not part of the public API"
+3. **Clarify conversions** - When converting `DCustomer` → `Customer` (DTO), the direction is obvious
+4. **Separate concerns** - API classes in one package (no prefix), domain classes in another (with D prefix)
+
+**Example naming pattern:**
+- Entity: `DCustomer`, `DOrder`, `DProduct`, `DInvoice`
+- DTO: `Customer`, `Order`, `Product`, `Invoice`
+- Converter: `DCustomerMapper.toDTO(DCustomer)` → `Customer`
+
+**Where to place entities:**
+- Entities: `com.example.domain.entity` (or `persistence`)
+- DTOs: `com.example.api.model` or `com.example.dto`
+
+**When to use D* prefix:**
+- ✅ **DO** use for entity beans (internal domain model)
+- ✅ **DO** use when you have parallel DTO classes with similar names
+- ❌ **DON'T** use for DTOs or public API classes
+- ❌ **DON'T** use if you have no DTOs and entities are your public API
+
+Example with and without prefix:
+
+```java
+// With D* prefix (recommended - allows both entity and DTO to exist)
+@Entity
+public class DCustomer {
+  @Id private long id;
+  private String name;
+  // ... entity-specific fields and methods
+}
+
+// Public API DTO (no D prefix)
+public record Customer(long id, String name) {
+  // ... conversion method
+}
+
+// Conversion
+public static Customer toDTO(DCustomer entity) {
+  return new Customer(entity.getId(), entity.getName());
+}
+```
+
+This naming convention is optional but highly recommended for projects with separate domain and API layers.
+
+---
+
 ## Minimal Entity (No Boilerplate)
 
 This is a complete, valid Ebean entity:
