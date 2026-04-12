@@ -254,11 +254,14 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
           }
         }
       }
-      context.desc.ebeanServer().loadBean(new LoadBeanRequest(this, ebi, context.hitCache));
-      batch.clear();
-      if (reincarnatedIds != null) {
-        for (Object id : reincarnatedIds) {
-          context.desc.contextClear(persistenceContext, id);
+      try {
+        context.desc.ebeanServer().loadBean(new LoadBeanRequest(this, ebi, context.hitCache));
+        batch.clear();
+      } finally {
+        if (reincarnatedIds != null) {
+          for (Object id : reincarnatedIds) {
+            context.desc.contextClear(persistenceContext, id);
+          }
         }
       }
     }
