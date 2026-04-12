@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.config.AggregateFormulaContext;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 
@@ -7,11 +8,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class FormulaPropertyPathTest extends BaseTest {
 
-  private BeanDescriptor<Customer> customerDesc = getBeanDescriptor(Customer.class);
+  private final BeanDescriptor<Customer> customerDesc = getBeanDescriptor(Customer.class);
 
   @Test
   public void isFormula() {
-
     assertFormula("max(version)", "max", "version");
     assertFormula("min(name)", "min", "name");
     assertFormula("avg(id)", "avg", "id");
@@ -58,8 +58,8 @@ public class FormulaPropertyPathTest extends BaseTest {
   }
 
   private void assertFormula(String input, String funcName, String expression, String cast, String alias) {
-
-    FormulaPropertyPath propertyPath = new FormulaPropertyPath(customerDesc, input, null);
+    var context = AggregateFormulaContext.builder().build();
+    FormulaPropertyPath propertyPath = new FormulaPropertyPath(customerDesc, context, input, null);
 
     assertThat(propertyPath.internalExpression()).isEqualTo(expression);
     assertThat(propertyPath.outerFunction()).isEqualTo(funcName);

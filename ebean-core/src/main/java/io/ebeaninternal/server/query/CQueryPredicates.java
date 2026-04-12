@@ -39,6 +39,7 @@ public final class CQueryPredicates {
   private final Object idValue;
   private final BindParams bindParams;
   private DefaultExpressionRequest filterMany;
+  private boolean filterManyJoin;
   /**
    * Bind values from the where expressions.
    */
@@ -106,6 +107,9 @@ public final class CQueryPredicates {
         dataBind.append(", ");
       }
     }
+    if (filterManyJoin) {
+      filterMany.bind(dataBind);
+    }
     if (idValue != null) {
       // this is a find by id type query...
       request.descriptor().bindId(dataBind, idValue);
@@ -119,7 +123,7 @@ public final class CQueryPredicates {
     if (where != null) {
       where.bind(dataBind);
     }
-    if (filterMany != null) {
+    if (!filterManyJoin && filterMany != null) {
       filterMany.bind(dataBind);
     }
     if (having != null) {
@@ -189,9 +193,10 @@ public final class CQueryPredicates {
       if (chunk != null) {
         SpiExpressionList<?> filterManyExpr = chunk.getFilterMany();
         if (filterManyExpr != null) {
-          this.filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
+          filterManyJoin = chunk.isFilterManyJoin();
+          filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
           if (buildSql) {
-            dbFilterMany = manyProperty.idNullOr(filterMany.buildSql());
+            dbFilterMany = filterMany.buildSql();
           }
         }
       }
@@ -339,10 +344,17 @@ public final class CQueryPredicates {
   }
 
   /**
-   * Return a db filter for filtering many fetch joins.
+   * Return a db filter to be included in the WHERE.
    */
-  String dbFilterMany() {
-    return dbFilterMany;
+  String dbFilterManyWhere() {
+    return filterManyJoin ? null : dbFilterMany;
+  }
+
+  /**
+   * Return a db filter to be included in the JOIN.
+   */
+  String dbFilterManyJoin() {
+    return filterManyJoin ? dbFilterMany : null;
   }
 
   /**

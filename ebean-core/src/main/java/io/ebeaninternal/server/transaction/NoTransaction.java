@@ -154,12 +154,12 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void registerDeleteBean(Integer hash) {
+  public void registerDeleteBean(Class<?> type, Object id) {
 
   }
 
   @Override
-  public boolean isRegisteredDeleteBean(Integer hash) {
+  public boolean isRegisteredDeleteBean(Class<?> type, Object id) {
     return false;
   }
 
@@ -233,11 +233,6 @@ final class NoTransaction implements SpiTransaction {
 
   @Override
   public void setSkipCache(boolean skipCache) {
-  }
-
-  @Override
-  public boolean isSkipCacheExplicit() {
-    return false;
   }
 
   @Override

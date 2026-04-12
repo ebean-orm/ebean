@@ -2410,7 +2410,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   private STreeProperty findSqlTreeFormula(String formula, String path) {
     String key = formula + "-" + path;
-    return dynamicProperty.computeIfAbsent(key, (fullKey) -> FormulaPropertyPath.create(this, formula, path));
+    return dynamicProperty.computeIfAbsent(key, (fullKey) -> ebeanServer.createFormulaProperty(this, formula, path));
+  }
+
+  @Override
+  public FormulaBuilder formulaBuilder() {
+    return new DFormulaBuilder(this);
   }
 
   /**

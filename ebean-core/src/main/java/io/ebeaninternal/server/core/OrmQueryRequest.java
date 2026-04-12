@@ -497,10 +497,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return cacheKey != null && query.queryCacheMode().isPut();
   }
 
-  public boolean isBeanCachePutMany() {
-    return !transaction.isSkipCacheExplicit() && query.isBeanCachePut();
-  }
-
   public boolean isBeanCachePut() {
     return !transaction.isSkipCache() && query.isBeanCachePut();
   }
@@ -784,6 +780,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   public void unmodifiableFreeze(EntityBean bean) {
     if (query.isUnmodifiable() && bean != null) {
       beanDescriptor.freeze(bean);
+    }
+  }
+
+  public void setAutoCommitOnFindIterate() {
+    if (createdTransaction) {
+      transaction.setAutoCommitOnFindIterate();
     }
   }
 }

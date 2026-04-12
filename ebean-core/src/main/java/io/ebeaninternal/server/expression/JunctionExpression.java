@@ -24,9 +24,9 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   DefaultExpressionList<T> exprList;
   Junction.Type type;
 
-  JunctionExpression(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
+  JunctionExpression(Junction.Type type, Query<T> query, ExpressionFactory expr, ExpressionList<T> parent) {
     this.type = type;
-    this.exprList = new DefaultExpressionList<>(query, parent);
+    this.exprList = new DefaultExpressionList<>(query, expr, parent, new ArrayList<>());
   }
 
   /**

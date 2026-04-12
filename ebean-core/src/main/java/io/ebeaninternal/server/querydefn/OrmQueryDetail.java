@@ -39,11 +39,20 @@ public final class OrmQueryDetail implements Serializable {
   /**
    * Return a deep copy of the OrmQueryDetail.
    */
-  public OrmQueryDetail copy() {
+  public OrmQueryDetail copy(OrmQueryDetail existing) {
     OrmQueryDetail copy = new OrmQueryDetail();
     copy.baseProps = baseProps.copy();
     for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
       copy.fetchPaths.put(entry.getKey(), entry.getValue().copy());
+    }
+    if (existing != null) {
+      // transfer any existing filterMany expressions
+      for (Map.Entry<String, OrmQueryProperties> entry : existing.fetchPaths.entrySet()) {
+        var filterMany = entry.getValue().getFilterMany();
+        if (filterMany != null) {
+          copy.getChunk(entry.getKey(), true).setFilterMany(filterMany);
+        }
+      }
     }
     return copy;
   }

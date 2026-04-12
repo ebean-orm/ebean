@@ -12,6 +12,8 @@ import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
@@ -24,13 +26,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BeanPersistControllerTest {
 
+  private static final Logger log = LoggerFactory.getLogger(BeanPersistControllerTest.class);
+
   private final PersistAdapter continuePersistingAdapter = new PersistAdapter(true);
 
   private final PersistAdapter stopPersistingAdapter = new PersistAdapter(false);
 
   @Test
   public void issued1() {
-    Database db = getDatabase(continuePersistingAdapter);
+    Database db = createDatabase(continuePersistingAdapter);
 
     UTMaster bean0 = new UTMaster("m0");
     bean0.setJournal(new UTMaster.Journal());
@@ -49,11 +53,12 @@ public class BeanPersistControllerTest {
     assertThat(journal.getEntries()).hasSize(2);
 
     db.shutdown();
+    log.info("done issued1");
   }
 
   @Test
   public void issue_1341() {
-    Database db = getDatabase(continuePersistingAdapter);
+    Database db = createDatabase(continuePersistingAdapter);
 
     UTMaster bean0 = new UTMaster("one0");
     UTDetail detail0 = new UTDetail("detail0", 12, 23D);
@@ -79,12 +84,13 @@ public class BeanPersistControllerTest {
     }
 
     db.shutdown();
+    log.info("done issue_1341");
   }
 
   @Test
   public void testInsertUpdateDelete_given_continuePersistingAdapter() {
 
-    Database db = getDatabase(continuePersistingAdapter);
+    Database db = createDatabase(continuePersistingAdapter);
 
     EBasicVer bean = new EBasicVer("testController");
 
@@ -104,12 +110,13 @@ public class BeanPersistControllerTest {
     assertThat(continuePersistingAdapter.methodsCalled).containsExactly("preDelete", "postDelete");
 
     db.shutdown();
+    log.info("done testInsertUpdateDelete_given_continuePersistingAdapter");
   }
 
   @Test
   public void testInsertUpdateDelete_given_stopPersistingAdapter() {
 
-    Database db = getDatabase(stopPersistingAdapter);
+    Database db = createDatabase(stopPersistingAdapter);
 
     EBasicVer bean = new EBasicVer("testController");
 
@@ -140,127 +147,19 @@ public class BeanPersistControllerTest {
     stopPersistingAdapter.methodsCalled.clear();
 
     db.shutdown();
+    log.info("done testInsertUpdateDelete_given_stopPersistingAdapter");
   }
 
-  @Test
-  public void testCascade() {
-    Database db = getDatabase(new BeanPersistAdapter() {
-      @Override
-      public boolean isRegisterFor(Class<?> cls) {
-        return UTMaster.class == cls;
-      }
-
-      @Override
-      public boolean preDelete(BeanPersistRequest<?> request) {
-        return false;
-      }
-    });
-    Integer id;
-    UTMaster master = new UTMaster();
-    master.addDetail(new UTDetail());
-    db.save(master);
-    id = master.getId();
-
-    master = db.find(UTMaster.class, id);
-    assertThat(master.getDetails()).hasSize(1);
-
-    try (Transaction txn = db.beginTransaction()) {
-      txn.setBatchMode(true);
-      db.delete(master);
-      txn.commit();
-    }
-
-    master = db.find(UTMaster.class, id);
-    assertThat(master).isNotNull();
-    // CHECKME: Deleting of master was denied by the PersistListener
-    // What about detail? Is this intended, that it will be deleted?
-    assertThat(master.getDetails()).hasSize(0);
-
-  }
-
-  @Test
-  public void testInsertUpdateDelete_with_LazyLoad() {
-
-    Database db = getDatabase(new BeanPersistAdapter() {
-
-      @Override
-      public boolean isRegisterFor(Class<?> cls) {
-        return EBasicVer.class == cls;
-      }
-
-      @Override
-      public boolean preInsert(BeanPersistRequest<?> request) {
-        assertThat(((EBasicVer) request.bean()).getDescription()).isEqualTo("MyDescription");
-        return true;
-      }
-
-      @Override
-      public boolean preUpdate(BeanPersistRequest<?> request) {
-        assertThat(((EBasicVer) request.bean()).getDescription()).isEqualTo("MyDescription");
-        return true;
-      }
-
-      @Override
-      public boolean preDelete(BeanPersistRequest<?> request) {
-        assertThat(((EBasicVer) request.bean()).getDescription()).isEqualTo("MyDescription");
-        return true;
-      }
-    });
-    Integer id;
-    try (Transaction txn = db.beginTransaction()) {
-      txn.setBatchMode(true);
-      EBasicVer bean = new EBasicVer("testController");
-      bean.setDescription("MyDescription");
-
-      db.save(bean);
-      txn.commit();
-      id = bean.getId();
-    }
-
-
-    try (Transaction txn = db.beginTransaction()) {
-      txn.setBatchMode(true);
-      EBasicVer bean = db.find(EBasicVer.class).setUseCache(false).select("name").setId(id).findOne();
-      bean.setName("otherName");
-
-      db.save(bean);
-
-      txn.commitAndContinue();
-
-      EBasicVer bean2 = db.find(EBasicVer.class).setUseCache(false).select("name").setId(id).findOne();
-      assertThat(bean2).isSameAs(bean);
-    }
-
-    try (Transaction txn = db.beginTransaction()) {
-      txn.setBatchMode(true);
-      EBasicVer bean = db.find(EBasicVer.class).setUseCache(false).select("name").setId(id).findOne();
-
-      db.delete(bean);
-      txn.commitAndContinue();
-      System.out.println(txn);
-    }
-/*
-    db.update(bean);
-
-    db.delete(bean);
-
-    db.delete(EBasicVer.class, 22);
-
-    db.deleteAll(EBasicVer.class, Arrays.asList(22,23,24));
-*/
-    db.shutdown();
-  }
-
-  private Database getDatabase(BeanPersistController persistAdapter) {
+  private Database createDatabase(PersistAdapter persistAdapter) {
     DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2ebasicver");
+    config.setRegister(false);
+    config.setDefaultServer(false);
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.setDdlExtra(false);
 
-    config.setRegister(false);
-    config.setDefaultServer(false);
     config.addClass(EBasicVer.class);
     config.addClass(UTMaster.class);
     config.addClass(UTDetail.class);

@@ -769,7 +769,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.useQueryCache = useQueryCache;
     copy.unmodifiable = unmodifiable;
     if (detail != null) {
-      copy.detail = detail.copy();
+      copy.detail = detail.copy(null);
     }
     copy.temporalMode = temporalMode;
     copy.firstRow = firstRow;
@@ -1387,7 +1387,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Query<T> select(FetchGroup<T> fetchGroup) {
     if (fetchGroup != null) {
-      this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
+      this.detail = ((SpiFetchGroup<T>) fetchGroup).detail(detail);
     }
     return this;
   }
@@ -1475,8 +1475,8 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public Query<T> usingMaster() {
-    this.useMaster = true;
+  public Query<T> usingMaster(boolean useMaster) {
+    this.useMaster = useMaster;
     return this;
   }
 
@@ -1895,7 +1895,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final ExpressionList<T> text() {
     if (textExpressions == null) {
       useDocStore = true;
-      textExpressions = new DefaultExpressionList<>(this);
+      textExpressions = new DefaultExpressionList<>(this, true);
     }
     return textExpressions;
   }
@@ -1903,7 +1903,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final ExpressionList<T> where() {
     if (whereExpressions == null) {
-      whereExpressions = new DefaultExpressionList<>(this, null);
+      whereExpressions = new DefaultExpressionList<>(this, false);
     }
     return whereExpressions;
   }
@@ -1924,7 +1924,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final ExpressionList<T> having() {
     if (havingExpressions == null) {
-      havingExpressions = new DefaultExpressionList<>(this, null);
+      havingExpressions = new DefaultExpressionList<>(this, false);
     }
     return havingExpressions;
   }

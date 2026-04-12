@@ -2,6 +2,7 @@ package org.tests.aggregateformula;
 
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
+import io.ebean.xtest.ForPlatform;
 import io.ebean.xtest.IgnorePlatform;
 import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
@@ -124,6 +125,27 @@ public class TestAggregateFormula extends BaseTestCase {
     assertThat(contact.getLastName()).isNotNull();
     assertThat(contact.getCustomer()).isNotNull();
     assertThat(contact.getCustomer().getId()).isNotNull();
+  }
+
+  @ForPlatform(Platform.H2)
+  @Test
+  public void group_agg() {
+    ResetBasicData.reset();
+
+    LoggedSql.start();
+
+    List<Order> orders = DB.find(Order.class)
+      .select("status, group_concat(id) as customerName")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertSql(sql.get(0)).contains("select t0.status, group_concat(t0.id) customerName from o_order t0 group by t0.status");
+
+    assertThat(orders).isNotEmpty();
+    for (Order order : orders) {
+      assertThat(order.getStatus()).isNotNull();
+      assertThat(order.getCustomerName()).isNotNull();
+    }
   }
 
   @Test

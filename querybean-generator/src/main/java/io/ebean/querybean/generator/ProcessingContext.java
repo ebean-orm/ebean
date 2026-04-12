@@ -11,10 +11,12 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
 import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
@@ -28,6 +30,7 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -88,6 +91,11 @@ class ProcessingContext implements Constants {
    */
   private String factoryPackage;
 
+  /**
+   * Cache of resolved generic type parameters for mapped superclasses.
+   */
+  private final Map<String, Map<String, TypeMirror>> genericTypeCache = new HashMap<>();
+
   ProcessingContext(ProcessingEnvironment processingEnv) {
     this.processingEnv = processingEnv;
     this.typeUtils = processingEnv.getTypeUtils();
@@ -122,27 +130,68 @@ class ProcessingContext implements Constants {
    */
   List<VariableElement> allFields(Element element) {
     List<VariableElement> list = new ArrayList<>();
-    gatherProperties(list, element);
+    gatherProperties(list, element, null);
     return list;
   }
 
   /**
    * Recursively gather all the fields (properties) for the given bean element.
    */
-  private void gatherProperties(List<VariableElement> fields, Element element) {
+  private void gatherProperties(List<VariableElement> fields, Element element, Map<String, TypeMirror> typeParameterMap) {
     TypeElement typeElement = (TypeElement) element;
     TypeMirror superclass = typeElement.getSuperclass();
     Element mappedSuper = typeUtils.asElement(superclass);
     if (isMappedSuperOrInheritance(mappedSuper)) {
-      gatherProperties(fields, mappedSuper);
+      // Resolve generic type parameters for the superclass
+      Map<String, TypeMirror> superTypeParameterMap = resolveGenericTypes(superclass, typeParameterMap);
+      gatherProperties(fields, mappedSuper, superTypeParameterMap);
     }
 
     List<VariableElement> allFields = ElementFilter.fieldsIn(element.getEnclosedElements());
     for (VariableElement field : allFields) {
       if (!ignoreField(field)) {
-        fields.add(field);
+        // Create a wrapper that holds both the field and its resolved type context
+        if (typeParameterMap != null && !typeParameterMap.isEmpty()) {
+          fields.add(new ResolvedVariableElement(field, typeParameterMap));
+        } else {
+          fields.add(field);
+        }
       }
     }
+  }
+
+  /**
+   * Wrapper class to hold a VariableElement along with its type parameter resolution context.
+   * This allows us to pass resolved generic type information along with field elements.
+   */
+  private static class ResolvedVariableElement implements VariableElement {
+    private final VariableElement delegate;
+    private final Map<String, TypeMirror> typeParameterMap;
+
+    ResolvedVariableElement(VariableElement delegate, Map<String, TypeMirror> typeParameterMap) {
+      this.delegate = delegate;
+      this.typeParameterMap = new HashMap<>(typeParameterMap);
+    }
+
+    public Map<String, TypeMirror> getTypeParameterMap() {
+      return typeParameterMap;
+    }
+
+    // Delegate all VariableElement methods to the original element
+    @Override public TypeMirror asType() { return delegate.asType(); }
+    @Override public ElementKind getKind() { return delegate.getKind(); }
+    @Override public Set<Modifier> getModifiers() { return delegate.getModifiers(); }
+    @Override public javax.lang.model.element.Name getSimpleName() { return delegate.getSimpleName(); }
+    @Override public Element getEnclosingElement() { return delegate.getEnclosingElement(); }
+    @Override public List<? extends Element> getEnclosedElements() { return delegate.getEnclosedElements(); }
+    @Override public List<? extends AnnotationMirror> getAnnotationMirrors() { return delegate.getAnnotationMirrors(); }
+    @Override public <A extends java.lang.annotation.Annotation> A getAnnotation(Class<A> annotationType) { return delegate.getAnnotation(annotationType); }
+    @Override public <A extends java.lang.annotation.Annotation> A[] getAnnotationsByType(Class<A> annotationType) { return delegate.getAnnotationsByType(annotationType); }
+    @Override public Object getConstantValue() { return delegate.getConstantValue(); }
+    @Override public <R, P> R accept(javax.lang.model.element.ElementVisitor<R, P> v, P p) { return delegate.accept(v, p); }
+    @Override public String toString() { return delegate.toString(); }
+    @Override public boolean equals(Object obj) { return delegate.equals(obj); }
+    @Override public int hashCode() { return delegate.hashCode(); }
   }
 
   /**
@@ -247,7 +296,118 @@ class ProcessingContext implements Constants {
     return trimAnnotations(remainder);
   }
 
+  /**
+   * Resolve generic type parameters for a superclass in the context of a subclass.
+   * This method maps generic type parameters from the superclass to their actual types
+   * as specified in the subclass declaration.
+   *
+   * @param superclassType The superclass type mirror (may be parameterized)
+   * @param parentTypeParameterMap Existing type parameter mappings from parent context
+   * @return A map of type parameter names to their resolved TypeMirror instances
+   */
+  private Map<String, TypeMirror> resolveGenericTypes(TypeMirror superclassType, Map<String, TypeMirror> parentTypeParameterMap) {
+    Map<String, TypeMirror> typeParameterMap = new HashMap<>();
+
+    // If we have parent type parameter mappings, inherit them
+    if (parentTypeParameterMap != null) {
+      typeParameterMap.putAll(parentTypeParameterMap);
+    }
+
+    if (superclassType.getKind() != TypeKind.DECLARED) {
+      return typeParameterMap;
+    }
+
+    DeclaredType declaredSuperclass = (DeclaredType) superclassType;
+    TypeElement superclassElement = (TypeElement) declaredSuperclass.asElement();
+
+    // Get the type parameters from the superclass definition
+    List<? extends TypeParameterElement> typeParameters = superclassElement.getTypeParameters();
+
+    // Get the actual type arguments used in this specific inheritance
+    List<? extends TypeMirror> typeArguments = declaredSuperclass.getTypeArguments();
+
+    // Map each type parameter to its actual type
+    for (int i = 0; i < typeParameters.size() && i < typeArguments.size(); i++) {
+      String parameterName = typeParameters.get(i).getSimpleName().toString();
+      TypeMirror actualType = typeArguments.get(i);
+
+      // If the actual type is itself a type variable, try to resolve it from parent context
+      if (actualType.getKind() == TypeKind.TYPEVAR && parentTypeParameterMap != null) {
+        TypeVariable typeVar = (TypeVariable) actualType;
+        String varName = typeVar.asElement().getSimpleName().toString();
+        TypeMirror resolvedType = parentTypeParameterMap.get(varName);
+        if (resolvedType != null) {
+          actualType = resolvedType;
+        }
+      }
+
+      typeParameterMap.put(parameterName, actualType);
+    }
+
+    // Cache the resolved types for performance
+    String cacheKey = superclassElement.getQualifiedName().toString();
+    genericTypeCache.put(cacheKey, new HashMap<>(typeParameterMap));
+
+    return typeParameterMap;
+  }
+
+  /**
+   * Resolve a field's type in the context of generic type parameters.
+   * If the field type is a type variable, resolve it to the actual type.
+   *
+   * @param fieldType The original field type
+   * @param typeParameterMap The resolved type parameter mappings
+   * @return The resolved type mirror, or the original type if no resolution needed
+   */
+  private TypeMirror resolveFieldType(TypeMirror fieldType, Map<String, TypeMirror> typeParameterMap) {
+    if (typeParameterMap == null || typeParameterMap.isEmpty()) {
+      return fieldType;
+    }
+
+    if (fieldType.getKind() == TypeKind.TYPEVAR) {
+      TypeVariable typeVar = (TypeVariable) fieldType;
+      String parameterName = typeVar.asElement().getSimpleName().toString();
+      TypeMirror resolvedType = typeParameterMap.get(parameterName);
+      if (resolvedType != null) {
+        return resolvedType;
+      }
+    }
+
+    // Handle parameterized types (e.g., List<T> where T needs resolution)
+    if (fieldType.getKind() == TypeKind.DECLARED) {
+      DeclaredType declaredType = (DeclaredType) fieldType;
+      List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
+
+      if (!typeArguments.isEmpty()) {
+        List<TypeMirror> resolvedArguments = new ArrayList<>();
+        boolean hasChanges = false;
+
+        for (TypeMirror typeArg : typeArguments) {
+          TypeMirror resolvedArg = resolveFieldType(typeArg, typeParameterMap);
+          resolvedArguments.add(resolvedArg);
+          if (resolvedArg != typeArg) {
+            hasChanges = true;
+          }
+        }
+
+        if (hasChanges) {
+          // Create a new DeclaredType with resolved type arguments
+          TypeElement typeElement = (TypeElement) declaredType.asElement();
+          return typeUtils.getDeclaredType(typeElement, resolvedArguments.toArray(new TypeMirror[0]));
+        }
+      }
+    }
+
+    return fieldType;
+  }
+
   PropertyType getPropertyType(VariableElement field) {
+    // Check if this is a resolved field from a generic mapped superclass
+    Map<String, TypeMirror> typeParameterMap = null;
+    if (field instanceof ResolvedVariableElement) {
+      typeParameterMap = ((ResolvedVariableElement) field).getTypeParameterMap();
+    }
+
     boolean toMany = dbToMany(field);
     if (dbJsonField(field)) {
       return propertyTypeMap.getDbJsonType();
@@ -255,10 +415,17 @@ class ProcessingContext implements Constants {
     if (dbArrayField(field)) {
       // get generic parameter type
       DeclaredType declaredType = (DeclaredType) field.asType();
-      String fullType = typeDef(declaredType.getTypeArguments().get(0));
+      TypeMirror arrayElementType = declaredType.getTypeArguments().get(0);
+      // Resolve the array element type if it's generic
+      TypeMirror resolvedElementType = resolveFieldType(arrayElementType, typeParameterMap);
+      String fullType = typeDef(resolvedElementType);
       return new PropertyTypeArray(fullType, Split.shortName(fullType));
     }
-    final TypeMirror typeMirror = field.asType();
+
+    // Get the field type, potentially resolved if it's generic
+    final TypeMirror originalTypeMirror = field.asType();
+    final TypeMirror typeMirror = resolveFieldType(originalTypeMirror, typeParameterMap);
+
     TypeMirror currentType = typeMirror;
     while (currentType != null) {
       PropertyType type = propertyTypeMap.getType(typeDef(currentType));
@@ -278,7 +445,7 @@ class ProcessingContext implements Constants {
 
     // workaround for https://bugs.eclipse.org/bugs/show_bug.cgi?id=544288
     fieldType = elementUtils.getTypeElement(fieldType.toString());
-    if (fieldType.getKind() == ElementKind.ENUM) {
+    if (fieldType != null && fieldType.getKind() == ElementKind.ENUM) {
       String fullType = typeDef(typeMirror);
       return new PropertyTypeEnum(fullType, Split.shortName(fullType));
     }
@@ -301,7 +468,7 @@ class ProcessingContext implements Constants {
 
     final PropertyType result;
     if (typeMirror.getKind() == TypeKind.DECLARED) {
-      result = createManyTypeAssoc(field, (DeclaredType) typeMirror);
+      result = createManyTypeAssoc(field, (DeclaredType) typeMirror, typeParameterMap);
     } else {
       result = null;
     }
@@ -333,20 +500,26 @@ class ProcessingContext implements Constants {
         .anyMatch(t -> typeInstanceOf(t, desiredInterface));
   }
 
-  private PropertyType createManyTypeAssoc(VariableElement field, DeclaredType declaredType) {
+  private PropertyType createManyTypeAssoc(VariableElement field, DeclaredType declaredType, Map<String, TypeMirror> typeParameterMap) {
     boolean toMany = dbToMany(field);
     List<? extends TypeMirror> typeArguments = declaredType.getTypeArguments();
     if (typeArguments.size() == 1) {
-      Element argElement = typeUtils.asElement(typeArguments.get(0));
+      TypeMirror argType = typeArguments.get(0);
+      // Resolve the type argument if it's generic
+      TypeMirror resolvedArgType = resolveFieldType(argType, typeParameterMap);
+      Element argElement = typeUtils.asElement(resolvedArgType);
       if (isEntityOrEmbedded(argElement)) {
         boolean embeddable = isEmbeddable(argElement);
-        return createPropertyTypeAssoc(embeddable, toMany, typeDef(argElement.asType()));
+        return createPropertyTypeAssoc(embeddable, toMany, typeDef(resolvedArgType));
       }
     } else if (typeArguments.size() == 2) {
-      Element argElement = typeUtils.asElement(typeArguments.get(1));
+      TypeMirror argType = typeArguments.get(1);
+      // Resolve the type argument if it's generic
+      TypeMirror resolvedArgType = resolveFieldType(argType, typeParameterMap);
+      Element argElement = typeUtils.asElement(resolvedArgType);
       if (isEntityOrEmbedded(argElement)) {
         boolean embeddable = isEmbeddable(argElement);
-        return createPropertyTypeAssoc(embeddable, toMany, typeDef(argElement.asType()));
+        return createPropertyTypeAssoc(embeddable, toMany, typeDef(resolvedArgType));
       }
     }
     return null;

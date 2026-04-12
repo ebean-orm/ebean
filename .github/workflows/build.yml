@@ -40,5 +40,5 @@ jobs:
 #    - name: Maven single test
 #      run: mvn --batch-mode clean verify -Dtest="io.ebeaninternal.server.core.DefaultServer_getReferenceTest" -DfailIfNoTests=false
     - name: Build with Maven
-      run: mvn -T 8 clean test
+      run: mvn -T 8 clean test -Pdefault
 

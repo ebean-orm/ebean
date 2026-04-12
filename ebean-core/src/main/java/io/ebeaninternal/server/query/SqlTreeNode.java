@@ -84,4 +84,12 @@ interface SqlTreeNode {
    */
   default void unselectLobsForPlatform() {
   }
+
+  default String prefix() {
+    return ""; // not matched
+  }
+
+  default void addChild(SqlTreeNode extraJoin) {
+    throw new UnsupportedOperationException();
+  }
 }

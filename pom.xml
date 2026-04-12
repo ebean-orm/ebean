@@ -4,12 +4,12 @@
   <parent>
     <groupId>org.avaje</groupId>
     <artifactId>java11-oss</artifactId>
-    <version>5.1</version>
+    <version>5.2</version>
   </parent>
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>16.0.0-RC3</version>
+  <version>16.4.0</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -47,11 +47,11 @@
     <ebean-annotation.version>8.4</ebean-annotation.version>
     <ebean-ddl-runner.version>2.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
-    <ebean-migration.version>14.2.0</ebean-migration.version>
-    <ebean-test-containers.version>7.14</ebean-test-containers.version>
-    <ebean-datasource.version>10.1</ebean-datasource.version>
-    <ebean-agent.version>14.12.0</ebean-agent.version>
-    <ebean-maven-plugin.version>14.12.0</ebean-maven-plugin.version>
+    <ebean-migration.version>14.3.0</ebean-migration.version>
+    <ebean-test-containers.version>8.0</ebean-test-containers.version>
+    <ebean-datasource.version>10.4</ebean-datasource.version>
+    <ebean-agent.version>16.4.0</ebean-agent.version>
+    <ebean-maven-plugin.version>16.4.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
@@ -60,14 +60,14 @@
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>junit</artifactId>
-      <version>1.5</version>
+      <version>1.8</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.31</version>
       <scope>test</scope>
     </dependency>
 
@@ -91,18 +91,24 @@
     <module>ebean-querybean</module>
     <module>ebean-postgis-types</module>
     <module>ebean-net-postgis-types</module>
+    <module>ebean-pgvector-types</module>
     <module>ebean-redis</module>
     <module>platforms</module>
     <module>composites</module>
     <module>ebean-jackson-mapper</module>
     <module>ebean-spring-txn</module>
-    <module>kotlin-querybean-generator</module>
     <module>ebean-core-json</module>
   </modules>
 
   <profiles>
     <profile>
+      <id>ea</id>
+    </profile>
+    <profile>
       <id>central</id>
+      <modules>
+        <module>kotlin-querybean-generator</module>
+      </modules>
     </profile>
     <profile>
       <id>h2v1</id>
@@ -125,6 +131,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>kotlin-querybean-generator</module>
         <module>tests</module>
       </modules>
     </profile>

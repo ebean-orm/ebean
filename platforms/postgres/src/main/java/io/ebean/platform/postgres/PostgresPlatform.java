@@ -35,6 +35,7 @@ public class PostgresPlatform extends DatabasePlatform {
     this.blobDbType = Types.LONGVARBINARY;
     this.clobDbType = Types.VARCHAR;
     this.nativeUuidType = true;
+    this.autoCommitFalseOnFindIterate = true;
     this.truncateTable = "truncate table %s cascade";
     this.dbEncrypt = new PostgresDbEncrypt();
     this.historySupport = new PostgresHistorySupport();
@@ -78,6 +79,11 @@ public class PostgresPlatform extends DatabasePlatform {
     dbTypeMap.put(DbType.CLOB, dbTypeText);
     dbTypeMap.put(DbType.LONGVARBINARY, dbBytea);
     dbTypeMap.put(DbType.LONGVARCHAR, dbTypeText);
+
+    dbTypeMap.put(DbType.VECTOR, new DbPlatformType("vector", 512, 2000, null));
+    dbTypeMap.put(DbType.VECTOR_HALF, new DbPlatformType("halfvec", 512, 4000, null));
+    dbTypeMap.put(DbType.VECTOR_BIT, new DbPlatformType("bit", 512, 64000, null));
+    dbTypeMap.put(DbType.VECTOR_SPARSE, new DbPlatformType("sparsevec", 512, 64000, null));
   }
 
   @Override

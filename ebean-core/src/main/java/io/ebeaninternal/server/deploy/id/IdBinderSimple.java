@@ -261,9 +261,4 @@ public final class IdBinderSimple implements IdBinder {
     final Object value = idProperty.getValue(bean);
     return scalarType.format(value);
   }
-
-  @Override
-  public String idNullOr(String prefix, String filterManyExpression) {
-    return "(${" + prefix + "}" + idProperty.dbColumn() + " is null or (" + filterManyExpression + "))";
-  }
 }

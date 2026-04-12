@@ -129,7 +129,7 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
       result = finder.postProcessMany(request, result);
     }
 
-    if (result != null && request.isBeanCachePutMany()) {
+    if (result != null && request.isBeanCachePut()) {
       // load the individual beans into the bean cache
       request.descriptor().cacheBeanPutAll(result.actualDetails());
     }

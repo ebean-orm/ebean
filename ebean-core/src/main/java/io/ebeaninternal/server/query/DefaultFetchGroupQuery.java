@@ -52,7 +52,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   @SuppressWarnings("rawtypes")
   @Override
   public Query<T> select(FetchGroup fetchGroup) {
-    this.detail = ((SpiFetchGroup) fetchGroup).detail();
+    this.detail = ((SpiFetchGroup) fetchGroup).detail(detail);
     return this;
   }
 
@@ -235,7 +235,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
-  public Query<T> usingMaster() {
+  public Query<T> usingMaster(boolean useMaster) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 

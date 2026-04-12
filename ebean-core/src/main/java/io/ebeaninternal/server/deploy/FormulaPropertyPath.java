@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.core.type.ScalarType;
+import io.ebean.config.AggregateFormulaContext;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.query.STreeProperty;
 
@@ -9,11 +10,10 @@ import java.util.Set;
 
 final class FormulaPropertyPath {
 
-  private static final String[] AGG_FUNCTIONS = {"count", "max", "min", "avg", "sum"};
-
   private static final String DISTINCT_ = "distinct ";
 
   private final BeanDescriptor<?> descriptor;
+  private final AggregateFormulaContext context;
   private final String formula;
   private final String outerFunction;
   private final String internalExpression;
@@ -24,12 +24,13 @@ final class FormulaPropertyPath {
   private String cast;
   private String alias;
 
-  static STreeProperty create(BeanDescriptor<?> descriptor, String formula, String path) {
-    return new FormulaPropertyPath(descriptor, formula, path).build();
+  static STreeProperty create(BeanDescriptor<?> descriptor, AggregateFormulaContext context, String formula, String path) {
+    return new FormulaPropertyPath(descriptor, context, formula, path).build();
   }
 
-  FormulaPropertyPath(BeanDescriptor<?> descriptor, String formula, String path) {
+  FormulaPropertyPath(BeanDescriptor<?> descriptor, AggregateFormulaContext context, String formula, String path) {
     this.descriptor = descriptor;
+    this.context = context;
     this.formula = formula;
     int openBracket = formula.indexOf('(');
     int closeBracket = formula.lastIndexOf(')');
@@ -106,10 +107,10 @@ final class FormulaPropertyPath {
       }
       return create(scalarType);
     }
-    if (isCount()) {
+    if (context.isCount(outerFunction)) {
       return create(descriptor.scalarType(Types.BIGINT));
     }
-    if (isConcat()) {
+    if (context.isConcat(outerFunction)) {
       return create(descriptor.scalarType(Types.VARCHAR));
     }
     if (firstProp == null) {
@@ -144,12 +145,7 @@ final class FormulaPropertyPath {
   }
 
   private boolean isAggregate() {
-    for (String aggFunction : AGG_FUNCTIONS) {
-      if (aggFunction.equals(outerFunction)) {
-        return true;
-      }
-    }
-    return false;
+    return context.isAggregate(outerFunction);
   }
 
   private String buildFormula(String parsed) {

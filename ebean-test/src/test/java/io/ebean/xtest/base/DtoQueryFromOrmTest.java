@@ -156,6 +156,34 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
   }
 
   @Test
+  public void asDto_usingMaster_true() {
+    asDtoUsingMaster(true);
+  }
+
+  @Test
+  public void asDto_usingMaster_false() {
+    asDtoUsingMaster(false);
+  }
+
+  private void asDtoUsingMaster(boolean useMaster) {
+    ResetBasicData.reset();
+    LoggedSql.start();
+
+    DtoQuery<ContactDto> query = DB.find(Contact.class)
+      .select("id, email")
+      .where().isNotNull("email")
+      .asDto(ContactDto.class)
+      .usingMaster(useMaster);
+
+    List<ContactDto> dtos = query.findList();
+
+    assertThat(dtos).isNotEmpty();
+    for (ContactDto dto : dtos) {
+      assertThat(dto.getEmail()).isNotNull();
+    }
+  }
+
+  @Test
   public void asDto_withExplicitId() {
 
     ResetBasicData.reset();

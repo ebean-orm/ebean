@@ -27,6 +27,24 @@ class TestInsertOnConflict extends BaseTestCase {
 
   @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
   @Test
+  void insertTestEntity() {
+    var entity1 = new EStrIdBean();
+    entity1.setId("entity-1");
+    entity1.setName("Example");
+    DB.insert(entity1);
+
+    var entity2 = new EStrIdBean();
+    entity2.setId("entity-1");
+    entity2.setName("Example");
+
+    DB.getDefault().insert(entity2, InsertOptions.builder()
+      .onConflictNothing()
+      .uniqueColumns("id")
+      .build());
+  }
+
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @Test
   void insertOnConflictUpdateExplicitTransaction() {
     Database db = DB.getDefault();
     db.truncate(EPersonOnline.class);

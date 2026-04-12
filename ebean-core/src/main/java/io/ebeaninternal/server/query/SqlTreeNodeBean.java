@@ -100,6 +100,16 @@ class SqlTreeNodeBean implements SqlTreeNode {
   }
 
   @Override
+  public String prefix() {
+    return prefix;
+  }
+
+  @Override
+  public void addChild(SqlTreeNode extraJoin) {
+    children.add(extraJoin);
+  }
+
+  @Override
   public SqlTreeLoad createLoad() {
     return new SqlTreeLoadBean(this);
   }

@@ -990,6 +990,14 @@ public interface DatabaseBuilder {
   DatabaseBuilder setNamingConvention(NamingConvention namingConvention);
 
   /**
+   * Set the AggregateFormulaContext which is used to determine if a database function
+   * is an aggregate function (like sum, min, max, avg etc).
+   * <p>
+   * Use this to override the default known aggregation functions.
+   */
+  DatabaseConfig aggregateFormulaContext(AggregateFormulaContext aggregateFormulaContext);
+
+  /**
    * Set to true if all DB column and table names should use quoted identifiers.
    * <p>
    * For Postgres pgjdbc version 42.3.0 should be used with datasource property
@@ -2609,6 +2617,11 @@ public interface DatabaseBuilder {
      * If none has been set the default UnderscoreNamingConvention is used.
      */
     NamingConvention getNamingConvention();
+
+    /**
+     * Return the AggregateFormulaContext.
+     */
+    AggregateFormulaContext aggregateFormulaContext();
 
     /**
      * Return true if all DB column and table names should use quoted identifiers.

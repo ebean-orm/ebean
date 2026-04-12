@@ -22,7 +22,7 @@ class QDataWithFormulaMainTest {
 
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains(" where ((t1.main_id is null and t1.meta_key is null and t1.value_index is null) or (t1.meta_key = ?)) order by t0.id");
+    assertThat(sql.get(0)).contains(" from data_with_formula_main t0 left join data_with_formula t1 on t1.main_id = t0.id and t1.meta_key = ? order by t0.id");
   }
 
   @Test
@@ -36,6 +36,6 @@ class QDataWithFormulaMainTest {
 
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(1);
-    assertThat(sql.get(0)).contains(" where ((t1.main_id is null and t1.meta_key is null and t1.value_index is null) or (t1.meta_key = ?)) order by t0.id");
+    assertThat(sql.get(0)).contains(" left join data_with_formula t1 on t1.main_id = t0.id and t1.meta_key = ? order by t0.id");
   }
 }

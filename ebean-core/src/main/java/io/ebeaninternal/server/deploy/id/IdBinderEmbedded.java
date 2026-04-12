@@ -46,20 +46,6 @@ public final class IdBinderEmbedded implements IdBinder {
   }
 
   @Override
-  public String idNullOr(String prefix, String filterManyExpression) {
-    StringBuilder sb = new StringBuilder(100);
-    sb.append("((");
-    for (int i = 0; i < props.length; i++) {
-      if (i > 0) {
-        sb.append(" and ");
-      }
-      sb.append("${").append(prefix).append('}').append(props[i].dbColumn()).append(" is null");
-    }
-    sb.append(") or (").append(filterManyExpression).append("))");
-    return sb.toString();
-  }
-
-  @Override
   public String idSelect() {
     return embIdProperty.name();
   }

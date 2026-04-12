@@ -15,8 +15,4 @@ public interface SpiQueryManyJoin {
    */
   String fetchOrderBy();
 
-  /**
-   * Wrap the filter many expression with a condition allowing lEFT JOIN null matching row.
-   */
-  String idNullOr(String filterManyExpression);
 }
