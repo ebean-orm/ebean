@@ -2,13 +2,15 @@ package io.ebean.xtest.event;
 
 
 import io.ebean.Database;
+import io.ebean.DatabaseBuilder;
 import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
-import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanDeleteIdRequest;
 import io.ebean.event.BeanPersistAdapter;
+import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistRequest;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -139,7 +141,7 @@ public class BeanPersistControllerTest {
     assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preDeleteById");
     stopPersistingAdapter.methodsCalled.clear();
 
-    db.deleteAll(EBasicVer.class, Arrays.asList(22,23,24));
+    db.deleteAll(EBasicVer.class, Arrays.asList(22, 23, 24));
     assertThat(stopPersistingAdapter.methodsCalled).hasSize(3);
     assertThat(stopPersistingAdapter.methodsCalled).containsExactly("preDeleteById", "preDeleteById", "preDeleteById");
     stopPersistingAdapter.methodsCalled.clear();
@@ -202,12 +204,12 @@ public class BeanPersistControllerTest {
 
       Object bean = request.bean();
       if (bean instanceof UTDetail) {
-        UTDetail detail = (UTDetail)bean;
+        UTDetail detail = (UTDetail) bean;
         // invoke lazy loading ... which invoke the flush of the jdbc batch
         detail.setQty(42);
       }
       if (bean instanceof UTMaster) {
-        UTMaster master = (UTMaster)bean;
+        UTMaster master = (UTMaster) bean;
         UTMaster.Journal journal = master.getJournal();
         if (journal == null) {
           journal = new UTMaster.Journal();
