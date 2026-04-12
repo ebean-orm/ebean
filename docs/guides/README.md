@@ -19,6 +19,12 @@ existing Maven project. Complete the steps in order.
 |-------|-------------|
 | [Lombok with Ebean entity beans](lombok-with-ebean-entity-beans.md) | Which Lombok annotations to use and avoid on entity beans; why `@Data` is incompatible with Ebean; how to use `@Getter` + `@Setter` + `@Accessors(chain = true)` |
 
+## Testing
+
+| Guide | Description |
+|-------|-------------|
+| [Testing with TestEntityBuilder](testing-with-testentitybuilder.md) | Rapidly create test entity instances with auto-populated random values; manage relationships and cascades; customize value generation for domain-specific testing needs |
+
 ## Database migrations
 
 | Guide | Description |
