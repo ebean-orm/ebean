@@ -10,7 +10,7 @@ import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
 import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
-import io.ebeaninternal.server.util.Checksum;
+import io.ebeaninternal.server.util.JsonContentHash;
 
 import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
@@ -141,7 +141,10 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
   }
 
   /**
-   * Hold checksum of json source content to use for dirty detection.
+   * Hold canonical hash of json content to use for dirty detection.
+   * <p>
+   * Uses an order-independent hash so that databases which reorder JSON object
+   * keys (e.g. PostgreSQL JSONB) do not cause false dirty detection.
    * <p>
    * Does not support rebuilding 'oldValue' as no original json content.
    */
@@ -152,7 +155,7 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
 
     ChecksumMutableValue(ScalarType<?> parent, String json) {
       this.parent = parent;
-      this.checksum = Checksum.checksum(json);
+      this.checksum = JsonContentHash.hash(json);
     }
 
     /**
@@ -165,13 +168,13 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
 
     @Override
     public MutableValueNext nextDirty(String json) {
-      final long nextChecksum = Checksum.checksum(json);
+      final long nextChecksum = JsonContentHash.hash(json);
       return nextChecksum == checksum ? null : new NextPair(json, new ChecksumMutableValue(parent, nextChecksum));
     }
 
     @Override
     public boolean isEqualToObject(Object obj) {
-      return Checksum.checksum(parent.format(obj)) == checksum;
+      return JsonContentHash.hash(parent.format(obj)) == checksum;
     }
 
     @Override
@@ -182,6 +185,10 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
 
   /**
    * Hold json source content. This supports rebuilding the 'oldValue'.
+   * <p>
+   * Uses fast string equality as primary check, with an order-independent
+   * canonical hash as fallback to handle databases that reorder JSON object
+   * keys (e.g. PostgreSQL JSONB).
    */
   private static final class SourceMutableValue implements MutableValueInfo, MutableValueNext {
 
@@ -195,12 +202,15 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
 
     @Override
     public MutableValueNext nextDirty(String json) {
-      return Objects.equals(originalJson, json) ? null : new SourceMutableValue(parent, json);
+      if (jsonContentEqual(originalJson, json)) {
+        return null;
+      }
+      return new SourceMutableValue(parent, json);
     }
 
     @Override
     public boolean isEqualToObject(Object obj) {
-      return Objects.equals(originalJson, parent.format(obj));
+      return jsonContentEqual(originalJson, parent.format(obj));
     }
 
     @Override
@@ -218,5 +228,14 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
     public MutableValueInfo info() {
       return this;
     }
+  }
+
+  /**
+   * Compare two JSON strings for content equality, ignoring key ordering.
+   * Uses fast string equality first, falls back to order-independent hash comparison.
+   */
+  private static boolean jsonContentEqual(String json1, String json2) {
+    return Objects.equals(json1, json2)
+      || JsonContentHash.hash(json1) == JsonContentHash.hash(json2);
   }
 }

@@ -227,7 +227,7 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
         // re-add to the batch and lazy load from DB skipping l2 cache
         if (loadingStarted.get()) {
           if (CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
-            CoreLog.markedAsDeleted.log(DEBUG, "Adding " + ebi + "to batch " + this + "after loadingStarted(2) ", new RuntimeException("Adding to batch after load(2"));
+            CoreLog.markedAsDeleted.log(DEBUG, "Adding " + ebi + "to batch " + this + "after loadingStarted(2) ", new RuntimeException("Adding to batch after load(2)"));
           }
         }
         batch.add(ebi);
@@ -239,9 +239,36 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
           return;
         }
       }
+      // ensure, that every bean in the batch is in the persistence context.
+      // this may happen, when bean was previously deleted, but the result is not yet committed.
+      List<Object> reincarnatedIds = ensureBatchInContext(ebi);
+      try {
+        context.desc.ebeanServer().loadBean(new LoadBeanRequest(this, ebi, context.hitCache));
+        batch.clear();
+      } finally {
+        if (reincarnatedIds != null) {
+          for (Object id : reincarnatedIds) {
+            context.desc.contextClear(persistenceContext, id);
+          }
+        }
+      }
+    }
 
-      context.desc.ebeanServer().loadBean(new LoadBeanRequest(this, ebi, context.hitCache));
-      batch.clear();
+    private List<Object> ensureBatchInContext(EntityBeanIntercept ebi) {
+      List<Object> reincarnatedIds = null;
+      for (EntityBeanIntercept batchEbi : batch) {
+        Object id = context.desc.getId(batchEbi.owner());
+        if (id != null && context.desc.contextPutIfAbsent(persistenceContext, id, batchEbi.owner()) == null) {
+          if (reincarnatedIds == null) {
+            reincarnatedIds = new ArrayList<>();
+          }
+          reincarnatedIds.add(id);
+          if (CoreLog.markedAsDeleted.isLoggable(DEBUG)) {
+            CoreLog.markedAsDeleted.log(DEBUG, "Temporary adding " + ebi + "to persistence context", new RuntimeException("Temporary adding bean to persistence context"));
+          }
+        }
+      }
+      return reincarnatedIds;
     }
   }
 
