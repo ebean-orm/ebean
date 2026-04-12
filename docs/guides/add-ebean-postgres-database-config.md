@@ -246,6 +246,17 @@ full details on generating and managing migration files.
 
 ---
 
+## See Also
+
+For advanced connection pool configuration, production deployment patterns, and connection
+validation best practices, see the [ebean-datasource guides](https://github.com/ebean-orm/ebean-datasource/tree/master/docs/guides/):
+
+- **[Creating DataSource Pools](https://github.com/ebean-orm/ebean-datasource/blob/master/docs/guides/create-datasource-pool.md)** — Covers read-only pools (`readOnly(true)` + `autoCommit(true)`), Kubernetes deployment strategies using `initialConnections`, and AWS Lambda optimization
+- **[AWS Aurora Read-Write Split](https://github.com/ebean-orm/ebean-datasource/blob/master/docs/guides/aws-aurora-read-write-split.md)** — Setting up dual DataSources with Aurora reader and writer endpoints, including Ebean secondary datasource routing
+- **[Connection Validation Best Practices](https://github.com/ebean-orm/ebean-datasource/blob/master/docs/guides/connection-validation-best-practices.md)** — Why `Connection.isValid()` is the recommended default and when (rarely) explicit `heartbeatSql` is needed
+
+---
+
 ## Verification
 
 1. Start the application (or run `mvn test -pl <your-module>`).

@@ -25,6 +25,18 @@ existing Maven project. Complete the steps in order.
 |-------|-------------|
 | [DB migration generation](add-ebean-db-migration-generation.md) | Add `GenerateDbMigration.java` to generate schema diff migrations offline; configure the migration runner; understand `.sql` and `.model.xml` output files; workflow for pending drops |
 
+## Connection Pooling & DataSource Configuration
+
+The [ebean-datasource](https://github.com/ebean-orm/ebean-datasource) project provides
+comprehensive guides on connection pool configuration and best practices. These are particularly
+useful for production deployments, especially in Kubernetes or AWS environments:
+
+| Guide | Description |
+|-------|-------------|
+| [Creating DataSource Pools](https://github.com/ebean-orm/ebean-datasource/blob/master/docs/guides/create-datasource-pool.md) | Step-by-step guide for basic, read-only, Kubernetes, and AWS Lambda datasource configurations |
+| [AWS Aurora Read-Write Split](https://github.com/ebean-orm/ebean-datasource/blob/master/docs/guides/aws-aurora-read-write-split.md) | Setting up dual DataSources with Aurora read and write endpoints for Ebean integration |
+| [Connection Validation Best Practices](https://github.com/ebean-orm/ebean-datasource/blob/master/docs/guides/connection-validation-best-practices.md) | Understanding connection heartbeat strategies and why `Connection.isValid()` is the recommended approach |
+
 ---
 
 ## Helping AI agents find these guides
