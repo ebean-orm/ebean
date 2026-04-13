@@ -20,6 +20,18 @@ existing Maven project. Complete the steps in order.
 | [Entity Bean Creation](entity-bean-creation.md) | How to generate clean, idiomatic Ebean entity beans for AI agents; patterns and anti-patterns; minimal boilerplate without getters/setters; decision tree for code generation |
 | [Lombok with Ebean entity beans](lombok-with-ebean-entity-beans.md) | Which Lombok annotations to use and avoid on entity beans; why `@Data` is incompatible with Ebean; how to use `@Getter` + `@Setter` + `@Accessors(chain = true)` |
 
+## Querying
+
+| Guide | Description |
+|-------|-------------|
+| [Write Ebean queries with query beans](writing-ebean-query-beans.md) | Step-by-step guidance for AI agents to write type-safe Ebean queries; choose the right terminal method; tune `select()` / `fetch()` / `fetchQuery()`; and project to DTOs when entity beans are not the right output |
+
+## Persisting & transactions
+
+| Guide | Description |
+|-------|-------------|
+| [Persisting and transactions with Ebean](persisting-and-transactions-with-ebean.md) | Step-by-step guidance for AI agents to choose `insert` / `save` / `update` / `delete`; inspect cascades; select the right transaction boundary; and use batch or bulk update for large write sets |
+
 ## Testing
 
 | Guide | Description |
@@ -61,10 +73,10 @@ Add a section near the top of your project README:
 ## AI Agent Instructions
 
 This project uses [Ebean ORM](https://ebean.io). Step-by-step guides for common
-Ebean tasks (Maven setup, database configuration, test containers, DB migrations,
-Lombok) are at:
+Ebean tasks (Maven setup, database configuration, query writing, transactions,
+test containers, DB migrations, Lombok) are at:
 
-**https://github.com/ebean-orm/ebean/tree/main/docs/guides/**
+**https://github.com/ebean-orm/ebean/tree/HEAD/docs/guides/**
 
 AI agents should fetch and follow the relevant guide before performing Ebean-related
 tasks.
@@ -85,14 +97,16 @@ discover the guides without requiring tool-specific configuration files.
 ## Ebean ORM
 
 This project uses [Ebean ORM](https://ebean.io). Step-by-step guides for common
-tasks are at: https://github.com/ebean-orm/ebean/tree/main/docs/guides/
+tasks are at: https://github.com/ebean-orm/ebean/tree/HEAD/docs/guides/
 
 Key guides (fetch and follow these when performing the relevant task):
-- Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/main/docs/guides/add-ebean-postgres-maven-pom.md
-- Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/main/docs/guides/add-ebean-postgres-database-config.md
-- Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/main/docs/guides/add-ebean-postgres-test-container.md
-- DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/main/docs/guides/add-ebean-db-migration-generation.md
-- Lombok with entity beans: https://raw.githubusercontent.com/ebean-orm/ebean/main/docs/guides/lombok-with-ebean-entity-beans.md
+- Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md
+- Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
+- Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
+- Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
+- Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md
+- DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md
+- Lombok with entity beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/lombok-with-ebean-entity-beans.md
 ```
 
 ### Claude Code — `CLAUDE.md`
@@ -112,5 +126,5 @@ alwaysApply: false
 
 This project uses Ebean ORM. Before performing any Ebean-related task, fetch and
 follow the relevant step-by-step guide from:
-https://github.com/ebean-orm/ebean/tree/main/docs/guides/
+https://github.com/ebean-orm/ebean/tree/HEAD/docs/guides/
 ```
