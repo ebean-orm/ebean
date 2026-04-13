@@ -16,8 +16,9 @@ The default recommendation is:
 
 1. Prefer query beans first
 2. Prefer entity queries for domain logic
-3. Prefer DTO projection for summary/read-model use cases
-4. Only drop to raw SQL when the ORM query cannot express the requirement cleanly
+3. For read-only entity graphs, prefer `setUnmodifiable(true)`
+4. Prefer DTO projection for summary/read-model use cases
+5. Only drop to raw SQL when the ORM query cannot express the requirement cleanly
 
 ---
 
@@ -232,7 +233,59 @@ In this example:
 
 ---
 
-## Step 6 - Use `fetchQuery()` for to-many paths and `FetchGroup` for reusable query shapes
+## Step 6 - Use `setUnmodifiable(true)` for read-only entity graphs
+
+`setUnmodifiable(true)` turns the returned object graph into an unmodifiable,
+read-only graph.
+
+This means:
+
+- setters cannot mutate returned beans
+- associated collections are unmodifiable
+- lazy loading is disabled
+- accessing an unloaded property throws `LazyInitialisationException`
+- the query uses `PersistenceContextScope.QUERY`
+
+### Example - read-only entity graph
+
+```java
+private static final QCustomer CUST = QCustomer.alias();
+private static final QContact CONT = QContact.alias();
+
+List<Customer> customers = new QCustomer()
+  .select(CUST.name, CUST.status, CUST.whenCreated)
+  .contacts.fetch(CONT.email)
+  .status.equalTo(Customer.Status.ACTIVE)
+  .setUnmodifiable(true)
+  .findList();
+```
+
+### When to prefer `setUnmodifiable(true)`
+
+Use it when the result is meant to be read-only, such as:
+
+- service/query methods returning entity graphs for display or serialization
+- query results you want the application to treat as immutable
+- cached query results or other shared read models backed by entity graphs
+- partial entity graphs where you want accidental lazy loading to fail fast
+
+### When **not** to use it
+
+Do **not** use `setUnmodifiable(true)` when the caller will:
+
+- modify the beans and save them later
+- rely on lazy loading of associations or unloaded scalar properties
+- treat the result as a working persistence model rather than a read-only view
+
+### Agent rule
+
+If you are returning entity beans for read-only use, `setUnmodifiable(true)`
+should be the default recommendation. If the caller needs a mutable model or a
+serialized summary shape, choose mutable entities or DTO projection instead.
+
+---
+
+## Step 7 - Use `fetchQuery()` for to-many paths and `FetchGroup` for reusable query shapes
 
 Ebean applies important SQL rules when translating ORM queries:
 
@@ -292,7 +345,7 @@ plain `fetch(...)` on those paths. `fetchQuery()` is often the safer default.
 
 ---
 
-## Step 7 - Use DTO projection when the caller does not need entity beans
+## Step 8 - Use DTO projection when the caller does not need entity beans
 
 For list screens, API summaries, exports, or read-model views, the caller often
 does **not** need managed entity beans. In those cases, project directly to a
@@ -323,7 +376,7 @@ List<CustomerSummary> summaries = new QCustomer()
 
 ---
 
-## Step 8 - Only fall back to raw SQL when the ORM query is not a good fit
+## Step 9 - Only fall back to raw SQL when the ORM query is not a good fit
 
 Prefer the following order:
 
@@ -382,7 +435,12 @@ Customer customer = new QCustomer()
 If the caller only needs summary fields, return a DTO instead of partially
 loaded entities that might later trigger more loading or confuse serializers.
 
-### Anti-pattern 4 - Fetching every relationship "just in case"
+### Anti-pattern 4 - Returning mutable entity graphs for read-only use
+
+If the caller is only meant to read the result, prefer `setUnmodifiable(true)`
+so accidental setter calls, collection mutation, and lazy loading fail fast.
+
+### Anti-pattern 5 - Fetching every relationship "just in case"
 
 Do not eagerly fetch large object graphs unless the immediate caller will use
 them. Query tuning is part of the job.
@@ -398,6 +456,8 @@ them. Query tuning is part of the job.
 | Old `Q*` class still appears after entity rename | Stale generated source/class output | Run a clean rebuild |
 | `findOne()` fails because multiple rows match | Predicate is not unique | Use `findList()` or tighten the predicate |
 | Returned entities only have some fields loaded | `select()` or `FetchGroup` limited the query shape | Add the required fields or switch to DTO projection |
+| Setter calls or collection mutation fail on query results | `setUnmodifiable(true)` returned a read-only graph | Remove `setUnmodifiable(true)` or treat the result as read-only |
+| Accessing an unloaded property throws `LazyInitialisationException` | `setUnmodifiable(true)` disables lazy loading | Fetch the property up front or use DTO projection |
 | Ebean executes secondary queries for a to-many path | ORM rules avoided cartesian product or honored `maxRows` | This is expected; use `fetchQuery()` explicitly when appropriate |
 
 ---
@@ -410,9 +470,10 @@ When asked to add or modify an Ebean query:
 2. Choose the terminal method first (`exists`, `findOne`, `findList`, `findPagedList`, `asDto`)
 3. Add predicates with query bean properties and association traversal
 4. Add explicit ordering and pagination if relevant
-5. Tune the fetch shape with `select()` / `fetch()` / `fetchQuery()` / `FetchGroup`
-6. Prefer DTO projection for read models and serialized responses
-7. Only use raw SQL if the ORM query is genuinely the wrong tool
+5. If the result is read-only entity data, consider `setUnmodifiable(true)`
+6. Tune the fetch shape with `select()` / `fetch()` / `fetchQuery()` / `FetchGroup`
+7. Prefer DTO projection for read models and serialized responses
+8. Only use raw SQL if the ORM query is genuinely the wrong tool
 
 ---
 
