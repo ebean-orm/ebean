@@ -39,7 +39,7 @@ Problems caused:
 
 `@Data` generates a `toString()` that accesses **all** fields, including
 `@OneToMany` and `@ManyToOne` associations. Accessing an unloaded lazy association
-outside of a transaction triggers a `LazyInitializationException` or fires an unexpected
+outside of a transaction triggers a `LazyInitialisationException` or fires an unexpected
 SQL query, which can:
 - Cause subtle bugs in logging statements
 - Trigger N+1 queries in test output or debug logging

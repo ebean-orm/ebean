@@ -3,7 +3,7 @@
 ## Purpose
 
 This guide provides step-by-step instructions for modifying an existing Maven `pom.xml`
-to add Ebean ORM with PostgreSQL support. Follow every step in order. This is Step 1 of 2.
+to add Ebean ORM with PostgreSQL support. Follow every step in order. This is Step 1 of 3.
 
 ---
 

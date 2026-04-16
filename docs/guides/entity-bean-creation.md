@@ -2,7 +2,7 @@
 
 **Target Audience:** AI systems (Claude, Copilot, ChatGPT, etc.)
 **Purpose:** Learn how to generate clean, idiomatic Ebean entity beans
-**Key Insight:** Ebean requires private fields with getters/setters (or other accessors), but they don't need to follow Java bean conventions; no public fields; no equals/hashCode implementation needed
+**Key Insight:** Ebean entity fields must be non-public (no public fields). Getters/setters are optional, and if used they don't need JavaBeans naming conventions; no manual equals/hashCode implementation is needed
 **Language:** Java
 **Framework:** Ebean ORM
 
@@ -16,7 +16,7 @@ Before writing entity code, remember:
 |-------------|---------|-----------------------------------------------------------------------------------------------------------------------|
 | `@Entity` annotation | ✅ **YES** | Marks class as persistent entity                                                                                      |
 | `@Id` annotation | ✅ **YES** | Marks primary key field                                                                                               |
-| Getters/setters (or other accessors) | ✅ **YES** | Required for field access. Don't need to follow Java bean spec; can be record-style, fluent, or any accessor pattern. |
+| Getters/setters (or other accessors) | ⚠️ **OPTIONAL** | Ebean can use field access directly. Add accessors when your API/design needs them; naming can be JavaBeans, fluent, or custom. |
 | Default constructor | ❌ **NO** | Not required. Ebean can instantiate without it.                                                                       |
 | equals/hashCode | ❌ **NO** | Ebean auto-enhances these at compile time.                                                                            |
 | toString() | ❌ **NO** | Ebean auto-enhances this. Don't implement with getters.                                                               |
@@ -26,8 +26,8 @@ Before writing entity code, remember:
 
 **Critical:**
 - Prefer primitive `long` for `@Id` and `@Version`, NOT `Long` object.
-- Fields should be **private** or **protected** (not public). Access via getters/setters or other accessors.
-- Getters/setters do NOT need to follow Java bean conventions.
+- Fields should be non-public: **private**, **protected**, or package-private.
+- If you add accessors, they do NOT need to follow Java bean conventions.
 
 ---
 
@@ -112,7 +112,7 @@ public class Customer {
 - ✅ `@Entity` marks it as persistent
 - ✅ `@Id private long id` is the primary key
 - ✅ Private fields (Ebean does NOT support public fields without expert flags enabled)
-- ✅ Getters/setters don't need to follow Java bean conventions (shown above with setName but no getId setter)
+- ✅ Accessors can follow any naming convention, and can be omitted when field access is preferred
 - ✅ No default constructor needed
 - ✅ No equals/hashCode needed (Ebean enhances these)
 
@@ -641,7 +641,6 @@ public class Customer {
 **Why:** Ebean's naming convention handles this automatically. Only use @Column when your database column doesn't match the convention.
 
 ---
----
 
 ## What Ebean Enhancement Provides
 
@@ -662,7 +661,7 @@ At compile time, Ebean enhances your entity classes:
 **Recommended for ID/Version:**
 - `long` (primitive) ✅ Use this
 - `int` (primitive) ✅ Use this
-- `uuid` (UUID) ✅ Use this
+- `UUID` ✅ Use this
 
 **Not recommended:**
 - `Long` object ⚠️ Avoid (use primitive long)
@@ -752,19 +751,19 @@ Each step adds only what's necessary. No getters/setters needed unless your desi
 ### Creating and saving
 ```java
 Customer customer = new Customer();
-customer.name = "Alice";
+customer.setName("Alice");
 DB.save(customer);  // id auto-generated
 ```
 
 ### Finding
 ```java
 Customer found = DB.find(Customer.class, 1);
-System.out.println(found.name);  // Direct field access works
+System.out.println(found.getName());
 ```
 
 ### Updating
 ```java
-found.name = "Bob";
+found.setName("Bob");
 DB.update(found);  // version auto-incremented
 ```
 

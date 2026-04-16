@@ -91,7 +91,7 @@ Customer customer = new QCustomer()
 
 customer.setStatus(Customer.Status.ACTIVE);
 
-DB.save(customer);
+DB.update(customer);
 ```
 
 ### When to prefer `insert()` over `save()`

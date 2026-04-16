@@ -24,17 +24,19 @@ The `TestEntityBuilder` class is provided by the `ebean-test` module.
 <dependency>
   <groupId>io.ebean</groupId>
   <artifactId>ebean-test</artifactId>
-  <version>16.5.0</version>
+  <version>${ebean.version}</version>
   <scope>test</scope>
 </dependency>
 ```
 
 **Gradle:**
 ```gradle
-testImplementation 'io.ebean:ebean-test:16.5.0'
+testImplementation "io.ebean:ebean-test:${ebeanVersion}"
 ```
 
-Replace `16.5.0` with the version matching your Ebean installation.
+Use a version that matches your Ebean runtime (`ebean.version` /
+`ebeanVersion`), or replace with an explicit fixed version if your build does
+not centralize dependency versions.
 
 ### Import the Class
 
@@ -64,15 +66,14 @@ The `build()` method creates an instance with populated fields **without persist
 Product product = builder.build(Product.class);
 
 // Fields are populated:
-// - id: null (not populated)
+// - id: unset (typically 0 for primitive long, null for boxed Long)
 // - name: random UUID-based string
 // - price: random BigDecimal
 // - inStock: true
 // - createdAt: current instant
 // - etc.
 
-// Not persisted yet:
-assert product.getId() == null;
+// Not persisted yet (`@Id` is still unset until the entity is persisted).
 ```
 
 ### Build and Save (Persist to Database)
@@ -83,7 +84,7 @@ The `save()` method creates, persists, and returns an entity with the database-a
 Product product = builder.save(Product.class);
 
 // Entity is now in the database:
-assert product.getId() != null;
+assert DB.find(Product.class, product.getId()) != null;
 
 // Verify it was saved:
 Product found = DB.find(Product.class, product.getId());
@@ -167,7 +168,8 @@ Order order = builder.build(Order.class);
 // Both order and customer are built:
 assert order != null;
 assert order.getCustomer() != null;
-assert order.getCustomer().getId() == null;  // not persisted yet
+// Before persist, @Id values are typically unset
+// (0 for primitive IDs, null for boxed IDs).
 
 // When saved, cascade handles both:
 Order saved = builder.save(Order.class);
@@ -253,7 +255,7 @@ Subclass `RandomValueGenerator` and override individual `random*()` methods:
 
 ```java
 class CompanyTestDataGenerator extends RandomValueGenerator {
-  
+
   @Override
   protected String randomString(String propName, int maxLength) {
     if (propName != null && propName.toLowerCase().contains("email")) {
@@ -267,14 +269,14 @@ class CompanyTestDataGenerator extends RandomValueGenerator {
     }
     return super.randomString(propName, maxLength);
   }
-  
+
   // Override other methods as needed:
   @Override
   protected Object randomEnum(Class<?> type) {
     if (type == OrderStatus.class) {
       // Bias towards common statuses for realistic test data
-      return ThreadLocalRandom.current().nextDouble() < 0.8 
-        ? OrderStatus.PENDING 
+      return ThreadLocalRandom.current().nextDouble() < 0.8
+        ? OrderStatus.PENDING
         : OrderStatus.COMPLETED;
     }
     return super.randomEnum(type);
@@ -299,7 +301,7 @@ assert user.getEmail().endsWith("@mycompany.com");
 
 ```java
 public class MoneyValueGenerator extends RandomValueGenerator {
-  
+
   @Override
   protected BigDecimal randomBigDecimal(int precision, int scale) {
     // Generate prices in a realistic range: $5.00 to $999.99
@@ -346,7 +348,7 @@ When test requirements demand specific field values, manually override after bui
 void whenStockIsLow_thenShowWarning() {
   Product product = builder.build(Product.class);
   product.setQuantity(2);  // Specific value for this test
-  
+
   boolean shouldWarn = product.shouldShowLowStockWarning();
   assertThat(shouldWarn).isTrue();
 }
@@ -358,23 +360,23 @@ Encapsulate common test entity setups in factory methods:
 
 ```java
 public class TestDataFactory {
-  
-  private static final TestEntityBuilder builder = 
+
+  private static final TestEntityBuilder builder =
     TestEntityBuilder.builder(DB.getDefault()).build();
-  
+
   public static Order createPendingOrder() {
     Order order = builder.build(Order.class);
     order.setStatus(OrderStatus.PENDING);
     return order;
   }
-  
+
   public static Order createShippedOrder() {
     Order order = builder.build(Order.class);
     order.setStatus(OrderStatus.SHIPPED);
     order.setShippedAt(Instant.now());
     return order;
   }
-  
+
   public static Order savePendingOrder() {
     Order order = createPendingOrder();
     DB.save(order);
@@ -400,7 +402,7 @@ void whenFetchingMultipleOrders_thenAllUnique() {
   Order order1 = builder.save(Order.class);
   Order order2 = builder.save(Order.class);
   Order order3 = builder.save(Order.class);
-  
+
   assertThat(order1.getId()).isNotEqualTo(order2.getId());
   assertThat(order2.getId()).isNotEqualTo(order3.getId());
   assertThat(order1.getOrderNumber()).isNotEqualTo(order2.getOrderNumber());
@@ -416,31 +418,31 @@ void whenFetchingMultipleOrders_thenAllUnique() {
 ```java
 @SpringBootTest
 class OrderRepositoryTest {
-  
+
   @Autowired
   private OrderRepository orderRepository;
-  
+
   private TestEntityBuilder builder;
-  
+
   @BeforeEach
   void setup() {
     builder = TestEntityBuilder.builder(DB.getDefault()).build();
   }
-  
+
   @Test
   void whenFindingOrdersByStatus_thenReturnsMatching() {
     // Create test data quickly
     Order pending1 = builder.build(Order.class);
     pending1.setStatus(OrderStatus.PENDING);
-    
+
     Order pending2 = builder.build(Order.class);
     pending2.setStatus(OrderStatus.PENDING);
-    
+
     Order shipped = builder.build(Order.class);
     shipped.setStatus(OrderStatus.SHIPPED);
-    
+
     DB.saveAll(pending1, pending2, shipped);
-    
+
     // Test the query
     List<Order> pending = orderRepository.findByStatus(OrderStatus.PENDING);
     assertThat(pending).hasSize(2);
@@ -454,12 +456,13 @@ class OrderRepositoryTest {
 @Test
 void whenBuildingOrderWithCustomer_thenBothPopulated() {
   Order order = builder.build(Order.class);
-  
+
   // Customer is recursively built because of @ManyToOne(cascade=PERSIST)
   assertThat(order.getCustomer()).isNotNull();
-  assertThat(order.getCustomer().getId()).isNull();  // not persisted yet
+  // Before persist, @Id values are typically unset
+  // (0 for primitive IDs, null for boxed IDs).
   assertThat(order.getCustomer().getName()).isNotNull();
-  
+
   // Saving cascades to customer:
   Order saved = builder.save(Order.class);
   assertThat(saved.getId()).isNotNull();
@@ -486,7 +489,7 @@ void usingCustomGenerator() {
   TestEntityBuilder builder = TestEntityBuilder.builder(DB.getDefault())
       .valueGenerator(new ECommerceTestDataGenerator())
       .build();
-  
+
   Product product = builder.build(Product.class);
   assertThat(product.getPrice())
       .isBetween(BigDecimal.TEN, BigDecimal.valueOf(500.0));
@@ -510,19 +513,22 @@ public class Product {
 }
 ```
 
-### Fields are null even though I expected them to be populated
+### Fields are unset even though I expected them to be populated
 
 **Cause:** `TestEntityBuilder` does **not** populate:
-- `@Id` fields (identity/primary key)
-- `@Version` fields (optimistic locking)
+- `@Id` fields (identity/primary key; left unset until persist)
+- `@Version` fields (optimistic locking; left unset until persist)
 - `@Transient` fields
 - `@OneToMany` collections
 - Non-cascade `@ManyToOne` relationships
 
-**Solution:** Set these fields manually in your test if needed:
+**Solution:** Set only the fields your test scenario cares about, then persist.
+`@Id` and `@Version` are usually database-managed and should typically be left
+unset before save:
 ```java
 Product product = builder.build(Product.class);
-product.setId(1L);  // Set @Id manually
+product.setName("specific-name");  // test-specific override
+DB.save(product);                  // database assigns @Id/@Version
 ```
 
 ### Building recursive relationships causes StackOverflowError
@@ -543,7 +549,7 @@ person.getOrganization().setFounder(null);  // Break cycle
 ```java
 class DeterministicTestDataGenerator extends RandomValueGenerator {
   private int counter = 0;
-  
+
   @Override
   protected String randomString(String propName, int maxLength) {
     return "test_" + (counter++);
