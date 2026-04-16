@@ -2,6 +2,9 @@
 
 Step-by-step guides written as instructions for AI agents and developers.
 
+For a high-level capability reference (scope, core APIs, and AI guidance), see
+[../LIBRARY.md](../LIBRARY.md).
+
 ## Adding Ebean ORM with PostgreSQL to an existing Maven project
 
 A three-part guide covering everything needed to wire Ebean + PostgreSQL into an
