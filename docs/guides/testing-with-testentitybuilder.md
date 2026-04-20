@@ -53,10 +53,13 @@ import io.ebean.test.TestEntityBuilder;
 `TestEntityBuilder` uses a builder pattern for configuration:
 
 ```java
-TestEntityBuilder builder = TestEntityBuilder.builder(DB.getDefault()).build();
+TestEntityBuilder builder = TestEntityBuilder.builder(database).build();
 ```
 
-The `Database` parameter (e.g., `DB.getDefault()`) specifies which Ebean database instance to use for entity type lookups and persistence operations.
+The `Database` parameter specifies which Ebean database instance to use for entity type
+lookups and persistence operations. Pass the injected `Database` bean (see
+[Using with Dependency Injection](#using-with-dependency-injection) below) rather than
+`DB.getDefault()` when working in a Spring or Avaje Inject context.
 
 ### Build an Entity (In-Memory)
 
@@ -84,13 +87,88 @@ The `save()` method creates, persists, and returns an entity with the database-a
 Product product = builder.save(Product.class);
 
 // Entity is now in the database:
-assert DB.find(Product.class, product.getId()) != null;
-
-// Verify it was saved:
-Product found = DB.find(Product.class, product.getId());
-assert found != null;
-assert found.getName().equals(product.getName());
+assert database.find(Product.class, product.getId()) != null;
 ```
+
+---
+
+## Using with Dependency Injection
+
+Most applications using Ebean also use a DI framework. The recommended pattern is to
+register `TestEntityBuilder` as a bean in the test DI context so it can be injected
+directly into test classes — eliminating `@BeforeEach` setup boilerplate entirely.
+
+### Spring Boot — `@TestConfiguration`
+
+Add a `@TestConfiguration` class that provides `TestEntityBuilder` as a bean:
+
+```java
+@TestConfiguration
+class TestConfig {
+
+  @Bean
+  TestEntityBuilder testEntityBuilder(Database database) {
+    return TestEntityBuilder.builder(database).build();
+  }
+}
+```
+
+Then inject it directly into test classes:
+
+```java
+@SpringBootTest
+class OrderControllerTest {
+
+  @Autowired Database database;
+  @Autowired TestEntityBuilder builder;
+
+  @Test
+  void findByStatus() {
+    var order = builder.build(Order.class).setStatus(OrderStatus.PENDING);
+    database.save(order);
+
+    // ... test assertions
+  }
+}
+```
+
+### Avaje Inject — `@TestScope @Factory`
+
+Add a `@Bean` method to your test-scoped `@Factory` class:
+
+```java
+@TestScope
+@Factory
+class TestConfiguration {
+
+  @Bean
+  TestEntityBuilder testEntityBuilder(Database database) {
+    return TestEntityBuilder.builder(database).build();
+  }
+}
+```
+
+Then inject it directly into test classes using `@InjectTest`:
+
+```java
+@InjectTest
+class OrderControllerTest {
+
+  @Inject Database database;
+  @Inject TestEntityBuilder builder;
+
+  @Test
+  void findByStatus() {
+    var order = builder.build(Order.class).setStatus(OrderStatus.PENDING);
+    database.save(order);
+
+    // ... test assertions
+  }
+}
+```
+
+Both patterns produce a single shared `TestEntityBuilder` instance, wired
+from the managed `Database` bean — no `@BeforeEach` required.
 
 ---
 
@@ -104,7 +182,7 @@ assert found.getName().equals(product.getName());
 | Email fields | `uuid@domain.com` format | Detected when property name contains "email" (case-insensitive) |
 | `Integer` / `int` | Random in `[1, 1_000)` | |
 | `Long` / `long` | Random in `[1, 100_000)` | |
-| `Short` / `short` | Random in `[1, 100)` | |
+| `Short` / `short` | Random in `[1, 100)` | See note on flag fields below |
 | `Double` / `double` | Random in `[1, 100)` | |
 | `Float` / `float` | Random in `[1, 100)` | |
 | `BigDecimal` | Respects precision and scale | Precision and scale from `@Column(precision=..., scale=...)` |
@@ -146,6 +224,18 @@ public class LineItem {
 
 LineItem item = builder.build(LineItem.class);
 assert item.getAmount().scale() == 2;
+```
+
+### Short Fields Used as Boolean Flags
+
+Some legacy schemas use `short` to represent boolean-like flags (e.g. `active = 1`
+means active, `0` means inactive). `TestEntityBuilder` generates a random short in
+`[1, 100)`, which will be non-zero but not necessarily `1`. If your application
+code checks `entity.getActive() == 1` specifically, override the field after building:
+
+```java
+Organisation org = builder.build(Organisation.class)
+    .setActive((short) 1);  // explicit override — random short won't do
 ```
 
 ---
@@ -289,12 +379,24 @@ class CompanyTestDataGenerator extends RandomValueGenerator {
 Pass the custom generator when building:
 
 ```java
-TestEntityBuilder builder = TestEntityBuilder.builder(DB.getDefault())
+TestEntityBuilder builder = TestEntityBuilder.builder(database)
     .valueGenerator(new CompanyTestDataGenerator())
     .build();
 
 User user = builder.build(User.class);
 assert user.getEmail().endsWith("@mycompany.com");
+```
+
+In a DI context, register this as the bean:
+
+```java
+// Spring Boot
+@Bean
+TestEntityBuilder testEntityBuilder(Database database) {
+  return TestEntityBuilder.builder(database)
+      .valueGenerator(new CompanyTestDataGenerator())
+      .build();
+}
 ```
 
 ### Example: Money Type
@@ -324,7 +426,7 @@ public class MoneyValueGenerator extends RandomValueGenerator {
 @Test
 void whenSaving_thenCanRetrieve() {
   Product product = builder.save(Product.class);
-  Product found = DB.find(Product.class, product.getId());
+  Product found = database.find(Product.class, product.getId());
   assertThat(found).isNotNull();
 }
 ```
@@ -356,39 +458,63 @@ void whenStockIsLow_thenShowWarning() {
 
 ### 3. Create Fixture Factories for Common Patterns
 
-Encapsulate common test entity setups in factory methods:
+For shared domain-specific setup, encapsulate build patterns in an instance helper class
+rather than a static factory. In a DI context, this class can be registered as a bean
+alongside `TestEntityBuilder`:
 
 ```java
-public class TestDataFactory {
+// Spring Boot
+@TestConfiguration
+class TestConfig {
 
-  private static final TestEntityBuilder builder =
-    TestEntityBuilder.builder(DB.getDefault()).build();
+  @Bean
+  TestEntityBuilder testEntityBuilder(Database database) {
+    return TestEntityBuilder.builder(database).build();
+  }
 
-  public static Order createPendingOrder() {
+  @Bean
+  OrderTestFactory orderTestFactory(TestEntityBuilder builder, Database database) {
+    return new OrderTestFactory(builder, database);
+  }
+}
+
+public class OrderTestFactory {
+
+  private final TestEntityBuilder builder;
+  private final Database database;
+
+  public OrderTestFactory(TestEntityBuilder builder, Database database) {
+    this.builder = builder;
+    this.database = database;
+  }
+
+  public Order savePendingOrder() {
     Order order = builder.build(Order.class);
     order.setStatus(OrderStatus.PENDING);
+    database.save(order);
     return order;
   }
 
-  public static Order createShippedOrder() {
+  public Order saveShippedOrder() {
     Order order = builder.build(Order.class);
     order.setStatus(OrderStatus.SHIPPED);
     order.setShippedAt(Instant.now());
-    return order;
-  }
-
-  public static Order savePendingOrder() {
-    Order order = createPendingOrder();
-    DB.save(order);
+    database.save(order);
     return order;
   }
 }
 
 // Usage in tests:
-@Test
-void whenOrderPending_thenCanUpdate() {
-  Order order = TestDataFactory.savePendingOrder();
-  // ... test logic
+@SpringBootTest
+class OrderControllerTest {
+
+  @Autowired OrderTestFactory orderFactory;
+
+  @Test
+  void whenOrderPending_thenCanUpdate() {
+    Order order = orderFactory.savePendingOrder();
+    // ... test logic
+  }
 }
 ```
 
@@ -413,25 +539,29 @@ void whenFetchingMultipleOrders_thenAllUnique() {
 
 ## Complete Examples
 
-### Example 1: Integration Test with Repository
+### Example 1: Integration Test with Spring Boot
+
+Register `TestEntityBuilder` as a `@TestConfiguration` bean, then inject it alongside
+the repository under test:
 
 ```java
+@TestConfiguration
+class TestConfig {
+  @Bean
+  TestEntityBuilder testEntityBuilder(Database database) {
+    return TestEntityBuilder.builder(database).build();
+  }
+}
+
 @SpringBootTest
 class OrderRepositoryTest {
 
-  @Autowired
-  private OrderRepository orderRepository;
-
-  private TestEntityBuilder builder;
-
-  @BeforeEach
-  void setup() {
-    builder = TestEntityBuilder.builder(DB.getDefault()).build();
-  }
+  @Autowired OrderRepository orderRepository;
+  @Autowired Database database;
+  @Autowired TestEntityBuilder builder;
 
   @Test
   void whenFindingOrdersByStatus_thenReturnsMatching() {
-    // Create test data quickly
     Order pending1 = builder.build(Order.class);
     pending1.setStatus(OrderStatus.PENDING);
 
@@ -441,16 +571,51 @@ class OrderRepositoryTest {
     Order shipped = builder.build(Order.class);
     shipped.setStatus(OrderStatus.SHIPPED);
 
-    DB.saveAll(pending1, pending2, shipped);
+    database.saveAll(pending1, pending2, shipped);
 
-    // Test the query
     List<Order> pending = orderRepository.findByStatus(OrderStatus.PENDING);
     assertThat(pending).hasSize(2);
   }
 }
 ```
 
-### Example 2: Recursive Relationship Building
+### Example 2: Integration Test with Avaje Inject
+
+```java
+@TestScope
+@Factory
+class TestConfiguration {
+  @Bean
+  TestEntityBuilder testEntityBuilder(Database database) {
+    return TestEntityBuilder.builder(database).build();
+  }
+}
+
+@InjectTest
+class OrderControllerTest {
+
+  @Inject Database database;
+  @Inject TestEntityBuilder builder;
+
+  @Test
+  void whenFindingOrdersByStatus_thenReturnsMatching() {
+    Order pending1 = builder.build(Order.class);
+    pending1.setStatus(OrderStatus.PENDING);
+
+    Order pending2 = builder.build(Order.class);
+    pending2.setStatus(OrderStatus.PENDING);
+
+    Order shipped = builder.build(Order.class);
+    shipped.setStatus(OrderStatus.SHIPPED);
+
+    database.saveAll(pending1, pending2, shipped);
+
+    // ... test assertions
+  }
+}
+```
+
+### Example 3: Recursive Relationship Building
 
 ```java
 @Test
@@ -470,7 +635,7 @@ void whenBuildingOrderWithCustomer_thenBothPopulated() {
 }
 ```
 
-### Example 3: Custom Generator for Domain Values
+### Example 4: Custom Generator for Domain Values
 
 ```java
 // Custom generator for your domain
@@ -486,7 +651,7 @@ class ECommerceTestDataGenerator extends RandomValueGenerator {
 
 @Test
 void usingCustomGenerator() {
-  TestEntityBuilder builder = TestEntityBuilder.builder(DB.getDefault())
+  TestEntityBuilder builder = TestEntityBuilder.builder(database)
       .valueGenerator(new ECommerceTestDataGenerator())
       .build();
 
@@ -528,7 +693,7 @@ unset before save:
 ```java
 Product product = builder.build(Product.class);
 product.setName("specific-name");  // test-specific override
-DB.save(product);                  // database assigns @Id/@Version
+database.save(product);            // database assigns @Id/@Version
 ```
 
 ### Building recursive relationships causes StackOverflowError
@@ -569,4 +734,3 @@ class DeterministicTestDataGenerator extends RandomValueGenerator {
 4. **Respecting constraints** — Column lengths and decimal scales are enforced
 5. **Supporting customization** — Extend `RandomValueGenerator` for domain needs
 
-Use it for **integration tests and persistence layer tests** where you need representative data without specific values. For **validation tests** and **specific edge cases**, manually set the required field values.

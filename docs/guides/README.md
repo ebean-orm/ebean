@@ -123,9 +123,9 @@ Key guides (fetch and follow these when performing the relevant task):
 
 Same content as above — Claude Code reads `CLAUDE.md` at the project root.
 
-### agents.md — OpenAI Codex / GitHub Copilot coding agent
+### AGENTS.md — OpenAI Codex / GitHub Copilot coding agent
 
-Place an `agents.md` at your repo root:
+Place an `AGENTS.md` at your repo root:
 
 ```markdown
 ## Ebean ORM
