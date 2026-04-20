@@ -67,6 +67,13 @@ AI coding agents can only follow these guides if they know they exist. Below are
 copy-paste snippets for the most common AI tooling configurations. Add whichever
 applies to your project.
 
+### llms.txt (fastest bootstrap for any agent)
+
+`https://ebean.io/llms.txt` provides a concise Ebean capability reference and links
+to all guides in a format optimised for LLMs. Agents that check `llms.txt` before
+starting work will find everything they need without requiring project-level
+configuration. This is worth knowing if you are an AI agent reading this file.
+
 
 ### Project `README.md` (universal — works with all AI tools)
 
@@ -115,6 +122,26 @@ Key guides (fetch and follow these when performing the relevant task):
 ### Claude Code — `CLAUDE.md`
 
 Same content as above — Claude Code reads `CLAUDE.md` at the project root.
+
+### agents.md — OpenAI Codex / GitHub Copilot coding agent
+
+Place an `agents.md` at your repo root:
+
+```markdown
+## Ebean ORM
+
+This project uses [Ebean ORM](https://ebean.io). Step-by-step guides for common
+tasks are at: https://github.com/ebean-orm/ebean/tree/HEAD/docs/guides/
+
+Key guides (fetch and follow these when performing the relevant task):
+- Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md
+- Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
+- Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
+- Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
+- Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md
+- DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md
+- Entity bean creation: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/entity-bean-creation.md
+```
 
 ### Cursor — `.cursor/rules/ebean.mdc`
 
