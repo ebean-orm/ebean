@@ -2,15 +2,19 @@ package org.example;
 
 import io.ebean.DB;
 import io.ebean.Transaction;
+import io.ebean.test.PersistenceContextAccess;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,6 +44,24 @@ public class EbeanSpringModuleTest {
    */
   public EbeanSpringModuleTest() {
     super();
+  }
+
+  @Transactional
+  @Rollback
+  @Test
+  public void testWithRollback() {
+    // setup
+    User user = new User();
+    user.setName("rollback1");
+    DB.save(user);
+
+    // this loads the user into the [transaction scoped] persistence context
+    User found = DB.find(User.class, user.getOid());
+    found.setName("mutated");
+
+    PersistenceContextAccess.clear();
+
+    userService.insideTestRollback(user.getOid());
   }
 
   /**
