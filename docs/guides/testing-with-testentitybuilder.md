@@ -38,6 +38,10 @@ Use a version that matches your Ebean runtime (`ebean.version` /
 `ebeanVersion`), or replace with an explicit fixed version if your build does
 not centralize dependency versions.
 
+> **Minimum version:** `TestEntityBuilder` was introduced in `ebean-test 17.5.0`. If your
+> existing Ebean version is below this, upgrade before proceeding — mismatched Ebean
+> runtime and test versions are not supported.
+
 ### Import the Class
 
 ```java
@@ -59,7 +63,9 @@ TestEntityBuilder builder = TestEntityBuilder.builder(database).build();
 The `Database` parameter specifies which Ebean database instance to use for entity type
 lookups and persistence operations. Pass the injected `Database` bean (see
 [Using with Dependency Injection](#using-with-dependency-injection) below) rather than
-`DB.getDefault()` when working in a Spring or Avaje Inject context.
+`DB.getDefault()` when working in a Spring or Avaje Inject context. For the same reason,
+use the injected `database` bean for **all** persistence operations in your tests
+(`database.save()`, `database.find()`, etc.) rather than mixing in static `DB.*` calls.
 
 ### Build an Entity (In-Memory)
 
@@ -269,25 +275,31 @@ assert saved.getCustomer().getId() != null;  // parent also saved
 
 ### Non-Cascade Relationships: Left Null
 
-Relationships without cascade persist are left null (caller can populate if needed):
+Relationships without cascade persist are not auto-created — even if marked `optional = false`.
+Create and save the related entity first (the builder works well here), then assign it manually
+before saving the parent:
 
 ```java
 @Entity
 public class BlogPost {
   @ManyToOne
-  private Author author;  // No cascade = left null
+  private Author author;  // No cascade = left null by builder
 }
 
 BlogPost post = builder.build(BlogPost.class);
 assert post.getAuthor() == null;
 
-// Set it manually if needed:
-post.setAuthor(manuallyCreatedAuthor);
+// Use the builder to create the related entity, then set it manually:
+Author author = builder.save(Author.class);
+post.setAuthor(author);
+database.save(post);
 ```
 
 ### Collection Relationships: Left Empty
 
-Collection relationships (`@OneToMany`, `@ManyToMany`) are left empty:
+Collection relationships (`@OneToMany`, `@ManyToMany`) are left empty. On Ebean-enhanced
+entities these fields are initialised to empty Ebean-managed lists (not `null`), so calling
+`.add()` or `.addAll()` directly is safe:
 
 ```java
 @Entity
