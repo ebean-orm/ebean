@@ -1,9 +1,8 @@
-package org.example.resource;
+package org.tests.resource;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
-import org.example.records.BaseModel;
 
 import java.util.List;
 import java.util.Locale;
