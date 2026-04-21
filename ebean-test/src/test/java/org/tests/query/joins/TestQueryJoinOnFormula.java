@@ -85,11 +85,19 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .orderBy().asc("order.totalAmount");
 
     shipQuery.findList();
-    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id, z_bt1.total_amount "
-      + "from or_order_ship t0 "
-      + "left join o_order t1 on t1.id = t0.order_id "
-      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
-      + "order by z_bt1.total_amount");
+    if (platformDistinctOn()) {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct on (z_bt1.total_amount, t0.id) t0.id, z_bt1.total_amount " +
+        "from or_order_ship t0 " +
+        "left join o_order t1 on t1.id = t0.order_id " +
+        "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id " +
+        "order by z_bt1.total_amount");
+    } else {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id, z_bt1.total_amount "
+        + "from or_order_ship t0 "
+        + "left join o_order t1 on t1.id = t0.order_id "
+        + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
+        + "order by z_bt1.total_amount");
+    }
   }
 
   @Test
@@ -102,11 +110,19 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .where().isNotNull("order.totalAmount").query();
 
     shipQuery.findList();
-    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id "
-      + "from or_order_ship t0 "
-      + "left join o_order t1 on t1.id = t0.order_id "
-      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
-      + "where z_bt1.total_amount is not null");
+    if (platformDistinctOn()) {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct on (t0.id) t0.id " +
+        "from or_order_ship t0 " +
+        "left join o_order t1 on t1.id = t0.order_id " +
+        "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id " +
+        "where z_bt1.total_amount is not null");
+    } else {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id "
+        + "from or_order_ship t0 "
+        + "left join o_order t1 on t1.id = t0.order_id "
+        + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
+        + "where z_bt1.total_amount is not null");
+    }
   }
 
   @Test
