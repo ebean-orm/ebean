@@ -745,6 +745,12 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   }
 
   @Override
+  public R using(ImmutableBeanCache<?> beanCache) {
+    query.using(beanCache);
+    return root;
+  }
+
+  @Override
   public final boolean exists() {
     return query.exists();
   }

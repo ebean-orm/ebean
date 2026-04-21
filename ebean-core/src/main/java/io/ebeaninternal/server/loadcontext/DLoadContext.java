@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.loadcontext;
 
 import io.ebean.CacheMode;
+import io.ebean.ImmutableBeanCache;
 import io.ebean.ProfileLocation;
 import io.ebean.bean.*;
 import io.ebeaninternal.api.*;
@@ -28,6 +29,7 @@ public final class DLoadContext implements LoadContext {
    * Type based contexts used for assoc-one lazy loading registration.
    */
   private final Map<String, DLoadBeanContext> lazyBeanMap = new HashMap<>();
+  private final Map<Class<?>, ImmutableBeanCache<?>> immutableCaches;
   private final Map<String, DLoadManyContext> manyMap = new HashMap<>();
   private final DLoadBeanContext rootBeanContext;
   private final boolean asDraft;
@@ -76,6 +78,7 @@ public final class DLoadContext implements LoadContext {
     this.planLabel = null;
     this.profileLocation = null;
     this.profilingListener = null;
+    this.immutableCaches = Collections.emptyMap();
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, null);
     this.secondaryProperties = null;
   }
@@ -104,6 +107,7 @@ public final class DLoadContext implements LoadContext {
     this.profilingListener = query.profilingListener();
     this.planLabel = query.planLabel();
     this.profileLocation = query.profileLocation();
+    this.immutableCaches = query.immutableBeanCaches();
     this.secondaryProperties = query.isUnmodifiable() ? new HashSet<>() : null;
 
     ObjectGraphNode parentNode = query.parentNode();
@@ -293,6 +297,33 @@ public final class DLoadContext implements LoadContext {
 
   private DLoadBeanContext lazyBeanContext(BeanDescriptor<?> descriptor) {
     return lazyBeanMap.computeIfAbsent(descriptor.fullName(), p -> new DLoadBeanContext(this, descriptor, descriptor.name(), null));
+  }
+
+  @Override
+  public void populateFromImmutableCache() {
+    if (immutableCaches.isEmpty()) {
+      return;
+    }
+    for (Map.Entry<Class<?>, ImmutableBeanCache<?>> entry : immutableCaches.entrySet()) {
+      BeanDescriptor<?> descriptor = rootDescriptor.descriptor(entry.getKey());
+      if (descriptor == null) {
+        continue;
+      }
+      DLoadBeanContext context = lazyBeanMap.get(descriptor.fullName());
+      if (context == null) {
+        continue;
+      }
+      Set<Object> ids = new HashSet<>();
+      for (EntityBeanIntercept ebi : context.bufferedBeans()) {
+        Object id = descriptor.id(ebi.owner());
+        if (id != null) {
+          ids.add(id);
+        }
+      }
+      if (!ids.isEmpty()) {
+        entry.getValue().getAll(ids);
+      }
+    }
   }
 
   private void registerSecondaryNode(boolean many, OrmQueryProperties props) {

@@ -4,6 +4,7 @@ import org.jspecify.annotations.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.ExpressionList;
+import io.ebean.ImmutableBeanCache;
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
@@ -27,6 +28,7 @@ import io.ebeaninternal.server.rawsql.SpiRawSql;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -758,6 +760,16 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return true if the query should GET against bean cache.
    */
   boolean isBeanCacheGet();
+
+  /**
+   * Register immutable bean cache to use for this query execution.
+   */
+  void putImmutableBeanCache(ImmutableBeanCache<?> beanCache);
+
+  /**
+   * Return immutable bean caches configured for this query by bean type.
+   */
+  Map<Class<?>, ImmutableBeanCache<?>> immutableBeanCaches();
 
   /**
    * Return true if the query should PUT against the bean cache.

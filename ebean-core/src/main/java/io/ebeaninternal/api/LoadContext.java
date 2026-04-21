@@ -60,4 +60,9 @@ public interface LoadContext {
    * Return true to include a many as a secondary query for unmodified.
    */
   boolean includeSecondary(BeanPropertyAssocMany<?> many);
+
+  /**
+   * Populate buffered entity references from immutable bean caches.
+   */
+  void populateFromImmutableCache();
 }
