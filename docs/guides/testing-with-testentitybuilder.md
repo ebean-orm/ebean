@@ -96,6 +96,37 @@ Product product = builder.save(Product.class);
 assert database.find(Product.class, product.getId()) != null;
 ```
 
+### Save Multiple Entities
+
+The `saveAll()` method persists multiple pre-built entities in a single call:
+
+```java
+Product p1 = builder.build(Product.class);
+Product p2 = builder.build(Product.class);
+builder.saveAll(p1, p2);
+
+// Both are now in the database with assigned IDs:
+assert p1.getId() != null;
+assert p2.getId() != null;
+```
+
+This is equivalent to `database.saveAll(p1, p2)` but avoids needing a separate
+`Database` reference in tests that already hold a `TestEntityBuilder`.
+
+### Access the Underlying Database
+
+The `database()` method returns the `Database` instance used internally by the builder.
+This is useful in tests where you want a single injected object (`TestEntityBuilder`) but
+still need to perform `find()`, `delete()`, or other database operations:
+
+```java
+Product saved = builder.save(Product.class);
+
+// Use builder.database() instead of injecting a separate Database bean:
+Product found = builder.database().find(Product.class, saved.getId());
+assert found != null;
+```
+
 ---
 
 ## Using with Dependency Injection
@@ -569,7 +600,6 @@ class TestConfig {
 class OrderRepositoryTest {
 
   @Autowired OrderRepository orderRepository;
-  @Autowired Database database;
   @Autowired TestEntityBuilder builder;
 
   @Test
@@ -583,7 +613,7 @@ class OrderRepositoryTest {
     Order shipped = builder.build(Order.class);
     shipped.setStatus(OrderStatus.SHIPPED);
 
-    database.saveAll(pending1, pending2, shipped);
+    builder.saveAll(pending1, pending2, shipped);
 
     List<Order> pending = orderRepository.findByStatus(OrderStatus.PENDING);
     assertThat(pending).hasSize(2);
@@ -606,7 +636,6 @@ class TestConfiguration {
 @InjectTest
 class OrderControllerTest {
 
-  @Inject Database database;
   @Inject TestEntityBuilder builder;
 
   @Test
@@ -620,7 +649,7 @@ class OrderControllerTest {
     Order shipped = builder.build(Order.class);
     shipped.setStatus(OrderStatus.SHIPPED);
 
-    database.saveAll(pending1, pending2, shipped);
+    builder.saveAll(pending1, pending2, shipped);
 
     // ... test assertions
   }
