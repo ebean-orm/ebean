@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.transaction;
 
 import io.ebean.ProfileLocation;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Default transaction profiling event collection.
@@ -12,7 +13,7 @@ public final class DefaultProfileStream implements ProfileStream {
   private final TransactionProfile profile;
   private final TransactionProfile.Summary summary;
 
-  DefaultProfileStream(ProfileLocation location, boolean verbose) {
+  DefaultProfileStream(@Nullable ProfileLocation location, boolean verbose) {
     this.startNanos = System.nanoTime();
     this.profile = new TransactionProfile(System.currentTimeMillis(), location);
     this.summary = profile.getSummary();

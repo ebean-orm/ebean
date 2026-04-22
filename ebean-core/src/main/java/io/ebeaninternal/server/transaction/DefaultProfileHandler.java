@@ -7,6 +7,7 @@ import io.ebean.plugin.SpiServer;
 import io.ebean.util.IOUtils;
 import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiProfileHandler;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -94,10 +95,14 @@ public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
   }
 
   /**
-   * Create and return a ProfileStream.
+   * Create and return a ProfileStream, or null if location is null (implicit transactions
+   * are not profiled by the default file-based handler).
    */
   @Override
-  public ProfileStream createProfileStream(ProfileLocation location) {
+  public ProfileStream createProfileStream(@Nullable ProfileLocation location) {
+    if (location == null) {
+      return null;
+    }
     return new DefaultProfileStream(location, verbose);
   }
 
