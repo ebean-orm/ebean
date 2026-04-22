@@ -115,7 +115,7 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
   public void profile() {
     transaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId(), query.getGeneratedSql());
   }
 
   @Override

@@ -119,7 +119,7 @@ class OtelProfileHandlerTest {
       OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(null);
       assertNotNull(stream);
       // First query event should update the transaction span name
-      stream.addQueryEvent("fm", stream.offset(), "Customer", 5, "qplan-1");
+      stream.addQueryEvent("fm", stream.offset(), "Customer", 5, "qplan-1", "select ...");
       stream.addEvent("c", 0);
       stream.end(null);
     } finally {
@@ -141,7 +141,7 @@ class OtelProfileHandlerTest {
       assertNotNull(stream);
       long offset = stream.offset();
       // Simulate some time passing then record a find_many
-      stream.addQueryEvent("fm", offset, "Order", 42, "plan-abc");
+      stream.addQueryEvent("fm", offset, "Order", 42, "plan-abc", "select ...");
       stream.addEvent("c", 0);
       stream.end(null);
     } finally {
@@ -163,8 +163,8 @@ class OtelProfileHandlerTest {
     try (Scope ignored = parent.makeCurrent()) {
       OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("MyService.doAll"));
       assertNotNull(stream);
-      stream.addQueryEvent("fo", stream.offset(), "User", 1, "p1");
-      stream.addQueryEvent("fm", stream.offset(), "Order", 10, "p2");
+      stream.addQueryEvent("fo", stream.offset(), "User", 1, "p1", "select from user");
+      stream.addQueryEvent("fm", stream.offset(), "Order", 10, "p2", "select from order");
       stream.addEvent("c", 0);
       stream.end(null);
     } finally {

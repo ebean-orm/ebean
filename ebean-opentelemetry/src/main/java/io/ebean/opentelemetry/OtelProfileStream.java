@@ -21,8 +21,9 @@ import java.util.concurrent.TimeUnit;
  */
 final class OtelProfileStream implements ProfileStream {
 
-  static final AttributeKey<String> DB_SYSTEM = AttributeKey.stringKey("db.system");
-  static final AttributeKey<String> DB_OPERATION = AttributeKey.stringKey("db.operation");
+  static final AttributeKey<String> DB_SYSTEM = AttributeKey.stringKey("db.system.name");
+  static final AttributeKey<String> DB_OPERATION = AttributeKey.stringKey("db.operation.name");
+  static final AttributeKey<String> DB_QUERY_TEXT = AttributeKey.stringKey("db.query.text");
   static final AttributeKey<String> EBEAN_BEAN_TYPE = AttributeKey.stringKey("ebean.bean_type");
   static final AttributeKey<Long> EBEAN_ROW_COUNT = AttributeKey.longKey("ebean.row_count");
   static final AttributeKey<String> EBEAN_QUERY_ID = AttributeKey.stringKey("ebean.query_id");
@@ -50,7 +51,7 @@ final class OtelProfileStream implements ProfileStream {
   }
 
   @Override
-  public void addQueryEvent(String event, long offset, String beanName, int beanCount, String queryId) {
+  public void addQueryEvent(String event, long offset, String beanName, int beanCount, String queryId, String sql) {
     long exeMicros = offset() - offset;
     String operation = operationName(event);
     maybeUpdateTxnName(operation, beanName);
@@ -59,6 +60,7 @@ final class OtelProfileStream implements ProfileStream {
       .setAttribute(EBEAN_BEAN_TYPE, beanName)
       .setAttribute(EBEAN_ROW_COUNT, (long) beanCount)
       .setAttribute(EBEAN_QUERY_ID, queryId)
+      .setAttribute(DB_QUERY_TEXT, sql)
       .startSpan();
     child.end(startEpochNanos + TimeUnit.MICROSECONDS.toNanos(offset + exeMicros), TimeUnit.NANOSECONDS);
   }
