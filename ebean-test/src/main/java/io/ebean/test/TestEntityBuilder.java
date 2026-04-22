@@ -98,6 +98,20 @@ public class TestEntityBuilder {
     return bean;
   }
 
+  /**
+   * Save all the entity beans.
+   */
+  public void saveAll(Object... beans) {
+    database.saveAll(beans);
+  }
+
+  /**
+   * Return the underlying database.
+   */
+  public Database database() {
+    return database;
+  }
+
   private <T> T build(Class<T> beanClass, Set<Class<?>> buildStack) {
     BeanDescriptor<T> descriptor = (BeanDescriptor<T>) database.pluginApi().beanType(beanClass);
     if (descriptor == null) {
