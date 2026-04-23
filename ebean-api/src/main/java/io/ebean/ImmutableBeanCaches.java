@@ -15,6 +15,23 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Utility factory methods for {@link ImmutableBeanCache}.
+ *
+ * <p>Use {@link #builder(Class)} when you want explicit cache policy controls (for example
+ * max size or TTL). Use {@link #loading(Class, Database, FetchGroup)} as a shorthand for
+ * query-loader-backed memoization.
+ *
+ * <pre>{@code
+ * FetchGroup<MyRef> fetchGroup = FetchGroup.of(MyRef.class)
+ *   .select("version")
+ *   .build();
+ *
+ * ImmutableBeanCache<MyRef> cache = ImmutableBeanCaches.builder(MyRef.class)
+ *   .loading(database, fetchGroup)
+ *   .maxSize(10_000)
+ *   .maxIdleSeconds(300)
+ *   .maxSecondsToLive(1_800)
+ *   .build();
+ * }</pre>
  */
 @NullMarked
 public final class ImmutableBeanCaches {
@@ -24,6 +41,12 @@ public final class ImmutableBeanCaches {
 
   /**
    * Return a builder for immutable bean caches.
+   *
+   * <pre>{@code
+   * ImmutableBeanCache<MyRef> cache = ImmutableBeanCaches.builder(MyRef.class)
+   *   .loading(database, FetchGroup.of(MyRef.class, "version"))
+   *   .build();
+   * }</pre>
    */
   public static <T> ImmutableCacheBuilder<T> builder(Class<T> type) {
     SpiImmutableCacheFactory factory = XBootstrapService.immutableCacheFactory();
@@ -36,6 +59,15 @@ public final class ImmutableBeanCaches {
   /**
    * Return a loader-backed immutable bean cache that memoizes both hits and misses.
    *
+   * <pre>{@code
+   * ImmutableBeanCache<MyRef> cache = ImmutableBeanCaches.loading(MyRef.class, ids ->
+   *   database.find(MyRef.class)
+   *     .setUnmodifiable(true)
+   *     .where().idIn(ids)
+   *     .findMap()
+   * );
+   * }</pre>
+   *
    * @param type   The bean type.
    * @param loader Batch loader for unresolved ids.
    */
@@ -43,6 +75,17 @@ public final class ImmutableBeanCaches {
     return builder(type).loader(loader).build();
   }
 
+  /**
+   * Return a query-loader-backed immutable bean cache.
+   *
+   * <pre>{@code
+   * ImmutableBeanCache<MyRef> cache = ImmutableBeanCaches.loading(
+   *   MyRef.class,
+   *   database,
+   *   FetchGroup.of(MyRef.class, "version")
+   * );
+   * }</pre>
+   */
   public static <T> ImmutableBeanCache<T> loading(Class<T> type, Database db, FetchGroup<T> fetchGroup) {
     return builder(type).loading(db, fetchGroup).build();
   }

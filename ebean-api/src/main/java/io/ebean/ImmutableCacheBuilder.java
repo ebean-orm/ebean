@@ -8,6 +8,22 @@ import java.util.function.Function;
 
 /**
  * Builder for creating {@link ImmutableBeanCache} instances.
+ *
+ * <pre>{@code
+ * FetchGroup<MyRef> fetchGroup = FetchGroup.of(MyRef.class)
+ *   .select("version")
+ *   .fetch("names", "locale,text")
+ *   .build();
+ *
+ * ImmutableBeanCache<MyRef> cache = ImmutableBeanCaches.builder(MyRef.class)
+ *   .loading(database, fetchGroup)
+ *   .maxSize(10_000)
+ *   .maxIdleSeconds(300)
+ *   .maxSecondsToLive(1_800)
+ *   .build();
+ * }</pre>
+ *
+ * @see ImmutableBeanCaches#builder(Class)
  */
 @NullMarked
 public interface ImmutableCacheBuilder<T> {

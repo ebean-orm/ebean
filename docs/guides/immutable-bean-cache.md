@@ -10,7 +10,7 @@ Use this when you want:
 
 ---
 
-## Step 1 - Build an immutable cache (typical builder use)
+## Step 1 - Build an immutable cache (typical via builder)
 
 ```java
 FetchGroup<Label> fetchGroup = FetchGroup.of(Label.class)
@@ -32,6 +32,20 @@ ImmutableBeanCache<Label> labelCache = ImmutableBeanCaches.builder(Label.class)
 - `setUnmodifiable(true)`
 - `where().idIn(ids)`
 - `findMap()`
+
+Alternative domain example:
+
+```java
+FetchGroup<Customer> customerGroup = FetchGroup.of(Customer.class)
+  .select("name,version")
+  .fetch("billingAddress", "line1,city")
+  .fetch("shippingAddress", "line1,city")
+  .build();
+
+ImmutableBeanCache<Customer> customerCache = ImmutableBeanCaches.builder(Customer.class)
+  .loading(database, customerGroup)
+  .build();
+```
 
 ---
 
