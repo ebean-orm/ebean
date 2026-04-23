@@ -315,11 +315,50 @@ class ResourceEntityTest {
     assertThat(one.getName().getLabelTexts())
       .extracting(LabelText::getLocaleText)
       .containsExactlyInAnyOrder("Height", "Höhe");
+
     assertThat(one.getDescription().getLabelTexts())
       .extracting(LabelText::getLocaleText)
       .containsExactlyInAnyOrder("Height property", "Höhe Eigenschaft");
-    List<String> sql = LoggedSql.stop();
 
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).isEmpty();
+  }
+
+  @Test
+  void find_unmodifiableUsingImmutableBeanCachesBuilderLoadingWithLabelTexts_expect_assocLoadedAndNoLazyLoadSql() {
+
+    FetchGroup<Label> fetchGroup = FetchGroup.of(Label.class)
+      .select("version")
+      .fetch("labelTexts", "locale, localeText")
+      .build();
+
+    ImmutableBeanCache<Label> cache = ImmutableBeanCaches.builder(Label.class)
+      .loading(DB.getDefault(), fetchGroup)
+      .maxSize(10_000)
+      .maxIdleSeconds(300)
+      .maxSecondsToLive(6_000)
+      .build();
+
+    AttributeDescriptor one = DB.find(AttributeDescriptor.class)
+      .setId(heightDescriptor.id())
+      .setUnmodifiable(true)
+      .using(cache)
+      .findOne();
+
+    assertThat(one).isNotNull();
+    assertThat(DB.beanState(one.getName()).isUnmodifiable()).isTrue();
+    assertThat(DB.beanState(one.getDescription()).isUnmodifiable()).isTrue();
+
+    LoggedSql.start();
+    assertThat(one.getName().getLabelTexts())
+      .extracting(LabelText::getLocaleText)
+      .containsExactlyInAnyOrder("Height", "Höhe");
+
+    assertThat(one.getDescription().getLabelTexts())
+      .extracting(LabelText::getLocaleText)
+      .containsExactlyInAnyOrder("Height property", "Höhe Eigenschaft");
+
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).isEmpty();
   }
 

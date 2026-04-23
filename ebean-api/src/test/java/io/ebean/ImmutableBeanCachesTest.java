@@ -3,6 +3,7 @@ package io.ebean;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -11,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ImmutableBeanCachesTest {
 
@@ -132,5 +134,48 @@ class ImmutableBeanCachesTest {
     assertThat(result).isEqualTo(loaded);
     assertThat(unmodifiable).isTrue();
     assertThat(capturedIds.get()).containsExactlyInAnyOrder("A", "B");
+  }
+
+  @Test
+  void builder_loader_buildsCache() {
+
+    AtomicInteger loadCount = new AtomicInteger();
+
+    ImmutableBeanCache<String> cache = ImmutableBeanCaches.builder(String.class)
+      .loader(ids -> {
+        loadCount.incrementAndGet();
+        Map<Object, String> map = new LinkedHashMap<>();
+        for (Object id : ids) {
+          if ("A".equals(id)) {
+            map.put(id, "val-A");
+          }
+        }
+        return map;
+      })
+      .build();
+
+    assertThat(cache.getAll(Set.of("A", "B"))).containsEntry("A", "val-A").doesNotContainKey("B");
+    assertThat(cache.getAll(Set.of("A", "B"))).containsEntry("A", "val-A").doesNotContainKey("B");
+    assertThat(loadCount.get()).isEqualTo(1);
+  }
+
+  @Test
+  void builder_withPolicy_requiresFactoryWhenUnavailable() {
+
+    if (XBootstrapService.immutableCacheFactory() != null) {
+      ImmutableBeanCache<String> cache = ImmutableBeanCaches.builder(String.class)
+        .maxSize(10)
+        .loader(ids -> Collections.emptyMap())
+        .build();
+      assertThat(cache.getAll(Set.of("A"))).isEmpty();
+      return;
+    }
+
+    assertThatThrownBy(() -> ImmutableBeanCaches.builder(String.class)
+      .maxSize(10)
+      .loader(ids -> Collections.emptyMap())
+      .build()
+    ).isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("SpiImmutableCacheFactory");
   }
 }

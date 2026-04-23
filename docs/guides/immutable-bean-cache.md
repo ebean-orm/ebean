@@ -10,21 +10,23 @@ Use this when you want:
 
 ---
 
-## Step 1 - Build a loader-backed immutable cache
-
-Use `ImmutableBeanCaches.loading(...)` with a `FetchGroup` and unmodifiable
-query semantics.
+## Step 1 - Build an immutable cache (typical builder use)
 
 ```java
-// define a FetchGroup to control what the cached beans contain
-FetchGroup<Label> fetchGroup = FetchGroup.of(Label.class, "version");
+FetchGroup<Label> fetchGroup = FetchGroup.of(Label.class)
+  .select("version")
+  .fetch("labelTexts", "locale, localeText")
+  .build();
 
-// build an ImmutableBeanCache
-ImmutableBeanCache<Label> labelCache =
-  ImmutableBeanCaches.loading(Label.class, DB.getDefault(), fetchGroup);
+ImmutableBeanCache<Label> labelCache = ImmutableBeanCaches.builder(Label.class)
+  .loading(database, fetchGroup)
+  .maxSize(10_000)
+  .maxIdleSeconds(300)
+  .maxSecondsToLive(6_000)
+  .build();
 ```
 
-This helper uses the query shape:
+`loading(...)` uses the query shape:
 
 - `select(fetchGroup)`
 - `setUnmodifiable(true)`
@@ -45,6 +47,20 @@ AttributeDescriptor one = DB.find(AttributeDescriptor.class)
 
 `using(...)` is on the root query. Ebean will use this cache for matching
 bean types when resolving references.
+
+---
+
+## Use loading helper for simple memoization
+
+If you don't need policy controls, use the shorthand helper:
+
+```java
+ImmutableBeanCache<Label> labelCache =
+  ImmutableBeanCaches.loading(Label.class, database, FetchGroup.of(Label.class, "version"));
+```
+
+With `ebean-core` on the classpath, builder policy settings are backed by core
+cache implementation (including periodic trim / eviction).
 
 ---
 
@@ -89,9 +105,9 @@ the immutable cache.
 
 ## Operational note (TTL / max size)
 
-`ImmutableBeanCaches.loading(...)` is a memoizing helper. If you need explicit
-TTL/max-size policy, provide a custom `ImmutableBeanCache` implementation with
-your preferred cache backend/policy.
+Use `ImmutableBeanCaches.builder(...)` when you need explicit TTL/max-size
+policy. `ImmutableBeanCaches.loading(...)` remains the simple helper for
+loader-based memoization.
 
 
 ---
