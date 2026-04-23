@@ -1,5 +1,7 @@
 # Guides
 
+See also: [AGENTS.md](AGENTS.md) — a minimal template for AI agent onboarding and automation in Ebean ORM projects.
+
 Step-by-step guides written as instructions for AI agents and developers.
 
 For a high-level capability reference (scope, core APIs, and AI guidance), see
