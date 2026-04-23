@@ -1,7 +1,9 @@
 package org.tests.resource;
 
 import io.ebean.DB;
+import io.ebean.FetchGroup;
 import io.ebean.ImmutableBeanCache;
+import io.ebean.ImmutableBeanCaches;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -170,15 +172,13 @@ class ResourceEntityTest {
   @Test
   void find_unmodifiableUsingImmutableLabelCache_expect_readableRefsWithNoLazyLoadSql() {
 
-    Map<Object, Label> cachedLabels = new LinkedHashMap<>();
-    cachedLabels.put(heightDescriptor.getName().id(), immutableLabel(heightDescriptor.getName().id()));
-    cachedLabels.put(heightDescriptor.getDescription().id(), immutableLabel(heightDescriptor.getDescription().id()));
-    Set<Object> cacheLookups = new LinkedHashSet<>();
+    var cache = loadingLabelCache();
+    cache.getAll(Set.of(heightDescriptor.getName().id(), heightDescriptor.getDescription().id()));
 
     AttributeDescriptor one = DB.find(AttributeDescriptor.class)
       .setId(heightDescriptor.id())
       .setUnmodifiable(true)
-      .using(labelCacheBackfill(cachedLabels, cacheLookups))
+      .using(cache)
       .findOne();
 
     assertThat(one).isNotNull();
@@ -190,22 +190,19 @@ class ResourceEntityTest {
     assertThat(one.getDescription().version()).isGreaterThan(0);
     List<String> sql = LoggedSql.stop();
 
-    assertThat(cacheLookups)
-      .containsExactlyInAnyOrder(heightDescriptor.getName().id(), heightDescriptor.getDescription().id());
     assertThat(sql).isEmpty();
   }
 
   @Test
   void find_unmodifiableUsingImmutableLabelCacheWithPartialHits_expect_backfillAndNoLazyLoadSql() {
 
-    Map<Object, Label> cachedLabels = new LinkedHashMap<>();
-    cachedLabels.put(heightDescriptor.getName().id(), immutableLabel(heightDescriptor.getName().id()));
-    Set<Object> cacheLookups = new LinkedHashSet<>();
+    var cache = loadingLabelCache();
+    cache.getAll(Set.of(heightDescriptor.getName().id()));
 
     AttributeDescriptor one = DB.find(AttributeDescriptor.class)
       .setId(heightDescriptor.id())
       .setUnmodifiable(true)
-      .using(labelCacheBackfill(cachedLabels, cacheLookups))
+      .using(cache)
       .findOne();
 
     assertThat(one).isNotNull();
@@ -217,20 +214,18 @@ class ResourceEntityTest {
     assertThat(one.getDescription().version()).isGreaterThan(0);
     List<String> sql = LoggedSql.stop();
 
-    assertThat(cacheLookups)
-      .containsExactlyInAnyOrder(heightDescriptor.getName().id(), heightDescriptor.getDescription().id());
     assertThat(sql).isEmpty();
   }
 
   @Test
   void find_unmodifiableUsingImmutableLabelCacheWithNoHits_expect_backfillAndNoLazyLoadSql() {
 
-    Set<Object> cacheLookups = new LinkedHashSet<>();
+    var cache = loadingLabelCache();
 
     AttributeDescriptor one = DB.find(AttributeDescriptor.class)
       .setId(heightDescriptor.id())
       .setUnmodifiable(true)
-      .using(labelCacheBackfill(new LinkedHashMap<>(), cacheLookups))
+      .using(cache)
       .findOne();
 
     assertThat(one).isNotNull();
@@ -242,8 +237,34 @@ class ResourceEntityTest {
     assertThat(one.getDescription().version()).isGreaterThan(0);
     List<String> sql = LoggedSql.stop();
 
-    assertThat(cacheLookups)
-      .containsExactlyInAnyOrder(heightDescriptor.getName().id(), heightDescriptor.getDescription().id());
+    assertThat(sql).isEmpty();
+  }
+
+  @Test
+  void find_unmodifiableUsingImmutableBeanCachesLoading_expect_seededLabelsLoadedAndNoLazyLoadSql() {
+
+    var cache = loadingLabelCache();
+
+    LoggedSql.start();
+    AttributeDescriptor one = DB.find(AttributeDescriptor.class)
+      .setId(heightDescriptor.id())
+      .setUnmodifiable(true)
+      .using(cache)
+      .findOne();
+
+    List<String> loadSql = LoggedSql.stop();
+
+    assertThat(one).isNotNull();
+    assertThat(one.getName().id()).isEqualTo(heightDescriptor.getName().id());
+    assertThat(one.getDescription().id()).isEqualTo(heightDescriptor.getDescription().id());
+    assertThat(DB.beanState(one.getName()).isUnmodifiable()).isTrue();
+    assertThat(DB.beanState(one.getDescription()).isUnmodifiable()).isTrue();
+    assertThat(loadSql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+
+    LoggedSql.start();
+    assertThat(one.getName().version()).isGreaterThan(0);
+    assertThat(one.getDescription().version()).isGreaterThan(0);
+    List<String> sql = LoggedSql.stop();
     assertThat(sql).isEmpty();
   }
 
@@ -269,36 +290,8 @@ class ResourceEntityTest {
     };
   }
 
-  private ImmutableBeanCache<Label> labelCacheBackfill(Map<Object, Label> cachedLabels, Set<Object> cacheLookups) {
-    return new ImmutableBeanCache<>() {
-      @Override
-      public Class<Label> type() {
-        return Label.class;
-      }
-
-      @Override
-      public Map<Object, Label> getAll(Set<Object> ids) {
-        cacheLookups.addAll(ids);
-        Map<Object, Label> hits = new LinkedHashMap<>();
-        for (Object id : ids) {
-          Label bean = cachedLabels.get(id);
-          if (bean == null) {
-            bean = DB.find(Label.class).setId(id).setUnmodifiable(true).findOne();
-            if (bean != null) {
-              cachedLabels.put(id, bean);
-            }
-          }
-          if (bean != null) {
-            hits.put(id, bean);
-          }
-        }
-        return hits;
-      }
-    };
-  }
-
-  private Label immutableLabel(Object id) {
-    return DB.find(Label.class).setId(id).setUnmodifiable(true).findOne();
+  private ImmutableBeanCache<Label> loadingLabelCache() {
+    return ImmutableBeanCaches.loading(Label.class, DB.getDefault(), FetchGroup.of(Label.class, "version"));
   }
 
 }
