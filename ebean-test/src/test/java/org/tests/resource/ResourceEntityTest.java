@@ -268,6 +268,79 @@ class ResourceEntityTest {
     assertThat(sql).isEmpty();
   }
 
+  @Test
+  void find_unmodifiableUsingImmutableBeanCachesLoadingWithLabelTexts_expect_assocLoadedAndNoLazyLoadSql() {
+
+    var cache = loadingLabelWithTextsCache();
+
+    AttributeDescriptor one = DB.find(AttributeDescriptor.class)
+      .setId(heightDescriptor.id())
+      .setUnmodifiable(true)
+      .using(cache)
+      .findOne();
+
+    assertThat(one).isNotNull();
+    assertThat(DB.beanState(one.getName()).isUnmodifiable()).isTrue();
+    assertThat(DB.beanState(one.getDescription()).isUnmodifiable()).isTrue();
+
+    LoggedSql.start();
+    assertThat(one.getName().getLabelTexts())
+      .extracting(LabelText::getLocaleText)
+      .containsExactlyInAnyOrder("Height", "Höhe");
+    assertThat(one.getDescription().getLabelTexts())
+      .extracting(LabelText::getLocaleText)
+      .containsExactlyInAnyOrder("Height property", "Höhe Eigenschaft");
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).isEmpty();
+  }
+
+  @Test
+  void find_fetchQuerySecondary_inheritsImmutableCache_expect_noLabelLazyLoadSql() {
+
+    var cache = loadingLabelCache();
+
+    AttributeValueOwner owner = DB.find(AttributeValueOwner.class)
+      .setId(resource.getAttributeValueOwner().id())
+      .fetchQuery("attributeValues", "intValue")
+      .fetch("attributeValues.attributeDescriptor", "name,description")
+      .using(cache)
+      .findOne();
+
+    assertThat(owner).isNotNull();
+    assertThat(owner.getAttributeValues()).hasSize(2);
+
+    LoggedSql.start();
+    accessDescriptorLabels(owner);
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).isEmpty();
+  }
+
+  @Test
+  void find_fetchLazySecondary_inheritsImmutableCache_expect_noLabelLazyLoadSql() {
+
+    var cache = loadingLabelCache();
+
+    AttributeValueOwner owner = DB.find(AttributeValueOwner.class)
+      .setId(resource.getAttributeValueOwner().id())
+      .fetchLazy("attributeValues", "intValue")
+      .fetch("attributeValues.attributeDescriptor", "name,description")
+      .using(cache)
+      .findOne();
+
+    assertThat(owner).isNotNull();
+
+    // Trigger the +lazy secondary query first.
+    assertThat(owner.getAttributeValues()).hasSize(2);
+
+    LoggedSql.start();
+    accessDescriptorLabels(owner);
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).isEmpty();
+  }
+
   private ImmutableBeanCache<Label> labelCache(Map<Object, Label> cachedLabels, Set<Object> cacheLookups) {
     return new ImmutableBeanCache<>() {
       @Override
@@ -292,6 +365,23 @@ class ResourceEntityTest {
 
   private ImmutableBeanCache<Label> loadingLabelCache() {
     return ImmutableBeanCaches.loading(Label.class, DB.getDefault(), FetchGroup.of(Label.class, "version"));
+  }
+
+  private ImmutableBeanCache<Label> loadingLabelWithTextsCache() {
+    FetchGroup<Label> fetchGroup = FetchGroup.of(Label.class)
+      .select("version")
+      .fetch("labelTexts", "locale, localeText")
+      .build();
+    return ImmutableBeanCaches.loading(Label.class, DB.getDefault(), fetchGroup);
+  }
+
+  private void accessDescriptorLabels(AttributeValueOwner owner) {
+    for (AttributeValue attributeValue : owner.getAttributeValues()) {
+      AttributeDescriptor descriptor = attributeValue.getAttributeDescriptor();
+      assertThat(descriptor).isNotNull();
+      assertThat(descriptor.getName().version()).isGreaterThan(0);
+      assertThat(descriptor.getDescription().version()).isGreaterThan(0);
+    }
   }
 
 }

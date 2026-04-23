@@ -425,6 +425,11 @@ public final class DLoadContext implements LoadContext {
     if (disableReadAudit) {
       query.setDisableReadAuditing();
     }
+    if (!immutableCaches.isEmpty()) {
+      for (ImmutableBeanCache<?> beanCache : immutableCaches.values()) {
+        query.putImmutableBeanCache(beanCache);
+      }
+    }
     if (profilingListener != null) {
       query.setProfilingListener(profilingListener);
     }
