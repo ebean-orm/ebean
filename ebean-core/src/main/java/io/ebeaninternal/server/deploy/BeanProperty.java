@@ -665,6 +665,33 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
+   * By default, getIntercept and setIntercept will check, if the passed bean is an instance of descriptor type.
+   * <p>
+   * If the property is not part of the type hierarchy (i.e. is this property from this descriptor)
+   * an UnsuppoertedOperation is thrown.
+   * <p>
+   * If inheritance is involved, this method returns false instead of an exception, if the property might exist in
+   * one of the child beans. This is necessary for getIntercept, as it returns <code>null</code> in this case.
+   * @return true if property can be
+   */
+  private boolean checkPropertyAccess(EntityBean bean) {
+    if (bean == null || descriptor.type().isInstance(bean)) { // null = fall through - NPE is catched later.
+      return true;
+    }
+    InheritInfo inheritInfo = descriptor.inheritInfo();
+    if (inheritInfo == null || inheritInfo.isRoot() || !inheritInfo.getRoot().getType().isInstance(bean)) {
+      throw new IllegalArgumentException(propertyIncomatibleMsg(bean));
+    } else {
+      return false;
+    }
+  }
+
+  private String propertyIncomatibleMsg(EntityBean bean) {
+    String beanType = bean == null ? "null" : bean.getClass().getName();
+    return "Property " + name + " on [" + descriptor + "] is incompatible with type[" + beanType + "]";
+  }
+
+  /**
    * Set the value of the property without interception or
    * PropertyChangeSupport.
    */
@@ -680,6 +707,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Set the value of the property.
    */
   public void setValueIntercept(EntityBean bean, Object value) {
+    if (!checkPropertyAccess(bean)) {
+      throw new IllegalArgumentException(propertyIncomatibleMsg(bean));
+    }
     try {
       setter.setIntercept(bean, value);
     } catch (Exception ex) {
@@ -791,6 +821,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public Object getValueIntercept(EntityBean bean) {
+    if (!checkPropertyAccess(bean)) {
+      return null;
+    }
     try {
       return getter.getIntercept(bean);
     } catch (Exception ex) {
