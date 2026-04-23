@@ -351,23 +351,11 @@ public final class DLoadContext implements LoadContext {
           if (ebi != null && bean instanceof EntityBean) {
             EntityBean cachedBean = (EntityBean) bean;
             descriptor.merge(cachedBean, ebi.owner());
-            // TODO Move loaded-property propagation into BeanDescriptor.merge().
-            markLoadedProperties(cachedBean, ebi);
             ebi.setLoadedFromCache(true);
             ebi.setLoadedLazy();
           }
         }
       }
-    }
-  }
-
-  private void markLoadedProperties(EntityBean source, EntityBeanIntercept target) {
-    Set<String> loadedProperties = source._ebean_getIntercept().loadedPropertyNames();
-    if (loadedProperties == null) {
-      return;
-    }
-    for (String property : loadedProperties) {
-      target.setPropertyLoaded(property, true);
     }
   }
 
