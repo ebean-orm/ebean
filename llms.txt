@@ -1,0 +1,116 @@
+# Ebean ORM — AI Agent & LLM Instructions
+
+> Ebean is a Java and Kotlin ORM (Object Relational Mapping) library for SQL databases. All guides and onboarding templates are designed for both humans and AI agents.
+
+## Key onboarding files
+- [AGENTS.md template](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/AGENTS.md): Minimal template for agent onboarding and automation in Ebean ORM projects
+- [Guide index](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/README.md): Full index of the Ebean AI/developer guides, including setup, entities, querying, transactions, testing, and migrations.
+
+## Step-by-step guides (fetch and follow as needed)
+- [Add Ebean + PostgreSQL — Step 1: Maven POM setup](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md)
+- [Add Ebean + PostgreSQL — Step 2: Database configuration](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md)
+- [Add Ebean + PostgreSQL — Step 3: Test container setup](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md)
+- [Entity bean creation](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/entity-bean-creation.md)
+- [Lombok with Ebean entity beans](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/lombok-with-ebean-entity-beans.md)
+- [Write Ebean queries with query beans](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md)
+- [Persisting and transactions with Ebean](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md)
+- [Testing with TestEntityBuilder](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/testing-with-testentitybuilder.md)
+- [DB migration generation](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md)
+
+## Always check AGENTS.md and the guide index before automating or generating code for Ebean ORM projects.
+
+## Full Guide Index
+
+- [Guide index](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/README.md): Full index of the Ebean AI/developer guides, including setup, entities, querying, transactions, testing, and migrations.
+- [Add Ebean + PostgreSQL — Step 1: Maven POM setup](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md): Prescriptive instructions for modifying pom.xml — adds ebean-postgres, postgresql JDBC driver, ebean-maven-plugin, and querybean-generator annotation processor. Handles merging into existing annotationProcessorPaths blocks.
+- [Add Ebean + PostgreSQL — Step 2: Database configuration](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md): Configure the Ebean Database bean using DataSourceBuilder and DatabaseConfig with Avaje Inject. Covers minimal (master-only) and extended (master + read-only replica) setup. Includes verification steps and troubleshooting table.
+- [Add Ebean + PostgreSQL — Step 3: Test container setup](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md): Start a PostgreSQL or PostGIS Docker container for tests using ebean-test-containers and a @TestScope @Factory with Avaje Inject. Covers image mirror for CI/ECR, autoReadOnlyDataSource, dumpMetrics, PostGIS variant with optional LW/HexWKB mode, and keeping containers running locally.
+- [Entity bean creation](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/entity-bean-creation.md): Generate clean, idiomatic Ebean entity beans. Covers required annotations, recommended field patterns, relationships, audit fields, and anti-patterns such as public fields, `Set` collections, or custom equals/hashCode.
+- [Lombok with Ebean entity beans](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/lombok-with-ebean-entity-beans.md): Which Lombok annotations to use and avoid on entity beans. Explains why @Data is incompatible (hashCode/equals breaks entity identity, toString triggers lazy loading). Prescribes @Getter + @Setter + @Accessors(chain=true). Includes compatibility table for common Lombok annotations.
+- [Write Ebean queries with query beans](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md): Prefer Q-bean queries for type-safe ORM queries. Covers choosing `exists()`/`findOne()`/`findList()`/`findPagedList()`, tuning `select()` / `fetch()` / `fetchQuery()` / `FetchGroup`, using `setUnmodifiable(true)` for read-only entity graphs, and projecting to DTOs when entity beans are not the right output.
+- [Persisting and transactions with Ebean](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md): Choose `insert`, `save`, `update`, `delete`, or bulk update based on intent. Covers cascade rules, implicit transactions, `@Transactional`, explicit transactions, and batching for larger write workloads.
+- [Testing with TestEntityBuilder](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/testing-with-testentitybuilder.md): Rapidly create test entity instances with auto-populated values. Covers relationship handling, cascade-persist behavior, custom value generators, and when TestEntityBuilder is a good fit versus manual fixtures.
+- [DB migration generation](https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md): Add GenerateDbMigration.java to generate schema diff migrations offline (no database needed). Configure the migration runner with ebean.migration.run=true. Understand .sql and .model.xml output files. Covers version naming, multi-platform, pending drops, setPathToResources for multi-module projects, and named database support.
+
+# Ebean ORM
+
+> Ebean is a Java and Kotlin ORM (Object Relational Mapping) library for SQL databases.
+> It provides multiple abstraction levels: ORM queries, DTO queries, SqlQuery, and raw JDBC.
+> It supports PostgreSQL, MySQL, MariaDB, Oracle, SQL Server, H2, SQLite, and more.
+
+Ebean uses **bytecode enhancement** at build time (via `ebean-maven-plugin` or `ebean-gradle-plugin`)
+to provide dirty-checking and lazy loading without requiring field access through getters/setters.
+
+Key concepts:
+
+- Entity beans annotated with `@Entity` and `@Id` (Jakarta or javax persistence annotations)
+- Type-safe **query beans** (`Q`-prefixed classes) generated at compile time by `querybean-generator`
+- Platform-specific main dependency (e.g. `io.ebean:ebean-postgres`) — one per database platform
+- `DataSourceBuilder` from `io.ebean:ebean-datasource` for connection pool configuration
+- `DatabaseBuilder` to construct and configure the `io.ebean.Database` instance
+- `ebean-test` for testing with automatic Docker containers for all supported platforms
+- DDL generation and DB migration support built in
+
+## Getting Started
+
+- [Getting started overview](https://ebean.io/docs/getting-started/): Prerequisites and example projects
+- [Maven setup](https://ebean.io/docs/getting-started/maven): Add Ebean dependencies and plugins to pom.xml — includes full example pom for Postgres
+- [Gradle setup](https://ebean.io/docs/getting-started/gradle): Add Ebean to a Gradle project
+- [First entity](https://ebean.io/docs/getting-started/first-entity): Create an entity bean, add ebean.mf, run first test
+- [ebean-test setup](https://ebean.io/docs/getting-started/ebean-test): Configure Ebean for testing with application-test.yaml
+
+
+## Entities and Mapping
+
+- [Introduction to entities](https://ebean.io/docs/intro/first-entity/): Defining entity beans
+- [JPA mapping annotations](https://ebean.io/docs/mapping/jpa/): @Entity, @Id, @OneToMany, @ManyToOne, @ManyToMany, @Version, @MappedSuperclass, @Lob
+- [Collections](https://ebean.io/docs/mapping/collections): @OneToMany and @ManyToMany collection mapping
+- [Type mapping](https://ebean.io/docs/mapping/type/): UUID, Enums, JSON, arrays, custom types
+- [Naming conventions](https://ebean.io/docs/mapping/naming-convention): Table and column naming
+
+## Queries
+
+- [ORM queries overview](https://ebean.io/docs/intro/queries/orm-query): fetch graphs, partial objects, N+1 avoidance
+- [Query beans](https://ebean.io/docs/query/query-beans): Type-safe Q-bean queries with IDE auto-complete
+- [findList / findOne](https://ebean.io/docs/query/findMethods): Core find methods
+- [where expressions](https://ebean.io/docs/query/where): Filtering with expressions
+- [fetch / fetchGroup](https://ebean.io/docs/query/fetch): Controlling which associations to load
+- [DTO queries](https://ebean.io/docs/query/dtoquery): Map query results directly to DTO classes
+- [SqlQuery](https://ebean.io/docs/query/sqlquery): Raw SQL with Ebean type mapping
+- [orderBy / select](https://ebean.io/docs/query/select): Selecting columns and ordering
+
+## Persistence
+
+- [Save, update, delete](https://ebean.io/docs/persist/): Insert, update, delete entity beans
+
+## Transactions
+
+- [Transactions overview](https://ebean.io/docs/transactions/): @Transactional annotation, transaction scopes
+- [Batch inserts/updates](https://ebean.io/docs/transactions/batch): JDBC batch support
+
+## DB Migrations
+
+- [DB Migrations overview](https://ebean.io/docs/db-migrations/): Generate and run database migrations
+- [Migration detail](https://ebean.io/docs/db-migrations/detail): Repeatable, init, and versioned migrations
+
+## Testing
+
+- [Testing overview](https://ebean.io/docs/testing/): ebean-test, Docker containers, H2, DDL modes
+- [CI Testing](https://ebean.io/docs/ci-testing/): Running tests in CI environments
+
+## Setup and Configuration
+
+- [DatabaseConfig / ServerConfig](https://ebean.io/docs/setup/serverconfig): All DatabaseConfig options
+- [Enhancement](https://ebean.io/docs/setup/enhancement): Bytecode enhancement — Maven, Gradle, IDE agents
+- [Logging](https://ebean.io/docs/setup/logging): SQL logging, transaction logging, DDL logging
+
+## Optional
+
+- [Read replicas](https://ebean.io/docs/read-replicas/): Configuring read-only datasource for read replicas
+- [Kotlin support](https://ebean.io/docs/kotlin/): Using Ebean with Kotlin
+- [Multi-database](https://ebean.io/docs/multi-database/): Working with multiple Database instances
+- [Spring integration](https://ebean.io/docs/setup/spring): Using Ebean with Spring Framework
+- [DDL generation](https://ebean.io/docs/ddl-generation/): How Ebean generates DDL from entity models
+- [Tuning / autotune](https://ebean.io/docs/tuning/): Query profiling and automatic query tuning
+- [GraalVM native image](https://ebean.io/docs/setup/graalvm): Building GraalVM native executables with Ebean
+- [Examples](https://ebean.io/docs/examples): Example projects for Maven, Gradle, Kotlin, PostGIS
