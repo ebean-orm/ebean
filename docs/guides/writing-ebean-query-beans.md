@@ -283,6 +283,9 @@ If you are returning entity beans for read-only use, `setUnmodifiable(true)`
 should be the default recommendation. If the caller needs a mutable model or a
 serialized summary shape, choose mutable entities or DTO projection instead.
 
+If you need cached assoc-one references for unmodifiable graphs, see
+[Immutable bean cache for read-only references](immutable-bean-cache.md).
+
 ---
 
 ## Step 7 - Use `fetchQuery()` for to-many paths and `FetchGroup` for reusable query shapes
@@ -481,4 +484,5 @@ When asked to add or modify an Ebean query:
 
 - [Add Ebean Postgres Maven POM](add-ebean-postgres-maven-pom.md)
 - [Entity Bean Creation](entity-bean-creation.md)
+- [Immutable bean cache for read-only references](immutable-bean-cache.md)
 - [Ebean query docs](https://ebean.io/docs/query/)

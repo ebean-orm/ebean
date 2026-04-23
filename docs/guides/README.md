@@ -28,6 +28,7 @@ existing Maven project. Complete the steps in order.
 | Guide | Description |
 |-------|-------------|
 | [Write Ebean queries with query beans](writing-ebean-query-beans.md) | Step-by-step guidance for AI agents to write type-safe Ebean queries; choose the right terminal method; tune `select()` / `fetch()` / `fetchQuery()`; and project to DTOs when entity beans are not the right output |
+| [Immutable bean cache for read-only references](immutable-bean-cache.md) | Use `ImmutableBeanCache` and `ImmutableBeanCaches.loading(...)` to resolve assoc-one references in read-only/unmodifiable queries, including secondary `fetchQuery`/`fetchLazy` loads |
 
 ## Persisting & transactions
 
@@ -106,6 +107,7 @@ Key guides (fetch and follow these when performing the relevant task):
 - Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md
 - Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
+- Immutable bean cache for read-only references: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/immutable-bean-cache.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md
 - DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md

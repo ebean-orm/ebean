@@ -170,6 +170,34 @@ class ResourceEntityTest {
   }
 
   @Test
+  void find_mutableUsingImmutableBeanCache_expect_additionalLazyLoadingStillWorks() {
+
+    var cache = loadingLabelCache();
+
+    AttributeDescriptor one = DB.find(AttributeDescriptor.class)
+      .setId(heightDescriptor.id())
+      .using(cache)
+      .findOne();
+
+    assertThat(one).isNotNull();
+    assertThat(DB.beanState(one.getName()).isUnmodifiable()).isFalse();
+    assertThat(DB.beanState(one.getDescription()).isUnmodifiable()).isFalse();
+
+    LoggedSql.start();
+    assertThat(one.getName().version()).isGreaterThan(0);
+    assertThat(one.getDescription().version()).isGreaterThan(0);
+    List<String> sqlFromCache = LoggedSql.stop();
+    assertThat(sqlFromCache).isEmpty();
+
+    LoggedSql.start();
+    assertThat(one.getName().getLabelTexts()).hasSize(2);
+    assertThat(one.getDescription().getLabelTexts()).hasSize(2);
+    List<String> lazySql = LoggedSql.stop();
+
+    assertThat(lazySql.stream().anyMatch(sql -> sql.contains("from label_text"))).isTrue();
+  }
+
+  @Test
   void find_unmodifiableUsingImmutableLabelCache_expect_readableRefsWithNoLazyLoadSql() {
 
     var cache = loadingLabelCache();
