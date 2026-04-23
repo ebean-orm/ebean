@@ -602,6 +602,11 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   }
 
   @Override
+  public void registerForImmutable(EntityBeanIntercept ebi) {
+    request.loadContext().registerForImmutable(ebi);
+  }
+
+  @Override
   public boolean includeSecondary(BeanPropertyAssocMany<?> many) {
     return request.loadContext().includeSecondary(many);
   }

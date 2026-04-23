@@ -29,6 +29,10 @@ public final class DLoadContext implements LoadContext {
    * Type based contexts used for assoc-one lazy loading registration.
    */
   private final Map<String, DLoadBeanContext> lazyBeanMap = new HashMap<>();
+  /**
+   * Type based sets used when lazy loading is disabled but immutable cache population should still occur.
+   */
+  private final Map<String, Set<EntityBeanIntercept>> immutableRefMap = new HashMap<>();
   private final Map<Class<?>, ImmutableBeanCache<?>> immutableCaches;
   private final Map<String, DLoadManyContext> manyMap = new HashMap<>();
   private final DLoadBeanContext rootBeanContext;
@@ -280,6 +284,17 @@ public final class DLoadContext implements LoadContext {
     manyContext(path, many).register(bc);
   }
 
+  @Override
+  public void registerForImmutable(EntityBeanIntercept ebi) {
+    if (immutableCaches.isEmpty()) {
+      return;
+    }
+    BeanDescriptor<?> descriptor = descriptor(ebi);
+    if (immutableCaches.containsKey(descriptor.type())) {
+      immutableRefMap.computeIfAbsent(descriptor.fullName(), key -> new LinkedHashSet<>()).add(ebi);
+    }
+  }
+
   int batchSize(OrmQueryProperties props) {
     if (props == null) {
       return defaultBatchSize;
@@ -310,19 +325,49 @@ public final class DLoadContext implements LoadContext {
         continue;
       }
       DLoadBeanContext context = lazyBeanMap.get(descriptor.fullName());
-      if (context == null) {
-        continue;
-      }
-      Set<Object> ids = new HashSet<>();
-      for (EntityBeanIntercept ebi : context.bufferedBeans()) {
-        Object id = descriptor.id(ebi.owner());
-        if (id != null) {
-          ids.add(id);
+      Map<Object, EntityBeanIntercept> interceptById = new LinkedHashMap<>();
+      if (context != null) {
+        for (EntityBeanIntercept ebi : context.bufferedBeans()) {
+          Object id = descriptor.id(ebi.owner());
+          if (id != null) {
+            interceptById.put(id, ebi);
+          }
         }
       }
-      if (!ids.isEmpty()) {
-        entry.getValue().getAll(ids);
+      Set<EntityBeanIntercept> immutableRefs = immutableRefMap.get(descriptor.fullName());
+      if (immutableRefs != null) {
+        for (EntityBeanIntercept ebi : immutableRefs) {
+          Object id = descriptor.id(ebi.owner());
+          if (id != null) {
+            interceptById.putIfAbsent(id, ebi);
+          }
+        }
       }
+      if (!interceptById.isEmpty()) {
+        Map<Object, ?> hits = entry.getValue().getAll(interceptById.keySet());
+        for (Map.Entry<Object, ?> hit : hits.entrySet()) {
+          EntityBeanIntercept ebi = interceptById.get(hit.getKey());
+          Object bean = hit.getValue();
+          if (ebi != null && bean instanceof EntityBean) {
+            EntityBean cachedBean = (EntityBean) bean;
+            descriptor.merge(cachedBean, ebi.owner());
+            // TODO Move loaded-property propagation into BeanDescriptor.merge().
+            markLoadedProperties(cachedBean, ebi);
+            ebi.setLoadedFromCache(true);
+            ebi.setLoadedLazy();
+          }
+        }
+      }
+    }
+  }
+
+  private void markLoadedProperties(EntityBean source, EntityBeanIntercept target) {
+    Set<String> loadedProperties = source._ebean_getIntercept().loadedPropertyNames();
+    if (loadedProperties == null) {
+      return;
+    }
+    for (String property : loadedProperties) {
+      target.setPropertyLoaded(property, true);
     }
   }
 

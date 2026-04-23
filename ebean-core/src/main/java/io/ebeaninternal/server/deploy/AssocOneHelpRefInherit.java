@@ -56,6 +56,8 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
     Object ref = desc.contextRef(pc, id, ctx.unmodifiable(), ctx.isDisableLazyLoading());
     if (!ctx.unmodifiable() && !ctx.isDisableLazyLoading()) {
       ctx.registerBeanInherit(property, ((EntityBean) ref)._ebean_getIntercept());
+    } else {
+      ctx.registerForImmutable(((EntityBean) ref)._ebean_getIntercept());
     }
     return ref;
   }
