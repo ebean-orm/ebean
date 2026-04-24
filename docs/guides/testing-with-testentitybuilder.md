@@ -135,48 +135,36 @@ Most applications using Ebean also use a DI framework. The recommended pattern i
 register `TestEntityBuilder` as a bean in the test DI context so it can be injected
 directly into test classes — eliminating `@BeforeEach` setup boilerplate entirely.
 
-### Spring Boot — `@TestConfiguration`
-
-Add a `@TestConfiguration` class that provides `TestEntityBuilder` as a bean:
-
-```java
-@TestConfiguration
-class TestConfig {
-
-  @Bean
-  TestEntityBuilder testEntityBuilder(Database database) {
-    return TestEntityBuilder.builder(database).build();
-  }
-}
-```
-
-Then inject it directly into test classes:
-
-```java
-@SpringBootTest
-class OrderControllerTest {
-
-  @Autowired Database database;
-  @Autowired TestEntityBuilder builder;
-
-  @Test
-  void findByStatus() {
-    var order = builder.build(Order.class).setStatus(OrderStatus.PENDING);
-    database.save(order);
-
-    // ... test assertions
-  }
-}
-```
-
 ### Avaje Inject — `@TestScope @Factory`
 
 Add a `@Bean` method to your test-scoped `@Factory` class:
 
 ```java
+import io.ebean.Database;
+import io.ebean.test.ContainerDatabase;
+import io.avaje.inject.Bean;
+import io.avaje.inject.Factory;
+import io.avaje.inject.test.TestScope;
+import io.ebean.test.TestEntityBuilder;
+
 @TestScope
 @Factory
 class TestConfiguration {
+
+  @Bean
+  PostgresContainer postgres() {
+    return PostgresContainer.builder("17")   // Postgres image version
+        .dbName("my_app")                    // database to create inside the container
+        .build()
+        .start();
+  }
+
+  @Bean
+  Database database(PostgresContainer container) {
+    return container.ebean()
+        .builder()
+        .build();
+  }
 
   @Bean
   TestEntityBuilder testEntityBuilder(Database database) {
@@ -206,6 +194,58 @@ class OrderControllerTest {
 
 Both patterns produce a single shared `TestEntityBuilder` instance, wired
 from the managed `Database` bean — no `@BeforeEach` required.
+
+### Spring Boot — `@TestConfiguration`
+
+Add a `@TestConfiguration` class that provides `TestEntityBuilder` as a bean:
+
+```java
+@TestConfiguration
+class TestConfig {
+
+  @Bean
+  PostgresContainer postgres() {
+    return PostgresContainer.builder("17")   // Postgres image version
+      .dbName("my_app")                    // database to create inside the container
+      .build()
+      .start();
+  }
+
+  // use @Primary if your main application context also wires a Database bean
+  // or conditionally wire the main Database bean to exclude it from tests
+  @Primary
+  @Bean
+  Database database(PostgresContainer container) {
+    return container.ebean()
+      .builder()
+      .build();
+  }
+
+  @Bean
+  TestEntityBuilder testEntityBuilder(Database database) {
+    return TestEntityBuilder.builder(database).build();
+  }
+}
+```
+
+Then inject it directly into test classes:
+
+```java
+@SpringBootTest
+class OrderControllerTest {
+
+  @Autowired Database database;
+  @Autowired TestEntityBuilder builder;
+
+  @Test
+  void findByStatus() {
+    var order = builder.build(Order.class).setStatus(OrderStatus.PENDING);
+    database.save(order);
+
+    // ... test assertions
+  }
+}
+```
 
 ---
 
