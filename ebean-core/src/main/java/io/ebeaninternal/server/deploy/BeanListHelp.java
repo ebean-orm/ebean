@@ -5,6 +5,7 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanList;
+import io.ebean.common.BeanListLazyAdd;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonWriter;
@@ -19,12 +20,11 @@ import java.util.List;
  */
 public class BeanListHelp<T> extends BaseCollectionHelp<T> {
 
+  private final boolean hasOrderColumn;
+
   BeanListHelp(BeanPropertyAssocMany<T> many) {
     super(many);
-  }
-
-  BeanListHelp() {
-    super();
+    hasOrderColumn = many.hasOrderColumn();
   }
 
   @Override
@@ -53,7 +53,12 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
 
   @Override
   public final BeanCollection<T> createEmpty(EntityBean parentBean) {
-    BeanList<T> beanList = new BeanList<>(loader, parentBean, propertyName);
+    BeanList<T> beanList;
+    if (hasOrderColumn) {
+      beanList = new BeanList<>(loader, parentBean, propertyName);
+    } else {
+      beanList = new BeanListLazyAdd<>(loader, parentBean, propertyName);
+    }
     if (many != null) {
       beanList.setModifyListening(many.modifyListenMode());
     }
@@ -62,7 +67,12 @@ public class BeanListHelp<T> extends BaseCollectionHelp<T> {
 
   @Override
   public final BeanCollection<T> createReference(EntityBean parentBean) {
-    BeanList<T> beanList = new BeanList<>(loader, parentBean, propertyName);
+    BeanList<T> beanList;
+    if (hasOrderColumn) {
+      beanList = new BeanList<>(loader, parentBean, propertyName);
+    } else {
+      beanList = new BeanListLazyAdd<>(loader, parentBean, propertyName);
+    }
     beanList.setModifyListening(many.modifyListenMode());
     return beanList;
   }
