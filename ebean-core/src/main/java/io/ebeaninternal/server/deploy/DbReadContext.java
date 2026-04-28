@@ -60,6 +60,11 @@ public interface DbReadContext {
   void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc);
 
   /**
+   * Register a bean as a candidate for immutable cache population.
+   */
+  void registerForImmutable(EntityBeanIntercept ebi);
+
+  /**
    * Set back the bean that has just been loaded with its id.
    */
   void setLazyLoadedChildBean(EntityBean loadedBean, Object parentId);

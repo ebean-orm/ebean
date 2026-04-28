@@ -52,6 +52,11 @@ public interface LoadContext {
   void register(String path, BeanPropertyAssocMany<?> many, BeanCollection<?> bc);
 
   /**
+   * Register a bean as a candidate for immutable cache population.
+   */
+  void registerForImmutable(EntityBeanIntercept ebi);
+
+  /**
    * Use soft-references for streaming queries, so unreachable entries can be garbage collected.
    */
   void useReferences(boolean useReferences);
@@ -60,4 +65,9 @@ public interface LoadContext {
    * Return true to include a many as a secondary query for unmodified.
    */
   boolean includeSecondary(BeanPropertyAssocMany<?> many);
+
+  /**
+   * Populate buffered entity references from immutable bean caches.
+   */
+  void populateFromImmutableCache();
 }

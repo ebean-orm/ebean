@@ -468,10 +468,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     return entityType;
   }
 
-  private String[] properties() {
-    return properties;
-  }
-
   public BeanProperty propertyByIndex(int pos) {
     return propertiesIndex[pos];
   }
@@ -715,14 +711,17 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public void merge(EntityBean bean, EntityBean existing) {
     EntityBeanIntercept fromEbi = bean._ebean_getIntercept();
     EntityBeanIntercept toEbi = existing._ebean_getIntercept();
-    int propertyLength = toEbi.propertyLength();
-    String[] names = properties();
+    int propertyLength = Math.min(toEbi.propertyLength(), propertiesIndex.length);
     for (int i = 0; i < propertyLength; i++) {
       if (fromEbi.isLoadedProperty(i)) {
-        BeanProperty property = beanProperty(names[i]);
+        BeanProperty property = propertiesIndex[i];
+        if (property == null) {
+          property = beanProperty(fromEbi.property(i));
+        }
         if (!toEbi.isLoadedProperty(i)) {
           Object val = property.getValue(bean);
           property.setValue(existing, val);
+          toEbi.setLoadedProperty(i);
         } else if (property.isMany()) {
           property.merge(bean, existing);
         }
