@@ -301,7 +301,12 @@ public class TransactionManager implements SpiTransactionManager {
    * Create a new Transaction for query only purposes (can use read only datasource).
    */
   public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
-    return transactionFactory.createReadOnlyTransaction(tenantId, useMaster);
+    SpiTransaction t = transactionFactory.createReadOnlyTransaction(tenantId, useMaster);
+    ProfileStream stream = profileHandler.createProfileStream(null);
+    if (stream != null) {
+      t.setProfileStream(stream);
+    }
+    return t;
   }
 
   /**
@@ -464,6 +469,10 @@ public class TransactionManager implements SpiTransactionManager {
    */
   public final SpiTransaction beginServerTransaction() {
     SpiTransaction t = createTransaction(false, -1);
+    ProfileStream stream = profileHandler.createProfileStream(null);
+    if (stream != null) {
+      t.setProfileStream(stream);
+    }
     scopeManager.set(t);
     return t;
   }
@@ -569,9 +578,10 @@ public class TransactionManager implements SpiTransactionManager {
         registerProfileLocation(profileLocation);
       }
       transaction.setProfileLocation(profileLocation);
-      if (profileLocation.trace()) {
-        transaction.setProfileStream(profileHandler.createProfileStream(profileLocation));
-      }
+    }
+    ProfileStream stream = profileHandler.createProfileStream(profileLocation);
+    if (stream != null) {
+      transaction.setProfileStream(stream);
     }
   }
 

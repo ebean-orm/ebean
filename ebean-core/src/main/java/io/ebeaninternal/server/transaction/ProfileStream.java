@@ -13,7 +13,7 @@ public interface ProfileStream {
   /**
    * Add a query event.
    */
-  void addQueryEvent(String event, long offset, String beanName, int beanCount, String queryId);
+  void addQueryEvent(String event, long offset, String beanName, int beanCount, String queryId, String sql);
 
   /**
    * Add a persist event.

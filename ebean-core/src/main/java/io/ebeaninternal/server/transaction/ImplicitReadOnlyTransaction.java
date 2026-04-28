@@ -41,6 +41,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   private final SpiTxnLogger logger;
   private final boolean logSql;
   private final boolean logSummary;
+  private ProfileStream profileStream;
 
   /**
    * The status of the transaction.
@@ -117,22 +118,24 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
 
   @Override
   public long profileOffset() {
-    return 0;
+    return (profileStream == null) ? 0 : profileStream.offset();
   }
 
   @Override
   public void profileEvent(SpiProfileTransactionEvent event) {
-    // do nothing
+    if (profileStream != null) {
+      event.profile();
+    }
   }
 
   @Override
   public void setProfileStream(ProfileStream profileStream) {
-    // do nothing
+    this.profileStream = profileStream;
   }
 
   @Override
   public ProfileStream profileStream() {
-    return null;
+    return profileStream;
   }
 
   @Override
@@ -497,6 +500,9 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     connection = null;
     active = false;
     manager.collectMetricReadOnly((System.nanoTime() - startNanos) / 1000L);
+    if (profileStream != null) {
+      profileStream.end(manager);
+    }
   }
 
   /**
