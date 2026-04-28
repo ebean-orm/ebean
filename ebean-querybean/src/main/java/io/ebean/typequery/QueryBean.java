@@ -274,6 +274,14 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   }
 
   @Override
+  public final R alsoIfPresent(@Nullable Object value, Consumer<R> apply) {
+    if (value != null) {
+      apply.accept(root);
+    }
+    return root;
+  }
+
+  @Override
   public final R asOf(Timestamp asOf) {
     query.asOf(asOf);
     return root;
