@@ -20,7 +20,14 @@ public final class DLoadContext implements LoadContext {
 
   private final SpiEbeanServer ebeanServer;
   private final BeanDescriptor<?> rootDescriptor;
+  /**
+   * Path based contexts used for +query secondary query execution.
+   */
   private final Map<String, DLoadBeanContext> beanMap = new HashMap<>();
+  /**
+   * Type based contexts used for assoc-one lazy loading registration.
+   */
+  private final Map<String, DLoadBeanContext> lazyBeanMap = new HashMap<>();
   private final Map<String, DLoadManyContext> manyMap = new HashMap<>();
   private final DLoadBeanContext rootBeanContext;
   private final boolean asDraft;
@@ -246,12 +253,22 @@ public final class DLoadContext implements LoadContext {
 
   @Override
   public void register(String path, EntityBeanIntercept ebi) {
-    beanContext(path).register(ebi);
+    DLoadBeanContext context = pathBeanContext(path);
+    if (context != null) {
+      context.register(ebi);
+    } else {
+      lazyBeanContext(descriptor(ebi)).register(ebi);
+    }
   }
 
   @Override
   public void register(String path, EntityBeanIntercept ebi, BeanPropertyAssocOne<?> property) {
-    beanContextWithInherit(path, property).register(ebi);
+    DLoadBeanContext context = pathBeanContext(path);
+    if (context != null) {
+      context.register(ebi);
+    } else {
+      lazyBeanContext(property.targetDescriptor()).register(ebi);
+    }
   }
 
   @Override
@@ -267,16 +284,15 @@ public final class DLoadContext implements LoadContext {
     return batchSize == 0 ? defaultBatchSize : batchSize;
   }
 
-  DLoadBeanContext beanContext(String path) {
+  private DLoadBeanContext pathBeanContext(String path) {
     if (path == null) {
       return rootBeanContext;
     }
-    return beanMap.computeIfAbsent(path, p -> createBeanContext(p, null));
+    return beanMap.get(path);
   }
 
-  DLoadBeanContext beanContextWithInherit(String path, BeanPropertyAssocOne<?> property) {
-    String key = path + ":" + property.targetDescriptor().name();
-    return beanMap.computeIfAbsent(key, p -> createBeanContext(property, path));
+  private DLoadBeanContext lazyBeanContext(BeanDescriptor<?> descriptor) {
+    return lazyBeanMap.computeIfAbsent(descriptor.fullName(), p -> new DLoadBeanContext(this, descriptor, descriptor.name(), null));
   }
 
   private void registerSecondaryNode(boolean many, OrmQueryProperties props) {
@@ -306,8 +322,8 @@ public final class DLoadContext implements LoadContext {
     return new DLoadBeanContext(this, p.targetDescriptor(), path, queryProps);
   }
 
-  private DLoadBeanContext createBeanContext(BeanPropertyAssoc<?> property, String path) {
-    return new DLoadBeanContext(this, property.targetDescriptor(), path, null);
+  private BeanDescriptor<?> descriptor(EntityBeanIntercept ebi) {
+    return rootDescriptor.descriptor(ebi.owner().getClass());
   }
 
   private BeanProperty beanProperty(BeanDescriptor<?> desc, String path) {
