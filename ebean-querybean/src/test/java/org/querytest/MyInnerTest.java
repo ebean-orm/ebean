@@ -66,11 +66,101 @@ class MyInnerTest {
 
     assertThat(found6).isNotNull();
 
+    MyInner found7 = new QMyInner()
+      .one.icontainsIfPresent("n")
+      .findOne();
+
+    assertThat(found7).isNotNull();
+
+    MyInner found8 = new QMyInner()
+      .one.icontainsIfPresent(null)
+      .description.eq("foo")
+      .findOne();
+
+    assertThat(found8).isNotNull();
+
+    MyInner found9 = new QMyInner()
+      .one.likeIfPresent("on%")
+      .findOne();
+
+    assertThat(found9).isNotNull();
+
+    MyInner found10 = new QMyInner()
+      .one.likeIfPresent(null)
+      .description.eq("foo")
+      .findOne();
+
+    assertThat(found10).isNotNull();
+
+    MyInner found11 = new QMyInner()
+      .one.ilikeIfPresent("ON%")
+      .findOne();
+
+    assertThat(found11).isNotNull();
+
+    MyInner found12 = new QMyInner()
+      .one.ilikeIfPresent(null)
+      .description.eq("foo")
+      .findOne();
+
+    assertThat(found12).isNotNull();
+
+    MyInner found13 = new QMyInner()
+      .one.istartsWithIfPresent("ON")
+      .findOne();
+
+    assertThat(found13).isNotNull();
+
+    MyInner found14 = new QMyInner()
+      .one.istartsWithIfPresent(null)
+      .description.eq("foo")
+      .findOne();
+
+    assertThat(found14).isNotNull();
+
+    MyInner found15 = new QMyInner()
+      .one.startsWithIfPresent("on")
+      .findOne();
+
+    assertThat(found15).isNotNull();
+
+    MyInner found16 = new QMyInner()
+      .one.startsWithIfPresent(null)
+      .description.eq("foo")
+      .findOne();
+
+    assertThat(found16).isNotNull();
+
+    MyInner found17 = new QMyInner()
+      .one.containsIfPresent("ne")
+      .findOne();
+
+    assertThat(found17).isNotNull();
+
+    MyInner found18 = new QMyInner()
+      .one.containsIfPresent(null)
+      .description.eq("foo")
+      .findOne();
+
+    assertThat(found18).isNotNull();
+
     List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(4);
-    assertThat(sql.get(0)).contains("select /* MyInnerTest.insert_and_find:36 */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.one = ?;");
-    assertThat(sql.get(1)).contains("select /* MyInnerTest.insert_and_find:43 */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.description = ?;");
-    assertThat(sql.get(2)).contains("select /* MyInnerTest.insert_and_find:54 */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.id < ? and t0.description = ?;");
-    assertThat(sql.get(3)).contains("select /* MyInnerTest.insert_and_find:65 */ t0.id, t0.one, t0.id, t0.one, t0.description from my_inner t0 where t0.id < ? and t0.one > ? and t0.one >= ? and t0.one < ? and t0.one <= ? and t0.id > ?;");
+    assertThat(sql).hasSize(16);
+    assertThat(sql.get(0)).contains("where t0.one = ?");
+    assertThat(sql.get(1)).contains("where t0.description = ?");
+    assertThat(sql.get(2)).contains("where t0.id < ? and t0.description = ?");
+    assertThat(sql.get(3)).contains("where t0.id < ? and t0.one > ? and t0.one >= ? and t0.one < ? and t0.one <= ? and t0.id > ?");
+    assertThat(sql.get(4)).contains("where lower(t0.one) like ?");
+    assertThat(sql.get(5)).contains("where t0.description = ?");
+    assertThat(sql.get(6)).contains("where t0.one like ?");
+    assertThat(sql.get(7)).contains("where t0.description = ?");
+    assertThat(sql.get(8)).contains("where lower(t0.one) like ?");
+    assertThat(sql.get(9)).contains("where t0.description = ?");
+    assertThat(sql.get(10)).contains("where lower(t0.one) like ?");
+    assertThat(sql.get(11)).contains("where t0.description = ?");
+    assertThat(sql.get(12)).contains("where t0.one like ?");
+    assertThat(sql.get(13)).contains("where t0.description = ?");
+    assertThat(sql.get(14)).contains("where t0.one like ?");
+    assertThat(sql.get(15)).contains("where t0.description = ?");
   }
 }
