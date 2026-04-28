@@ -45,6 +45,16 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   SELF alsoIf(BooleanSupplier predicate, Consumer<SELF> apply);
 
   /**
+   * Apply changes to the query when the supplied value is non-null.
+   * <p>
+   * Typically, the changes are extra predicates etc.
+   *
+   * @param value The value which when non-null the changes are applied
+   * @param apply The changes to apply to the query
+   */
+  SELF alsoIfPresent(@Nullable Object value, Consumer<SELF> apply);
+
+  /**
    * Perform an 'As of' query using history tables to return the object graph
    * as of a time in the past.
    * <p>

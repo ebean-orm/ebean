@@ -308,6 +308,14 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public Query<T> alsoIfPresent(@Nullable Object value, Consumer<Query<T>> consumer) {
+    if (value != null) {
+      consumer.accept(this);
+    }
+    return this;
+  }
+
+  @Override
   public final void addSoftDeletePredicate(String softDeletePredicate) {
     if (softDeletePredicates == null) {
       softDeletePredicates = new ArrayList<>();
