@@ -129,6 +129,9 @@ public final class BeanPersistIds implements BinaryWritable {
     changeSet.addClearQuery(beanDescriptor);
     if (ids != null) {
       changeSet.addBeanRemoveMany(beanDescriptor, ids);
+      if (beanDescriptor.hasImmutableCaches()) {
+        changeSet.addImmutableRemoveMany(beanDescriptor, ids);
+      }
     }
   }
 }

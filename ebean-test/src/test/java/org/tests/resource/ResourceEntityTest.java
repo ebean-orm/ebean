@@ -5,14 +5,24 @@ import io.ebean.FetchGroup;
 import io.ebean.ImmutableBeanCache;
 import io.ebean.ImmutableBeanCaches;
 import io.ebean.test.LoggedSql;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.api.TransactionEventTable;
+import io.ebeaninternal.server.core.PersistRequest;
+import io.ebeaninternal.server.transaction.BeanPersistIds;
+import io.ebeaninternal.server.transaction.RemoteTableMod;
+import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Customer;
+import org.tests.model.basic.VwCustomer;
 
+import java.sql.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -363,6 +373,234 @@ class ResourceEntityTest {
   }
 
   @Test
+  void immutable_cache_insert_on_same_table_does_not_invalidate_existing_entries() {
+    var cache = loadingLabelCache();
+    Object existingId = heightDescriptor.getName().id();
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> initialLoadSql = LoggedSql.stop();
+    assertThat(initialLoadSql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+
+    Label inserted = new Label();
+    inserted.addLabelText(Locale.ENGLISH, "Insert only");
+    inserted.addLabelText(Locale.GERMAN, "Nur Insert");
+    DB.save(inserted);
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> postInsertSql = LoggedSql.stop();
+    assertThat(postInsertSql.stream().filter(sql -> sql.contains(" from label "))).isEmpty();
+  }
+
+  @Test
+  void immutable_cache_sql_update_on_same_table_invalidates_existing_entries() {
+    var cache = loadingLabelCache();
+    Object existingId = heightDescriptor.getName().id();
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    LoggedSql.stop();
+
+    DB.sqlUpdate("update label set version = version where id = ?")
+      .setParameter(existingId)
+      .execute();
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> postUpdateSql = LoggedSql.stop();
+    assertThat(postUpdateSql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+  }
+
+  @Test
+  void immutable_cache_remote_table_mod_on_same_table_invalidates_existing_entries() {
+    var cache = loadingLabelCache();
+    Object existingId = heightDescriptor.getName().id();
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    LoggedSql.stop();
+
+    RemoteTransactionEvent remoteEvent = new RemoteTransactionEvent("other");
+    remoteEvent.addRemoteTableMod(new RemoteTableMod(Set.of(labelTable())));
+    spiServer().remoteTransactionEvent(remoteEvent);
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> postRemoteTableModSql = LoggedSql.stop();
+    assertThat(postRemoteTableModSql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+  }
+
+  @Test
+  void immutable_cache_remote_table_iud_insert_on_same_table_does_not_invalidate_existing_entries() {
+    var cache = loadingLabelCache();
+    Object existingId = heightDescriptor.getName().id();
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    LoggedSql.stop();
+
+    RemoteTransactionEvent remoteEvent = new RemoteTransactionEvent("other");
+    remoteEvent.addTableIUD(new TransactionEventTable.TableIUD(labelTable(), true, false, false));
+    spiServer().remoteTransactionEvent(remoteEvent);
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> postRemoteInsertSql = LoggedSql.stop();
+    assertThat(postRemoteInsertSql.stream().filter(sql -> sql.contains(" from label "))).isEmpty();
+  }
+
+  @Test
+  void immutable_cache_remote_table_iud_update_on_same_table_invalidates_existing_entries() {
+    var cache = loadingLabelCache();
+    Object existingId = heightDescriptor.getName().id();
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    LoggedSql.stop();
+
+    RemoteTransactionEvent remoteEvent = new RemoteTransactionEvent("other");
+    remoteEvent.addTableIUD(new TransactionEventTable.TableIUD(labelTable(), false, true, false));
+    spiServer().remoteTransactionEvent(remoteEvent);
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> postRemoteUpdateSql = LoggedSql.stop();
+    assertThat(postRemoteUpdateSql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+  }
+
+  @Test
+  void immutable_cache_remote_table_iud_delete_on_same_table_invalidates_existing_entries() {
+    var cache = loadingLabelCache();
+    Object existingId = heightDescriptor.getName().id();
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    LoggedSql.stop();
+
+    RemoteTransactionEvent remoteEvent = new RemoteTransactionEvent("other");
+    remoteEvent.addTableIUD(new TransactionEventTable.TableIUD(labelTable(), false, false, true));
+    spiServer().remoteTransactionEvent(remoteEvent);
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> postRemoteDeleteSql = LoggedSql.stop();
+    assertThat(postRemoteDeleteSql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+  }
+
+  @Test
+  void immutable_cache_remote_delete_by_id_invalidates_only_target_id() {
+    var cache = loadingLabelCache();
+    Object removedId = heightDescriptor.getName().id();
+    Object retainedId = heightDescriptor.getDescription().id();
+
+    cache.getAll(Set.of(removedId, retainedId));
+
+    RemoteTransactionEvent remoteEvent = new RemoteTransactionEvent("other");
+    BeanPersistIds persistIds = new BeanPersistIds(spiServer().descriptor(Label.class));
+    persistIds.addId(PersistRequest.Type.DELETE, removedId);
+    remoteEvent.addBeanPersistIds(persistIds);
+    spiServer().remoteTransactionEvent(remoteEvent);
+
+    LoggedSql.start();
+    cache.getAll(Set.of(removedId));
+    List<String> removedSql = LoggedSql.stop();
+    assertThat(removedSql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+
+    LoggedSql.start();
+    cache.getAll(Set.of(retainedId));
+    List<String> retainedSql = LoggedSql.stop();
+    assertThat(retainedSql.stream().filter(sql -> sql.contains(" from label "))).isEmpty();
+  }
+
+  @Test
+  void immutable_cache_local_orm_update_on_label_invalidates_existing_entries() {
+    Label label = createLabel("orm-update");
+    var cache = loadingLabelCache();
+    Object existingId = label.id();
+
+    cache.getAll(Set.of(existingId));
+
+    label.addLabelText(Locale.ENGLISH, "updated-" + UUID.randomUUID());
+    DB.update(label);
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> postUpdateSql = LoggedSql.stop();
+    assertThat(postUpdateSql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+  }
+
+  @Test
+  void immutable_cache_local_orm_delete_on_label_invalidates_existing_entries() {
+    Label label = createLabel("orm-delete");
+    var cache = loadingLabelCache();
+    Object existingId = label.id();
+
+    cache.getAll(Set.of(existingId));
+    DB.delete(label);
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> firstAfterDeleteSql = LoggedSql.stop();
+    assertThat(firstAfterDeleteSql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> secondAfterDeleteSql = LoggedSql.stop();
+    assertThat(secondAfterDeleteSql.stream().filter(sql -> sql.contains(" from label "))).isEmpty();
+  }
+
+  @Test
+  void immutable_cache_multiple_caches_for_same_type_are_both_invalidated_on_update() {
+    var cacheA = loadingLabelCache();
+    var cacheB = loadingLabelCache();
+    Object existingId = heightDescriptor.getName().id();
+
+    cacheA.getAll(Set.of(existingId));
+    cacheB.getAll(Set.of(existingId));
+
+    DB.sqlUpdate("update label set version = version where id = ?")
+      .setParameter(existingId)
+      .execute();
+
+    LoggedSql.start();
+    cacheA.getAll(Set.of(existingId));
+    List<String> cacheASql = LoggedSql.stop();
+    assertThat(cacheASql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+
+    LoggedSql.start();
+    cacheB.getAll(Set.of(existingId));
+    List<String> cacheBSql = LoggedSql.stop();
+    assertThat(cacheBSql.stream().filter(sql -> sql.contains(" from label "))).hasSize(1);
+  }
+
+  @Test
+  void immutable_cache_view_invalidation_clears_on_dependent_table_touch() {
+    Customer customerEntity = new Customer();
+    customerEntity.setName("view-immutable-" + UUID.randomUUID().toString().substring(0, 8));
+    customerEntity.setStatus(Customer.Status.ACTIVE);
+    customerEntity.setAnniversary(new Date(System.currentTimeMillis()));
+    DB.save(customerEntity);
+
+    ImmutableBeanCache<VwCustomer> cache = ImmutableBeanCaches.loading(VwCustomer.class, DB.getDefault(), FetchGroup.of(VwCustomer.class, "name"));
+    Object existingId = customerEntity.getId();
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> initialLoadSql = LoggedSql.stop();
+    assertThat(initialLoadSql.stream().filter(sql -> sql.contains(" from o_customer "))).hasSize(1);
+
+    DB.sqlUpdate("update o_customer set name = name where id = ?")
+      .setParameter(existingId)
+      .execute();
+
+    LoggedSql.start();
+    cache.getAll(Set.of(existingId));
+    List<String> postTouchSql = LoggedSql.stop();
+    assertThat(postTouchSql.stream().filter(sql -> sql.contains(" from o_customer "))).hasSize(1);
+  }
+
+  @Test
   void find_fetchQuerySecondary_inheritsImmutableCache_expect_noLabelLazyLoadSql() {
 
     var cache = loadingLabelCache();
@@ -440,6 +678,22 @@ class ResourceEntityTest {
       .fetch("labelTexts", "locale, localeText")
       .build();
     return ImmutableBeanCaches.loading(Label.class, DB.getDefault(), fetchGroup);
+  }
+
+  private SpiEbeanServer spiServer() {
+    return (SpiEbeanServer) DB.getDefault();
+  }
+
+  private String labelTable() {
+    return spiServer().descriptor(Label.class).baseTable();
+  }
+
+  private Label createLabel(String prefix) {
+    Label label = new Label();
+    label.addLabelText(Locale.ENGLISH, prefix + "-en");
+    label.addLabelText(Locale.GERMAN, prefix + "-de");
+    DB.save(label);
+    return label;
   }
 
   private void accessDescriptorLabels(AttributeValueOwner owner) {

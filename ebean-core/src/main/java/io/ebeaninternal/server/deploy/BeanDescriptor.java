@@ -3,6 +3,7 @@ package io.ebeaninternal.server.deploy;
 import io.ebean.*;
 import io.ebean.annotation.DocStoreMode;
 import io.ebean.bean.*;
+import io.ebean.ImmutableBeanCache;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.DatabaseBuilder;
 import io.ebean.config.EncryptKey;
@@ -1186,6 +1187,22 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   @Override
   public void clearQueryCache() {
     cacheHelp.queryCacheClear();
+  }
+
+  public void registerImmutableCache(ImmutableBeanCache<?> beanCache) {
+    cacheHelp.registerImmutableCache(beanCache);
+  }
+
+  public boolean hasImmutableCaches() {
+    return cacheHelp.hasImmutableCaches();
+  }
+
+  public void clearImmutableCaches() {
+    cacheHelp.clearImmutableCaches();
+  }
+
+  public void removeImmutableCacheByIds(Collection<Object> ids) {
+    cacheHelp.removeImmutableCacheByIds(ids);
   }
 
   /**

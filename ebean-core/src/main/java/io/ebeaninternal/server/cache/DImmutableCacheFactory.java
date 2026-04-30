@@ -12,12 +12,9 @@ import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
 import io.ebean.service.SpiImmutableCacheFactory;
+import io.ebeaninternal.api.SpiEbeanServer;
 
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
@@ -98,7 +95,11 @@ public final class DImmutableCacheFactory implements SpiImmutableCacheFactory {
       if (executor != null) {
         serverCache.periodicTrim(executor);
       }
-      return new ServerLoadingCache<>(type, loader, serverCache);
+      ServerLoadingCache<T> immutableCache = new ServerLoadingCache<>(type, loader, serverCache);
+      if (database instanceof SpiEbeanServer) {
+        ((SpiEbeanServer) database).registerImmutableCache(immutableCache);
+      }
+      return immutableCache;
     }
 
     private BackgroundExecutor executor() {
@@ -110,7 +111,7 @@ public final class DImmutableCacheFactory implements SpiImmutableCacheFactory {
     }
   }
 
-  private static final class ServerLoadingCache<T> implements ImmutableBeanCache<T> {
+  private static final class ServerLoadingCache<T> implements ImmutableBeanCache<T>, ImmutableCacheInvalidator {
 
     private static final Object MISS = new Object();
 
@@ -169,6 +170,16 @@ public final class DImmutableCacheFactory implements SpiImmutableCacheFactory {
         }
       }
       return result;
+    }
+
+    @Override
+    public void clear() {
+      cache.clear();
+    }
+
+    @Override
+    public void removeAll(Collection<Object> ids) {
+      cache.removeAll(new HashSet<>(ids));
     }
   }
 }
