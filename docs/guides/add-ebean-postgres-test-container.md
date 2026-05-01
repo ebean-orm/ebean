@@ -4,7 +4,12 @@
 
 This guide provides step-by-step instructions for setting up a PostgreSQL Docker
 container for tests using `ebean-test-containers`, exposing an `io.ebean.Database`
-bean via an Avaje Inject `@TestScope @Factory` class. This is Step 3 of 3.
+bean via an Avaje Inject `@TestScope @Factory` class. This is Step 2 of 3.
+
+Complete this step before configuring the production database in Step 3. Getting
+the test container working first gives you a fast feedback loop — you can verify
+entity changes compile, enhance, and persist correctly with `mvn verify` before
+wiring up production datasource configuration.
 
 Two variants are covered:
 - **Variant A** — plain PostgreSQL
@@ -17,7 +22,6 @@ Two variants are covered:
 - **Step 1 complete**: `pom.xml` includes `ebean-postgres`, `ebean-maven-plugin`,
   `querybean-generator`, and **`ebean-test`** as a test-scoped dependency
   (see `add-ebean-postgres-maven-pom.md`)
-- **Step 2 complete**: A production `Database` bean exists (see `add-ebean-postgres-database-config.md`)
 - **Avaje Inject** is on the classpath with test support (`io.avaje:avaje-inject-test`)
 - **Docker** is installed and running on the developer machine
 
@@ -181,7 +185,7 @@ class DatabaseTest {
 Run the tests:
 
 ```bash
-mvn test -pl <your-module>
+mvn verify
 ```
 
 Expected log output confirming the container started and Ebean connected:
@@ -193,6 +197,10 @@ INFO  DataSourcePool [my_app] autoCommit[false] ...
 INFO  DatabasePlatform name:my_app platform:postgres
 INFO  Executing db-create-all.sql - ...
 ```
+
+**Important:** Verify this step passes with `mvn verify` before proceeding to
+Step 3 (production database configuration). A working test container gives you
+a fast feedback loop for all subsequent entity and query changes.
 
 ---
 

@@ -171,5 +171,7 @@ Expected result: `BUILD SUCCESS` with no errors from Ebean or the annotation pro
 
 ## Next Step
 
-Proceed to **Step 2: Configure the Datasource and Ebean Database bean**
-(`add-ebean-postgres-database-config.md`).
+Proceed to **Step 2: Test container setup**
+(`add-ebean-postgres-test-container.md`) to wire an injectable test `Database`
+backed by `ebean-test` containers. Verify with `mvn verify` before continuing
+to production database configuration.

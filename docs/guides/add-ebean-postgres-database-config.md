@@ -4,7 +4,7 @@
 
 This guide provides step-by-step instructions for configuring an Ebean `Database` bean
 using **Avaje Inject** (`@Factory` / `@Bean`), backed by a PostgreSQL datasource built
-with Ebean's `DataSourceBuilder`. Follow every step in order. This is Step 2 of 3.
+with Ebean's `DataSourceBuilder`. Follow every step in order. This is Step 3 of 3.
 
 ---
 
@@ -12,6 +12,8 @@ with Ebean's `DataSourceBuilder`. Follow every step in order. This is Step 2 of 
 
 - **Step 1 complete**: `pom.xml` already includes `ebean-postgres`, `ebean-maven-plugin`,
   and `querybean-generator` (see `add-ebean-postgres-maven-pom.md`)
+- **Step 2 complete**: Test container setup is working and `mvn verify` passes
+  (see `add-ebean-postgres-test-container.md`)
 - **Avaje Inject** is on the classpath (e.g. `io.avaje:avaje-inject`)
 - A configuration source is available at runtime (e.g. `avaje-config` reading
   `application.yml` or environment variables)
@@ -283,8 +285,7 @@ validation best practices, see the [ebean-datasource guides](https://github.com/
 
 ---
 
-## Next Step
+## Related
 
-Proceed to **Step 3: Test container setup**
-(`add-ebean-postgres-test-container.md`) to wire an injectable test `Database`
-backed by `ebean-test` containers.
+The test container setup (Step 2) should already be complete and passing
+before this step. See `add-ebean-postgres-test-container.md`.

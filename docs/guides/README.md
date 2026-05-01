@@ -15,8 +15,8 @@ existing Maven project. Complete the steps in order.
 | Step | Guide | Description |
 |------|-------|-------------|
 | 1 | [Maven POM setup](add-ebean-postgres-maven-pom.md) | Add Ebean dependencies, the enhancement plugin, and the querybean-generator annotation processor to `pom.xml` |
-| 2 | [Database configuration](add-ebean-postgres-database-config.md) | Configure the Ebean `Database` bean using `DataSourceBuilder` and `DatabaseBuilder` with Avaje Inject |
-| 3 | [Test container setup](add-ebean-postgres-test-container.md) | Start a PostgreSQL (or PostGIS) Docker container for tests using `@TestScope @Factory` with Avaje Inject; covers image mirror, read-only datasource, and PostGIS variant |
+| 2 | [Test container setup](add-ebean-postgres-test-container.md) | Start a PostgreSQL (or PostGIS) Docker container for tests using `@TestScope @Factory` with Avaje Inject; verify the test database works with `mvn verify` before adding production configuration |
+| 3 | [Database configuration](add-ebean-postgres-database-config.md) | Configure the production Ebean `Database` bean using `DataSourceBuilder` and `DatabaseBuilder` with Avaje Inject |
 
 ## Entity beans
 
