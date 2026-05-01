@@ -129,6 +129,53 @@ for Postgres test instances:
 
 ---
 
+## Step 4b — Add DI framework dependencies (if applicable)
+
+If the user chose **Avaje Inject** in Step 0, add the following dependencies and
+annotation processor. Skip this step if the user chose Spring or no DI.
+
+### Dependencies
+
+```xml
+<dependency>
+    <groupId>io.avaje</groupId>
+    <artifactId>avaje-inject</artifactId>
+    <version>11.5</version>
+</dependency>
+<dependency>
+    <groupId>io.avaje</groupId>
+    <artifactId>avaje-inject-test</artifactId>
+    <version>11.5</version>
+    <scope>test</scope>
+</dependency>
+```
+
+> Check [Maven Central](https://central.sonatype.com/artifact/io.avaje/avaje-inject)
+> for the latest version.
+
+### Annotation processor
+
+The `avaje-inject-generator` must be added to the `annotationProcessorPaths` in
+`maven-compiler-plugin` (added in Step 6 below). When adding both processors,
+the final `<annotationProcessorPaths>` block should include both:
+
+```xml
+<annotationProcessorPaths>
+    <path> <!-- generate ebean query beans -->
+        <groupId>io.ebean</groupId>
+        <artifactId>querybean-generator</artifactId>
+        <version>${ebean.version}</version>
+    </path>
+    <path> <!-- generate avaje-inject DI code -->
+        <groupId>io.avaje</groupId>
+        <artifactId>avaje-inject-generator</artifactId>
+        <version>11.5</version>
+    </path>
+</annotationProcessorPaths>
+```
+
+---
+
 ## Step 5 — Add the ebean-maven-plugin (bytecode enhancement)
 
 Ebean requires bytecode enhancement to provide dirty-checking and lazy-loading.
