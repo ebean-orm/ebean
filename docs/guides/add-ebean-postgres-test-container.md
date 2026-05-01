@@ -433,3 +433,13 @@ mkdir -p ~/.ebean && touch ~/.ebean/ignore-docker-shutdown
 ```
 
 On CI servers, omit this file so containers are cleaned up after each build.
+
+---
+
+## Next Steps
+
+- **Add `TestEntityBuilder`** to your test configuration for rapid test data creation
+  with auto-populated random values. See `testing-with-testentitybuilder.md`.
+- **Proceed to Step 3** — production database configuration
+  (`add-ebean-postgres-database-config.md`). Verify this step passes with
+  `mvn verify` before continuing.
