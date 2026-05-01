@@ -159,13 +159,15 @@ Example — if the existing block already has a path for, say, `avaje-nima-gener
 
 ## Verification
 
-Run the following to confirm the POM is valid and the project compiles:
+Run the following to confirm the POM is valid and both main and test sources compile:
 
 ```bash
-mvn compile -pl <your-module-name>
+mvn test-compile
 ```
 
 Expected result: `BUILD SUCCESS` with no errors from Ebean or the annotation processor.
+Using `test-compile` rather than `compile` ensures test dependencies and test
+source files are also verified.
 
 ---
 

@@ -65,6 +65,23 @@ useful for production deployments, especially in Kubernetes or AWS environments:
 
 ## Helping AI agents find these guides
 
+### Agent Skills (recommended)
+
+The **ebean-orm skill** packages these guides into a structured format that AI agents
+load on-demand. See the [ebean-orm/skills](https://github.com/ebean-orm/skills) repo
+for installation instructions. Quick start:
+
+```bash
+git clone git@github.com:ebean-orm/skills.git ~/.agents/ebean-skills
+ln -sf ~/.agents/ebean-skills/ebean-orm ~/.agents/skills/ebean-orm
+```
+
+This works with [pi](https://github.com/mariozechner/pi-coding-agent),
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code), and any harness
+that supports the [Agent Skills standard](https://agentskills.io/specification).
+
+### Other approaches
+
 AI coding agents can only follow these guides if they know they exist. Below are
 copy-paste snippets for the most common AI tooling configurations. Add whichever
 applies to your project.
