@@ -382,7 +382,7 @@ Prefer the following order:
 
 1. Query bean query
 2. Query bean query + `asDto(...)`
-3. `DB.findDto(...)` or DTO query
+3. `database.findDto(...)` or DTO query
 4. Native SQL / `SqlQuery` / `RawSql`
 
 ### Typical reasons to use raw SQL
@@ -404,7 +404,7 @@ beans already handle ordinary relationship traversal well.
 **Avoid:**
 
 ```java
-List<Customer> customers = DB.findNative(Customer.class,
+List<Customer> customers = database.findNative(Customer.class,
   "select c.* from customer c join address a on a.id = c.billing_address_id where a.city = ?")
   .setParameter(1, city)
   .findList();

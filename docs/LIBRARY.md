@@ -41,9 +41,9 @@ Ebean is an ORM library for Java and Kotlin focused on relational data access, t
 |------|------|------|
 | `DB.getDefault()` | Access default `Database` | `Database db = DB.getDefault();` |
 | `DB.byName("...")` | Access named `Database` | `Database reporting = DB.byName("reporting");` |
-| `DB.find(...)` | Query entities from default database | `Customer c = DB.find(Customer.class, id);` |
-| `DB.insert/save/update/delete` | Persist entity changes | `DB.save(customer);` |
-| `DB.beginTransaction()` | Manual transaction boundary | `try (Transaction txn = DB.beginTransaction()) { ... }` |
+| `database.find(...)` | Query entities | `Customer c = database.find(Customer.class, id);` |
+| `database.insert/save/update/delete` | Persist entity changes | `database.save(customer);` |
+| `database.beginTransaction()` | Manual transaction boundary | `try (Transaction txn = database.beginTransaction()) { ... }` |
 | `Database.builder()` | Programmatic `Database` setup | `Database.builder().loadFromProperties().build();` |
 
 ### Query APIs
@@ -168,9 +168,11 @@ class Customer {
   }
 }
 
-Customer customer = DB.find(Customer.class, 42);
+Database database = DB.getDefault(); // or injected
+
+Customer customer = database.find(Customer.class, 42);
 customer.setName("Updated");
-DB.save(customer);
+database.save(customer);
 ```
 
 ## Common Tasks & Guides

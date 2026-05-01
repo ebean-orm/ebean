@@ -2,7 +2,7 @@
 
 **Target Audience:** AI systems (Claude, Copilot, ChatGPT, etc.)
 **Purpose:** Learn how to generate clean, idiomatic Ebean entity beans
-**Key Insight:** Ebean entity fields must be non-public (no public fields). Getters/setters are optional, and if used they don't need JavaBeans naming conventions; no manual equals/hashCode implementation is needed
+**Key Insight:** Ebean entity fields must be non-public (no public fields). Accessors don't need JavaBeans naming conventions; no manual equals/hashCode implementation is needed
 **Language:** Java
 **Framework:** Ebean ORM
 
@@ -16,7 +16,7 @@ Before writing entity code, remember:
 |-------------|---------|-----------------------------------------------------------------------------------------------------------------------|
 | `@Entity` annotation | ✅ **YES** | Marks class as persistent entity                                                                                      |
 | `@Id` annotation | ✅ **YES** | Marks primary key field                                                                                               |
-| Getters/setters (or other accessors) | ⚠️ **OPTIONAL** | Ebean can use field access directly. Add accessors when your API/design needs them; naming can be JavaBeans, fluent, or custom. |
+| Getters/setters (or other accessors) | ✅ **YES** | Needed for application code to access fields. Naming can be JavaBeans, fluent, or custom — no specific convention required. |
 | Default constructor | ❌ **NO** | Not required. Ebean can instantiate without it.                                                                       |
 | equals/hashCode | ❌ **NO** | Ebean auto-enhances these at compile time.                                                                            |
 | toString() | ❌ **NO** | Ebean auto-enhances this. Don't implement with getters.                                                               |
@@ -241,11 +241,11 @@ public class Order {
 Order order = new Order();
 order.setOrderNumber("ORD-001");
 order.setTotalAmount(new BigDecimal("99.99"));
-DB.save(order);  // createdAt is automatically set by Ebean
+database.save(order);  // createdAt is automatically set by Ebean
 
 // Modify
 order.setTotalAmount(new BigDecimal("109.99"));
-DB.update(order);  // version incremented, modifiedAt updated automatically
+database.update(order);  // version incremented, modifiedAt updated automatically
 
 // Check when modified
 System.out.println(order.getModifiedAt());  // Current timestamp
@@ -377,54 +377,6 @@ public class Customer {
 - Use `List<>` not `Set<>` for collections (Set calls equals/hashCode before beans have IDs)
 - `mappedBy` means Order.customer is the owner
 - Relationships are lazy-loaded by default
-
----
-
-## Pattern 5: Entity with Getters/Setters (Optional)
-
-**Use this when:** External code accesses this entity's fields.
-
-```java
-@Entity
-public class Employee {
-  @Id long id;
-  @Version long version;
-
-  String firstName;
-  String lastName;
-  BigDecimal salary;
-
-  public long getId() {
-    return id;
-  }
-
-  public String getFirstName() {
-    return firstName;
-  }
-
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
-  }
-
-  public String getLastName() {
-    return lastName;
-  }
-
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
-
-  public BigDecimal getSalary() {
-    return salary;
-  }
-
-  public void setSalary(BigDecimal salary) {
-    this.salary = salary;
-  }
-}
-```
-
-**Note:** This is valid but verbose. Most Ebean code doesn't use getters/setters. **Only add them if needed by your API design.**
 
 ---
 
@@ -685,6 +637,12 @@ public class BlogPost {
   @Id long id;
   String title;
   String content;
+
+  public long getId() { return id; }
+  public String getTitle() { return title; }
+  public void setTitle(String title) { this.title = title; }
+  public String getContent() { return content; }
+  public void setContent(String content) { this.content = content; }
 }
 ```
 
@@ -699,6 +657,15 @@ public class BlogPost {
 
   String title;
   String content;
+
+  public long getId() { return id; }
+  public long getVersion() { return version; }
+  public Instant getCreatedAt() { return createdAt; }
+  public Instant getModifiedAt() { return modifiedAt; }
+  public String getTitle() { return title; }
+  public void setTitle(String title) { this.title = title; }
+  public String getContent() { return content; }
+  public void setContent(String content) { this.content = content; }
 }
 ```
 
@@ -716,6 +683,17 @@ public class BlogPost {
 
   @ManyToOne
   Author author;
+
+  public long getId() { return id; }
+  public long getVersion() { return version; }
+  public Instant getCreatedAt() { return createdAt; }
+  public Instant getModifiedAt() { return modifiedAt; }
+  public String getTitle() { return title; }
+  public void setTitle(String title) { this.title = title; }
+  public String getContent() { return content; }
+  public void setContent(String content) { this.content = content; }
+  public Author getAuthor() { return author; }
+  public void setAuthor(Author author) { this.author = author; }
 }
 ```
 
@@ -739,10 +717,21 @@ public class BlogPost {
     this.content = content;
     this.author = author;
   }
+
+  public long getId() { return id; }
+  public long getVersion() { return version; }
+  public Instant getCreatedAt() { return createdAt; }
+  public Instant getModifiedAt() { return modifiedAt; }
+  public String getTitle() { return title; }
+  public void setTitle(String title) { this.title = title; }
+  public String getContent() { return content; }
+  public void setContent(String content) { this.content = content; }
+  public Author getAuthor() { return author; }
+  public void setAuthor(Author author) { this.author = author; }
 }
 ```
 
-Each step adds only what's necessary. No getters/setters needed unless your design requires them.
+Each step adds only what's necessary for the entity structure. Accessors are always included so application code can use the entity.
 
 ---
 
@@ -752,25 +741,25 @@ Each step adds only what's necessary. No getters/setters needed unless your desi
 ```java
 Customer customer = new Customer();
 customer.setName("Alice");
-DB.save(customer);  // id auto-generated
+database.save(customer);  // id auto-generated
 ```
 
 ### Finding
 ```java
-Customer found = DB.find(Customer.class, 1);
+Customer found = database.find(Customer.class, 1);
 System.out.println(found.getName());
 ```
 
 ### Updating
 ```java
 found.setName("Bob");
-DB.update(found);  // version auto-incremented
+database.update(found);  // version auto-incremented
 ```
 
 ### Collections (relationships)
 ```java
-Customer customer = DB.find(Customer.class, 1);
-List<Order> orders = customer.orders;  // Lazy loads automatically
+Customer customer = database.find(Customer.class, 1);
+List<Order> orders = customer.getOrders();  // Lazy loads automatically
 ```
 
 ---
@@ -786,7 +775,7 @@ When generating Ebean entity beans:
 - Use @WhenCreated/@WhenModified for audit trail
 - Use List for collections, not Set
 - Add constructors only if domain logic requires it
-- Add getters/setters only if your API requires them
+- Add getters/setters for all fields that application code needs to read or write
 
 ❌ **DON'T:**
 - Use Long object for @Id/@Version
@@ -794,7 +783,6 @@ When generating Ebean entity beans:
 - Implement toString() with getters
 - Use Set for @OneToMany/@ManyToMany
 - Add unnecessary @Column annotations
-- Add getters/setters "just in case"
 - Add default constructors "just in case"
 
 **Result:** Clean, readable, maintainable entity beans with full ORM functionality and zero boilerplate.
