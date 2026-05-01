@@ -73,6 +73,7 @@ for installation instructions. Quick start:
 
 ```bash
 git clone git@github.com:ebean-orm/skills.git ~/.agents/ebean-skills
+mkdir -p ~/.agents/skills
 ln -sf ~/.agents/ebean-skills/ebean-orm ~/.agents/skills/ebean-orm
 ```
 
