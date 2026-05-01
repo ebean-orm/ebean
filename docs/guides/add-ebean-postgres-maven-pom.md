@@ -15,6 +15,49 @@ to add Ebean ORM with PostgreSQL support. Follow every step in order. This is St
 
 ---
 
+## Step 0 — Gather requirements from the user
+
+Before modifying any files, ask the user the following questions to determine
+the correct setup path. Record the answers — they affect dependency choices
+in this step and the approach used in Steps 2 and 3.
+
+### Question 1: Dependency injection framework
+
+> "Does this project use (or will it use) a DI framework? If so, which one?"
+
+| Answer | Effect |
+|--------|--------|
+| **Avaje Inject** | Add `avaje-inject` + `avaje-inject-test` dependencies; use `@TestScope @Factory` for test container (Step 2); use `@Factory`/`@Bean` for production database (Step 3) |
+| **Spring** | Use Spring `@TestConfiguration` for test container (Step 2); use Spring `@Configuration`/`@Bean` for production database (Step 3) |
+| **None** | Use declarative `application-test.yaml` for test container (Step 2); use programmatic `Database.builder()` directly in application code (Step 3) |
+
+### Question 2: PostGIS
+
+> "Do you need PostGIS spatial extensions (geometry types, spatial queries)?"
+
+| Answer | Effect |
+|--------|--------|
+| **Yes** | Use `PostgisContainer` in test setup (Step 2); may need `net.postgis:postgis-jdbc` dependency |
+| **No** | Use `PostgresContainer` in test setup (Step 2) |
+
+### Question 3: Read replica
+
+> "Does your production environment use a separate read-replica (read-only) database?"
+
+| Answer | Effect |
+|--------|--------|
+| **Yes** | Configure a read-only `DataSourceBuilder` in production database config (Step 3) |
+| **No** | Single datasource only (Step 3) |
+
+### Defaults
+
+If the user is unsure or setting up a new project, recommend:
+- **Avaje Inject** (lightweight, fast compile-time DI)
+- **No PostGIS** (can be added later)
+- **No read replica** (can be added later)
+
+---
+
 ## Step 1 — Define the Ebean version property
 
 Open the module's `pom.xml` (the one that will use Ebean directly, i.e. the module

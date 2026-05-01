@@ -1,19 +1,15 @@
-# Guide: Add Ebean ORM (PostgreSQL) to an Existing Maven Project — Step 3: Test Container Setup
+# Guide: Add Ebean ORM (PostgreSQL) to an Existing Maven Project - Step 2: Test Container Setup
 
 ## Purpose
 
 This guide provides step-by-step instructions for setting up a PostgreSQL Docker
-container for tests using `ebean-test-containers`, exposing an `io.ebean.Database`
-bean via an Avaje Inject `@TestScope @Factory` class. This is Step 2 of 3.
+container for tests, exposing an `io.ebean.Database` instance for use in test
+classes. This is Step 2 of 3.
 
 Complete this step before configuring the production database in Step 3. Getting
-the test container working first gives you a fast feedback loop — you can verify
+the test container working first gives you a fast feedback loop - you can verify
 entity changes compile, enhance, and persist correctly with `mvn verify` before
 wiring up production datasource configuration.
-
-Two variants are covered:
-- **Variant A** — plain PostgreSQL
-- **Variant B** — PostgreSQL with PostGIS extension
 
 ---
 
@@ -22,48 +18,62 @@ Two variants are covered:
 - **Step 1 complete**: `pom.xml` includes `ebean-postgres`, `ebean-maven-plugin`,
   `querybean-generator`, and **`ebean-test`** as a test-scoped dependency
   (see `add-ebean-postgres-maven-pom.md`)
-- **Avaje Inject** is on the classpath with test support (`io.avaje:avaje-inject-test`)
+- **Step 0 answers recorded**: DI framework choice and PostGIS requirement
 - **Docker** is installed and running on the developer machine
 
 ---
 
-## Overview: Declarative vs Programmatic approach
+## Overview: Choosing your approach
 
-`ebean-test` supports two ways to configure the test database:
+The approach depends on the DI framework choice made in Step 0:
 
-| Approach | How | Best for |
-|----------|-----|---------|
-| **Declarative** | `src/test/resources/application-test.yaml` | Simple projects with no DI, no image mirrors |
-| **Programmatic** | `@TestScope @Factory` class | Avaje Inject tests, private image mirrors (ECR), more control |
+| DI framework | Approach | How |
+|--------------|----------|-----|
+| **Avaje Inject** | Programmatic | `@TestScope @Factory` class with injectable `Database` bean |
+| **Spring** | Programmatic | `@TestConfiguration` class with `@Bean` methods |
+| **None** | Declarative | `application-test.yaml` + plain JUnit test |
 
-This guide uses the **programmatic approach** because it integrates naturally with
-Avaje Inject, allows a private mirror to be specified (useful in CI with ECR or similar),
-and makes the `Database` injectable into tests.
+Follow the path that matches your choice below.
 
 ---
 
-## Step 1 — Verify ebean-test is a test dependency
+## Path A — Programmatic with Avaje Inject (recommended)
 
-Confirm the following is present in `pom.xml` (added in Step 1):
+This approach uses `@TestScope @Factory` to expose the container and `Database`
+as injectable beans. It offers more control (image mirrors, custom config) and
+makes `Database` directly injectable into test classes.
+
+### A.1 — Verify Avaje Inject test dependencies
+
+Confirm the following are present in `pom.xml` (in addition to `ebean-test`):
 
 ```xml
 <dependency>
-    <groupId>io.ebean</groupId>
-    <artifactId>ebean-test</artifactId>
-    <version>${ebean.version}</version>
+    <groupId>io.avaje</groupId>
+    <artifactId>avaje-inject</artifactId>
+    <version>${avaje-inject.version}</version>
+</dependency>
+<dependency>
+    <groupId>io.avaje</groupId>
+    <artifactId>avaje-inject-test</artifactId>
+    <version>${avaje-inject.version}</version>
     <scope>test</scope>
 </dependency>
 ```
 
-`ebean-test` transitively brings in `ebean-test-containers` which provides
-`PostgresContainer` and `PostgisContainer`.
+And the `avaje-inject-generator` annotation processor in `maven-compiler-plugin`:
 
----
+```xml
+<path>
+    <groupId>io.avaje</groupId>
+    <artifactId>avaje-inject-generator</artifactId>
+    <version>${avaje-inject.version}</version>
+</path>
+```
 
-## Step 2 — Create a `@TestScope @Factory` class
+### A.2 — Create a `@TestScope @Factory` class
 
-Create a new class in the test source tree (e.g., `src/test/java/.../testconfig/TestConfiguration.java`).
-Annotate it with `@TestScope` and `@Factory` so Avaje Inject uses it only in tests.
+Create a new class in the test source tree (e.g., `src/test/java/.../testconfig/TestConfiguration.java`):
 
 ```java
 package com.example.testconfig;
@@ -76,15 +86,13 @@ import io.ebean.Database;
 @TestScope
 @Factory
 class TestConfiguration {
-    // bean methods added in the steps below
+    // bean methods added below
 }
 ```
 
----
+### A.3 — Add a container bean and a Database bean
 
-## Step 3 — Add a container bean and a Database bean
-
-### Variant A — Plain PostgreSQL
+#### Plain PostgreSQL
 
 ```java
 import io.ebean.test.containers.PostgresContainer;
@@ -110,9 +118,9 @@ class TestConfiguration {
 }
 ```
 
-### Variant B — PostGIS (PostgreSQL + PostGIS extension)
+#### PostGIS (PostgreSQL + PostGIS extension)
 
-Use `PostgisContainer` instead of `PostgresContainer`. The default image is
+Use `PostgisContainer` instead. The default image is
 `ghcr.io/baosystems/postgis:{version}` and the extensions `hstore`, `pgcrypto`,
 and `postgis` are installed automatically.
 
@@ -125,7 +133,7 @@ class TestConfiguration {
 
     @Bean
     PostgisContainer postgres() {
-        return PostgisContainer.builder("17")    // PostGIS image version (Postgres 17)
+        return PostgisContainer.builder("17")
             .dbName("my_app")
             .build()
             .start();
@@ -140,7 +148,7 @@ class TestConfiguration {
 }
 ```
 
-### Key differences from Variant A
+#### Key differences
 
 | | PostgresContainer | PostgisContainer |
 |---|---|---|
@@ -149,9 +157,7 @@ class TestConfiguration {
 | Default port | 6432 | 6432 |
 | Optional LW mode | — | `.useLW(true)` (see Optional section) |
 
----
-
-## Step 4 — Write a test
+### A.4 — Write a test
 
 Annotate the test class with `@InjectTest` and inject `Database` with `@Inject`:
 
@@ -178,17 +184,13 @@ class DatabaseTest {
 }
 ```
 
----
-
-## Verification
-
-Run the tests:
+### A.5 — Verify
 
 ```bash
 mvn verify
 ```
 
-Expected log output confirming the container started and Ebean connected:
+Expected log output:
 
 ```
 INFO  Container ut_postgres running with port:6432 ...
@@ -199,8 +201,140 @@ INFO  Executing db-create-all.sql - ...
 ```
 
 **Important:** Verify this step passes with `mvn verify` before proceeding to
-Step 3 (production database configuration). A working test container gives you
-a fast feedback loop for all subsequent entity and query changes.
+Step 3 (production database configuration).
+
+---
+
+## Path B — Programmatic with Spring
+
+Use Spring’s `@TestConfiguration` to provide the container and `Database` beans.
+
+### B.1 — Create a `@TestConfiguration` class
+
+```java
+package com.example.testconfig;
+
+import io.ebean.Database;
+import io.ebean.test.containers.PostgresContainer;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
+
+@TestConfiguration
+class TestDatabaseConfig {
+
+    @Bean
+    PostgresContainer postgres() {
+        return PostgresContainer.builder("17")
+            .dbName("my_app")
+            .build()
+            .start();
+    }
+
+    @Primary
+    @Bean
+    Database database(PostgresContainer container) {
+        return container.ebean()
+            .builder()
+            .build();
+    }
+}
+```
+
+For PostGIS, use `PostgisContainer` instead (same pattern as Path A).
+
+### B.2 — Write a test
+
+```java
+package com.example;
+
+import io.ebean.Database;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@SpringBootTest
+class DatabaseTest {
+
+    @Autowired
+    Database database;
+
+    @Test
+    void database_isAvailable() {
+        assertThat(database).isNotNull();
+    }
+}
+```
+
+### B.3 — Verify
+
+Run `mvn verify` and confirm the same log output as Path A.
+
+---
+
+## Path C — Declarative (no DI framework)
+
+This is the simplest approach but offers less control. `ebean-test` reads a
+YAML config file and automatically manages the Docker container and `Database`
+instance. Use this when the project has no DI framework.
+
+### C.1 — Create `application-test.yaml`
+
+Create `src/test/resources/application-test.yaml`:
+
+```yaml
+ebean:
+  test:
+    platform: postgres
+    ddlMode: dropCreate
+    dbName: my_app
+```
+
+For PostGIS, use `platform: postgis` instead.
+
+### C.2 — Write a test
+
+Use `DB.getDefault()` to obtain the `Database` instance:
+
+```java
+package com.example;
+
+import io.ebean.DB;
+import io.ebean.Database;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+class DatabaseTest {
+
+    @Test
+    void database_isAvailable() {
+        Database database = DB.getDefault();
+        assertThat(database).isNotNull();
+    }
+}
+```
+
+### C.3 — Verify
+
+```bash
+mvn verify
+```
+
+Expected log output:
+
+```
+INFO  Container ut_postgres running with port:6432 ...
+INFO  connectivity confirmed for ut_postgres
+INFO  DataSourcePool [my_app] autoCommit[false] ...
+INFO  DatabasePlatform name:my_app platform:postgres
+```
+
+**Important:** Verify this passes before proceeding to Step 3.
+
+Skip to [Optional configurations](#optional-configurations) or proceed to Step 3.
 
 ---
 
@@ -209,7 +343,7 @@ a fast feedback loop for all subsequent entity and query changes.
 ### Image mirror (for CI / private registry)
 
 If CI builds pull images from a private registry (e.g., AWS ECR) instead of Docker Hub
-or GitHub Container Registry, specify a mirror. The mirror is **only used in CI** —
+or GitHub Container Registry, specify a mirror. The mirror is **only used in CI** -
 it is ignored on local developer machines (where Docker Hub / GHCR is used directly).
 
 ```java
