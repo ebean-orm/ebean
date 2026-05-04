@@ -21,6 +21,22 @@ Before modifying any files, ask the user the following questions to determine
 the correct setup path. Record the answers — they affect dependency choices
 in this step and the approach used in Steps 2 and 3.
 
+### Mandatory gate (do not skip)
+
+- Do **not** continue to Step 1+ until the DI path is explicitly recorded.
+- Do **not** infer the **None** path by default. Use **None** only when the user explicitly confirms no DI framework.
+- If the user asks for a partial action (for example, "do only step 3"), keep the previously selected DI path; do not switch paths implicitly.
+
+### DI path precedence (when user has not answered yet)
+
+Use this precedence order:
+
+1. Existing project context (highest priority): if dependencies/config already show Avaje Inject or Spring, select that path.
+2. Explicit user answer in this guide's questions.
+3. Recommended default only when context is genuinely unknown: Avaje Inject.
+
+If context remains ambiguous, ask one multiple-choice clarification question and wait for the answer before editing files.
+
 ### Question 1: Dependency injection framework
 
 > "Does this project use (or will it use) a DI framework? If so, which one?"
