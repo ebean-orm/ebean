@@ -7,6 +7,8 @@ import jakarta.persistence.PersistenceException;
 
 import java.util.concurrent.locks.ReentrantLock;
 
+import static java.lang.System.Logger.Level.WARNING;
+
 /**
  * Creates Database instances.
  * <p>
@@ -61,7 +63,11 @@ public final class DatabaseFactory {
 
   /**
    * Create using the DatabaseConfig object to configure the database.
-   *
+   * <p>
+   * When the configuration has {@link DatabaseBuilder.Settings#isRegister()} set to true,
+   * and a database with the same name is already registered, this returns the existing
+   * registered database rather than creating a new one.
+   * </p>
    * <pre>{@code
    *
    *   DatabaseConfig config = new DatabaseConfig();
@@ -76,18 +82,28 @@ public final class DatabaseFactory {
     lock.lock();
     try {
       var config = builder.settings();
-      if (config.getName() == null) {
+      var name = config.getName();
+      if (name == null) {
         throw new PersistenceException("The name is null (it is required)");
+      }
+      if (config.isRegister()) {
+        // We're explicitly creating a database to be registered, so avoid
+        // triggering DbContext static initialisation to auto-create a default one.
+        DbPrimary.setSkip(true);
+        Database existing = DbContext.getInstance().getRegistered(name);
+        if (existing != null) {
+          EbeanVersion.log.log(WARNING, "Using existing database with name:{0}", name);
+          return existing;
+        }
       }
       Database server = createInternal(config);
       if (config.isRegister()) {
         if (config.isDefaultServer()) {
-          if (defaultServerName != null && !defaultServerName.equals(config.getName())) {
-            throw new IllegalStateException("Registering [" + config.getName() + "] as the default server but [" + defaultServerName + "] is already registered as the default");
+          if (defaultServerName != null && !defaultServerName.equals(name)) {
+            throw new IllegalStateException("Registering [" + name + "] as the default server but [" + defaultServerName + "] is already registered as the default");
           }
-          defaultServerName = config.getName();
+          defaultServerName = name;
         }
-        DbPrimary.setSkip(true);
         DbContext.getInstance().register(server, config.isDefaultServer());
       }
       return server;
