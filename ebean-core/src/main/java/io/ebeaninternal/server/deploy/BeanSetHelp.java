@@ -1,17 +1,13 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
 import io.ebean.common.BeanSet;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -26,21 +22,11 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
     super(many);
   }
 
-  /**
-   * For a query that returns a set.
-   */
-  BeanSetHelp() {
-    super();
-  }
-
   @Override
-  public final BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey) {
+  public final BeanCollectionAdd collectionAdd(Object bc, String mapKey) {
     if (bc instanceof BeanSet<?>) {
       BeanSet<?> beanSet = (BeanSet<?>) bc;
-      if (beanSet.actualSet() == null) {
-        beanSet.setActualSet(new LinkedHashSet<>());
-      }
-      return beanSet;
+      return beanSet.collectionAdd();
     } else {
       throw new RuntimeException("Unhandled type " + bc);
     }
@@ -72,9 +58,10 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
     return beanSet;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public final void refresh(BeanCollection<?> bc, EntityBean parentBean) {
-    BeanSet<?> newBeanSet = (BeanSet<?>) bc;
+    BeanSet<T> newBeanSet = (BeanSet<T>) bc;
     Set<?> current = (Set<?>) many.getValue(parentBean);
     newBeanSet.setModifyListening(many.modifyListenMode());
     if (current == null) {
@@ -83,9 +70,8 @@ public class BeanSetHelp<T> extends BaseCollectionHelp<T> {
 
     } else if (current instanceof BeanSet<?>) {
       // normally this case, replace just the underlying list
-      BeanSet<?> currentBeanSet = (BeanSet<?>) current;
-      currentBeanSet.setActualSet(newBeanSet.actualSet());
-      currentBeanSet.setModifyListening(many.modifyListenMode());
+      BeanSet<T> currentBeanSet = (BeanSet<T>) current;
+      currentBeanSet.refresh(many.modifyListenMode(), newBeanSet);
 
     } else {
       // replace the entire set
