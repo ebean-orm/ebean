@@ -11,11 +11,12 @@ public final class EncodeSerializable implements Encode {
   @Override
   public byte[] encode(Object value) {
     try {
-      ObjectOutputStream oos = new ObjectOutputStream(new ByteArrayOutputStream());
+      final var baos = new ByteArrayOutputStream();
+      final var oos = new ObjectOutputStream(baos);
       oos.writeObject(value);
       oos.flush();
       oos.close();
-      return new ByteArrayOutputStream().toByteArray();
+      return baos.toByteArray();
     } catch (IOException e) {
       throw new RuntimeException("Failed to decode cache data", e);
     }

@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.query;
 
-import io.avaje.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
 import io.ebean.FetchConfig;
 import io.ebean.FetchGroup;
 import io.ebean.FetchGroupBuilder;
@@ -10,7 +10,7 @@ import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 /**
  * Default implementation of the FetchGroupBuilder.
  */
-@NonNullApi
+@NullMarked
 final class DFetchGroupBuilder<T> implements FetchGroupBuilder<T> {
 
   private static final FetchConfig DEFAULT_FETCH = FetchConfig.ofDefault();

@@ -62,8 +62,7 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
     List<UTMaster> list = server.find(UTMaster.class).fetch("details").findList();
 
-    Transaction txn = server.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       txn.setBatchMode(true);
       txn.setBatchOnCascade(true);
 
@@ -103,11 +102,8 @@ public class TestBatchPersistCascade extends BaseTestCase {
 
       logger.info("commit ------------ ");
 
-      server.commitTransaction();
-    } finally {
-      server.endTransaction();
+      txn.commit();
     }
-
   }
 
   private UTDetail createUTDetail(String master, int count) {

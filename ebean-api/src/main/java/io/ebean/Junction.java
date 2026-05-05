@@ -61,7 +61,7 @@ package io.ebean;
  *            .eq("status", Customer.Status.ACTIVE)
  *            .gt("id", 0)
  *            .endAnd()
- *      .order().asc("name");
+ *      .orderBy().asc("name");
  *
  * q.findList();
  * String s = q.getGeneratedSql();

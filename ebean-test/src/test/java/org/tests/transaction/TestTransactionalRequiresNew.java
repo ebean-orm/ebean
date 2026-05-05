@@ -68,11 +68,8 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
     Database server = server();
     try(Transaction txn = server.beginTransaction()) {
       String txnName = txn.toString();
-      DB.beginTransaction(TxScope.requiresNew());
-      try {
-        DB.commitTransaction();
-      } finally {
-        DB.endTransaction();
+      try (Transaction txn2 = DB.beginTransaction(TxScope.requiresNew())) {
+        txn2.commit();
       }
       assertThat(txn.toString()).isEqualTo(txnName);
     }
@@ -83,11 +80,8 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
     Database server = server();
     try (Transaction txn = server.beginTransaction()) {
       String txnName = txn.toString();
-      server.beginTransaction(TxScope.requiresNew());
-      try {
-        server.commitTransaction();
-      } finally {
-        server.endTransaction();
+      try (Transaction txn2 = server.beginTransaction(TxScope.requiresNew())) {
+        txn2.commit();
       }
       assertThat(txn.toString()).isEqualTo(txnName);
     }
@@ -98,11 +92,8 @@ public class TestTransactionalRequiresNew extends BaseTestCase {
     Database server = server();
     try (Transaction txn = server.beginTransaction()) {
       String txnName = txn.toString();
-      Transaction txn2 = DB.beginTransaction(TxScope.requiresNew());
-      try {
+      try (Transaction txn2 = DB.beginTransaction(TxScope.requiresNew())) {
         txn2.commit();
-      } finally {
-        txn2.end();
       }
       assertThat(txn.toString()).isEqualTo(txnName);
     }

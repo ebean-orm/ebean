@@ -1,6 +1,6 @@
 package io.ebean.typequery;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import io.ebean.Query;
 
 import java.util.Collection;

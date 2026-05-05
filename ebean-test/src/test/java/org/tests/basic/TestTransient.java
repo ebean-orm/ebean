@@ -5,6 +5,7 @@ import io.ebean.BeanState;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 
 import java.sql.Types;
 import java.util.Optional;
@@ -16,7 +17,7 @@ public class TestTransient extends BaseTestCase {
 
   @Test
   public void testTransient() {
-
+    ResetBasicData.reset();
     Customer cnew = new Customer();
     cnew.setName("testTrans");
 

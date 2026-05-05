@@ -46,6 +46,7 @@ alter table table_history drop column textfield2;
 -- apply post alter
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 create or replace function migtest_e_history2_history_version() returns trigger as $$
+-- play-ebean-start
 declare
   lowerTs timestamptz;
   upperTs timestamptz;
@@ -61,6 +62,7 @@ begin
     return old;
   end if;
 end;
+-- play-ebean-end
 $$ LANGUAGE plpgsql;
 
 create trigger migtest_e_history2_history_upd
@@ -69,6 +71,7 @@ create trigger migtest_e_history2_history_upd
 
 create view migtest_e_history5_with_history as select * from migtest_e_history5 union all select * from migtest_e_history5_history;
 create or replace function migtest_e_history5_history_version() returns trigger as $$
+-- play-ebean-start
 declare
   lowerTs timestamptz;
   upperTs timestamptz;
@@ -84,6 +87,7 @@ begin
     return old;
   end if;
 end;
+-- play-ebean-end
 $$ LANGUAGE plpgsql;
 
 create trigger migtest_e_history5_history_upd
@@ -92,6 +96,7 @@ create trigger migtest_e_history5_history_upd
 
 create view table_with_history as select * from "table" union all select * from table_history;
 create or replace function table_history_version() returns trigger as $$
+-- play-ebean-start
 declare
   lowerTs timestamptz;
   upperTs timestamptz;
@@ -107,6 +112,7 @@ begin
     return old;
   end if;
 end;
+-- play-ebean-end
 $$ LANGUAGE plpgsql;
 
 create trigger table_history_upd

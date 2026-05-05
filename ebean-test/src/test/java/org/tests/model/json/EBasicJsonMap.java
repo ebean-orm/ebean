@@ -18,7 +18,7 @@ public class EBasicJsonMap {
 
   String name;
 
-  @DbJson
+  @DbJson(length = 5000)
   Map<String, Object> content;
 
   @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL)

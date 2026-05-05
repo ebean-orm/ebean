@@ -31,11 +31,8 @@ public class TestTransactionCallback extends BaseTestCase {
     assertEquals(0, countPreRollback);
     assertEquals(0, countPostRollback);
 
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       DB.register(new MyCallback());
-    } finally {
-      DB.rollbackTransaction();
     }
 
     assertEquals(1, countPreCommit);

@@ -2,10 +2,7 @@ package io.ebeaninternal.server.expression;
 
 import io.ebean.InTuples;
 import io.ebean.service.SpiInTuples;
-import io.ebeaninternal.api.BindValuesKey;
-import io.ebeaninternal.api.NaturalKeyQueryData;
-import io.ebeaninternal.api.SpiExpression;
-import io.ebeaninternal.api.SpiExpressionRequest;
+import io.ebeaninternal.api.*;
 
 import java.util.List;
 
@@ -15,7 +12,7 @@ final class InTuplesExpression extends AbstractExpression {
 
   private final boolean not;
   private final String[] properties;
-  private final List<Object[]> entries;
+  private List<Object[]> entries;
 
   InTuplesExpression(InTuples pairs, boolean not) {
     super("");
@@ -28,7 +25,15 @@ final class InTuplesExpression extends AbstractExpression {
 
   @Override
   public boolean naturalKey(NaturalKeyQueryData<?> data) {
-    return false;
+    if (not) {
+      return false;
+    }
+    List<Object[]> copy = data.matchInTuples(properties, entries);
+    if (copy == null) {
+      return false;
+    }
+    entries = copy;
+    return true;
   }
 
   @Override
@@ -37,7 +42,7 @@ final class InTuplesExpression extends AbstractExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (Object[] entry : entries) {
       for (Object value : entry) {
         requireNonNull(value);

@@ -97,7 +97,7 @@ abstract class AbstractExpression implements SpiExpression {
     validation.validate(propName);
   }
 
-  protected final ElPropertyValue getElProp(SpiExpressionRequest request) {
+  protected final ElPropertyValue getElProp(SpiExpressionBind request) {
     return request.descriptor().elGetValue(propName);
   }
 }

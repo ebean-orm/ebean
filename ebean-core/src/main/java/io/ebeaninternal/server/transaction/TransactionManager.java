@@ -5,6 +5,7 @@ import io.ebean.BackgroundExecutor;
 import io.ebean.ProfileLocation;
 import io.ebean.TxScope;
 import io.ebean.annotation.PersistBatch;
+import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxType;
 import io.ebean.cache.ServerCacheNotification;
 import io.ebean.cache.ServerCacheNotify;
@@ -30,6 +31,8 @@ import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.api.DocStoreUpdates;
 
 import jakarta.persistence.PersistenceException;
+import org.jspecify.annotations.Nullable;
+
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -103,6 +106,7 @@ public class TransactionManager implements SpiTransactionManager {
   private final ServerCacheNotify cacheNotify;
   private final boolean supportsSavepointId;
   private final ConcurrentHashMap<String, ProfileLocation> profileLocations = new ConcurrentHashMap<>();
+  private final boolean autoCommitMode;
 
   /**
    * Create the TransactionManager
@@ -112,6 +116,7 @@ public class TransactionManager implements SpiTransactionManager {
     this.logManager = options.logManager;
     this.databasePlatform = options.config.getDatabasePlatform();
     this.supportsSavepointId = databasePlatform.supportsSavepointId();
+    this.autoCommitMode = databasePlatform.platform() == Platform.CLICKHOUSE;
     this.skipCacheAfterWrite = options.config.isSkipCacheAfterWrite();
     this.notifyL2CacheInForeground = options.notifyL2CacheInForeground;
     this.autoPersistUpdates = options.config.isAutoPersistUpdates();
@@ -203,6 +208,10 @@ public class TransactionManager implements SpiTransactionManager {
     }
   }
 
+  final boolean isAutoCommitMode() {
+    return autoCommitMode;
+  }
+
   /**
    * Return true if the DB platform supports SavepointId().
    */
@@ -257,6 +266,7 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   @Override
+  @Nullable
   public final DataSource readOnlyDataSource() {
     return dataSourceSupplier.readOnlyDataSource();
   }
@@ -292,13 +302,6 @@ public class TransactionManager implements SpiTransactionManager {
    */
   public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
     return transactionFactory.createReadOnlyTransaction(tenantId, useMaster);
-  }
-
-  /**
-   * Create a new transaction.
-   */
-  SpiTransaction createTransaction(boolean explicit, Connection c) {
-    return new JdbcTransaction(explicit, c, this);
   }
 
   /**

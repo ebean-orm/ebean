@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.el;
 
+import io.ebeaninternal.api.SpiQueryManyJoin;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
 /**
@@ -10,7 +11,7 @@ import io.ebeaninternal.server.deploy.BeanProperty;
  * joins and set place holders for table alias'.
  * </p>
  */
-public interface ElPropertyDeploy {
+public interface ElPropertyDeploy extends SpiQueryManyJoin {
 
   /**
    * This is the elPrefix for all root level properties.
@@ -80,4 +81,14 @@ public interface ElPropertyDeploy {
    * is left as a 'join' and which get converted to query join.
    */
   int fetchPreference();
+
+  @Override
+  default String path() {
+    return elName();
+  }
+
+  @Override
+  default String fetchOrderBy() {
+    return beanProperty().fetchOrderBy();
+  }
 }

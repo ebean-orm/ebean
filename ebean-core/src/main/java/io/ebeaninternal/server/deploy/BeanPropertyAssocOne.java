@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
@@ -125,15 +124,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         // no imported or exported information
       } else if (!oneToOneExported) {
         importedId = createImportedId(this, targetDescriptor, tableJoin);
-        if (importedId.isScalar()) {
-          // limit JoinColumn mapping to the @Id / primary key
-          TableJoinColumn[] columns = tableJoin.columns();
-          String foreignJoinColumn = columns[0].getForeignDbColumn();
-          String foreignIdColumn = targetDescriptor.idProperty().dbColumn();
-          if (!foreignJoinColumn.equalsIgnoreCase(foreignIdColumn)) {
-            throw new PersistenceException("Mapping limitation - @JoinColumn on " + fullName() + " needs to map to a primary key as per Issue #529 "
-              + " - joining to " + foreignJoinColumn + " and not " + foreignIdColumn);
-          }
+        if (importedId == null) {
+          throw new PersistenceException("Cannot find imported id for " + fullName() + " from " + targetDescriptor
+          + ". If using native-image, possibly missing reflect-config for the Id property.");
         }
       } else {
         exportedProperties = createExported();
@@ -661,6 +654,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void setTenantValue(EntityBean entityBean, Object tenantId) {
     setValue(entityBean, targetDescriptor.createRef(tenantId, null));
+  }
+
+  @Override
+  public void freeze(EntityBean entityBean) {
+    Object value = getValue(entityBean);
+    if (value instanceof EntityBean) {
+      targetDescriptor.freeze((EntityBean) value);
+    }
   }
 
   @Override

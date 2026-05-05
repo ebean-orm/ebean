@@ -20,6 +20,7 @@ public final class TableJoinColumn {
   private final String foreignSqlFormula;
   private final boolean insertable;
   private final boolean updateable;
+  private final boolean nullable;
   /**
    * Hash for including in a query plan
    */
@@ -34,7 +35,8 @@ public final class TableJoinColumn {
     this.localSqlFormula = InternString.intern(deploy.getLocalSqlFormula());
     this.foreignSqlFormula = InternString.intern(deploy.getForeignSqlFormula());
     this.insertable = deploy.isInsertable();
-    this.updateable = deploy.isUpdateable();
+    this.updateable = deploy.isUpdatable();
+    this.nullable = deploy.isNullable();
     this.queryHash = hash();
   }
 
@@ -45,6 +47,7 @@ public final class TableJoinColumn {
     this.foreignSqlFormula = null;
     this.insertable = source.isInsertable();
     this.updateable = source.isUpdateable();
+    this.nullable = source.isNullable();
     this.queryHash = hash();
   }
 
@@ -113,6 +116,13 @@ public final class TableJoinColumn {
    */
   boolean isUpdateable() {
     return updateable;
+  }
+
+  /**
+   * Return if this column is nullable.
+   */
+  public boolean isNullable() {
+    return nullable;
   }
 
   public String getLocalSqlFormula() {

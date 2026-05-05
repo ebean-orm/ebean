@@ -5,8 +5,6 @@ import io.ebean.service.SpiContainer;
 import io.ebean.service.SpiContainerFactory;
 import jakarta.persistence.PersistenceException;
 
-import java.util.Iterator;
-import java.util.ServiceLoader;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -157,10 +155,10 @@ public final class DatabaseFactory {
    * Create the container instance using the configuration.
    */
   private static SpiContainer createContainer(ContainerConfig containerConfig) {
-    Iterator<SpiContainerFactory> factories = ServiceLoader.load(SpiContainerFactory.class).iterator();
-    if (factories.hasNext()) {
-      return factories.next().create(containerConfig);
+    SpiContainerFactory factory = XBootstrapService.containerFactory();
+    if (factory == null) {
+      throw new IllegalStateException("Service loader didn't find a SpiContainerFactory?");
     }
-    throw new IllegalStateException("Service loader didn't find a SpiContainerFactory?");
+    return factory.create(containerConfig);
   }
 }

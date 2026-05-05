@@ -126,6 +126,12 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private boolean loadModuleInfo = true;
 
   /**
+   * When true then include a sql comment in generated SELECT queries with the query
+   * label or profile location label.
+   */
+  private boolean includeLabelInSql = true;
+
+  /**
    * Interesting classes such as entities, embedded, ScalarTypes,
    * Listeners, Finders, Controllers, AttributeConverters etc.
    */
@@ -236,7 +242,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   private PersistBatch persistBatchOnCascade = PersistBatch.INHERIT;
 
-  private int persistBatchSize = 20;
+  private int persistBatchSize = 100;
 
   private EnumType defaultEnumType = EnumType.ORDINAL;
 
@@ -245,7 +251,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   /**
    * The default batch size for lazy loading
    */
-  private int lazyLoadBatchSize = 10;
+  private int lazyLoadBatchSize = 100;
 
   /**
    * The default batch size for 'query joins'.
@@ -305,6 +311,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private boolean skipDataSourceCheck;
 
   private boolean readOnlyDatabase;
+  private boolean shutdownHook = true;
 
   /**
    * The data source (if programmatically provided).
@@ -348,6 +355,8 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    * The naming convention.
    */
   private NamingConvention namingConvention = new UnderscoreNamingConvention();
+
+  private AggregateFormulaContext aggregateFormulaContext = AggregateFormulaContext.builder().build();
 
   /**
    * Behaviour of updates in JDBC batch to by default include all properties.
@@ -475,6 +484,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    * Time to live for query plans - defaults to 5 minutes.
    */
   private int queryPlanTTLSeconds = 60 * 5;
+  private String queryPlanExplain;
 
   /**
    * Set to true to globally disable L2 caching (typically for performance testing).
@@ -544,6 +554,8 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private boolean dumpMetricsOnShutdown;
 
   private String dumpMetricsOptions;
+
+  private LengthCheck lengthCheck = LengthCheck.OFF;
 
   private Function<String, String> metricNaming = MetricNamingMatch.INSTANCE;
 
@@ -1270,6 +1282,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
+  public AggregateFormulaContext aggregateFormulaContext() {
+    return aggregateFormulaContext;
+  }
+
+  @Override
+  public DatabaseConfig aggregateFormulaContext(AggregateFormulaContext aggregateFormulaContext) {
+    this.aggregateFormulaContext = aggregateFormulaContext;
+    return this;
+  }
+
+  @Override
   public boolean isAllQuotedIdentifiers() {
     return platformConfig.isAllQuotedIdentifiers();
   }
@@ -1354,6 +1377,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public boolean readOnlyDatabase() {
     return readOnlyDatabase;
+  }
+
+  @Override
+  public DatabaseBuilder shutdownHook(boolean shutdownHook) {
+    this.shutdownHook = shutdownHook;
+    return this;
+  }
+
+  @Override
+  public boolean shutdownHook() {
+    return shutdownHook;
   }
 
   @Override
@@ -2128,9 +2162,11 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     loadDocStoreSettings(p);
 
     defaultServer = p.getBoolean("defaultServer", defaultServer);
+    shutdownHook = p.getBoolean("shutdownHook", shutdownHook);
     readOnlyDatabase = p.getBoolean("readOnlyDatabase", readOnlyDatabase);
     autoPersistUpdates = p.getBoolean("autoPersistUpdates", autoPersistUpdates);
     loadModuleInfo = p.getBoolean("loadModuleInfo", loadModuleInfo);
+    includeLabelInSql = p.getBoolean("includeLabelInSql", includeLabelInSql);
     maxCallStack = p.getInt("maxCallStack", maxCallStack);
     dumpMetricsOnShutdown = p.getBoolean("dumpMetricsOnShutdown", dumpMetricsOnShutdown);
     dumpMetricsOptions = p.get("dumpMetricsOptions", dumpMetricsOptions);
@@ -2142,6 +2178,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     queryPlanCapturePeriodSecs = p.getLong("queryPlan.capturePeriodSecs", queryPlanCapturePeriodSecs);
     queryPlanCaptureMaxTimeMillis = p.getLong("queryPlan.captureMaxTimeMillis", queryPlanCaptureMaxTimeMillis);
     queryPlanCaptureMaxCount = p.getInt("queryPlan.captureMaxCount", queryPlanCaptureMaxCount);
+    queryPlanExplain = p.get("queryPlan.explain", queryPlanExplain);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     localOnlyL2Cache = p.getBoolean("localOnlyL2Cache", localOnlyL2Cache);
@@ -2195,6 +2232,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     jdbcFetchSizeFindEach = p.getInt("jdbcFetchSizeFindEach", jdbcFetchSizeFindEach);
     jdbcFetchSizeFindList = p.getInt("jdbcFetchSizeFindList", jdbcFetchSizeFindList);
     databasePlatformName = p.get("databasePlatformName", databasePlatformName);
+    lengthCheck = p.getEnum(LengthCheck.class, "lengthCheck", lengthCheck);
 
     uuidVersion = p.getEnum(UuidVersion.class, "uuidVersion", uuidVersion);
     uuidStateFile = p.get("uuidStateFile", uuidStateFile);
@@ -2393,6 +2431,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
+  public String getQueryPlanExplain() {
+    return queryPlanExplain;
+  }
+
+  @Override
+  public DatabaseBuilder queryPlanExplain(String queryPlanExplain) {
+    this.queryPlanExplain = queryPlanExplain;
+    return this;
+  }
+
+  @Override
   public DatabaseConfig setQueryPlanTTLSeconds(int queryPlanTTLSeconds) {
     this.queryPlanTTLSeconds = queryPlanTTLSeconds;
     return this;
@@ -2544,6 +2593,11 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     return loadModuleInfo;
   }
 
+  @Override
+  public boolean isIncludeLabelInSql() {
+    return includeLabelInSql;
+  }
+
   /**
    * @deprecated - migrate to {@link #isLoadModuleInfo()}.
    */
@@ -2561,6 +2615,12 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
+  public DatabaseConfig includeLabelInSql(boolean includeLabelInSql) {
+    this.includeLabelInSql = includeLabelInSql;
+    return this;
+  }
+
+  @Override
   public Function<String, String> getMetricNaming() {
     return metricNaming;
   }
@@ -2568,6 +2628,19 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public DatabaseConfig setMetricNaming(Function<String, String> metricNaming) {
     this.metricNaming = metricNaming;
+    return this;
+  }
+
+  /**
+   * Returns the length check mode.
+   */
+  public LengthCheck getLengthCheck() {
+    return lengthCheck;
+  }
+
+  @Override
+  public DatabaseConfig lengthCheck(LengthCheck lengthCheck) {
+    this.lengthCheck = lengthCheck;
     return this;
   }
 

@@ -8,7 +8,8 @@ import java.util.List;
 public class MRole {
 
   @Id
-  Integer roleid;
+  @Column(name = "role_id")
+  Integer roleId;
 
   String roleName;
 
@@ -23,12 +24,12 @@ public class MRole {
     this.roleName = roleName;
   }
 
-  public Integer getRoleid() {
-    return roleid;
+  public Integer getRoleId() {
+    return roleId;
   }
 
-  public void setRoleid(Integer roleid) {
-    this.roleid = roleid;
+  public void setRoleId(Integer roleId) {
+    this.roleId = roleId;
   }
 
   public String getRoleName() {
@@ -61,8 +62,8 @@ public class MRole {
     // Make sure other is not null and has the same class as this
     if (other != null && getClass().equals(other.getClass())) {
       final MRole rhs = (MRole) other;
-      if (roleid.equals(rhs.roleid)) {
-        if (roleid == 0) {
+      if (roleId.equals(rhs.roleId)) {
+        if (roleId == 0) {
           return false;
         } else {
           return true;
@@ -74,8 +75,8 @@ public class MRole {
 
   @Override
   public int hashCode() {
-    if (roleid != null && roleid != 0) {
-      int rid = roleid;
+    if (roleId != null && roleId != 0) {
+      int rid = roleId;
       return (int) (rid ^ (rid >>> 32));
     }
     return super.hashCode();

@@ -36,6 +36,11 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   }
 
   @Override
+  public Set<E> freeze() {
+    return set == null ? null : Collections.unmodifiableSet(set);
+  }
+
+  @Override
   public void toString(ToStringBuilder builder) {
     builder.addCollection(set);
   }
@@ -212,7 +217,6 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   @Override
   public boolean add(E bean) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       if (set.add(bean)) {
@@ -227,7 +231,6 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   @Override
   public boolean addAll(Collection<? extends E> beans) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       boolean changed = false;
@@ -245,7 +248,6 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   @Override
   public void clear() {
-    checkReadOnly();
     initClear();
     if (modifyListening) {
       for (E bean : set) {
@@ -276,9 +278,6 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   @Override
   public Iterator<E> iterator() {
     init();
-    if (readOnly) {
-      return new ReadOnlyIterator<>(set.iterator());
-    }
     if (modifyListening) {
       return new ModifyIterator<>(this, set.iterator());
     }
@@ -287,7 +286,6 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   @Override
   public boolean remove(Object bean) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       if (set.remove(bean)) {
@@ -301,7 +299,6 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   @Override
   public boolean removeAll(Collection<?> beans) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       boolean changed = false;
@@ -318,7 +315,6 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
 
   @Override
   public boolean retainAll(Collection<?> beans) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       boolean changed = false;
@@ -356,36 +352,4 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     return set.toArray(array);
   }
 
-  private static final class ReadOnlyIterator<E> implements Iterator<E>, Serializable {
-
-    private static final long serialVersionUID = 2577697326745352605L;
-
-    private final Iterator<E> it;
-
-    ReadOnlyIterator(Iterator<E> it) {
-      this.it = it;
-    }
-
-    @Override
-    public boolean hasNext() {
-      return it.hasNext();
-    }
-
-    @Override
-    public E next() {
-      return it.next();
-    }
-
-    @Override
-    public void remove() {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
-    }
-  }
-
-  @Override
-  public BeanCollection<E> shallowCopy() {
-    BeanSet<E> copy = new BeanSet<>(new LinkedHashSet<>(set));
-    copy.setFromOriginal(this);
-    return copy;
-  }
 }

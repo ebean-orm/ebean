@@ -2,7 +2,6 @@ package io.ebeaninternal.api;
 
 import io.ebeaninternal.server.transaction.TransactionScopeManager;
 import io.ebeaninternal.server.util.ArrayStack;
-
 import jakarta.persistence.PersistenceException;
 
 /**
@@ -169,8 +168,35 @@ public final class ScopedTransaction extends SpiTransactionProxy {
   /**
    * Maybe rollback based on TxScope rollback on settings.
    */
-  public Exception caughtThrowable(Exception e) {
+  public <T extends Exception> T caughtThrowable(T e) {
     return current.caughtThrowable(e);
+  }
+
+  /**
+   * New user objects are always written to the current ScopeTrans.
+   */
+  @Override
+  public void putUserObject(String name, Object value) {
+    current.putUserObject(name, value);
+  }
+
+  /**
+   * Returns the userObject in the stack, Herew we search
+   * the stack and return the first found userObject
+   */
+  @Override
+  public Object getUserObject(String name) {
+    Object obj = current.getUserObject(name);
+    if (obj != null) {
+      return obj;
+    }
+    for (ScopeTrans trans : stack) {
+      obj = trans.getUserObject(name);
+      if (obj != null) {
+        return obj;
+      }
+    }
+    return transaction.getUserObject(name);
   }
 
 }

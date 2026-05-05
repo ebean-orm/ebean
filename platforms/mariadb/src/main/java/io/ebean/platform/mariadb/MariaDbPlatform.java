@@ -16,6 +16,7 @@ public class MariaDbPlatform extends BaseMySqlPlatform {
     super();
     this.platform = Platform.MARIADB;
     this.sequenceBatchMode = false;
+    this.selectCountWithColumnAlias = true;
     // for MariaDB probably turn off forwardOnlyHintOnFindIterate with later driver
     // this.forwardOnlyHintOnFindIterate = false;
     this.historySupport = new MariaDbHistorySupport();

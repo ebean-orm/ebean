@@ -10,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Service provided by Ebean for parsing and column mapping raw SQL queries.
  */
-public interface SpiRawSqlService {
+public interface SpiRawSqlService extends BootstrapService {
 
   /**
    * Create based on a JDBC ResultSet.

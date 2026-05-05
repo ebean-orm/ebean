@@ -17,6 +17,7 @@ import jakarta.persistence.PersistenceException;
 import jakarta.persistence.RollbackException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -67,7 +68,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   private int depth;
   private boolean autoCommit;
   private IdentityHashMap<Object, Object> persistingBeans;
-  private HashSet<Integer> deletingBeansHash;
+  private Map<Class<?>, Set<Object>> deletingBeans;
   private HashMap<String, String> m2mIntersectionSave;
   private Map<String, Object> userObjects;
   private List<TransactionCallback> callbackList;
@@ -89,12 +90,17 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
    */
   private final boolean skipCacheAfterWrite;
   DocStoreTransaction docStoreTxn;
-  private ProfileStream profileStream;
+  protected ProfileStream profileStream;
   private ProfileLocation profileLocation;
+  private final Instant startTime = Instant.now();
   private final long startNanos;
   private boolean autoPersistUpdates;
 
   JdbcTransaction(boolean explicit, Connection connection, TransactionManager manager) {
+    this(false, explicit, connection, manager);
+  }
+
+  JdbcTransaction(boolean autoCommit, boolean explicit, Connection connection, TransactionManager manager) {
     try {
       this.active = true;
       this.explicit = explicit;
@@ -123,7 +129,9 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
         this.onQueryOnlyCommit = true;
       }
 
-      checkAutoCommit(connection);
+      if (!autoCommit) {
+        checkAutoCommit(connection);
+      }
 
     } catch (Exception e) {
       throw new PersistenceException(e);
@@ -141,8 +149,8 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   }
 
   @Override
-  public final long startNanoTime() {
-    return startNanos;
+  public final Instant startTime() {
+    return startTime;
   }
 
   @Override
@@ -199,11 +207,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public final boolean isAutoPersistUpdates() {
     return autoPersistUpdates;
-  }
-
-  @Override
-  public final boolean isSkipCacheExplicit() {
-    return (skipCache != null && !skipCache);
   }
 
   @Override
@@ -326,40 +329,28 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     deferredList.add(derived);
   }
 
-  /**
-   * Add a bean to the registed list.
-   * <p>
-   * This is to handle bi-directional relationships where both sides Cascade.
-   * </p>
-   */
   @Override
-  public final void registerDeleteBean(Integer persistingBean) {
-    if (deletingBeansHash == null) {
-      deletingBeansHash = new HashSet<>();
+  public final void registerDeleteBean(Class<?> type, Object id) {
+    deleteBeanIds(type).add(id);
+  }
+
+  @Override
+  public final boolean isRegisteredDeleteBean(Class<?> type, Object id) {
+    return deleteBeanIds(type).contains(id);
+  }
+
+  private Set<Object> deleteBeanIds(Class<?> type) {
+    if (deletingBeans == null) {
+      deletingBeans = new HashMap<>();
     }
-    deletingBeansHash.add(persistingBean);
+    return deletingBeans.computeIfAbsent(type, k -> new HashSet<>());
   }
 
-  /**
-   * Return true if this is a bean that has already been saved/deleted.
-   */
-  @Override
-  public final boolean isRegisteredDeleteBean(Integer persistingBean) {
-    return deletingBeansHash != null && deletingBeansHash.contains(persistingBean);
-  }
-
-  /**
-   * Unregister the persisted beans (when persisting at the top level).
-   */
   @Override
   public final void unregisterBeans() {
     persistingBeans.clear();
   }
 
-  /**
-   * Return true if this is a bean that has already been saved. This will
-   * register the bean if it is not already.
-   */
   @Override
   public final boolean isRegisteredBean(Object bean) {
     if (persistingBeans == null) {
@@ -368,10 +359,6 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
     return (persistingBeans.put(bean, PLACEHOLDER) != null);
   }
 
-  /**
-   * Return true if the m2m intersection save is allowed from a given bean direction.
-   * This is to stop m2m intersection management via both directions of a m2m.
-   */
   @Override
   public final boolean isSaveAssocManyIntersection(String intersectionTable, String beanName) {
     if (m2mIntersectionSave == null) {
@@ -417,6 +404,10 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public final void markNotQueryOnly() {
     this.queryOnly = false;
+    // if the transaction is readonly, it should not allow updates/deletes
+    if (localReadOnly){
+      throw new IllegalStateException("This transaction is read-only");
+    }
   }
 
   @Override
@@ -1080,6 +1071,11 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
   @Override
   public boolean isActive() {
     return active;
+  }
+
+  @Override
+  public void deactivateExternal() {
+    this.active = false;
   }
 
   @Override

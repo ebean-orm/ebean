@@ -4,6 +4,7 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
 import org.tests.model.basic.Contact;
@@ -18,10 +19,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestQueryCacheTableDependency extends BaseTestCase {
 
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
+
   @Test
   public void testFindCountOnDependent() {
-
-    ResetBasicData.reset();
 
     ServerCache customerCache = DB.cacheManager().queryCache(Customer.class);
     customerCache.clear();
@@ -30,13 +34,13 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
       .where().eq("line2", "St Lukes")
       .findList();
 
-    int custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    int custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lukes")
       .findCount();
 
     assertThat(custs).isEqualTo(3);
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lukes")
       .findCount();
 
@@ -46,14 +50,14 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
     a1.setLine2("St Lucky");
     DB.save(a1);
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lukes")
       .findCount();
 
     assertThat(custs).isEqualTo(2);
 
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lucky")
       .findCount();
 
@@ -64,13 +68,13 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
       .where().eq("line2", "St Lucky")
       .update();
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lucky")
       .findCount();
 
     assertThat(custs).isEqualTo(0);
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lucky2")
       .findCount();
     assertThat(custs).isEqualTo(1);
@@ -79,12 +83,12 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
       .setParameters("St Lucky3", "St Lucky2")
       .execute();
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lucky2")
       .findCount();
     assertThat(custs).isEqualTo(0);
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lucky3")
       .findCount();
 
@@ -95,11 +99,9 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
   @Test
   public void testFindCountOnOtherL2Cached() {
 
-    ResetBasicData.reset();
-
     Customer fi = DB.find(Customer.class).where().eq("name", "Fiona").findOne();
 
-    int custCount0 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    int custCount0 = DB.find(Customer.class).setUseQueryCache(true)
       .where()
       .eq("name", "Fiona")
       .isNull("contacts.phone")
@@ -115,7 +117,7 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
 
     assertThat(updateRows).isGreaterThan(0);
 
-    int custCount1 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    int custCount1 = DB.find(Customer.class).setUseQueryCache(true)
       .where()
       .eq("name", "Fiona")
       .isNull("contacts.phone")

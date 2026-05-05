@@ -30,13 +30,13 @@ public class BeanFindControllerTest extends BaseTestCase {
     var config = new DatabaseConfig();
 
     config.setName("h2otherfind");
+    config.setRegister(false);
+    config.setDefaultServer(false);
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.setDdlExtra(false);
 
-    config.setRegister(false);
-    config.setDefaultServer(false);
     config.add(new ModUuidGenerator());
     config.addClass(EBasic.class);
     config.addClass(ECustomId.class);
@@ -173,13 +173,13 @@ public class BeanFindControllerTest extends BaseTestCase {
     DatabaseConfig config = new DatabaseConfig();
 
     config.setName("h2otherfind");
+    config.setRegister(false);
+    config.setDefaultServer(false);
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.setDdlExtra(false);
 
-    config.setRegister(false);
-    config.setDefaultServer(false);
     config.add(new ModUuidGenerator());
     config.addClass(FindControllerMain.class);
     config.addClass(SoftRefA.class);

@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 /**
@@ -35,7 +35,7 @@ import java.util.List;
  *   public List<Customer> findNew() {
  *     return query().where()
  *       .eq("status", Customer.Status.NEW)
- *       .order("name")
+ *       .orderBy("name")
  *       .findList()
  *   }
  * }
@@ -60,7 +60,7 @@ import java.util.List;
  * @see BeanRepository
  * @see BeanFinder
  */
-@NonNullApi
+@NullMarked
 public class Finder<I, T> {
 
   /**

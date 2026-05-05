@@ -1,33 +1,11 @@
 package io.ebeaninternal.server.query;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
-import io.ebean.CacheMode;
-import io.ebean.CountDistinctOrder;
-import io.ebean.Database;
-import io.ebean.DtoQuery;
-import io.ebean.Expression;
-import io.ebean.ExpressionFactory;
-import io.ebean.ExpressionList;
-import io.ebean.FetchConfig;
-import io.ebean.FetchGroup;
-import io.ebean.FetchPath;
-import io.ebean.FutureIds;
-import io.ebean.FutureList;
-import io.ebean.FutureRowCount;
-import io.ebean.OrderBy;
-import io.ebean.PagedList;
-import io.ebean.PersistenceContextScope;
-import io.ebean.ProfileLocation;
-import io.ebean.Query;
-import io.ebean.QueryIterator;
-import io.ebean.QueryType;
-import io.ebean.RawSql;
-import io.ebean.Transaction;
-import io.ebean.UpdateQuery;
-import io.ebean.Version;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+import io.ebean.*;
 import io.ebean.service.SpiFetchGroupQuery;
 import io.ebeaninternal.api.SpiQueryFetch;
+import io.ebeaninternal.server.expression.DefaultExpressionList;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.SpiFetchGroup;
 
@@ -45,7 +23,7 @@ import java.util.stream.Stream;
 /**
  * Implementation of FetchGroup query for use to create FetchGroup via query beans.
  */
-@NonNullApi
+@NullMarked
 final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQueryFetch {
 
   private static final FetchConfig FETCH_CACHE = FetchConfig.ofCache();
@@ -53,10 +31,16 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   private static final FetchConfig FETCH_LAZY = FetchConfig.ofLazy();
 
   private OrmQueryDetail detail = new OrmQueryDetail();
+  private OrderBy<T> orderBy;
 
   @Override
   public FetchGroup<T> buildFetchGroup() {
     return new DFetchGroup<>(detail);
+  }
+
+  @Override
+  public Query<T> distinctOn(String distinctOn) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
@@ -68,7 +52,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   @SuppressWarnings("rawtypes")
   @Override
   public Query<T> select(FetchGroup fetchGroup) {
-    this.detail = ((SpiFetchGroup) fetchGroup).detail();
+    this.detail = ((SpiFetchGroup) fetchGroup).detail(detail);
     return this;
   }
 
@@ -131,6 +115,11 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   @Override
   public Query<T> setLabel(String label) {
     return this;
+  }
+
+  @Override
+  public Query<T> setHint(String hint) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
   // Everything else deemed invalid
@@ -221,7 +210,17 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
+  public Query<T> also(Consumer<Query<T>> apply) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
   public Query<T> alsoIf(BooleanSupplier predicate, Consumer<Query<T>> apply) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public Query<T> alsoIfPresent(@Nullable Object value, Consumer<Query<T>> apply) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
@@ -241,7 +240,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
-  public Query<T> usingMaster() {
+  public Query<T> usingMaster(boolean useMaster) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
@@ -347,17 +346,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
-  public int delete(Transaction transaction) {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
   public int update() {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
-  }
-
-  @Override
-  public int update(Transaction transaction) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
@@ -378,6 +367,11 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
 
   @Override
   public FutureList<T> findFutureList() {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public <K> FutureMap<K,T> findFutureMap() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 
@@ -423,7 +417,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
 
   @Override
   public ExpressionList<T> where() {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+    return DefaultExpressionList.forFetchGroup(this);
   }
 
   @Override
@@ -453,7 +447,10 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
 
   @Override
   public OrderBy<T> orderBy() {
-    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+    if (orderBy == null) {
+      orderBy = new OrderBy<>();
+    }
+    return orderBy;
   }
 
   @Override
@@ -492,6 +489,11 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
+  public Query<T> setPaging(Paging paging) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
   public Query<T> setMapKey(String mapKey) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
@@ -512,7 +514,7 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
-  public Query<T> setReadOnly(boolean readOnly) {
+  public Query<T> setUnmodifiable(boolean unmodifiable) {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }
 

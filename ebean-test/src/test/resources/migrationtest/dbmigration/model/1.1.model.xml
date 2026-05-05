@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <migration xmlns="http://ebean-orm.github.io/xml/ns/dbmigration">
     <changeSet type="apply">
+        <alterColumn columnName="something" tableName="migtest_ckey_detail" type="varchar" currentType="varchar(255)" currentNotnull="false"/>
         <addColumn tableName="migtest_ckey_detail">
             <column name="one_key" type="integer"/>
             <column name="two_key" type="varchar(127)"/>

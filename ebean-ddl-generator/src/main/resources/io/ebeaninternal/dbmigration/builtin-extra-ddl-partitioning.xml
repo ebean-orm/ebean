@@ -10,6 +10,7 @@
 -- Type used to hold common partitioning parameters such as period start and end etc
 ------------------------------------------------------------------------------------
 do $$
+-- play-ebean-start
 begin
   if not exists (select 1 from pg_type where typname = 'partition_meta') THEN
     create type partition_meta as
@@ -22,7 +23,9 @@ begin
       part_name      text
     );
   end if;
-end$$;
+end;
+-- play-ebean-end
+$$;
 
 ------------------------------------------------------------------------------------
 -- Function: _partition_create
@@ -34,6 +37,7 @@ create or replace function _partition_create(meta partition_meta)
 language plpgsql
 set timezone to 'UTC'
 as $$
+-- play-ebean-start
 begin
   if (meta.schema_name = '') then
     execute format('create table if not exists %I partition of %I for values from (''%s'') TO (''%s'')', meta.part_name, meta.base_name, meta.period_start, meta.period_end);
@@ -42,6 +46,7 @@ begin
   end if;
   return meta.part_name;
 end;
+-- play-ebean-end
 $$;
 
 
@@ -60,6 +65,7 @@ create or replace function _partition_meta(
 language plpgsql
 set timezone to 'UTC'
 as $$
+-- play-ebean-start
 declare
   partName  text;
   meta      partition_meta;
@@ -92,6 +98,7 @@ begin
 
   return meta;
 end;
+-- play-ebean-end
 $$;
 
 ------------------------------------------------------------------------------------
@@ -108,6 +115,7 @@ create or replace function _partition_over(
   returns TABLE(of_date date)
 language plpgsql
 as $$
+-- play-ebean-start
 declare
   endDate date;
 begin
@@ -132,6 +140,7 @@ begin
     return query select s::date from generate_series(fromDate, endDate, '1 month') s;
   end if;
 end;
+-- play-ebean-end
 $$;
 
 
@@ -158,11 +167,13 @@ create or replace function partition(
 language plpgsql
 set timezone to 'UTC'
 as $$
+-- play-ebean-start
 begin
   perform _partition_create(_partition_meta(mode, poDate, baseName, schemaName))
   from _partition_over(mode, fromDate, partitionCount) poDate;
   return 'done';
 end;
+-- play-ebean-end
 $$;
 </ddl-script>
 

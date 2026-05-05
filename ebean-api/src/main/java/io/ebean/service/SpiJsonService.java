@@ -17,7 +17,7 @@ import java.util.Set;
  *
  * Supports converting between JSON content and simple java Maps/Lists.
  */
-public interface SpiJsonService {
+public interface SpiJsonService extends BootstrapService {
 
   /**
    * Write the nested Map/List as json.

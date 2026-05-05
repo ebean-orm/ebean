@@ -61,6 +61,7 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
   /**
    * Execute the update or delete statement returning the row count.
    */
+  @SuppressWarnings("resource")
   public int execute() throws SQLException {
     long startNano = System.nanoTime();
     try {
@@ -109,6 +110,7 @@ final class CQueryUpdate implements SpiProfileTransactionEvent, CancelableQuery 
     pstmt = null;
   }
 
+  @SuppressWarnings("resource")
   @Override
   public void profile() {
     transaction()

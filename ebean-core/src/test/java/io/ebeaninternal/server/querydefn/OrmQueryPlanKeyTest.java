@@ -30,6 +30,27 @@ public class OrmQueryPlanKeyTest extends BaseTest {
   }
 
   @Test
+  public void equals_when_hintIsDifferent_expect_different() {
+    DefaultOrmQuery<Customer> q1 = query();
+    q1.setHint("a");
+    assertDifferent(q1, query());
+
+    DefaultOrmQuery<Customer> q2 = query();
+    q2.setHint("b");
+    assertDifferent(q1, q2);
+  }
+
+  @Test
+  public void equals_when_hintIsSame() {
+    DefaultOrmQuery<Customer> q1 = query();
+    q1.setHint("b");
+    DefaultOrmQuery<Customer> q2 = query();
+    q2.setHint("b");
+
+    assertSame(q1, q2);
+  }
+
+  @Test
   public void equals_when_diffTableJoinNull() {
 
     DefaultOrmQuery<Customer> q1 = query();
@@ -130,11 +151,11 @@ public class OrmQueryPlanKeyTest extends BaseTest {
   @Test
   public void equals_when_diffOrderByNull() {
 
-    CQueryPlanKey key1 = planKey(query().order("id"));
+    CQueryPlanKey key1 = planKey(query().orderBy("id"));
     CQueryPlanKey key2 = planKey(query());
     assertDifferent(key1, key2);
 
-    key1 = planKey(query().order().asc("id"));
+    key1 = planKey(query().orderBy().asc("id"));
     key2 = planKey(query());
     assertDifferent(key1, key2);
   }
@@ -142,8 +163,8 @@ public class OrmQueryPlanKeyTest extends BaseTest {
   @Test
   public void equals_when_orderBySame() {
 
-    CQueryPlanKey key1 = planKey(query().order("id, name"));
-    CQueryPlanKey key2 = planKey(query().order("id, name"));
+    CQueryPlanKey key1 = planKey(query().orderBy("id, name"));
+    CQueryPlanKey key2 = planKey(query().orderBy("id, name"));
     assertSame(key1, key2);
   }
 

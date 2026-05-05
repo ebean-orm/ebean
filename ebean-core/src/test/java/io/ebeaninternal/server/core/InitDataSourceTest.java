@@ -196,10 +196,6 @@ public class InitDataSourceTest {
     public void dataSourceDown(DataSource dataSource, SQLException reason) {
     }
 
-    @Override
-    public void dataSourceWarning(DataSource dataSource, String msg) {
-    }
-
   }
 
   @Test

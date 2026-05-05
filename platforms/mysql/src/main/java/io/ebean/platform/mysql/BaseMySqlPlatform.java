@@ -13,6 +13,7 @@ public abstract class BaseMySqlPlatform extends DatabasePlatform {
   public BaseMySqlPlatform() {
     super();
     this.useExtraTransactionOnIterateSecondaryQueries = true;
+    this.selectCountWithColumnAlias = true;
     this.selectCountWithAlias = true;
     this.supportsSavepointId = false;
     this.inlineSqlUpdateLimit = true;

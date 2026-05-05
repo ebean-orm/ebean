@@ -1,6 +1,7 @@
 package org.tests.json;
 
 import io.ebean.DB;
+import io.ebean.annotation.Platform;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonBString;
@@ -38,10 +39,21 @@ class TestDbJsonBStringType {
 
 
     // change content only
-    found.content("{\"mykey\": 95}");
+    found.content("{\"mykey\": 95, \"other\": \"AI\"}");
     DB.save(found);
     sql = LoggedSql.stop();
     assertThat(sql.get(0)).contains("update ebasic_json_bstring set content=?, version=? where id=? and version=?");
 
+
+    if (DB.getDefault().platform() == Platform.POSTGRES) {
+      List<EBasicJsonBString> result = DB.find(EBasicJsonBString.class)
+        .where()
+        .raw("content -> 'other' ?? ?", "AI")
+        .raw("jsonb_exists(content -> 'other', ?)", "AI")
+        .raw("jsonb_path_exists(content, '$.other ? (@ >= $param)', '{\"param\":\"AI\"}')")
+        .findList();
+
+      assertThat(result).hasSize(1);
+    }
   }
 }

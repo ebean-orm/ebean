@@ -23,10 +23,6 @@ public final class QueryFutureIds<T> extends BaseFuture<List<Object>> implements
     return futureTask;
   }
 
-  public Transaction transaction() {
-    return call.transaction;
-  }
-
   @Override
   public Query<T> getQuery() {
     return call.query;

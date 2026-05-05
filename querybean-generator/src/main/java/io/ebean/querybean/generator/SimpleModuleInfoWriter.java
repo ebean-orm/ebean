@@ -88,7 +88,7 @@ class SimpleModuleInfoWriter {
       for (Set<String> value : processingContext.getOtherDbEntities().values()) {
         allEntities.addAll(value);
       }
-
+      allEntities.addAll(processingContext.getMappedSuper());
       if (!allEntities.isEmpty()) {
         FileObject jfo = processingContext.createNativeImageWriter(factoryPackage + ".ebean-entity");
         if (jfo != null) {
@@ -104,6 +104,13 @@ class SimpleModuleInfoWriter {
             writer.write("\n  {\"name\": \"");
             writer.write(entity);
             writer.write("\", \"allDeclaredConstructors\": true, \"allDeclaredFields\": true}");
+          }
+          if (processingContext.hasOtherClasses()) {
+            for (String otherClass : processingContext.getOtherClasses()) {
+              writer.write(",\n  {\"name\": \"");
+              writer.write(otherClass);
+              writer.write("\", \"allDeclaredConstructors\": true}");
+            }
           }
           writer.write("\n]\n");
           writer.write("\n");
@@ -186,7 +193,7 @@ class SimpleModuleInfoWriter {
   private void writeMethodEntityClasses(Set<String> dbEntities, String dbName) {
     String method = "defaultEntityClasses";
     if (dbName != null) {
-      method = "entitiesFor_" + dbName;
+      method = "entitiesFor_" + Util.stripForMethod(dbName);
       writeMethodComment("Entities for @DbName(name=\"%s\"))", dbName);
     } else {
       writeMethodComment("Entities with no @DbName", dbName);
@@ -216,7 +223,7 @@ class SimpleModuleInfoWriter {
   private void writeMethodEntityClassesFor(Set<String> otherDbNames) {
     writer.append("  private List<Class<?>> classesFor(String dbName) {").eol();
     for (String dbName : otherDbNames) {
-      writer.append("    if (\"%s\".equals(dbName)) return entitiesFor_%s();", dbName, dbName).eol();
+      writer.append("    if (\"%s\".equals(dbName)) return entitiesFor_%s();", dbName, Util.stripForMethod(dbName)).eol();
     }
     writer.append("    return new ArrayList<>();").eol();
     writer.append("  }").eol().eol();

@@ -23,6 +23,7 @@ public class QContactTest {
     var query = new QContact()
       .firstName.isNotNull()
       .email.isNotNull()
+      .others.filterMany(o -> o.something.gt(43))
       .inTuples(inTuples)
       .query();
 

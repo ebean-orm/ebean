@@ -11,8 +11,8 @@ public final class RsetDataReaderIndexed extends RsetDataReader {
 
   private final int[] rsetIndexPositions;
 
-  public RsetDataReaderIndexed(DataTimeZone dataTimeZone, ResultSet rset, int[] rsetIndexPositions) {
-    super(dataTimeZone, rset);
+  public RsetDataReaderIndexed(boolean unmodifiable, DataTimeZone dataTimeZone, ResultSet rset, int[] rsetIndexPositions) {
+    super(unmodifiable, dataTimeZone, rset);
     this.rsetIndexPositions = rsetIndexPositions;
   }
 

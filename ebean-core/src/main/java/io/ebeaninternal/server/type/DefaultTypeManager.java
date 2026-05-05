@@ -7,6 +7,7 @@ import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.*;
+import io.ebean.plugin.Lookups;
 import io.ebean.types.Cidr;
 import io.ebean.types.Inet;
 import io.ebean.util.AnnotationUtil;
@@ -20,6 +21,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.EnumType;
 import java.io.File;
+import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -214,6 +216,9 @@ public final class DefaultTypeManager implements TypeManager {
       }
       found = checkInheritedTypes(type);
     }
+    if (found instanceof ScalarTypeClass) {
+      log.log(WARNING, "@Column mapping for type Class is deprecated. Please refer to https://ebean.io/docs/deprecated#class-mapping");
+    }
     return found != ScalarTypeNotFound.INSTANCE ? found : null; // Do not return ScalarTypeNotFound, otherwise checks will fail
   }
 
@@ -369,7 +374,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private ScalarType<?> createJsonObjectMapperType(DeployBeanProperty prop, int dbType, DocPropertyType docType) {
     if (jsonMapper == null) {
-      throw new IllegalArgumentException("Unsupported @DbJson mapping - Jackson ObjectMapper not present for " + prop);
+      throw new IllegalArgumentException("Unsupported @DbJson mapping - Missing dependency ebean-jackson-mapper? Jackson ObjectMapper not present for " + prop);
     }
     if (MutationDetection.DEFAULT == prop.getMutationDetection()) {
       prop.setMutationDetection(jsonManager.mutationDetection());
@@ -597,19 +602,20 @@ public final class DefaultTypeManager implements TypeManager {
   private void initialiseCustomScalarTypes(BootupClasses bootupClasses) {
     for (Class<? extends ScalarType<?>> cls : bootupClasses.getScalarTypes()) {
       try {
+        var lookup = Lookups.getLookup(cls);
         ScalarType<?> scalarType;
         if (objectMapper == null) {
-          scalarType = cls.getDeclaredConstructor().newInstance();
+          scalarType = Lookups.newDefaultInstance(cls);
         } else {
           try {
             // first try objectMapper constructor
-            scalarType = cls.getDeclaredConstructor(ObjectMapper.class).newInstance(objectMapper);
+            scalarType = (ScalarType<?>) lookup.findConstructor(cls, MethodType.methodType(ObjectMapper.class)).invoke(objectMapper);
           } catch (NoSuchMethodException e) {
-            scalarType = cls.getDeclaredConstructor().newInstance();
+            scalarType = Lookups.newDefaultInstance(cls);
           }
         }
         add(scalarType);
-      } catch (Exception e) {
+      } catch (Throwable e) {
         log.log(ERROR, "Error loading ScalarType " + cls.getName(), e);
       }
     }
@@ -639,11 +645,11 @@ public final class DefaultTypeManager implements TypeManager {
         if (wrappedType == null) {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
-        ScalarTypeConverter converter = foundType.getDeclaredConstructor().newInstance();
+        ScalarTypeConverter converter = Lookups.newDefaultInstance(foundType);
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, converter);
         log.log(DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
         add(stw);
-      } catch (Exception e) {
+      } catch (Throwable e) {
         log.log(ERROR, "Error registering ScalarTypeConverter " + foundType.getName(), e);
       }
     }
@@ -663,11 +669,11 @@ public final class DefaultTypeManager implements TypeManager {
         if (wrappedType == null) {
           throw new IllegalStateException("Could not find ScalarType for: " + paramTypes[1]);
         }
-        AttributeConverter converter = foundType.getDeclaredConstructor().newInstance();
+        AttributeConverter converter =  Lookups.newDefaultInstance(foundType);
         ScalarTypeWrapper stw = new ScalarTypeWrapper(logicalType, wrappedType, new AttributeConverterAdapter(converter));
         log.log(DEBUG, "Register ScalarTypeWrapper from {0} -> {1} using:{2}", logicalType, persistType, foundType);
         add(stw);
-      } catch (Exception e) {
+      } catch (Throwable e) {
         log.log(ERROR, "Error registering AttributeConverter " + foundType.getName(), e);
       }
     }

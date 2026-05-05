@@ -14,6 +14,7 @@ import io.ebeanservice.docstore.api.DocStoreTransaction;
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 
 /**
  * Extends Transaction with additional API required on server.
@@ -64,12 +65,12 @@ public interface SpiTransaction extends Transaction {
    * <p>
    * This is to handle bi-directional relationships where both sides Cascade.
    */
-  void registerDeleteBean(Integer hash);
+  void registerDeleteBean(Class<?> type, Object id);
 
   /**
    * Return true if this is a bean that has already been saved/deleted.
    */
-  boolean isRegisteredDeleteBean(Integer hash);
+  boolean isRegisteredDeleteBean(Class<?> type, Object id);
 
   /**
    * Unregister the persisted beans. Expected after persisting top level beans
@@ -95,7 +96,7 @@ public interface SpiTransaction extends Transaction {
   /**
    * Return the start timestamp for the transaction (JVM side).
    */
-  long startNanoTime();
+  Instant startTime();
 
   /**
    * Return true if this transaction has updateAllLoadedProperties set.
@@ -338,11 +339,6 @@ public interface SpiTransaction extends Transaction {
   boolean isNestedUseSavepoint();
 
   /**
-   * Return true if explicitly set to skip cache (ignores skipOnWrite).
-   */
-  boolean isSkipCacheExplicit();
-
-  /**
    * Fire pre commit processing/listeners.
    */
   void preCommit();
@@ -357,4 +353,18 @@ public interface SpiTransaction extends Transaction {
    */
   void postRollback(Throwable cause);
 
+  /**
+   * Set the transaction to be inactive via external transaction manager.
+   */
+  void deactivateExternal();
+
+  /**
+   * Set autocommit to false for a findIterate query.
+   * <p>
+   * This is done for specific platforms that need it, in order to make
+   * use cursors to stream a large or unbounded query result to the client.
+   */
+  default void setAutoCommitOnFindIterate() {
+    throw new UnsupportedOperationException();
+  }
 }

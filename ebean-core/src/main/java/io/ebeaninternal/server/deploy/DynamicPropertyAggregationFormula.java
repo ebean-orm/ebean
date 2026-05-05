@@ -63,7 +63,12 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
   }
 
   @Override
-  public boolean isDbLob() {
+  public final void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
+    ctx.appendParseSelect(parsedFormula, null);
+  }
+
+  @Override
+  public boolean isLobForPlatform() {
     return false;
   }
 

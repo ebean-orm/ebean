@@ -1,14 +1,13 @@
 package io.ebeaninternal.server.core;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.bean.*;
 import io.ebean.bean.PersistenceContext.WithOption;
 import io.ebean.cache.ServerCacheManager;
-import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.config.*;
 import io.ebean.config.dbplatform.DatabasePlatform;
 import io.ebean.event.BeanPersistController;
@@ -70,7 +69,7 @@ import static java.util.stream.StreamSupport.stream;
 /**
  * The default server side implementation of EbeanServer.
  */
-@NonNullApi
+@NullMarked
 public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   private static final System.Logger log = CoreLog.internal;
@@ -83,7 +82,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final QueryPlanManager queryPlanManager;
   private final ExtraMetrics extraMetrics;
   private final DataTimeZone dataTimeZone;
-  private final ClockService clockService;
+  private final Clock clock;
   private final CallOriginFactory callStackFactory;
   private final Persister persister;
   private final OrmQueryEngine queryEngine;
@@ -114,6 +113,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final long slowQueryMicros;
   private final SlowQueryListener slowQueryListener;
   private final boolean disableL2Cache;
+  private final AggregateFormulaContext formulaContext;
   private boolean shutdown;
 
   /**
@@ -129,6 +129,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.backgroundExecutor = config.getBackgroundExecutor();
     this.extraMetrics = config.getExtraMetrics();
     this.serverName = this.config.getName();
+    this.formulaContext = config.getConfig().aggregateFormulaContext();
     this.lazyLoadBatchSize = this.config.getLazyLoadBatchSize();
     this.cqueryEngine = config.getCQueryEngine();
     this.expressionFactory = config.getExpressionFactory();
@@ -151,7 +152,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.beanLoader = new DefaultBeanLoader(this);
     this.jsonContext = config.createJsonContext(this);
     this.dataTimeZone = config.getDataTimeZone();
-    this.clockService = config.getClockService();
+    this.clock = config.clock();
 
     DocStoreIntegration docStoreComponents = config.createDocStoreIntegration(this);
     this.transactionManager = config.createTransactionManager(this, docStoreComponents.updateProcessor());
@@ -163,8 +164,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     this.scriptRunner = new DScriptRunner(this);
 
     configureServerPlugins();
-    // Register with the JVM Shutdown hook
-    ShutdownManager.registerDatabase(this);
+    if (this.config.shutdownHook() && "true".equalsIgnoreCase(System.getProperty("ebean.registerShutdownHook", "true"))) {
+      // register with the JVM Shutdown hook
+      ShutdownManager.registerDatabase(this);
+    }
   }
 
   /**
@@ -279,6 +282,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  @Nullable
   public DataSource readOnlyDataSource() {
     return transactionManager.readOnlyDataSource();
   }
@@ -414,18 +418,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public ExtendedServer extended() {
-    return this;
-  }
-
-  @Override
   public long clockNow() {
-    return clockService.nowMillis();
-  }
-
-  @Override
-  public void setClock(Clock clock) {
-    this.clockService.setClock(clock);
+    return clock.millis();
   }
 
   @Override
@@ -620,7 +614,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     InheritInfo inheritInfo = desc.inheritInfo();
     if (inheritInfo == null || inheritInfo.isConcrete()) {
-      return (T) desc.contextRef(pc, null, false, id);
+      return (T) desc.contextRef(pc, id);
     }
     return referenceFindOne(type, id, desc);
   }
@@ -680,6 +674,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return callable.call();
     } catch (Error e) {
       throw scopeTrans.caughtError(e);
+    } catch (PersistenceException e) {
+      throw scopeTrans.caughtThrowable(e);
     } catch (Exception e) {
       throw new PersistenceException(scopeTrans.caughtThrowable(e));
     } finally {
@@ -699,6 +695,8 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       runnable.run();
     } catch (Error e) {
       throw t.caughtError(e);
+    } catch (PersistenceException e) {
+      throw t.caughtThrowable(e);
     } catch (Exception e) {
       throw new PersistenceException(t.caughtThrowable(e));
     } finally {
@@ -754,16 +752,6 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void flush() {
     currentTransaction().flush();
-  }
-
-  @Override
-  public void commitTransaction() {
-    currentTransaction().commit();
-  }
-
-  @Override
-  public void rollbackTransaction() {
-    currentTransaction().rollback();
   }
 
   @Override
@@ -942,6 +930,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     return findId(query);
   }
 
+  @Override
+  public <T> STreeProperty createFormulaProperty(SpiBeanType desc, String formula, String path) {
+    return desc.formulaBuilder().create(formulaContext, formula, path);
+  }
+
   <T> SpiOrmQueryRequest<T> createQueryRequest(Type type, SpiQuery<T> query) {
     SpiOrmQueryRequest<T> request = buildQueryRequest(type, query);
     request.prepareQuery();
@@ -1010,7 +1003,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       return null;
     }
     // Hit the L2 bean cache
-    return desc.cacheBeanGet(id, query.isReadOnly(), pc);
+    return desc.cacheBeanGet(id, query.isUnmodifiable(), pc);
   }
 
   /**
@@ -1221,11 +1214,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.ID_LIST, query);
     Object result = request.getFromQueryCache();
     if (result != null) {
-      if (Boolean.FALSE.equals(request.query().isReadOnly())) {
-        return new CopyOnFirstWriteList<>((List<A>) result);
-      } else {
-        return (List<A>) result;
-      }
+      return (List<A>) result;
     }
     try {
       request.initTransIfRequired();
@@ -1270,66 +1259,55 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
   }
 
+  private <T> SpiQuery<T> configureForFuture(SpiQuery<T> query) {
+    query.usingFuture();
+    if (query.transaction() == null) {
+      // use a current transaction if active
+      query.usingTransaction(currentServerTransaction());
+    }
+    return query;
+  }
+
   @Override
   public <T> FutureRowCount<T> findFutureCount(SpiQuery<T> query) {
-    SpiQuery<T> copy = query.copy();
-    copy.usingFuture();
-    boolean createdTransaction = false;
-    SpiTransaction transaction = query.transaction();
-    if (transaction == null) {
-      transaction = currentServerTransaction();
-      if (transaction == null) {
-        transaction = (SpiTransaction) createTransaction();
-        createdTransaction = true;
-      }
-      copy.usingTransaction(transaction);
-    }
-    var queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<>(this, copy, createdTransaction));
+    SpiQuery<T> copy = configureForFuture(query.copy());
+    var queryFuture = new QueryFutureRowCount<>(new CallableQueryCount<>(this, copy));
     backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
 
   @Override
   public <T> FutureIds<T> findFutureIds(SpiQuery<T> query) {
-    SpiQuery<T> copy = query.copy();
-    copy.usingFuture();
-    boolean createdTransaction = false;
-    SpiTransaction transaction = query.transaction();
-    if (transaction == null) {
-      transaction = currentServerTransaction();
-      if (transaction == null) {
-        transaction = (SpiTransaction) createTransaction();
-        createdTransaction = true;
-      }
-      copy.usingTransaction(transaction);
-    }
-    QueryFutureIds<T> queryFuture = new QueryFutureIds<>(new CallableQueryIds<>(this, copy, createdTransaction));
+    SpiQuery<T> copy = configureForFuture(query.copy());
+    final var queryFuture = new QueryFutureIds<T>(new CallableQueryIds<>(this, copy));
     backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
 
   @Override
   public <T> FutureList<T> findFutureList(SpiQuery<T> query) {
-    SpiQuery<T> spiQuery = query.copy();
-    spiQuery.usingFuture();
-    // FutureList query always run in it's own persistence content
+    SpiQuery<T> spiQuery = configureForFuture(query.copy());
+    // FutureList query always run in its own persistence content
     spiQuery.setPersistenceContext(new DefaultPersistenceContext());
     if (!spiQuery.isDisableReadAudit()) {
       BeanDescriptor<T> desc = descriptorManager.descriptor(spiQuery.getBeanType());
       desc.readAuditFutureList(spiQuery);
     }
-    // Create a new transaction solely to execute the findList() at some future time
-    boolean createdTransaction = false;
-    SpiTransaction transaction = query.transaction();
-    if (transaction == null) {
-      transaction = currentServerTransaction();
-      if (transaction == null) {
-        transaction = (SpiTransaction) createTransaction();
-        createdTransaction = true;
-      }
-      spiQuery.usingTransaction(transaction);
+    final var queryFuture = new QueryFutureList<T>(new CallableQueryList<>(this, spiQuery));
+    backgroundExecutor.execute(queryFuture.futureTask());
+    return queryFuture;
+  }
+
+  @Override
+  public <K, T> FutureMap<K, T> findFutureMap(SpiQuery<T> query) {
+    SpiQuery<T> spiQuery = configureForFuture(query.copy());
+    // FutureMap query always run in it's own persistence content
+    spiQuery.setPersistenceContext(new DefaultPersistenceContext());
+    if (!spiQuery.isDisableReadAudit()) {
+      BeanDescriptor<T> desc = descriptorManager.descriptor(spiQuery.getBeanType());
+      desc.readAuditFutureList(spiQuery);
     }
-    QueryFutureList<T> queryFuture = new QueryFutureList<>(new CallableQueryList<>(this, spiQuery, createdTransaction));
+    final var queryFuture = new QueryFutureMap<K, T>(new CallableQueryMap<>(this, spiQuery));
     backgroundExecutor.execute(queryFuture.futureTask());
     return queryFuture;
   }
@@ -1699,6 +1677,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       for (Object bean : beans) {
         persister.insert(checkEntityBean(bean), options, txn);
       }
+      txn.flushBatchOnCollection();
       return 0;
     }, transaction);
   }
@@ -2194,7 +2173,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public void slowQueryCheck(long timeMicros, int rowCount, SpiQuery<?> query) {
     if (timeMicros > slowQueryMicros && slowQueryListener != null) {
-      slowQueryListener.process(new SlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount, query.parentNode()));
+      List<Object> bindParams = new SlowQueryBindCapture(query).capture();
+      slowQueryListener.process(new DSlowQueryEvent(query.getGeneratedSql(), timeMicros / 1000L, rowCount,
+        query.parentNode(), bindParams, query.label(), query.profileLocation()));
     }
   }
 

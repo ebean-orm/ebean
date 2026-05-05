@@ -21,10 +21,6 @@ public final class QueryFutureRowCount<T> extends BaseFuture<Integer> implements
     return futureTask;
   }
 
-  public Transaction transaction() {
-    return call.transaction;
-  }
-
   @Override
   public boolean cancel(boolean mayInterruptIfRunning) {
     call.query.cancel();

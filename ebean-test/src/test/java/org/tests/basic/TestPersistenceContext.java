@@ -47,10 +47,9 @@ public class TestPersistenceContext extends BaseTestCase {
     // implicit transaction with its own persistence context
     Order oBefore = DB.find(Order.class, 1);
     // start a persistence context
-    DB.beginTransaction();
 
     Order order;
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       order = DB.find(Order.class, 1);
       // not the same instance ...as a different persistence context
       assertNotSame(order, oBefore);
@@ -63,9 +62,6 @@ public class TestPersistenceContext extends BaseTestCase {
       // all the same instance
       assertSame(order, o2);
       assertSame(order, o3);
-
-    } finally {
-      DB.endTransaction();
     }
 
     // implicit transaction with its own persistence context
@@ -74,8 +70,7 @@ public class TestPersistenceContext extends BaseTestCase {
     assertNotSame(oAfter, order);
 
     // start a persistence context
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       Order testOrder = ResetBasicData.createOrderCustAndOrder("testPC");
       Integer id = testOrder.getCustomer().getId();
       Integer orderId = testOrder.getId();
@@ -94,9 +89,6 @@ public class TestPersistenceContext extends BaseTestCase {
 
       assertEquals(customer.getId(), customer2.getId());
       assertSame(customer, customer2);
-
-    } finally {
-      DB.endTransaction();
     }
   }
 

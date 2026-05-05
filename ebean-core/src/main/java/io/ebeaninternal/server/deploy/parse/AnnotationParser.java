@@ -98,7 +98,7 @@ public abstract class AnnotationParser extends AnnotationBase {
     prop.setUnique(columnAnn.unique());
     if (columnAnn.precision() > 0) {
       prop.setDbLength(columnAnn.precision());
-    } else if (columnAnn.length() != 255) {
+    } else if (columnAnn.length() != 0) {
       // set default 255 on DbTypeMap
       prop.setDbLength(columnAnn.length());
     }

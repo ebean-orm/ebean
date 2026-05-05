@@ -1,5 +1,6 @@
 package org.tests.transaction;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
@@ -12,10 +13,7 @@ public class TestStatelessUpdateClearPC extends BaseTestCase {
 
   @Test
   public void test() {
-
-
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       EBasic newUser = new EBasic();
       newUser.setName("any@email.com");
       DB.save(newUser);
@@ -32,8 +30,6 @@ public class TestStatelessUpdateClearPC extends BaseTestCase {
 
       EBasic loadedUser = DB.find(EBasic.class, newUser.getId());
       assertEquals("anyNew@email.com", loadedUser.getName());
-    } finally {
-      DB.rollbackTransaction();
     }
   }
 }

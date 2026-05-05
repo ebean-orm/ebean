@@ -1,14 +1,17 @@
 package io.ebeaninternal.server.deploy.meta;
 
+import org.jspecify.annotations.Nullable;
 import io.ebean.annotation.*;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.dbplatform.DbDefaultValue;
 import io.ebean.config.dbplatform.DbEncrypt;
 import io.ebean.config.dbplatform.DbEncryptFunction;
+import io.ebean.config.dbplatform.ExtraDbTypes;
 import io.ebean.core.type.ScalarType;
 import io.ebean.util.AnnotationUtil;
 import io.ebeaninternal.server.core.InternString;
 import io.ebeaninternal.server.deploy.BeanProperty;
+import io.ebeaninternal.server.deploy.BindMaxLength;
 import io.ebeaninternal.server.deploy.DbMigrationInfo;
 import io.ebeaninternal.server.deploy.DeployDocPropertyOptions;
 import io.ebeaninternal.server.deploy.generatedproperty.GeneratedProperty;
@@ -614,6 +617,8 @@ public class DeployBeanProperty {
     this.dbRead = true;
     this.dbInsertable = false;
     this.dbUpdateable = false;
+    // aggregation by default not fetchEager
+    this.fetchEager = false;
   }
 
   /**
@@ -1132,5 +1137,21 @@ public class DeployBeanProperty {
 
   boolean isJsonType() {
     return mutationDetection != null;
+  }
+
+  @Nullable
+  public BindMaxLength bindMaxLength() {
+      if (dbLength == 0) {
+        return null;
+      }
+      switch (dbType) {
+        case Types.VARCHAR:
+        case Types.BLOB:
+        case ExtraDbTypes.JSON:
+          return desc.bindMaxLength();
+        default:
+          return null;
+      }
+
   }
 }

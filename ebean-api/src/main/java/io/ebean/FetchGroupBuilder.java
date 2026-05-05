@@ -1,6 +1,6 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Builds a FetchGroup by adding fetch clauses.
@@ -23,7 +23,7 @@ import io.avaje.lang.NonNullApi;
  *
  * }</pre>
  */
-@NonNullApi
+@NullMarked
 public interface FetchGroupBuilder<T> {
 
   /**

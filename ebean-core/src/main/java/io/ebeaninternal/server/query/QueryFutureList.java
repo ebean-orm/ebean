@@ -27,10 +27,6 @@ public final class QueryFutureList<T> extends BaseFuture<List<T>> implements Fut
     return futureTask;
   }
 
-  public Transaction transaction() {
-    return call.transaction;
-  }
-
   @Override
   public Query<T> getQuery() {
     return call.query;

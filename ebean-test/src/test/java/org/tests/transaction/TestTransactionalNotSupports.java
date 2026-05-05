@@ -32,8 +32,7 @@ public class TestTransactionalNotSupports extends BaseTestCase {
   public void withOuterTransaction_expect_currentTransaction_null_and_originalTxnRestored() {
 
     outerTxn = null;
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       currentTxn = DB.currentTransaction();
       assertNotNull(currentTxn);
       new SomeTransactionalWithNotSupported().doStuff();
@@ -44,8 +43,6 @@ public class TestTransactionalNotSupports extends BaseTestCase {
       // the original transaction was restored
       Transaction restored = DB.currentTransaction();
       assertSame(currentTxn, restored);
-    } finally {
-      DB.endTransaction();
     }
   }
 

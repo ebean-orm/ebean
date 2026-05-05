@@ -19,5 +19,11 @@ class InnerTest {
 
     val found = DB.find(MyKotInner::class.java, myId)
     assertThat(found).isNotNull
+
+    val result = new QOrder()
+      .customer.id.eq(42)
+      .findList()
+
+    assertThat(result).isEmpty
   }
 }

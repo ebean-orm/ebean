@@ -55,6 +55,7 @@ import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
 
+import java.time.Clock;
 import java.util.*;
 
 import static java.lang.System.Logger.Level.*;
@@ -75,7 +76,7 @@ public final class InternalConfiguration {
   private final DeployInherit deployInherit;
   private final TypeManager typeManager;
   private final DtoBeanManager dtoBeanManager;
-  private final ClockService clockService;
+  private final Clock clock;
   private final DataTimeZone dataTimeZone;
   private final Binder binder;
   private final DeployCreateProperties deployCreateProperties;
@@ -103,7 +104,7 @@ public final class InternalConfiguration {
     this.online = online;
     this.config = config;
     this.jacksonCorePresent = config.getClassLoadConfig().isJacksonCorePresent();
-    this.clockService = new ClockService(config.settings().getClock());
+    this.clock = config.settings().getClock();
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(service(DocStoreFactory.class));
@@ -189,8 +190,8 @@ public final class InternalConfiguration {
     return docStoreFactory;
   }
 
-  ClockService getClockService() {
-    return clockService;
+  Clock clock() {
+    return clock;
   }
 
   public ExtraMetrics getExtraMetrics() {
@@ -300,11 +301,12 @@ public final class InternalConfiguration {
   }
 
   DtoQueryEngine createDtoQueryEngine() {
-    return new DtoQueryEngine(binder);
+    return new DtoQueryEngine(binder, config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList(), databasePlatform.autoCommitFalseOnFindIterate());
   }
 
   RelationalQueryEngine createRelationalQueryEngine() {
-    return new DefaultRelationalQueryEngine(binder, config.getDatabaseBooleanTrue(), config.getPlatformConfig().getDbUuid().useBinaryOptimized());
+    return new DefaultRelationalQueryEngine(binder, config.getDatabaseBooleanTrue(), config.getPlatformConfig().getDbUuid().useBinaryOptimized(),
+      config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList(), databasePlatform.autoCommitFalseOnFindIterate());
   }
 
   OrmQueryEngine createOrmQueryEngine() {
@@ -390,7 +392,7 @@ public final class InternalConfiguration {
     TransactionManagerOptions options =
       new TransactionManagerOptions(server, notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
         indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
-        tableModState, cacheNotify, clockService);
+        tableModState, cacheNotify);
 
     if (config.isDocStoreOnly()) {
       return new DocStoreTransactionManager(options);
@@ -449,6 +451,9 @@ public final class InternalConfiguration {
    */
   private DataTimeZone initDataTimeZone() {
     String tz = config.getDataTimeZone();
+    if ("NoTimeZone".equals(tz)) {
+      return new NoDataTimeZone();
+    }
     if (tz == null) {
       if (isMySql(getPlatform())) {
         return new MySqlDataTimeZone();
@@ -580,25 +585,30 @@ public final class InternalConfiguration {
       return QueryPlanManager.NOOP;
     }
     long threshold = config.getQueryPlanThresholdMicros();
-    return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.platform()), extraMetrics);
+    return new CQueryPlanManager(transactionManager, threshold, queryPlanLogger(databasePlatform.platform(), config), extraMetrics);
   }
 
   /**
    * Returns the logger to log query plans for the given platform.
    */
-  QueryPlanLogger queryPlanLogger(Platform platform) {
+  QueryPlanLogger queryPlanLogger(Platform platform, DatabaseBuilder.Settings config) {
     switch (platform.base()) {
       case SQLSERVER:
         return new QueryPlanLoggerSqlServer();
       case ORACLE:
         return new QueryPlanLoggerOracle();
       case POSTGRES:
-        return new QueryPlanLoggerExplain("explain (analyze, buffers) ");
+        return new QueryPlanLoggerExplain(explain(config, "explain (analyze, costs, verbose, buffers) "));
       case YUGABYTE:
-        return new QueryPlanLoggerExplain("explain (analyze, buffers, dist) ");
+        return new QueryPlanLoggerExplain(explain(config,"explain (analyze, buffers, dist) "));
       default:
-        return new QueryPlanLoggerExplain("explain ");
+        return new QueryPlanLoggerExplain(explain(config,"explain "));
     }
+  }
+
+  private static String explain(DatabaseBuilder.Settings config, String defaultExplain) {
+    String explain = config.getQueryPlanExplain();
+    return explain == null ? defaultExplain : explain + ' ';
   }
 
   /**

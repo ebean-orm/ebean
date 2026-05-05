@@ -2,6 +2,10 @@ package io.ebean.querybean.generator;
 
 class Util {
 
+  static String stripForMethod(String dbName) {
+    return dbName.replace('-', '_');
+  }
+
   static String packageOf(boolean nested, String originName) {
     return nested ? nestedPackageOf(originName) : packageOf(originName);
   }

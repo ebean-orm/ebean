@@ -42,7 +42,7 @@ final class RawExpression extends NonPrepareExpression {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     if (values != null) {
       for (Object value : values) {
         if (value instanceof Collection<?>) {

@@ -12,7 +12,7 @@ ebean:
     postgis:
       containerName: ebeanbuild_postgis
       port: 9432
-      image: ghcr.io/baosystems/postgis:15
+      image: ghcr.io/baosystems/postgis:16
 #      extensions: postgis
 #      url: jdbc:postgresql_lwgis://localhost:6432/mygisapp
 #      driver: org.postgis.DriverWrapperLW

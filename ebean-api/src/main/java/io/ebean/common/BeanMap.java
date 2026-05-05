@@ -35,6 +35,11 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   }
 
   @Override
+  public Map<K, E> freeze() {
+    return map == null ? null : Collections.unmodifiableMap(map);
+  }
+
+  @Override
   public void toString(ToStringBuilder builder) {
     if (map == null || map.isEmpty()) {
       builder.addRaw("{}");
@@ -219,7 +224,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   @Override
   public void clear() {
-    checkReadOnly();
     initClear();
     if (modifyListening) {
       // add all beans to the removal list
@@ -245,9 +249,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   @Override
   public Set<Entry<K, E>> entrySet() {
     init();
-    if (readOnly) {
-      return Collections.unmodifiableSet(map.entrySet());
-    }
     return modifyListening ? new ModifyEntrySet<>(this, map.entrySet()) : map.entrySet();
   }
 
@@ -266,15 +267,11 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   @Override
   public Set<K> keySet() {
     init();
-    if (readOnly) {
-      return Collections.unmodifiableSet(map.keySet());
-    }
     return modifyListening ? new ModifyKeySet<>(this, map.keySet()) : map.keySet();
   }
 
   @Override
   public E put(K key, E value) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       E oldBean = map.put(key, value);
@@ -291,7 +288,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   @Override
   public void putAll(Map<? extends K, ? extends E> puts) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       for (Entry<? extends K, ? extends E> entry : puts.entrySet()) {
@@ -308,17 +304,16 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
 
   @Override
   public void addBean(E bean) {
-    throw new IllegalStateException("Method not allowed on Map. Please use List instead.");
+    throw new UnsupportedOperationException("Method not allowed on Map. Please use List instead.");
   }
 
   @Override
   public void removeBean(E bean) {
-    throw new IllegalStateException("Method not allowed on Map. Please use List instead.");
+    throw new UnsupportedOperationException("Method not allowed on Map. Please use List instead.");
   }
 
   @Override
   public E remove(Object key) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       E o = map.remove(key);
@@ -337,16 +332,6 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   @Override
   public Collection<E> values() {
     init();
-    if (readOnly) {
-      return Collections.unmodifiableCollection(map.values());
-    }
     return modifyListening ? new ModifyCollection<>(this, map.values()) : map.values();
-  }
-
-  @Override
-  public BeanCollection<E> shallowCopy() {
-    BeanMap<K, E> copy = new BeanMap<>(new LinkedHashMap<>(map));
-    copy.setFromOriginal(this);
-    return copy;
   }
 }

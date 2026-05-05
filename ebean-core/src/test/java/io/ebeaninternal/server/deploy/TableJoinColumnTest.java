@@ -8,7 +8,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class TableJoinColumnTest {
 
   TableJoinColumn col(String localDbColumn, String foreignDbColumn, boolean insertable, boolean updateable) {
-    DeployTableJoinColumn column = new DeployTableJoinColumn(localDbColumn, foreignDbColumn, insertable, updateable);
+    DeployTableJoinColumn column = new DeployTableJoinColumn(localDbColumn, foreignDbColumn, insertable, updateable, true);
     return new TableJoinColumn(column);
   }
 

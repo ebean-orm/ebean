@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>13.26.1-jakarta</version>
+    <version>16.5.0</version>
   </parent>
 
   <artifactId>composites</artifactId>
@@ -24,6 +24,8 @@
     <module>ebean-oracle</module>
     <module>ebean-postgres</module>
     <module>ebean-postgis</module>
+    <module>ebean-net-postgis</module>
+    <module>ebean-pgvector</module>
 <!--    <module>sqlanywhere</module>-->
     <module>ebean-sqlite</module>
     <module>ebean-sqlserver</module>

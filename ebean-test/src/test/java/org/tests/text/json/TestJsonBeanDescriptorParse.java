@@ -9,12 +9,10 @@ import io.ebeaninternal.api.json.SpiJsonReader;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.json.ReadJson;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Address;
-import org.tests.model.basic.Contact;
-import org.tests.model.basic.ContactNote;
-import org.tests.model.basic.Customer;
+import org.tests.model.basic.*;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -27,6 +25,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestJsonBeanDescriptorParse extends BaseTestCase {
+
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
 
   @BeforeEach
   void setup() {
@@ -76,7 +79,7 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
   }
 
   @Test
-  public void testJsonManyUpdate() throws IOException {
+  public void testJsonManyUpdate() {
 
     Customer customer = DB.find(Customer.class, 234);
     String json =
@@ -108,7 +111,7 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
   }
 
   @Test
-  public void testJsonUpdate() throws IOException {
+  public void testJsonUpdate() {
     Customer customer = DB.find(Customer.class, 234);
     DB.json().toBean(customer, "{}");
     assertFalse(DB.beanState(customer).isDirty());
@@ -184,8 +187,7 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
     StringReader reader = new StringReader("{\"id\":123,\"name\":\"Hello Rob\"}");
     JsonParser parser = server.json().createParser(reader);
 
-    SpiJsonReader readJson = new ReadJson(descriptor, parser, null, null, false);
-    return readJson;
+    return new ReadJson(descriptor, parser, null, null, false);
   }
 
 }

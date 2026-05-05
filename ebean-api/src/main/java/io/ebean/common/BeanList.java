@@ -2,7 +2,6 @@ package io.ebean.common;
 
 import io.ebean.bean.*;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**
@@ -37,6 +36,17 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
    */
   public BeanList(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
     super(loader, ownerBean, propertyName);
+  }
+
+  @Override
+  public List<E> freeze() {
+    if (list == null) {
+      return null;
+    } else if (list.isEmpty()) {
+      return List.of();
+    } else {
+      return Collections.unmodifiableList(list);
+    }
   }
 
   @Override
@@ -225,7 +235,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public void add(int index, E element) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       modifyAddition(element);
@@ -240,7 +249,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public boolean add(E bean) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       if (list.add(bean)) {
@@ -255,7 +263,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public boolean addAll(Collection<? extends E> beans) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       // all elements in c are added (no contains checking)
@@ -266,7 +273,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public boolean addAll(int index, Collection<? extends E> beans) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       // all elements in c are added (no contains checking)
@@ -277,7 +283,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public void clear() {
-    checkReadOnly();
     // TODO: when clear() and not initialised could be more clever
     // and fetch just the Id's
     initClear();
@@ -322,9 +327,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   @Override
   public Iterator<E> iterator() {
     init();
-    if (readOnly) {
-      return new ReadOnlyListIterator<>(list.listIterator());
-    }
     if (modifyListening) {
       return new ModifyIterator<>(this, list.iterator());
     }
@@ -340,9 +342,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   @Override
   public ListIterator<E> listIterator() {
     init();
-    if (readOnly) {
-      return new ReadOnlyListIterator<>(list.listIterator());
-    }
     if (modifyListening) {
       return new ModifyListIterator<>(this, list.listIterator());
     }
@@ -352,9 +351,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   @Override
   public ListIterator<E> listIterator(int index) {
     init();
-    if (readOnly) {
-      return new ReadOnlyListIterator<>(list.listIterator(index));
-    }
     if (modifyListening) {
       return new ModifyListIterator<>(this, list.listIterator(index));
     }
@@ -370,7 +366,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public E remove(int index) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       E o = list.remove(index);
@@ -382,7 +377,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public boolean remove(Object bean) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       boolean isRemove = list.remove(bean);
@@ -396,7 +390,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public boolean removeAll(Collection<?> beans) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       boolean changed = false;
@@ -414,7 +407,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public boolean retainAll(Collection<?> retainBeans) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       boolean changed = false;
@@ -435,7 +427,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
 
   @Override
   public E set(int index, E element) {
-    checkReadOnly();
     init();
     if (modifyListening) {
       E o = list.set(index, element);
@@ -455,9 +446,6 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
   @Override
   public List<E> subList(int fromIndex, int toIndex) {
     init();
-    if (readOnly) {
-      return Collections.unmodifiableList(list.subList(fromIndex, toIndex));
-    }
     if (modifyListening) {
       return new ModifyList<>(this, list.subList(fromIndex, toIndex));
     }
@@ -477,67 +465,4 @@ public final class BeanList<E> extends AbstractBeanCollection<E> implements List
     return list.toArray(array);
   }
 
-  private static final class ReadOnlyListIterator<E> implements ListIterator<E>, Serializable {
-
-    private static final long serialVersionUID = 3097271091406323699L;
-
-    private final ListIterator<E> i;
-
-    ReadOnlyListIterator(ListIterator<E> i) {
-      this.i = i;
-    }
-
-    @Override
-    public void add(E o) {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
-    }
-
-    @Override
-    public void remove() {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
-    }
-
-    @Override
-    public void set(E o) {
-      throw new IllegalStateException("This collection is in ReadOnly mode");
-    }
-
-    @Override
-    public boolean hasNext() {
-      return i.hasNext();
-    }
-
-    @Override
-    public boolean hasPrevious() {
-      return i.hasPrevious();
-    }
-
-    @Override
-    public E next() {
-      return i.next();
-    }
-
-    @Override
-    public int nextIndex() {
-      return i.nextIndex();
-    }
-
-    @Override
-    public E previous() {
-      return i.previous();
-    }
-
-    @Override
-    public int previousIndex() {
-      return i.previousIndex();
-    }
-
-  }
-
-  @Override
-  public BeanCollection<E> shallowCopy() {
-    BeanList<E> copy = new BeanList<>(new CopyOnFirstWriteList<>(list));
-    copy.setFromOriginal(this);
-    return copy;
-  }
 }

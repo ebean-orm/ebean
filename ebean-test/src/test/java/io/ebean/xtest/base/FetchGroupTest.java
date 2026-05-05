@@ -26,11 +26,12 @@ public class FetchGroupTest extends BaseTestCase {
       .query()
       .where()
       .ilike("name", "rob")
+      .setLabel("hello")
       .select(fetch);
 
     query.findList();
 
-    assertThat(sqlOf(query)).contains("select t0.id, t0.name, t0.status from");
+    assertThat(sqlOf(query)).contains("select /* hello */ t0.id, t0.name, t0.status from");
   }
 
 

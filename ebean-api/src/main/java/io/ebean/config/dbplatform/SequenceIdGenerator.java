@@ -157,7 +157,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
       if (newIds.isEmpty()) {
         throw new PersistenceException("Always expecting more than 1 row from " + sql);
       }
-
+      connection.commit();
       return newIds;
 
     } catch (SQLException e) {

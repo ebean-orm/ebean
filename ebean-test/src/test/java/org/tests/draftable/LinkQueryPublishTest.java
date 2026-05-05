@@ -45,7 +45,7 @@ public class LinkQueryPublishTest {
 
     Query<Link> pubQuery = server.find(Link.class)
       .where().idIn(ids)
-      .order().asc("id");
+      .orderBy().asc("id");
 
 
     List<Link> pubList = server.publish(pubQuery);

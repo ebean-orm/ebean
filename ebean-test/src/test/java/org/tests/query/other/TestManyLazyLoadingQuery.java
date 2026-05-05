@@ -1,5 +1,6 @@
 package org.tests.query.other;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -44,8 +45,7 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
 
 
     // start transaction to keep PC going to lazy query
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       DB.find(Order.class, 1);
 
       SpiQuery<?> query0 = (SpiQuery<?>) DB.find(OrderDetail.class);
@@ -57,9 +57,6 @@ public class TestManyLazyLoadingQuery extends BaseTestCase {
       query0.findList();
       assertThat(query0.getGeneratedSql()).contains(" from o_order_detail t0 where (t0.order_id) ");
       platformAssertIn(query0.getGeneratedSql(), "where (t0.order_id)");
-
-    } finally {
-      DB.endTransaction();
     }
 
     List<OrderDetail> details = DB.find(OrderDetail.class)

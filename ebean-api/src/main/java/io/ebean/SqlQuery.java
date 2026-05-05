@@ -1,11 +1,12 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 import java.io.Serializable;
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -39,7 +40,7 @@ import java.util.function.Predicate;
  *
  * }</pre>
  */
-@NonNullApi
+@NullMarked
 public interface SqlQuery extends Serializable, CancelableQuery {
 
   /**
@@ -62,7 +63,17 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    * source. We use {@code usingMaster()} to instead ensure that the query is executed
    * against the master data source.
    */
-  SqlQuery usingMaster();
+  default SqlQuery usingMaster() {
+    return usingMaster(true);
+  }
+
+  /**
+   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
+   * data source can be used if defined.
+   *
+   * @see #usingMaster()
+   */
+  SqlQuery usingMaster(boolean useMaster);
 
   /**
    * Execute the query returning a list.
@@ -171,7 +182,7 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    *   List<SqlRow> list =
    *     DB.sqlQuery(sql)
    *       .setParameter("Rob")
-   *       .setParameter("Status.NEW)
+   *       .setParameter(Status.NEW)
    *       .findList();
    *
    *   // the same as ...
@@ -242,9 +253,43 @@ public interface SqlQuery extends Serializable, CancelableQuery {
   SqlQuery setParameter(int position, Object value);
 
   /**
+   * Bind the array parameter by its index position for use with Postgres ANY.
+   * <p>
+   * For Postgres this binds an ARRAY rather than expands into multiple bind values.
+   * <pre>{@code
+   *
+   *    String sql = "select name from customer where id = any(?)";
+   *
+   *    List<SqlRow> list =
+   *      DB.sqlQuery(sql)
+   *        .setArrayParameter(1, List.of(1, 2, 3))
+   *        .findList();
+   *
+   * }</pre>
+   */
+  SqlQuery setArrayParameter(int position, Collection<?> value);
+
+  /**
    * Bind the named parameter value.
    */
   SqlQuery setParameter(String name, Object value);
+
+  /**
+   * Bind the named array parameter which we would use with Postgres ANY.
+   * <p>
+   * For Postgres this binds an ARRAY rather than expands into multiple bind values.
+   * <pre>{@code
+   *
+   *    String sql = "select name from customer where id = any(:idList)";
+   *
+   *    List<SqlRow> list =
+   *      DB.sqlQuery(sql)
+   *        .setArrayParameter("idList", List.of(1, 2, 3))
+   *        .findList();
+   *
+   * }</pre>
+   */
+  SqlQuery setArrayParameter(String name, Collection<?> value);
 
   /**
    * Set the index of the first row of the results to return.
@@ -321,6 +366,14 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    * @param <T> The type of the scalar values
    */
   interface TypeQuery<T> {
+
+    /**
+     * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
+     * data source can be used if defined.
+     *
+     * @see SqlQuery#usingMaster(boolean)
+     */
+    TypeQuery<T> usingMaster(boolean useMaster);
 
     /**
      * Execute the query using the given transaction.

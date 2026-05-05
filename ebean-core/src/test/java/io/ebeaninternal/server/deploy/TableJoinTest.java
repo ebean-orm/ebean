@@ -9,22 +9,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TableJoinTest {
 
-  DeployTableJoinColumn col(String localDbColumn, String foreignDbColumn, boolean insertable, boolean updateable) {
-    return new DeployTableJoinColumn(localDbColumn, foreignDbColumn, insertable, updateable);
+  DeployTableJoinColumn col(String localDbColumn, String foreignDbColumn, boolean insertable, boolean updateable, boolean nullable) {
+    return new DeployTableJoinColumn(localDbColumn, foreignDbColumn, insertable, updateable, nullable);
   }
 
   TableJoin table(String tableName, String col1, String col2) {
     DeployTableJoin deploy = new DeployTableJoin();
     deploy.setTable(tableName);
-    deploy.addJoinColumn(col(col1, col2, true, true));
+    deploy.addJoinColumn(col(col1, col2, true, true, true));
     return new TableJoin(deploy);
   }
 
   TableJoin table(String tableName, String col1, String col2, String col3, String col4) {
     DeployTableJoin deploy = new DeployTableJoin();
     deploy.setTable(tableName);
-    deploy.addJoinColumn(col(col1, col2, true, true));
-    deploy.addJoinColumn(col(col3, col4, true, true));
+    deploy.addJoinColumn(col(col1, col2, true, true, true));
+    deploy.addJoinColumn(col(col3, col4, true, true, true));
     return new TableJoin(deploy);
   }
 

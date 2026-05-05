@@ -84,10 +84,17 @@ public final class LoadBeanRequest extends LoadRequest {
     return idList;
   }
 
+  public SpiQuery<?> createQuery(SpiEbeanServer server) {
+    final SpiQuery<?> query = server.createQuery(beanType());
+    query.usingTransaction(transaction);
+    configureQuery(query);
+    return query;
+  }
+
   /**
    * Configure the query for lazy loading execution.
    */
-  public void configureQuery(SpiQuery<?> query) {
+  private void configureQuery(SpiQuery<?> query) {
     query.setMode(Mode.LAZYLOAD_BEAN);
     query.setPersistenceContext(loadBuffer.persistenceContext());
     query.setLoadDescription(mode(), description());

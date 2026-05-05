@@ -77,10 +77,13 @@ public final class PersistRequestOrmUpdate extends PersistRequest {
    */
   @Override
   public void postExecute() {
+    OrmUpdateType ormUpdateType = ormUpdate.ormUpdateType();
+    if (OrmUpdateType.INSERT != ormUpdateType && !transaction.isAutoPersistUpdates()) {
+      beanDescriptor.contextClear(transaction.persistenceContext());
+    }
     if (startNanos > 0) {
       persistExecute.collectOrmUpdate(label, startNanos);
     }
-    OrmUpdateType ormUpdateType = ormUpdate.ormUpdateType();
     String tableName = ormUpdate.baseTable();
     if (transaction.isLogSummary()) {
       transaction.logSummary("{0} table[{1}] rows[{2}] bind[{3}]", ormUpdateType, tableName, rowCount, bindLog);

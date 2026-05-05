@@ -33,7 +33,7 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   /**
    * Returns true, if this is a lob property from db-perspective.
    */
-  boolean isDbLob();
+  boolean isLobForPlatform();
 
   /**
    * Return true if the property is an embedded type.
@@ -91,6 +91,13 @@ public interface STreeProperty extends ScalarDataReader<Object> {
    * Append to the select clause.
    */
   void appendSelect(DbSqlContext ctx, boolean subQuery);
+
+  /**
+   * Append to group by.
+   */
+  default void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
+    appendSelect(ctx, subQuery);
+  }
 
   /**
    * Append to the from clause.

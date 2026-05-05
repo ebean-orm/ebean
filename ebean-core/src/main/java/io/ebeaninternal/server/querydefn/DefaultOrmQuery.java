@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.bean.CallOrigin;
 import io.ebean.bean.ObjectGraphNode;
@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 /**
  * Default implementation of an Object Relational query.
  */
-@NonNullApi
+@NullMarked
 public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   private static final String DEFAULT_QUERY_NAME = "default";
@@ -57,6 +57,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private ProfilingListener profilingListener;
   private Type type;
   private String label;
+  private String hint;
   private Mode mode = Mode.NORMAL;
   private boolean usingFuture;
   private Object tenantId;
@@ -71,6 +72,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
    * Lazy loading batch size (can override server wide default).
    */
   private int lazyLoadBatchSize;
+  private String distinctOn;
   private OrderBy<T> orderBy;
   private String loadMode;
   private String loadDescription;
@@ -130,7 +132,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private boolean usageProfiling = true;
   private CacheMode useBeanCache = CacheMode.AUTO;
   private CacheMode useQueryCache = CacheMode.OFF;
-  private Boolean readOnly;
+  private boolean unmodifiable;
   private PersistenceContextScope persistenceContextScope;
 
   /**
@@ -236,6 +238,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final String hint() {
+    return hint;
+  }
+
+  @Override
   public final String planLabel() {
     if (label != null) {
       return label;
@@ -255,6 +262,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Query<T> setLabel(String label) {
     this.label = label;
+    return this;
+  }
+
+  @Override
+  public final Query<T> setHint(String hint) {
+    this.hint = hint;
     return this;
   }
 
@@ -281,8 +294,22 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public Query<T> also(Consumer<Query<T>> apply) {
+    apply.accept(this);
+    return this;
+  }
+
+  @Override
   public Query<T> alsoIf(BooleanSupplier predicate, Consumer<Query<T>> consumer) {
     if (predicate.getAsBoolean()) {
+      consumer.accept(this);
+    }
+    return this;
+  }
+
+  @Override
+  public Query<T> alsoIfPresent(@Nullable Object value, Consumer<Query<T>> consumer) {
+    if (value != null) {
       consumer.accept(this);
     }
     return this;
@@ -491,19 +518,30 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final SpiQuerySecondary convertJoins() {
+  public final SpiQueryManyJoin convertJoins() {
     if (!useDocStore) {
       createExtraJoinsToSupportManyWhereClause();
     }
-    markQueryJoins();
+    if (unmodifiable) {
+      disableLazyLoading = true;
+      persistenceContextScope = PersistenceContextScope.QUERY;
+    }
+    return markQueryJoins();
+  }
+
+  @Override
+  public SpiQuerySecondary secondaryQuery() {
     return new OrmQuerySecondary(removeQueryJoins(), removeLazyJoins());
   }
 
   /**
    * Limit the number of fetch joins to Many properties, mark as query joins as needed.
+   *
+   * @return The query join many property or null.
    */
-  private void markQueryJoins() {
-    detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type.defaultSelect());
+  private SpiQueryManyJoin markQueryJoins() {
+    // no automatic join to query join conversion when distinctOn is used
+    return distinctOn != null ? null : detail.markQueryJoins(beanDescriptor, lazyLoadManyPath, isAllowOneManyFetch(), type.defaultSelect());
   }
 
   private boolean isAllowOneManyFetch() {
@@ -627,12 +665,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     return countDistinctOrder;
   }
 
-  /**
-   * Return true if the Id should be included in the query.
-   */
   @Override
   public final boolean isWithId() {
-    return !manualId && !distinct && !singleAttribute;
+    // distinctOn orm query will auto include the id property
+    // distinctOn dto query does NOT (via setting manualId to true)
+    return !manualId && !singleAttribute && (!distinct || distinctOn != null);
   }
 
   @Override
@@ -728,17 +765,19 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.baseTable = baseTable;
     copy.rootTableAlias = rootTableAlias;
     copy.distinct = distinct;
+    copy.distinctOn = distinctOn;
     copy.allowLoadErrors = allowLoadErrors;
     copy.timeout = timeout;
     copy.mapKey = mapKey;
     copy.id = id;
+    copy.hint = hint;
     copy.label = label;
     copy.nativeSql = nativeSql;
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
-    copy.readOnly = readOnly;
+    copy.unmodifiable = unmodifiable;
     if (detail != null) {
-      copy.detail = detail.copy();
+      copy.detail = detail.copy(null);
     }
     copy.temporalMode = temporalMode;
     copy.firstRow = firstRow;
@@ -784,6 +823,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final void setType(Type type) {
     this.type = type;
+  }
+
+  @Override
+  public String distinctOn() {
+    return distinctOn;
   }
 
   @Override
@@ -1069,13 +1113,21 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     if (manualId) {
       sb.append("/md");
     }
+    if (hint != null) {
+      sb.append("/h:").append(hint);
+    }
     if (distinct) {
       sb.append("/dt");
+      if (distinctOn != null) {
+        sb.append("/o:").append(distinctOn);
+      }
     }
     if (allowLoadErrors) {
       sb.append("/ae");
     }
-    if (disableLazyLoading) {
+    if (unmodifiable) {
+      sb.append("/um");
+    } else if (disableLazyLoading) {
       sb.append("/dl");
     }
     if (baseTable != null) {
@@ -1200,7 +1252,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final HashQuery queryHash() {
     // calculateQueryPlanHash is called just after potential AutoTune tuning
     // so queryPlanHash is calculated well before this method is called
-    BindValuesKey bindKey = new BindValuesKey();
+    BindValuesKey bindKey = new BindValuesKey(server);
     queryBindKey(bindKey);
     return new HashQuery(queryPlanKey, bindKey);
   }
@@ -1239,14 +1291,14 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final Boolean isReadOnly() {
-    return readOnly;
+  public Query<T> setUnmodifiable(boolean unmodifiable) {
+    this.unmodifiable = unmodifiable;
+    return this;
   }
 
   @Override
-  public final Query<T> setReadOnly(boolean readOnly) {
-    this.readOnly = readOnly;
-    return this;
+  public boolean isUnmodifiable() {
+    return unmodifiable;
   }
 
   @Override
@@ -1290,6 +1342,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Query<T> setUseQueryCache(CacheMode useQueryCache) {
     this.useQueryCache = useQueryCache;
+    if (CacheMode.OFF != useQueryCache) {
+      unmodifiable = true;
+    }
     return this;
   }
 
@@ -1325,6 +1380,13 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final Query<T> distinctOn(String distinctOn) {
+    this.distinctOn = distinctOn;
+    this.distinct = true;
+    return this;
+  }
+
+  @Override
   public final Query<T> select(String columns) {
     detail.select(columns);
     return this;
@@ -1332,7 +1394,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
 
   @Override
   public final Query<T> select(FetchGroup<T> fetchGroup) {
-    this.detail = ((SpiFetchGroup<T>) fetchGroup).detail();
+    if (fetchGroup != null) {
+      this.detail = ((SpiFetchGroup<T>) fetchGroup).detail(detail);
+    }
     return this;
   }
 
@@ -1419,8 +1483,8 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public Query<T> usingMaster() {
-    this.useMaster = true;
+  public Query<T> usingMaster(boolean useMaster) {
+    this.useMaster = useMaster;
     return this;
   }
 
@@ -1435,17 +1499,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final int delete(Transaction transaction) {
-    return server.delete(this);
-  }
-
-  @Override
   public final int update() {
-    return server.update(this);
-  }
-
-  @Override
-  public final int update(Transaction transaction) {
     return server.update(this);
   }
 
@@ -1566,6 +1620,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final FutureList<T> findFutureList() {
     return server.findFutureList(this);
+  }
+
+  @Override
+  public final <K> FutureMap<K, T> findFutureMap() {
+    return server.findFutureMap(this);
   }
 
   @Override
@@ -1781,6 +1840,22 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  @SuppressWarnings("unchecked")
+  public Query<T> setPaging(@Nullable Paging paging) {
+    if (paging != null && paging.pageSize() > 0) {
+      firstRow = paging.pageIndex() * paging.pageSize();
+      maxRows = paging.pageSize();
+      orderBy = (OrderBy<T>) paging.orderBy();
+      if (orderBy == null || orderBy.isEmpty()) {
+        // should not be paging without any order by clause so set
+        // orderById such that the Id property is used
+        orderById = true;
+      }
+    }
+    return this;
+  }
+
+  @Override
   public final String mapKey() {
     return mapKey;
   }
@@ -1828,7 +1903,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final ExpressionList<T> text() {
     if (textExpressions == null) {
       useDocStore = true;
-      textExpressions = new DefaultExpressionList<>(this);
+      textExpressions = new DefaultExpressionList<>(this, true);
     }
     return textExpressions;
   }
@@ -1836,7 +1911,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final ExpressionList<T> where() {
     if (whereExpressions == null) {
-      whereExpressions = new DefaultExpressionList<>(this, null);
+      whereExpressions = new DefaultExpressionList<>(this, false);
     }
     return whereExpressions;
   }
@@ -1857,7 +1932,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final ExpressionList<T> having() {
     if (havingExpressions == null) {
-      havingExpressions = new DefaultExpressionList<>(this, null);
+      havingExpressions = new DefaultExpressionList<>(this, false);
     }
     return havingExpressions;
   }

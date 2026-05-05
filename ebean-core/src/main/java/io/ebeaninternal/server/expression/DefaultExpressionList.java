@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.*;
@@ -18,7 +18,7 @@ import java.util.function.Predicate;
 /**
  * Default implementation of ExpressionList.
  */
-@NonNullApi
+@NullMarked
 public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   private static final String AND = " and ";
@@ -33,15 +33,15 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
    */
   private final boolean textRoot;
 
+  public static <P> ExpressionList<P> forFetchGroup(Query<P> q) {
+    return new DefaultExpressionList<>(q, null, null, null, false);
+  }
+
   /**
    * Construct for Text root expression list - this handles implicit Bool Should, Must etc.
    */
-  public DefaultExpressionList(Query<T> query) {
-    this(query, query.getExpressionFactory(), null, new ArrayList<>(), true);
-  }
-
-  public DefaultExpressionList(Query<T> query, ExpressionList<T> parentExprList) {
-    this(query, query.getExpressionFactory(), parentExprList, new ArrayList<>());
+  public DefaultExpressionList(Query<T> query, boolean textRoot) {
+    this(query, query.getExpressionFactory(), null, new ArrayList<>(), textRoot);
   }
 
   DefaultExpressionList(Query<T> query, ExpressionFactory expr, ExpressionList<T> parentExprList, List<SpiExpression> list) {
@@ -329,18 +329,8 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public int delete(Transaction transaction) {
-    return query.delete(transaction);
-  }
-
-  @Override
   public int update() {
     return query.update();
-  }
-
-  @Override
-  public int update(Transaction transaction) {
-    return query.update(transaction);
   }
 
   @Override
@@ -591,7 +581,7 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (SpiExpression expr : list) {
       expr.addBindValues(request);
     }
@@ -825,6 +815,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> containsIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : add(expr.contains(propertyName, value));
+  }
+
+  @Override
   public ExpressionList<T> endsWith(String propertyName, String value) {
     return add(expr.endsWith(propertyName, value));
   }
@@ -875,6 +870,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> icontainsIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : add(expr.icontains(propertyName, value));
+  }
+
+  @Override
   public ExpressionList<T> idIn(Object... idValues) {
     return add(expr.idIn(idValues));
   }
@@ -902,6 +902,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> ilike(String propertyName, String value) {
     return add(expr.ilike(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> ilikeIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : add(expr.ilike(propertyName, value));
   }
 
   @Override
@@ -1038,6 +1043,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public ExpressionList<T> istartsWithIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : add(expr.istartsWith(propertyName, value));
+  }
+
+  @Override
   public ExpressionList<T> le(String propertyName, Query<?> subQuery) {
     return add(expr.le(propertyName, subQuery));
   }
@@ -1060,6 +1070,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> like(String propertyName, String value) {
     return add(expr.like(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> likeIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : add(expr.like(propertyName, value));
   }
 
   @Override
@@ -1152,6 +1167,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   @Override
   public ExpressionList<T> startsWith(String propertyName, String value) {
     return add(expr.startsWith(propertyName, value));
+  }
+
+  @Override
+  public ExpressionList<T> startsWithIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : add(expr.startsWith(propertyName, value));
   }
 
   @Override

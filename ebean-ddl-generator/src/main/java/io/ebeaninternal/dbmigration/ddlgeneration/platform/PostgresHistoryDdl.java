@@ -71,6 +71,8 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     apply
       .append("create or replace function ").append(procedureName).append("() returns trigger as $$").newLine();
 
+    apply.append("-- play-ebean-start").newLine();
+
     apply.append("declare").newLine()
       .append("  lowerTs timestamptz;").newLine()
       .append("  upperTs timestamptz;").newLine();
@@ -93,6 +95,7 @@ public class PostgresHistoryDdl extends DbTriggerBasedHistoryDdl {
     apply
       .append("  end if;").newLine()
       .append("end;").newLine()
+      .append("-- play-ebean-end").newLine()
       .append("$$ LANGUAGE plpgsql;").newLine();
 
     apply.end();

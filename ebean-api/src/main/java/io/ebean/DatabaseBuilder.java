@@ -87,6 +87,7 @@ public interface DatabaseBuilder {
     }
     return this;
   }
+
   /**
    * Set the name of the Database.
    */
@@ -989,6 +990,14 @@ public interface DatabaseBuilder {
   DatabaseBuilder setNamingConvention(NamingConvention namingConvention);
 
   /**
+   * Set the AggregateFormulaContext which is used to determine if a database function
+   * is an aggregate function (like sum, min, max, avg etc).
+   * <p>
+   * Use this to override the default known aggregation functions.
+   */
+  DatabaseConfig aggregateFormulaContext(AggregateFormulaContext aggregateFormulaContext);
+
+  /**
    * Set to true if all DB column and table names should use quoted identifiers.
    * <p>
    * For Postgres pgjdbc version 42.3.0 should be used with datasource property
@@ -1060,6 +1069,11 @@ public interface DatabaseBuilder {
    * and use readOnly=true and autoCommit=true.
    */
   DatabaseBuilder readOnlyDatabase(boolean readOnlyDatabase);
+
+  /**
+   * Set to false such that the instance does not register a JVM shutdown hook.
+   */
+  DatabaseBuilder shutdownHook(boolean shutdownHook);
 
   /**
    * Set a DataSource.
@@ -1967,8 +1981,8 @@ public interface DatabaseBuilder {
   DatabaseBuilder setLocalOnlyL2Cache(boolean localOnlyL2Cache);
 
   /**
-   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code> or
-   * <code>&x64;jakarta.validation.contstraints.NotNull</code>
+   * Controls if Ebean should ignore <code>&#64;javax.validation.contstraints.NotNull</code> or
+   * <code>&#64;jakarta.validation.contstraints.NotNull</code>
    * with respect to generating a <code>NOT NULL</code> column.
    * <p>
    * Normally when Ebean sees javax NotNull annotation it means that column is defined as NOT NULL.
@@ -2017,6 +2031,11 @@ public interface DatabaseBuilder {
    */
   @Deprecated
   DatabaseBuilder setQueryPlanTTLSeconds(int queryPlanTTLSeconds);
+
+  /**
+   * Set the EXPLAIN (with options) to use for query plan capture.
+   */
+  DatabaseBuilder queryPlanExplain(String queryPlanExplain);
 
   /**
    * Create a new PlatformConfig based of the one held but with overridden properties by reading
@@ -2209,6 +2228,15 @@ public interface DatabaseBuilder {
   DatabaseBuilder setLoadModuleInfo(boolean loadModuleInfo);
 
   /**
+   * Set if generated SQL SELECT should include the query label as an
+   * inline SQL comment (to help reference back from the SQL to the code
+   * that executed the query.
+   *
+   * @param includeLabelInSql When true include a SQL inline comment in generated SELECT queries.
+   */
+  DatabaseConfig includeLabelInSql(boolean includeLabelInSql);
+
+  /**
    * Set the naming convention to apply to metrics names.
    */
   default DatabaseBuilder metricNaming(Function<String, String> metricNaming) {
@@ -2220,6 +2248,11 @@ public interface DatabaseBuilder {
    */
   @Deprecated
   DatabaseBuilder setMetricNaming(Function<String, String> metricNaming);
+
+  /**
+   * Sets the length check mode.
+   */
+  DatabaseConfig lengthCheck(LengthCheck lengthCheck);
 
   /**
    * Provides read access (getters) for the DatabaseBuilder configuration
@@ -2586,6 +2619,11 @@ public interface DatabaseBuilder {
     NamingConvention getNamingConvention();
 
     /**
+     * Return the AggregateFormulaContext.
+     */
+    AggregateFormulaContext aggregateFormulaContext();
+
+    /**
      * Return true if all DB column and table names should use quoted identifiers.
      */
     boolean isAllQuotedIdentifiers();
@@ -2622,6 +2660,11 @@ public interface DatabaseBuilder {
      * and use readOnly=true and autoCommit=true.
      */
     boolean readOnlyDatabase();
+
+    /**
+     * Return if a JVM shutdown hook should be registered.
+     */
+    boolean shutdownHook();
 
     /**
      * Return the DataSource.
@@ -3030,6 +3073,11 @@ public interface DatabaseBuilder {
     int getQueryPlanTTLSeconds();
 
     /**
+     * Return the EXPLAIN (with options) to use for capturing query plans.
+     */
+    String getQueryPlanExplain();
+
+    /**
      * Return mapping locations to search for xml mapping via class path search.
      */
     List<String> getMappingLocations();
@@ -3099,9 +3147,19 @@ public interface DatabaseBuilder {
     boolean isLoadModuleInfo();
 
     /**
+     * Return true if generated sql select query should include an inline sql comment with the
+     * query label or profile location label.
+     */
+    boolean isIncludeLabelInSql();
+
+    /**
      * Return the naming convention to apply to metrics names.
      */
     Function<String, String> getMetricNaming();
 
+    /**
+     * Returns the length check mode.
+     */
+    LengthCheck getLengthCheck();
   }
 }

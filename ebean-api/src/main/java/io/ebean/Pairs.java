@@ -30,7 +30,7 @@ import java.util.Objects;
  *   .where()
  *   .eq("store", "def")
  *   .inPairs(pairs)       // IN clause with 'pairs' of values
- *   .order("sku desc")
+ *   .orderBy("sku desc")
  *
  *   // query expressions cover the natural key properties
  *   // so we can choose to hit the L2 bean cache if we want

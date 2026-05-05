@@ -58,7 +58,7 @@ final class BeanEmbeddedMetaFactory {
   }
 
   private static int dbLength(Column override, BeanProperty source) {
-    return (override != null && (override.length() != 255)) ? override.length() : source.dbLength();
+    return (override != null && (override.length() != 0)) ? override.length() : source.dbLength();
   }
 
   private static int dbScale(Column override, BeanProperty source) {

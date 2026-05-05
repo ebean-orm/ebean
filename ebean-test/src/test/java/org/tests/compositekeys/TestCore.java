@@ -142,7 +142,7 @@ public class TestCore extends BaseTestCase {
   @Test
   public void testEmbeddedWithOrder() {
 
-    List<Item> items = server().find(Item.class).order("auditInfo.created asc, type asc").findList();
+    List<Item> items = server().find(Item.class).orderBy("auditInfo.created asc, type asc").findList();
 
     assertNotNull(items);
     assertEquals(2, items.size());
@@ -151,7 +151,7 @@ public class TestCore extends BaseTestCase {
   @Test
   public void testFindAndOrderByEType() {
 
-    List<Item> items = server().find(Item.class).order("eType").findList();
+    List<Item> items = server().find(Item.class).orderBy("eType").findList();
 
     assertNotNull(items);
     assertEquals(2, items.size());

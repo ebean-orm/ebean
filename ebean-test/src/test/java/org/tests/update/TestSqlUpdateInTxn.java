@@ -177,9 +177,7 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
     assertEquals("foo3", log4.getDescription());
     assertEquals("mod1", log4.getModifiedDescription());
 
-
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       SqlUpdate update = DB.sqlUpdate(updateDml);
       update.setParameter("desc", "foo4");
       update.setParameter("id", id);
@@ -189,9 +187,7 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
       updateMod.setParameter("desc", "mod2");
       updateMod.execute();
 
-      DB.commitTransaction();
-    } finally {
-      DB.endTransaction();
+      txn.commit();
     }
     AuditLog log5 = DB.find(AuditLog.class, log.getId());
     assertEquals("foo4", log5.getDescription());

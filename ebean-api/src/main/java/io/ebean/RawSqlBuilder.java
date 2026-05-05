@@ -22,14 +22,14 @@ public interface RawSqlBuilder {
    * resultSet.
    */
   static RawSql resultSet(ResultSet resultSet, String... propertyNames) {
-    return XServiceProvider.rawSql().resultSet(resultSet, propertyNames);
+    return XBootstrapService.rawSql().resultSet(resultSet, propertyNames);
   }
 
   /**
    * Create and return a SqlRow based on the resultSet with dbTrueValue and binaryOptimizedUUID options.
    */
   static SqlRow sqlRow(ResultSet resultSet, final String dbTrueValue, boolean binaryOptimizedUUID) throws SQLException {
-    return XServiceProvider.rawSql().sqlRow(resultSet, dbTrueValue, binaryOptimizedUUID);
+    return XBootstrapService.rawSql().sqlRow(resultSet, dbTrueValue, binaryOptimizedUUID);
   }
 
   /**
@@ -38,7 +38,7 @@ public interface RawSqlBuilder {
    * this query.
    */
   static RawSqlBuilder unparsed(String sql) {
-    return XServiceProvider.rawSql().unparsed(sql);
+    return XBootstrapService.rawSql().unparsed(sql);
   }
 
   /**
@@ -55,7 +55,7 @@ public interface RawSqlBuilder {
    * </p>
    */
   static RawSqlBuilder parse(String sql) {
-    return XServiceProvider.rawSql().parsed(sql);
+    return XBootstrapService.rawSql().parsed(sql);
   }
 
   /**

@@ -3,6 +3,7 @@
 [![Maven Central : ebean](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.ebean/ebean)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://github.com/ebean-orm/ebean/blob/master/LICENSE)
 [![Multi-JDK Build](https://github.com/ebean-orm/ebean/actions/workflows/multi-jdk-build.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/multi-jdk-build.yml)
+[![GraalVM Native Image](https://img.shields.io/badge/GraalVM-Native%20Image%20Ready-darkgreen?logo=graalvm)](https://www.graalvm.org/)
 
 ##### Build with database platforms
 [![H2Database](https://github.com/ebean-orm/ebean/actions/workflows/h2database.yml/badge.svg)](https://github.com/ebean-orm/ebean/actions/workflows/h2database.yml)
@@ -56,12 +57,7 @@ Work at the highest level of abstraction and drop down levels as needed.
     <tr>
       <td align="center" valign="middle">
         <a href="https://www.foconis.de/" target="_blank">
-          <img width="222px" src="https://www.foconis.de/templates/yootheme/cache/foconis_logo_322-709da1de.png">
-        </a>
-      </td>
-      <td align="center" valign="middle">
-        <a href="https://www.payintech.com/" target="_blank">
-          <img width="222px" src="https://ebean.io/images/sponsor_PayinTech-logo-noir.png">
+          <img width="222px" src="https://group.foconis.com/download/ci/logo/png-72dpi/logo-quer/foconis-analytics-quer.png">
         </a>
       </td>
       <td align="center" valign="middle">
@@ -84,6 +80,18 @@ or [github discussions](https://github.com/ebean-orm/ebean/discussions)
 
 ## Documentation
 Goto [https://ebean.io/docs/](https://ebean.io/docs/)
+
+## Guides
+Library reference (capabilities, scope, and AI guidance): [docs/LIBRARY.md](docs/LIBRARY.md)
+
+Step-by-step guides for common tasks: [docs/guides/](docs/guides/README.md)
+
+Available guides:
+- [Maven POM setup](docs/guides/add-ebean-postgres-maven-pom.md)
+- [Database configuration](docs/guides/add-ebean-postgres-database-config.md)
+- [Test container setup](docs/guides/add-ebean-postgres-test-container.md)
+- [DB migration generation](docs/guides/add-ebean-db-migration-generation.md)
+- [Lombok with Ebean entity beans](docs/guides/lombok-with-ebean-entity-beans.md)
 
 ## Maven central
 [Maven central - g:io.ebean](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22io.ebean%22%20)

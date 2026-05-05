@@ -39,7 +39,7 @@ public class TestM2MCascadeOne extends BaseTestCase {
 
     Query<MUser> query = DB.find(MUser.class)
       .select("userid")
-      .where().raw("roles.roleid in (?)", 24)
+      .where().raw("roles.roleId in (?)", 24)
       .query();
 
     query.findList();

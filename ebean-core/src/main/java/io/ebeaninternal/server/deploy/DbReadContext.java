@@ -15,16 +15,6 @@ import java.util.Map;
 public interface DbReadContext {
 
   /**
-   * Return the state of the object graph.
-   */
-  Boolean isReadOnly();
-
-  /**
-   * Propagate the state to the bean.
-   */
-  void propagateState(Object e);
-
-  /**
    * Return the DataReader.
    */
   DataReader dataReader();
@@ -102,4 +92,14 @@ public interface DbReadContext {
    */
   void handleLoadError(String fullName, Exception e);
 
+  /**
+   * Return true if this many property should be included in unmodifiable
+   * query via a secondary query.
+   */
+  boolean includeSecondary(BeanPropertyAssocMany<?> many);
+
+  /**
+   * Return true if we are loading unmodifiable beans.
+   */
+  boolean unmodifiable();
 }

@@ -2,11 +2,11 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.*;
 import io.ebean.bean.BeanCollection;
+import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.cache.QueryCacheEntry;
 import io.ebean.common.BeanList;
 import io.ebean.common.BeanMap;
-import io.ebean.common.CopyOnFirstWriteList;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryAdapter;
 import io.ebean.text.json.JsonReadOptions;
@@ -41,9 +41,9 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private CQueryPlanKey queryPlanKey;
   private SpiQuerySecondary secondaryQueries;
   private List<T> cacheBeans;
-  private BeanPropertyAssocMany<?> manyProperty;
   private boolean inlineCountDistinct;
   private Set<String> dependentTables;
+  private SpiQueryManyJoin manyJoin;
 
   public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, SpiTransaction t) {
     super(server, t);
@@ -168,7 +168,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
    */
   @Override
   public void prepareQuery() {
-    secondaryQueries = query.convertJoins();
+    manyJoin = query.convertJoins();
+    secondaryQueries = query.secondaryQuery();
     beanDescriptor.prepareQuery(query);
     adapterPreQuery();
     queryPlanKey = query.prepare(this);
@@ -446,19 +447,19 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     return query;
   }
 
-  /**
-   * Determine and return the ToMany property that is included in the query.
-   */
-  public BeanPropertyAssocMany<?> determineMany() {
-    manyProperty = beanDescriptor.manyProperty(query);
-    return manyProperty;
+  public SpiQueryManyJoin manyJoin() {
+    return manyJoin;
   }
 
   /**
-   * Return the many property that is fetched in the query or null if there is not one.
+   * Return true if there is a manyJoin that should be included with this query.
    */
-  public BeanPropertyAssocMany<?> manyPropertyForOrderBy() {
-    return query.isSingleAttribute() ? null : manyProperty;
+  public boolean includeManyJoin() {
+    if (manyJoin == null || query.isSingleAttribute()) {
+      return false;
+    }
+    final Type type = query.type();
+    return type != Type.SQ_EX && type != Type.COUNT;
   }
 
   /**
@@ -494,10 +495,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   public boolean isQueryCachePut() {
     return cacheKey != null && query.queryCacheMode().isPut();
-  }
-
-  public boolean isBeanCachePutMany() {
-    return !transaction.isSkipCacheExplicit() && query.isBeanCachePut();
   }
 
   public boolean isBeanCachePut() {
@@ -545,7 +542,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (orderBy != null && !orderBy.isEmpty()) {
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
     }
-    return cacheBeans;
+    return query.isUnmodifiable() ? Collections.unmodifiableList(cacheBeans) : cacheBeans;
   }
 
   @Override
@@ -564,7 +561,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     for (T bean : cacheBeans) {
       map.put((K) property.pathGet(bean), bean);
     }
-    return map;
+    return query.isUnmodifiable() ? Collections.unmodifiableMap(map) : map;
   }
 
   private ElPropertyValue mapProperty() {
@@ -582,7 +579,8 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     if (orderBy != null && !orderBy.isEmpty()) {
       beanDescriptor.sort(cacheBeans, orderBy.toStringFormat());
     }
-    return new LinkedHashSet<>(cacheBeans);
+    var set = new LinkedHashSet<>(cacheBeans);
+    return query.isUnmodifiable() ? Collections.unmodifiableSet(set) : set;
   }
 
   @Override
@@ -599,9 +597,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     //
     CacheIdLookup<T> idLookup = query.cacheIdLookup();
     if (idLookup != null) {
-      BeanCacheResult<T> cacheResult = beanDescriptor.cacheIdLookup(persistenceContext, idLookup.idValues());
+      BeanCacheResult<T> cacheResult = beanDescriptor.cacheIdLookup(persistenceContext, query.isUnmodifiable(), idLookup.idValues());
       // adjust the query (IN clause) based on the cache hits
       this.cacheBeans = idLookup.removeHits(cacheResult);
+      if (query.isUnmodifiable()) {
+        unmodifiableFreeze(cacheBeans);
+      }
       return idLookup.allHits();
     }
     if (!beanDescriptor.isNaturalKeyCaching()) {
@@ -612,7 +613,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       NaturalKeySet naturalKeySet = data.buildKeys();
       if (naturalKeySet != null) {
         // use the natural keys to lookup Ids to then hit the bean cache
-        BeanCacheResult<T> cacheResult = beanDescriptor.naturalKeyLookup(persistenceContext, naturalKeySet.keys());
+        BeanCacheResult<T> cacheResult = beanDescriptor.naturalKeyLookup(persistenceContext, query.isUnmodifiable(), naturalKeySet.keys());
         // adjust the query (IN clause) based on the cache hits
         this.cacheBeans = data.removeHits(cacheResult);
         return data.allHits();
@@ -638,31 +639,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
       return null;
     }
 
-    Object cached = beanDescriptor.queryCacheGet(cacheKey);
-    if (cached != null && isAuditReads() && readAuditQueryType()) {
-      if (cached instanceof BeanCollection) {
-        // raw sql can't use L2 cache so normal queries only in here
-        Collection<T> actualDetails = ((BeanCollection<T>) cached).actualDetails();
-        List<Object> ids = new ArrayList<>(actualDetails.size());
-        for (T bean : actualDetails) {
-          ids.add(beanDescriptor.idForJson(bean));
-        }
-        beanDescriptor.readAuditMany(queryPlanKey.partialKey(), "l2-query-cache", ids);
-      }
-    }
-    if (Boolean.FALSE.equals(query.isReadOnly())) {
-      // return shallow copies if readonly is explicitly set to false
-      if (cached instanceof BeanCollection) {
-        cached = ((BeanCollection<?>) cached).shallowCopy();
-      } else if (cached instanceof List) {
-        cached = new CopyOnFirstWriteList<>((List<?>) cached);
-      } else if (cached instanceof Set) {
-        cached = new LinkedHashSet<>((Set<?>) cached);
-      } else if (cached instanceof Map) {
-        cached = new LinkedHashMap<>((Map<?, ?>) cached);
-      }
-    }
-    return cached;
+    return beanDescriptor.queryCacheGet(cacheKey);
   }
 
   /**
@@ -684,7 +661,7 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   public void putToQueryCache(Object result) {
-    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, transaction.startNanoTime()));
+    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, transaction.startTime()));
   }
 
   /**
@@ -772,5 +749,43 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   public int forwardOnlyFetchSize() {
     return queryEngine.forwardOnlyFetchSize();
+  }
+
+  public void clearContext() {
+    if (!transaction.isAutoPersistUpdates()) {
+      beanDescriptor.contextClear(transaction.persistenceContext());
+    }
+  }
+
+  public void unmodifiableFreeze(Collection<T> beans) {
+    if (query.isUnmodifiable()) {
+      if (beans != null) {
+        for (T bean : beans) {
+          beanDescriptor.freeze((EntityBean) bean);
+        }
+      }
+    }
+  }
+
+  public void unmodifiableFreeze(BeanCollection<T> beanCollection) {
+    if (query.isUnmodifiable()) {
+      if (beanCollection != null) {
+        for (T bean : beanCollection.actualDetails()) {
+          beanDescriptor.freeze((EntityBean) bean);
+        }
+      }
+    }
+  }
+
+  public void unmodifiableFreeze(EntityBean bean) {
+    if (query.isUnmodifiable() && bean != null) {
+      beanDescriptor.freeze(bean);
+    }
+  }
+
+  public void setAutoCommitOnFindIterate() {
+    if (createdTransaction) {
+      transaction.setAutoCommitOnFindIterate();
+    }
   }
 }

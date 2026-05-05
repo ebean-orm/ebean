@@ -12,12 +12,20 @@ class ContainerConfigTest {
 
   @Test
   void loadFromProperties() {
-    ContainerConfig containerConfig  = new ContainerConfig();
+    Properties p = new Properties();
+    p.setProperty("ebean.cluster.active", "true");
+    p.setProperty("ebean.cluster.serviceName", "a");
+    p.setProperty("ebean.cluster.namespace", "b");
+    p.setProperty("ebean.cluster.podName", "c");
+    p.setProperty("ebean.cluster.port", "42");
 
-    assertThat(containerConfig.isActive()).isFalse();
-    assertThat(containerConfig.getServiceName()).isNull();
-    assertThat(containerConfig.getNamespace()).isNull();
-    assertThat(containerConfig.getPodName()).isNull();
-    assertThat(containerConfig.getPort()).isEqualTo(0);
+    ContainerConfig containerConfig  = new ContainerConfig();
+    containerConfig.loadFromProperties(p);
+
+    assertThat(containerConfig.isActive()).isTrue();
+    assertThat(containerConfig.getServiceName()).isEqualTo("a");
+    assertThat(containerConfig.getNamespace()).isEqualTo("b");
+    assertThat(containerConfig.getPodName()).isEqualTo("c");
+    assertThat(containerConfig.getPort()).isEqualTo(42);
   }
 }

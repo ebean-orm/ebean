@@ -20,7 +20,7 @@ public class TestMappedSuper extends BaseTestCase {
     // select includes a transient property
     TMapSuperEntity e2 = DB.find(TMapSuperEntity.class)
       .where().idEq(e.getId())
-      .select("id, name, myint, someObject, bananan")
+      .select("id, name, myint, someObject")
       .findOne();
 
     assertNotNull(e2);

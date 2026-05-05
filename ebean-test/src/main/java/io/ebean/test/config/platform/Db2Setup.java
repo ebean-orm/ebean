@@ -24,7 +24,7 @@ class Db2Setup implements PlatformSetup {
       return new Properties();
     }
 
-    dbConfig.setDockerVersion("11.5.6.0a");
+    dbConfig.setDockerVersion("11.5.9.0");
     return dbConfig.getDockerProperties();
   }
 

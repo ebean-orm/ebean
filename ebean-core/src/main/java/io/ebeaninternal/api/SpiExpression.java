@@ -84,7 +84,7 @@ public interface SpiExpression extends Expression {
    *
    * @param request the associated request.
    */
-  void addBindValues(SpiExpressionRequest request);
+  void addBindValues(SpiExpressionBind request);
 
   /**
    * Validate all the properties/paths associated with this expression.

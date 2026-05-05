@@ -1,6 +1,5 @@
 package io.ebeaninternal.server.expression.platform;
 
-import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.expression.Op;
 
 /**
@@ -14,7 +13,7 @@ final class PostgresDbExpression extends BaseDbExpression {
   }
 
   @Override
-  public void json(SpiExpressionRequest request, String propName, String path, Op operator, Object value) {
+  public void json(DbExpressionRequest request, String propName, String path, Op operator, Object value) {
     String[] paths = path.split("\\.");
     if (paths.length == 1) {
       // (t0.content ->> 'title') = 'Some value'
@@ -34,7 +33,7 @@ final class PostgresDbExpression extends BaseDbExpression {
   }
 
   @Override
-  public void arrayContains(SpiExpressionRequest request, String propName, boolean contains, Object... values) {
+  public void arrayContains(DbExpressionRequest request, String propName, boolean contains, Object... values) {
     if (!contains) {
       request.append("not (");
     }
@@ -49,7 +48,7 @@ final class PostgresDbExpression extends BaseDbExpression {
   }
 
   @Override
-  public void arrayIsEmpty(SpiExpressionRequest request, String propName, boolean empty) {
+  public void arrayIsEmpty(DbExpressionRequest request, String propName, boolean empty) {
     request.append("coalesce(cardinality(").property(propName).append("),0)");
     if (empty) {
       request.append(" = 0");

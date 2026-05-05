@@ -1,6 +1,6 @@
 package io.ebean.xtest.internal.api;
 
-import io.avaje.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
 import io.ebean.*;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
-@NonNullApi
+@NullMarked
 public class TDSpiServer implements SpiServer {
   @Override
   public void shutdown() {
@@ -188,6 +188,16 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
+  public void scopedTransactionEnter(TxScope txScope) {
+
+  }
+
+  @Override
+  public void scopedTransactionExit(Object returnOrThrowable, int opCode) {
+
+  }
+
+  @Override
   public Transaction createTransaction() {
     return null;
   }
@@ -223,21 +233,6 @@ public class TDSpiServer implements SpiServer {
   }
 
   @Override
-  public void commitTransaction() {
-
-  }
-
-  @Override
-  public void rollbackTransaction() {
-
-  }
-
-  @Override
-  public void endTransaction() {
-
-  }
-
-  @Override
   public void refresh(Object bean) {
 
   }
@@ -255,11 +250,6 @@ public class TDSpiServer implements SpiServer {
 
   @Override
   public <T> T reference(Class<T> beanType, Object id) {
-    return null;
-  }
-
-  @Override
-  public ExtendedServer extended() {
     return null;
   }
 

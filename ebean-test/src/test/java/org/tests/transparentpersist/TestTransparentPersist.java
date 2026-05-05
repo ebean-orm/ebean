@@ -7,12 +7,10 @@ import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiBeanTypeManager;
 import io.ebeaninternal.api.SpiTransaction;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.EBasicVer;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.OrderShipment;
+import org.tests.model.basic.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +18,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestTransparentPersist extends BaseTestCase {
+
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
 
   @Test
   public void insertFlush_mutateFlush_expect_update() {

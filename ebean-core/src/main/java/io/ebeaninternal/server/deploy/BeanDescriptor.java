@@ -23,6 +23,7 @@ import io.ebean.meta.QueryPlanInit;
 import io.ebean.plugin.BeanDocType;
 import io.ebean.plugin.BeanType;
 import io.ebean.plugin.ExpressionPath;
+import io.ebean.plugin.Lookups;
 import io.ebean.plugin.Property;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.*;
@@ -414,8 +415,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       return null;
     }
     try {
-      return (EntityBean) beanType.getDeclaredConstructor().newInstance();
-    } catch (Exception e) {
+      return Lookups.newDefaultInstance(beanType);
+    } catch (Throwable e) {
       throw new IllegalStateException("Error trying to create the prototypeEntityBean for " + beanType, e);
     }
   }
@@ -683,6 +684,22 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       }
       if (deleteRecurseSkippable) {
         deleteRecurseSkippable = inheritInfo.isDeleteRecurseSkippable();
+      }
+    }
+  }
+
+  @Override
+  public void freeze(EntityBean entityBean) {
+    if (entityBean._ebean_getIntercept().freeze()) {
+      // recursively freeze the graph for this entityBean
+      for (BeanProperty beanProperty : propertiesMutable) {
+        beanProperty.freeze(entityBean);
+      }
+      for (BeanPropertyAssocOne<?> one : propertiesOne) {
+        one.freeze(entityBean);
+      }
+      for (BeanPropertyAssocMany<?> many : propertiesMany) {
+        many.freeze(entityBean);
       }
     }
   }
@@ -1189,8 +1206,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Try to load the beanCollection from cache return true if successful.
    */
-  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey, Boolean readOnly) {
-    return cacheHelp.manyPropLoad(many, bc, parentKey, readOnly);
+  public boolean cacheManyPropLoad(BeanPropertyAssocMany<?> many, BeanCollection<?> bc, String parentKey) {
+    return cacheHelp.manyPropLoad(many, bc, parentKey);
   }
 
   /**
@@ -1239,8 +1256,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Load the entity bean as the correct bean type.
    */
-  EntityBean cacheBeanLoadDirect(Object id, Boolean readOnly, CachedBeanData data, PersistenceContext context) {
-    return cacheHelp.loadBeanDirect(id, readOnly, data, context);
+  EntityBean cacheBeanLoadDirect(Object id, boolean unmodifiable, CachedBeanData data, PersistenceContext context) {
+    return cacheHelp.loadBeanDirect(id, unmodifiable, data, context);
   }
 
   /**
@@ -1278,8 +1295,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Return a bean from the bean cache (or null).
    */
-  public T cacheBeanGet(Object id, Boolean readOnly, PersistenceContext context) {
-    return cacheHelp.beanCacheGet(cacheKey(id), readOnly, context);
+  public T cacheBeanGet(Object id, boolean unmodifiable, PersistenceContext context) {
+    return cacheHelp.beanCacheGet(cacheKey(id), unmodifiable, context);
   }
 
   /**
@@ -1308,15 +1325,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     return cacheHelp.beanCacheLoad(bean, ebi, cacheKey(id), context);
   }
 
-  public BeanCacheResult<T> cacheIdLookup(PersistenceContext context, Collection<?> ids) {
-    return cacheHelp.cacheIdLookup(context, ids);
+  public BeanCacheResult<T> cacheIdLookup(PersistenceContext context, boolean unmodifiable, Collection<?> ids) {
+    return cacheHelp.cacheIdLookup(context, unmodifiable, ids);
   }
 
   /**
    * Use natural key lookup to hit the bean cache.
    */
-  public BeanCacheResult<T> naturalKeyLookup(PersistenceContext context, Set<Object> keys) {
-    return cacheHelp.naturalKeyLookup(context, keys);
+  public BeanCacheResult<T> naturalKeyLookup(PersistenceContext context, boolean unmodifiable, Set<Object> keys) {
+    return cacheHelp.naturalKeyLookup(context, unmodifiable, keys);
   }
 
   public void cacheNaturalKeyPut(String key, String newKey) {
@@ -1454,7 +1471,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
     for (CQueryPlan queryPlan : queryPlanCache.values()) {
       if (request.includeHash(queryPlan.hash())) {
-        queryPlan.queryPlanInit(request.thresholdMicros());
+        queryPlan.queryPlanInit(request.thresholdMicros(queryPlan.hash()));
         list.add(queryPlan.createMeta(null, null));
       }
     }
@@ -1596,19 +1613,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     for (BeanProperty baseScalar : propertiesBaseScalar) {
       if (baseScalar.isGeneratedWhenModified()) {
         return baseScalar;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Return the many property included in the query or null if one is not.
-   */
-  public BeanPropertyAssocMany<?> manyProperty(SpiQuery<?> query) {
-    OrmQueryDetail detail = query.detail();
-    for (BeanPropertyAssocMany<?> many : propertiesMany) {
-      if (detail.includesPath(many.name())) {
-        return many;
       }
     }
     return null;
@@ -1777,10 +1781,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Create a reference with a check for the bean in the persistence context.
    */
-  public EntityBean createReference(Boolean readOnly, Object id, PersistenceContext pc) {
+  public EntityBean createReference(PersistenceContext pc, Object id) {
     Object refBean = contextGet(pc, id);
     if (refBean == null) {
-      refBean = createReference(readOnly, false, id, pc);
+      refBean = createReference(false, false, id, pc);
     }
     return (EntityBean) refBean;
   }
@@ -1789,8 +1793,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Create a reference bean based on the id.
    */
   @SuppressWarnings("unchecked")
-  public T createReference(Boolean readOnly, boolean disableLazyLoad, Object id, PersistenceContext pc) {
-    if (cacheSharableBeans && !disableLazyLoad && !Boolean.FALSE.equals(readOnly)) {
+  public T createReference(boolean unmodifiable, boolean disableLazyLoad, Object id, PersistenceContext pc) {
+    if (cacheSharableBeans && unmodifiable) {
       CachedBeanData d = cacheHelp.beanCacheGetData(cacheKey(id));
       if (d != null) {
         Object shareableBean = d.getSharableBean();
@@ -1806,18 +1810,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       if (inheritInfo != null && !inheritInfo.isConcrete()) {
         return findReferenceBean(id, pc);
       }
-      EntityBean eb = createEntityBean();
+      EntityBean eb = createEntityBean2(unmodifiable);
       id = convertSetId(id, eb);
       EntityBeanIntercept ebi = eb._ebean_getIntercept();
       if (disableLazyLoad) {
         ebi.setDisableLazyLoad(true);
-      } else {
+      } else if (!unmodifiable) {
         ebi.setBeanLoader(refBeanLoader());
       }
       ebi.setReference(idPropertyIndex);
-      if (Boolean.TRUE == readOnly) {
-        ebi.setReadOnly(true);
-      }
       if (pc != null) {
         contextPut(pc, id, eb);
         ebi.setPersistenceContext(pc);
@@ -2042,11 +2043,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     return pc.putIfAbsent(rootBeanType, id, localBean);
   }
 
-  /**
-   * Create a reference bean and put it in the persistence context (and return it).
-   */
-  public Object contextRef(PersistenceContext pc, Boolean readOnly, boolean disableLazyLoad, Object id) {
-    return createReference(readOnly, disableLazyLoad, id, pc);
+  public Object contextRef(PersistenceContext pc, Object id) {
+    return createReference(false, false, id, pc);
+  }
+
+  public Object contextRef(PersistenceContext pc, Object id, boolean unmodifiable, boolean disableLazyLoad) {
+    return createReference(unmodifiable, disableLazyLoad, id, pc);
   }
 
   /**
@@ -2054,6 +2056,13 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   public void contextClear(PersistenceContext pc, Object idValue) {
     pc.clear(rootBeanType, idValue);
+  }
+
+  /**
+   * Clear a bean from the persistence context.
+   */
+  public void contextClear(PersistenceContext pc) {
+    pc.clear(rootBeanType);
   }
 
   /**
@@ -2154,7 +2163,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * Set the Id value to the bean (without type conversion).
    */
   public void setId(Object idValue, EntityBean bean) {
-    idProperty.setValueIntercept(bean, idValue);
+    idProperty.setValue(bean, idValue);
   }
 
   @Override
@@ -2401,7 +2410,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   private STreeProperty findSqlTreeFormula(String formula, String path) {
     String key = formula + "-" + path;
-    return dynamicProperty.computeIfAbsent(key, (fullKey) -> FormulaPropertyPath.create(this, formula, path));
+    return dynamicProperty.computeIfAbsent(key, (fullKey) -> ebeanServer.createFormulaProperty(this, formula, path));
+  }
+
+  @Override
+  public FormulaBuilder formulaBuilder() {
+    return new DFormulaBuilder(this);
   }
 
   /**
@@ -3192,8 +3206,8 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    * provides unique ordering of the rows (so that the paging is predicable).
    */
   public void appendOrderById(SpiQuery<T> query) {
-    if (idProperty != null && !idProperty.isEmbedded() && !query.order().containsProperty(idProperty.name())) {
-      query.order().asc(idProperty.name());
+    if (idProperty != null && !idProperty.isEmbedded() && !query.orderBy().containsProperty(idProperty.name())) {
+      query.orderBy().asc(idProperty.name());
     }
   }
 

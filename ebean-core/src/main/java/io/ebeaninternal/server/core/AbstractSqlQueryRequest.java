@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.CancelableQuery;
-import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.persist.Binder;
@@ -91,6 +90,19 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
   public abstract boolean next() throws SQLException;
 
   protected abstract void requestComplete();
+
+  /**
+   * Set the JDBC buffer fetchSize hint if not set explicitly.
+   */
+  public void setDefaultFetchBuffer(int fetchSize) {
+    query.setDefaultFetchBuffer(fetchSize);
+  }
+
+  public void setAutoCommitOnFindIterate() {
+    if (createdTransaction) {
+      transaction.setAutoCommitOnFindIterate();
+    }
+  }
 
   /**
    * Close the underlying resources.

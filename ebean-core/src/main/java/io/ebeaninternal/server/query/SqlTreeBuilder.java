@@ -11,6 +11,7 @@ import io.ebeaninternal.server.deploy.InheritInfo;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
+import jakarta.persistence.PersistenceException;
 
 import java.util.*;
 
@@ -44,12 +45,12 @@ public final class SqlTreeBuilder {
    */
   private final boolean rawNoId;
   private final boolean disableLazyLoad;
-  private final boolean readOnly;
   private final SpiQuery.TemporalMode temporalMode;
-  private SqlTreeNode rootNode;
+  private final SqlTreeNode rootNode;
   private boolean sqlDistinct;
-  private final boolean distinctNoLobs;
+  private final boolean platformDistinctNoLobs;
   private final SqlTreeCommon common;
+  private final boolean unmodifiable;
 
   /**
    * Construct for RawSql query.
@@ -59,11 +60,11 @@ public final class SqlTreeBuilder {
     this.desc = request.descriptor();
     this.rawNoId = rawNoId;
     this.disableLazyLoad = request.query().isDisableLazyLoading();
-    this.readOnly = Boolean.TRUE.equals(request.query().isReadOnly());
+    this.unmodifiable = request.query().isUnmodifiable();
     this.query = null;
     this.subQuery = false;
     this.distinctOnPlatform = false;
-    this.distinctNoLobs = false;
+    this.platformDistinctNoLobs = false;
     this.queryDetail = queryDetail;
     this.predicates = predicates;
     this.temporalMode = SpiQuery.TemporalMode.CURRENT;
@@ -71,7 +72,8 @@ public final class SqlTreeBuilder {
     this.manyWhereJoins = null;
     this.alias = null;
     this.ctx = null;
-    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, readOnly, null);
+    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, unmodifiable, null);
+    this.rootNode = buildRootNode(desc);
   }
 
   /**
@@ -86,7 +88,7 @@ public final class SqlTreeBuilder {
     this.query = request.query();
     this.temporalMode = SpiQuery.TemporalMode.of(query);
     this.disableLazyLoad = query.isDisableLazyLoading();
-    this.readOnly = Boolean.TRUE.equals(query.isReadOnly());
+    this.unmodifiable = query.isUnmodifiable();
     this.subQuery = Type.SQ_EXISTS == query.type()
       || Type.SQ_EX == query.type()
       || Type.ID_LIST == query.type()
@@ -98,13 +100,14 @@ public final class SqlTreeBuilder {
     this.predicates = predicates;
     this.alias = new SqlTreeAlias(request.baseTableAlias(), temporalMode);
     this.distinctOnPlatform = builder.isPlatformDistinctOn();
-    this.distinctNoLobs = builder.isPlatformDistinctNoLobs();
+    this.platformDistinctNoLobs = builder.isPlatformDistinctNoLobs();
+    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, unmodifiable, includeJoin);
+    this.rootNode = buildRootNode(desc);
     String fromForUpdate = builder.fromForUpdate(query);
     CQueryHistorySupport historySupport = builder.historySupport(query);
     CQueryDraftSupport draftSupport = builder.draftSupport(query);
-    String colAlias = subQuery ? null : columnAliasPrefix;
-    this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, draftSupport, fromForUpdate);
-    this.common = new SqlTreeCommon(temporalMode, disableLazyLoad, readOnly, includeJoin);
+    String colAlias = subQuery || rootNode.isSingleProperty() ? null : columnAliasPrefix;
+    this.ctx = new DefaultDbSqlContext(alias, colAlias, historySupport, draftSupport, fromForUpdate, predicates.dbFilterManyJoin());
   }
 
   /**
@@ -112,7 +115,6 @@ public final class SqlTreeBuilder {
    */
   public SqlTree build() {
     // build the appropriate chain of SelectAdapter's
-    buildRoot(desc);
     // build the actual String
     String distinctOn = null;
     String selectSql = null;
@@ -156,6 +158,10 @@ public final class SqlTreeBuilder {
   }
 
   private String buildDistinctOn() {
+    String distinctOn = predicates.dbDistinctOn();
+    if (distinctOn != null) {
+      return distinctOn;
+    }
     if (rawSql || !distinctOnPlatform || !sqlDistinct || Type.COUNT == query.type()) {
       return null;
     }
@@ -209,8 +215,8 @@ public final class SqlTreeBuilder {
     return ctx.content();
   }
 
-  private void buildRoot(STreeType desc) {
-    rootNode = buildSelectChain(null, null, desc, null);
+  private SqlTreeNode buildRootNode(STreeType desc) {
+    SqlTreeNode root = buildSelectChain(null, null, desc, null);
     if (!rawSql) {
       alias.addJoin(queryDetail.getFetchPaths(), desc);
       alias.addJoin(predicates.predicateIncludes(), desc);
@@ -219,6 +225,7 @@ public final class SqlTreeBuilder {
       alias.buildAlias();
       predicates.parseTableAlias(alias);
     }
+    return root;
   }
 
   /**
@@ -269,8 +276,8 @@ public final class SqlTreeBuilder {
     if (joinList != null) {
       joinList.add(selectNode);
     }
-    if (sqlDistinct && distinctNoLobs) {
-      selectNode.unselectLobs();
+    if (sqlDistinct && platformDistinctNoLobs) {
+      selectNode.unselectLobsForPlatform();
     }
     return selectNode;
   }
@@ -364,10 +371,11 @@ public final class SqlTreeBuilder {
     IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes, predicateIncludes, manyWhereJoins, temporalMode);
     Collection<SqlTreeNodeExtraJoin> extraJoins = extraJoinDistill.getExtraJoinRootNodes();
     if (!extraJoins.isEmpty()) {
-      // add extra joins required to support predicates
-      // and/or order by clause
+      // add extra joins required to support predicates and/or order by clause
       for (SqlTreeNodeExtraJoin extraJoin : extraJoins) {
-        myList.add(extraJoin);
+        if (!addToParent(extraJoin, myList)) {
+          myList.add(extraJoin);
+        }
         if (extraJoin.isManyJoin()) {
           // as we are now going to join to the many then we need
           // to add the distinct to the sql query to stop duplicate
@@ -376,6 +384,20 @@ public final class SqlTreeBuilder {
         }
       }
     }
+  }
+
+  /**
+   * Return true if the extra join was added as a child to one of the nodes.
+   */
+  private boolean addToParent(SqlTreeNodeExtraJoin extraJoin, List<SqlTreeNode> myList) {
+    String parentPath = SplitName.split(extraJoin.prefix())[0];
+    for (SqlTreeNode maybeParent : myList) {
+      if (maybeParent.prefix().equals(parentPath)) {
+        maybeParent.addChild(extraJoin);
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -436,12 +458,9 @@ public final class SqlTreeBuilder {
 
     } else {
       // find the property including searching the
-      // sub class hierarchy if required
       STreeProperty p = desc.findPropertyWithDynamic(propName, queryProps.getPath());
       if (p == null) {
-        log.log(ERROR, "property [{0}] not found on {1} for query - excluding it.", propName, desc);
-        p = desc.findProperty("id");
-        selectProps.add(p);
+        throw new PersistenceException("Property not found - " + SplitName.add(queryProps.getPath(), propName));
 
       } else if (p.isId() && excludeIdProperty()) {
         // do not bother to include id for normal queries as the
@@ -637,7 +656,7 @@ public final class SqlTreeBuilder {
         SqlTreeNodeExtraJoin root = findExtraJoinRoot(includeProp, extraJoin);
         // register the root because these are the only ones we
         // return back.
-        rootRegister.put(root.name(), root);
+        rootRegister.put(root.prefix(), root);
       }
     }
 

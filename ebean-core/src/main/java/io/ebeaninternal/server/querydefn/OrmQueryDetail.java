@@ -3,6 +3,7 @@ package io.ebeaninternal.server.querydefn;
 import io.ebean.FetchConfig;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.SpiQueryManyJoin;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
@@ -38,11 +39,20 @@ public final class OrmQueryDetail implements Serializable {
   /**
    * Return a deep copy of the OrmQueryDetail.
    */
-  public OrmQueryDetail copy() {
+  public OrmQueryDetail copy(OrmQueryDetail existing) {
     OrmQueryDetail copy = new OrmQueryDetail();
     copy.baseProps = baseProps.copy();
     for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
       copy.fetchPaths.put(entry.getKey(), entry.getValue().copy());
+    }
+    if (existing != null) {
+      // transfer any existing filterMany expressions
+      for (Map.Entry<String, OrmQueryProperties> entry : existing.fetchPaths.entrySet()) {
+        var filterMany = entry.getValue().getFilterMany();
+        if (filterMany != null) {
+          copy.getChunk(entry.getKey(), true).setFilterMany(filterMany);
+        }
+      }
     }
     return copy;
   }
@@ -327,12 +337,15 @@ public final class OrmQueryDetail implements Serializable {
 
   /**
    * Mark 'fetch joins' to 'many' properties over to 'query joins' where needed.
+   *
+   * @return The fetch join many property or null
    */
-  void markQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath, boolean allowOne, boolean addIds) {
+  SpiQueryManyJoin markQueryJoins(BeanDescriptor<?> beanDescriptor, String lazyLoadManyPath, boolean allowOne, boolean addIds) {
     if (fetchPaths.isEmpty()) {
-      return;
+      return null;
     }
 
+    ElPropertyDeploy many = null;
     // the name of the many fetch property if there is one
     String manyFetchProperty = null;
     // flag that is set once the many fetch property is chosen
@@ -353,6 +366,7 @@ public final class OrmQueryDetail implements Serializable {
             fetchJoinFirstMany = false;
             manyFetchProperty = pair.getPath();
             chunk.filterManyInline();
+            many = elProp;
           } else {
             // convert this one over to a 'query join'
             chunk.markForQueryJoin();
@@ -360,6 +374,7 @@ public final class OrmQueryDetail implements Serializable {
         }
       }
     }
+    return many;
   }
 
   /**

@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
@@ -83,21 +83,21 @@ import java.util.concurrent.Callable;
  * @see DatabaseFactory
  * @see DatabaseConfig
  */
-@NonNullApi
+@NullMarked
 public interface Database {
 
   /**
    * Return a new database builder.
-    * <pre>{@code
- *
- *   // build the 'default' database using configuration
- *   // from application.properties / application.yaml
- *
- *   Database db = Database.builder()
- *     .loadFromProperties()
- *     .build();
- *
- * }</pre>
+   * <pre>{@code
+   *
+   *   // build the 'default' database using configuration
+   *   // from application.properties / application.yaml
+   *
+   *   Database db = Database.builder()
+   *     .loadFromProperties()
+   *     .build();
+   *
+   * }</pre>
    */
   static DatabaseBuilder builder() {
     return new DatabaseConfig();
@@ -137,6 +137,7 @@ public interface Database {
   /**
    * Return the associated read only DataSource for this Database instance (can be null).
    */
+  @Nullable
   DataSource readOnlyDataSource();
 
   /**
@@ -400,7 +401,7 @@ public interface Database {
    *   // find orders and their customers
    *   List<Order> list = database.find(Order.class)
    *     .fetch("customer")
-   *     .order("id")
+   *     .orderBy("id")
    *     .findList();
    *
    *   // sort by customer name ascending, then by order shipDate
@@ -667,49 +668,6 @@ public interface Database {
   void flush();
 
   /**
-   * Deprecated for removal migrate using try-with-resources and commit on the transaction itself.
-   * <p>
-   * Commit the current transaction.
-   */
-  @Deprecated(forRemoval = true)
-  void commitTransaction();
-
-  /**
-   * Deprecated for removal migrate to using try-with-resources and rollback on the transaction itself.
-   * <p>
-   * Rollback the current transaction.
-   */
-  @Deprecated(forRemoval = true)
-  void rollbackTransaction();
-
-  /**
-   * If the current transaction has already been committed do nothing otherwise
-   * rollback the transaction.
-   * <p>
-   * Useful to put in a finally block to ensure the transaction is ended, rather
-   * than a rollbackTransaction() in each catch block.
-   * <p>
-   * Code example:
-   * <p>
-   * <pre>{@code
-   *
-   *   database.beginTransaction();
-   *   try {
-   *     // do some fetching and or persisting ...
-   *
-   *     // commit at the end
-   *     database.commitTransaction();
-   *
-   *   } finally {
-   *     // if commit didn't occur then rollback the transaction
-   *     database.endTransaction();
-   *   }
-   *
-   * }</pre>
-   */
-  void endTransaction();
-
-  /**
    * Refresh the values of a bean.
    * <p>
    * Note that this resets OneToMany and ManyToMany properties so that if they
@@ -814,18 +772,6 @@ public interface Database {
    * @param id       the id value
    */
   <T> T reference(Class<T> beanType, Object id);
-
-  /**
-   * Return the extended API for Database.
-   * <p>
-   * The extended API has the options for executing queries that take an explicit
-   * transaction as an argument.
-   * <p>
-   * Typically, we only need to use the extended API when we do NOT want to use the
-   * usual ThreadLocal based mechanism to obtain the current transaction but instead
-   * supply the transaction explicitly.
-   */
-  ExtendedServer extended();
 
   /**
    * Either Insert or Update the bean depending on its state.

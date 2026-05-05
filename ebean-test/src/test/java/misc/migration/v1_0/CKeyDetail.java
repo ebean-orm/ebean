@@ -1,5 +1,6 @@
 package misc.migration.v1_0;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -11,6 +12,7 @@ public class CKeyDetail {
   @Id
   Integer id;
 
+  @Column(length = 255)
   String something;
 
 

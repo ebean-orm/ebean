@@ -3,6 +3,8 @@ package io.ebeaninternal.api;
 import io.ebean.TxScope;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Used internally to handle the scoping of transactions for methods.
@@ -32,8 +34,8 @@ public final class ScopeTrans {
    * Explicit set of Exceptions that DO cause a rollback to occur.
    */
   private final ArrayList<Class<? extends Throwable>> rollbackFor;
-  private Boolean restoreBatch;
-  private Boolean restoreBatchOnCascade;
+  private boolean restoreBatch;
+  private boolean restoreBatchOnCascade;
   private int restoreBatchSize;
   private Boolean restoreBatchGeneratedKeys;
   private boolean restoreBatchFlushOnQuery;
@@ -47,6 +49,11 @@ public final class ScopeTrans {
   private boolean nestedCommit;
   private boolean nestedUseSavepoint;
 
+  /**
+   * The UserObjects when using in nested transactions.
+   */
+  private Map<String, Object> userObjects;
+
   public ScopeTrans(boolean rollbackOnChecked, boolean created, SpiTransaction transaction, TxScope txScope) {
     this.rollbackOnChecked = rollbackOnChecked;
     this.created = created;
@@ -54,7 +61,7 @@ public final class ScopeTrans {
     this.noRollbackFor = txScope.getNoRollbackFor();
     this.rollbackFor = txScope.getRollbackFor();
     if (transaction != null) {
-      if (!created && txScope.isBatchSet() || txScope.isBatchOnCascadeSet() || txScope.isBatchSizeSet()) {
+      if (!created) {
         restoreBatch = transaction.isBatchMode();
         restoreBatchOnCascade = transaction.isBatchOnCascade();
         restoreBatchSize = transaction.getBatchSize();
@@ -135,16 +142,12 @@ public final class ScopeTrans {
       transaction.commit();
     } else {
       nestedCommit = true;
+      transaction.flush();
+      // restore the batch settings
       transaction.setFlushOnQuery(restoreBatchFlushOnQuery);
-      if (restoreBatch != null) {
-        transaction.setBatchMode(restoreBatch);
-      }
-      if (restoreBatchOnCascade != null) {
-        transaction.setBatchOnCascade(restoreBatchOnCascade);
-      }
-      if (restoreBatchSize > 0) {
-        transaction.setBatchSize(restoreBatchSize);
-      }
+      transaction.setBatchMode(restoreBatch);
+      transaction.setBatchOnCascade(restoreBatchOnCascade);
+      transaction.setBatchSize(restoreBatchSize);
       if (restoreBatchGeneratedKeys != null) {
         transaction.setGetGeneratedKeys(restoreBatchGeneratedKeys);
       }
@@ -218,4 +221,17 @@ public final class ScopeTrans {
     return e instanceof RuntimeException || rollbackOnChecked;
   }
 
+  public void putUserObject(String name, Object value) {
+    if (userObjects == null) {
+      userObjects = new HashMap<>();
+    }
+    userObjects.put(name, value);
+  }
+
+  public Object getUserObject(String name) {
+    if (userObjects == null) {
+      return null;
+    }
+    return userObjects.get(name);
+  }
 }

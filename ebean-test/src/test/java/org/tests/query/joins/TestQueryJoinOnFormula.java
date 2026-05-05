@@ -4,6 +4,7 @@ import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
@@ -16,6 +17,8 @@ import org.tests.model.family.ParentPerson;
 import java.sql.Date;
 import java.util.List;
 
+import static io.ebean.annotation.Platform.H2;
+import static io.ebean.annotation.Platform.POSTGRES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -79,14 +82,22 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     // Tests if SqlTreeBuilder.IncludesDistiller.createExtraJoin appends formulaJoinProperties
     Query<OrderShipment> shipQuery = DB.find(OrderShipment.class)
       .select("id")
-      .order().asc("order.totalAmount");
+      .orderBy().asc("order.totalAmount");
 
     shipQuery.findList();
-    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
-      + "from or_order_ship t0 "
-      + "left join o_order t1 on t1.id = t0.order_id "
-      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
-      + "order by z_bt1.total_amount");
+    if (platformDistinctOn()) {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct on (z_bt1.total_amount, t0.id) t0.id, z_bt1.total_amount " +
+        "from or_order_ship t0 " +
+        "left join o_order t1 on t1.id = t0.order_id " +
+        "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id " +
+        "order by z_bt1.total_amount");
+    } else {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id, z_bt1.total_amount "
+        + "from or_order_ship t0 "
+        + "left join o_order t1 on t1.id = t0.order_id "
+        + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
+        + "order by z_bt1.total_amount");
+    }
   }
 
   @Test
@@ -99,11 +110,19 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .where().isNotNull("order.totalAmount").query();
 
     shipQuery.findList();
-    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
-      + "from or_order_ship t0 "
-      + "left join o_order t1 on t1.id = t0.order_id "
-      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
-      + "where z_bt1.total_amount is not null");
+    if (platformDistinctOn()) {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct on (t0.id) t0.id " +
+        "from or_order_ship t0 " +
+        "left join o_order t1 on t1.id = t0.order_id " +
+        "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id " +
+        "where z_bt1.total_amount is not null");
+    } else {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id "
+        + "from or_order_ship t0 "
+        + "left join o_order t1 on t1.id = t0.order_id "
+        + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
+        + "where z_bt1.total_amount is not null");
+    }
   }
 
   @Test
@@ -137,7 +156,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     Query<OrderShipment> shipQuery = DB.find(OrderShipment.class)
       .select("id")
       .fetch("order", "totalAmount")
-      .order().asc("order.totalAmount");
+      .orderBy().asc("order.totalAmount");
 
     shipQuery.findList();
     assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id, t1.id, z_bt1.total_amount "
@@ -313,7 +332,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0))
-      .contains("select t0.identifier from child_person t0")
+      .contains("select distinct t0.identifier from child_person t0")
       .contains("left join (select i2.parent_identifier")
       .contains("where coalesce(f2.child_age, 0) = ?");
   }
@@ -329,8 +348,54 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
-    assertThat(loggedSql.get(0)).contains("select count(*) from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
-    assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?");
+    assertThat(loggedSql.get(0)).contains("select count(*) from ( select distinct t0.identifier from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?)");
+  }
+
+  /**
+   * Test for https://github.com/ebean-orm/ebean/issues/3686
+   * findCount with Formula join + subquery containing ORDER BY
+   * should produce valid SQL with properly balanced parentheses.
+   *
+   * Before the fix, lastIndexOf(" order by ") matched the ORDER BY inside the
+   * IN subquery, stripping its closing parenthesis and producing invalid SQL.
+   */
+  @ForPlatform({H2, POSTGRES})
+  @Test
+  public void test_findCount_formulaJoin_subqueryWithOrderBy_issue3686() {
+
+    LoggedSql.start();
+
+    // Subquery with orderBy — the order by inside the subquery triggers the bug.
+    Query<Order> subQuery = DB.find(Order.class)
+      .select("id")
+      .orderBy("id");
+
+    // Outer query: formula join (totalItems) via where clause + findCount
+    int count = DB.find(Order.class)
+      .where()
+      .in("id", subQuery)
+      .eq("totalItems", 3)
+      .findCount();
+
+    assertThat(count).isEqualTo(2);
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String countSql = sql.get(0);
+    // The count query must wrap with select count(*) from ( ... )
+    assertThat(countSql).contains("select count(*) from (");
+    // The subquery's ORDER BY and closing ) must be preserved
+    assertThat(countSql).contains("order by t0.id)");
+
+    // Parentheses must be balanced in the generated SQL
+    int open = 0, close = 0;
+    for (char c : countSql.toCharArray()) {
+      if (c == '(') open++;
+      if (c == ')') close++;
+    }
+    assertThat(open).as("parentheses must be balanced in: " + countSql).isEqualTo(close);
   }
 
   @Test

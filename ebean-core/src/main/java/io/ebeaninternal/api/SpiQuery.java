@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.ExpressionList;
@@ -227,6 +227,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   ProfileLocation profileLocation();
 
   /**
+   * Return the SQL hint to include in the query.
+   */
+  String hint();
+
+  /**
    * Return the label set on the query.
    */
   String label();
@@ -435,6 +440,11 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   SpiQuery<T> copy();
 
   /**
+   * Return the distinct on clause.
+   */
+  String distinctOn();
+
+  /**
    * Return a copy of the query attaching to a different EbeanServer.
    */
   SpiQuery<T> copy(SpiEbeanServer server);
@@ -544,7 +554,6 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
    * Return true if the query should include the Id property.
    * <p>
    * distinct and single attribute queries exclude the Id property.
-   * </p>
    */
   boolean isWithId();
 
@@ -571,7 +580,12 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   /**
    * Convert joins as necessary to query joins etc.
    */
-  SpiQuerySecondary convertJoins();
+  SpiQueryManyJoin convertJoins();
+
+  /**
+   * Return secondary queries if required.
+   */
+  SpiQuerySecondary secondaryQuery();
 
   /**
    * Return the TransactionContext.
@@ -766,9 +780,9 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   CacheMode queryCacheMode();
 
   /**
-   * Return true if the beans returned by this query should be read only.
+   * Return true if the beans returned by this query should be unmodifiable.
    */
-  Boolean isReadOnly();
+  boolean isUnmodifiable();
 
   /**
    * Return the query timeout.

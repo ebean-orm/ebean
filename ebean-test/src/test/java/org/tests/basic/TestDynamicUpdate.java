@@ -1,5 +1,6 @@
 package org.tests.basic;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.BeanState;
 import io.ebean.DB;
@@ -36,13 +37,11 @@ public class TestDynamicUpdate extends BaseTestCase {
 
     server.save(b2);
 
-    server.beginTransaction();
-    try {
+    try (Transaction txn = server.beginTransaction()) {
       EMain b3 = server.find(EMain.class, b.getId());
       assertEquals("ABC", b3.getEmbeddable().getDescription());
-    } finally {
-      server.endTransaction();
     }
+
     EMain b4 = server.find(EMain.class, b.getId());
     b4.setName("bbb");
     b4.getEmbeddable().setDescription("123");

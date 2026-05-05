@@ -152,7 +152,7 @@ class EqlAdapter<T> extends EqlWhereListener<T> {
       }
     }
 
-    query.order().add(new OrderBy.Property(path, asc, nulls, nullsFirstLast));
+    query.orderBy().add(new OrderBy.Property(path, asc, nulls, nullsFirstLast));
   }
 
   @Override

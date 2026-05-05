@@ -79,9 +79,7 @@ public class DefaultTransactionThreadLocalTest extends BaseTestCase {
   @ForPlatform({Platform.H2})
   @Test
   public void end_withoutActiveTransaction_isFine() {
-
     assertNull(DB.currentTransaction());
-    DB.endTransaction();
   }
 
   @ForPlatform({Platform.H2})

@@ -25,7 +25,7 @@ class PostgresSetup implements PlatformSetup {
     if (!config.isUseDocker()) {
       return new Properties();
     }
-    config.setDockerVersion("14");
+    config.setDockerVersion("16");
     config.setExtensions("hstore,pgcrypto");
     return config.getDockerProperties();
   }

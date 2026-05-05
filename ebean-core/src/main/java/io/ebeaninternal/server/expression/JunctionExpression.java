@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.expression;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.search.*;
@@ -18,15 +18,15 @@ import java.util.function.Predicate;
 /**
  * Junction implementation.
  */
-@NonNullApi
+@NullMarked
 final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, ExpressionList<T> {
 
   DefaultExpressionList<T> exprList;
   Junction.Type type;
 
-  JunctionExpression(Junction.Type type, Query<T> query, ExpressionList<T> parent) {
+  JunctionExpression(Junction.Type type, Query<T> query, ExpressionFactory expr, ExpressionList<T> parent) {
     this.type = type;
-    this.exprList = new DefaultExpressionList<>(query, parent);
+    this.exprList = new DefaultExpressionList<>(query, expr, parent, new ArrayList<>());
   }
 
   /**
@@ -141,7 +141,7 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public void addBindValues(SpiExpressionRequest request) {
+  public void addBindValues(SpiExpressionBind request) {
     for (SpiExpression expr : exprList.internalList()) {
       expr.addBindValues(request);
     }
@@ -273,6 +273,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> containsIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : exprList.contains(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> endsWith(String propertyName, String value) {
     return exprList.endsWith(propertyName, value);
   }
@@ -338,18 +343,8 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
-  public int delete(Transaction transaction) {
-    return exprList.delete(transaction);
-  }
-
-  @Override
   public int update() {
     return exprList.update();
-  }
-
-  @Override
-  public int update(Transaction transaction) {
-    return exprList.update(transaction);
   }
 
   @Override
@@ -671,6 +666,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> icontainsIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : exprList.icontains(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> idEq(Object value) {
     return exprList.idEq(value);
   }
@@ -708,6 +708,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> ilike(String propertyName, String value) {
     return exprList.ilike(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> ilikeIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : exprList.ilike(propertyName, value);
   }
 
   @Override
@@ -841,6 +846,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public ExpressionList<T> istartsWithIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : exprList.istartsWith(propertyName, value);
+  }
+
+  @Override
   public ExpressionList<T> le(String propertyName, Query<?> subQuery) {
     return exprList.le(propertyName, subQuery);
   }
@@ -853,6 +863,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> like(String propertyName, String value) {
     return exprList.like(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> likeIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : exprList.like(propertyName, value);
   }
 
   @Override
@@ -1023,6 +1038,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   @Override
   public ExpressionList<T> startsWith(String propertyName, String value) {
     return exprList.startsWith(propertyName, value);
+  }
+
+  @Override
+  public ExpressionList<T> startsWithIfPresent(String propertyName, @Nullable String value) {
+    return value == null ? this : exprList.startsWith(propertyName, value);
   }
 
   @Override

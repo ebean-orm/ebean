@@ -2,6 +2,7 @@ package org.tests.repository;
 
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -14,11 +15,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class TestBeanRepository extends BaseTestCase {
 
+  @BeforeAll
+  static void before() {
+    ResetBasicData.reset();
+  }
+
   @Test
   public void test() {
     DB.find(Customer.class).where().in("name", "c0", "c1").delete();
-
-    ResetBasicData.reset();
 
     CustomerRepository repository = new CustomerRepository(server());
 
@@ -52,9 +56,6 @@ public class TestBeanRepository extends BaseTestCase {
 
   @Test
   public void findByName() {
-
-    ResetBasicData.reset();
-
     CustomerRepository repository = new CustomerRepository(server());
 
     Customer blah = new Customer();
@@ -80,6 +81,5 @@ public class TestBeanRepository extends BaseTestCase {
 
     repository.deleteById(1099);
     repository.findAll();
-
   }
 }

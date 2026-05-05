@@ -82,6 +82,14 @@ interface SqlTreeNode {
   /**
    * Unselect lobs (for distinct queries on DB2 and Oracle).
    */
-  default void unselectLobs() {
+  default void unselectLobsForPlatform() {
+  }
+
+  default String prefix() {
+    return ""; // not matched
+  }
+
+  default void addChild(SqlTreeNode extraJoin) {
+    throw new UnsupportedOperationException();
   }
 }

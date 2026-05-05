@@ -17,6 +17,7 @@ import io.ebeanservice.docstore.api.DocStoreTransaction;
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 
 /**
  * Placeholder for use with SUPPORTS and NEVER transactional when there really isn't a transaction.
@@ -56,9 +57,9 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public long startNanoTime() {
+  public Instant startTime() {
     // not used
-    return System.nanoTime();
+    return Instant.now();
   }
 
   @Override
@@ -117,6 +118,10 @@ final class NoTransaction implements SpiTransaction {
     // do nothing
   }
 
+  @Override
+  public void deactivateExternal() {
+    // do nothing
+  }
 
   @Override
   public boolean isLogSql() {
@@ -149,12 +154,12 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
-  public void registerDeleteBean(Integer hash) {
+  public void registerDeleteBean(Class<?> type, Object id) {
 
   }
 
   @Override
-  public boolean isRegisteredDeleteBean(Integer hash) {
+  public boolean isRegisteredDeleteBean(Class<?> type, Object id) {
     return false;
   }
 
@@ -228,11 +233,6 @@ final class NoTransaction implements SpiTransaction {
 
   @Override
   public void setSkipCache(boolean skipCache) {
-  }
-
-  @Override
-  public boolean isSkipCacheExplicit() {
-    return false;
   }
 
   @Override

@@ -108,7 +108,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     PagedList<Order> pagedList2 = DB.find(Order.class)
       .setFirstRow(1)
       .setMaxRows(3)
-      .order("id")
+      .orderBy("id")
       .findPagedList();
 
     pagedList2.loadCount();
@@ -124,7 +124,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     PagedList<Order> pagedList3 = DB.find(Order.class)
       .setFirstRow(2)
       .setMaxRows(150)
-      .order("id")
+      .orderBy("id")
       .findPagedList();
 
     assertFalse(pagedList3.hasNext());
@@ -219,8 +219,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     // kinda not normal but just wrap in a transaction to assert
     // the background fetch does not occur (which explicitly creates
     // its own transaction) ... so a bit naughty with the test here
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
 
       List<Order> orders = pagedList.getList();
       int totalRowCount = pagedList.getTotalCount();
@@ -238,12 +237,8 @@ public class TestQueryFindPagedList extends BaseTestCase {
       String secTxn = loggedSql.get(1).substring(0, 10);
 
       assertEquals(firstTxn, secTxn);
-
-    } finally {
-      DB.endTransaction();
     }
   }
-
 
   @Test
   public void test_usingAlias() {

@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.docstore.DocQueryContext;
 import io.ebean.docstore.RawDoc;
 
@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 /**
  * Document storage operations.
  */
-@NonNullApi
+@NullMarked
 public interface DocumentStore {
 
   /**

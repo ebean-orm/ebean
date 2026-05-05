@@ -2,6 +2,7 @@ package io.ebeaninternal.server.transaction;
 
 import org.junit.jupiter.api.Test;
 
+import java.time.Instant;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -9,24 +10,23 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TableModStateTest {
+class TableModStateTest {
 
-  private TableModState tableModState = new TableModState();
+  private final TableModState tableModState = new TableModState();
 
   @Test
-  public void isValid() {
-
-    long before = System.nanoTime();
+  void isValid() {
+    Instant before = Instant.now();
 
     tableModState.touch(setOf("one", "two", "three"));
 
-    long after = System.nanoTime();
+    Instant after = Instant.now();
 
     // empty
-    assertTrue(tableModState.isValid(Collections.emptySet(), 12L));
+    assertTrue(tableModState.isValid(Collections.emptySet(), before));
 
     // no entry
-    assertTrue(tableModState.isValid(setOf("noEntry"), 12L));
+    assertTrue(tableModState.isValid(setOf("noEntry"), before));
 
     // later timestamp
     assertTrue(tableModState.isValid(setOf("one"), after));

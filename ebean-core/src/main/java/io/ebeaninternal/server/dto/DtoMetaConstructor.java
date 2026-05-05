@@ -1,20 +1,19 @@
 package io.ebeaninternal.server.dto;
 
-import io.ebean.core.type.DataReader;
-import io.ebean.core.type.ScalarType;
-import io.ebeaninternal.server.type.TypeManager;
-
 import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Constructor;
 import java.sql.SQLException;
+
+import io.ebean.core.type.DataReader;
+import io.ebean.core.type.ScalarType;
+import io.ebean.plugin.Lookups;
+import io.ebeaninternal.server.type.TypeManager;
 
 final class DtoMetaConstructor {
 
   private final Class<?>[] types;
   private final MethodHandle handle;
-  private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
   private final ScalarType<?>[] scalarTypes;
 
   DtoMetaConstructor(TypeManager typeManager, Constructor<?> constructor, Class<?> someClass) throws NoSuchMethodException, IllegalAccessException {
@@ -23,7 +22,7 @@ final class DtoMetaConstructor {
     for (int i = 0; i < types.length; i++) {
       scalarTypes[i] = typeManager.type(types[i]);
     }
-    this.handle = LOOKUP.findConstructor(someClass, typeFor(types));
+    this.handle = Lookups.getLookup(someClass).findConstructor(someClass, typeFor(types));
   }
 
   private MethodType typeFor(Class<?>[] types) {

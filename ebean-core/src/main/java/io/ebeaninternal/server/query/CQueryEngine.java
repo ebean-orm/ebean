@@ -37,14 +37,16 @@ public final class CQueryEngine {
   private final CQueryBuilder queryBuilder;
   private final CQueryHistorySupport historySupport;
   private final DatabasePlatform dbPlatform;
+  private final boolean autoCommitFalseOnFindIterate;
 
   public CQueryEngine(DatabaseBuilder.Settings config, DatabasePlatform dbPlatform, Binder binder, Map<String, String> asOfTableMapping, Map<String, String> draftTableMap) {
     this.dbPlatform = dbPlatform;
     this.defaultFetchSizeFindEach = config.getJdbcFetchSizeFindEach();
     this.defaultFetchSizeFindList = config.getJdbcFetchSizeFindList();
     this.forwardOnlyHintOnFindIterate = dbPlatform.forwardOnlyHintOnFindIterate();
+    this.autoCommitFalseOnFindIterate = dbPlatform.autoCommitFalseOnFindIterate();
     this.historySupport = new CQueryHistorySupport(dbPlatform.historySupport(), asOfTableMapping, config.getAsOfSysPeriod());
-    this.queryBuilder = new CQueryBuilder(dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
+    this.queryBuilder = new CQueryBuilder(config, dbPlatform, binder, historySupport, new CQueryDraftSupport(draftTableMap));
   }
 
   public int forwardOnlyFetchSize() {
@@ -73,6 +75,9 @@ public final class CQueryEngine {
       int rows = query.execute();
       if (request.logSql()) {
         request.logSql("{0}; --bind({1}) --micros({2}) --rows({3})", query.generatedSql(), query.bindLog(), query.micros(), rows);
+      }
+      if (rows > 0) {
+        request.clearContext();
       }
       return rows;
     } catch (SQLException e) {
@@ -104,15 +109,9 @@ public final class CQueryEngine {
         if (collection instanceof List) {
           collection = (A) Collections.unmodifiableList((List<?>) collection);
           request.putToQueryCache(collection);
-          if (Boolean.FALSE.equals(request.query().isReadOnly())) {
-            collection = (A) new ArrayList<>(collection);
-          }
         } else if (collection instanceof Set) {
           collection = (A) Collections.unmodifiableSet((Set<?>) collection);
           request.putToQueryCache(collection);
-          if (Boolean.FALSE.equals(request.query().isReadOnly())) {
-            collection = (A) new LinkedHashSet<>(collection);
-          }
         }
       }
       return collection;
@@ -184,6 +183,9 @@ public final class CQueryEngine {
       if (defaultFetchSizeFindEach > 0) {
         request.setDefaultFetchBuffer(defaultFetchSizeFindEach);
       }
+      if (autoCommitFalseOnFindIterate) {
+        request.setAutoCommitOnFindIterate();
+      }
       if (!cquery.prepareBindExecuteQueryForwardOnly(forwardOnlyHintOnFindIterate)) {
         // query has been cancelled already
         return null;
@@ -237,7 +239,7 @@ public final class CQueryEngine {
     }
 
     // order by lower sys period desc
-    query.order().desc(sysPeriodLower);
+    query.orderBy().desc(sysPeriodLower);
     CQuery<T> cquery = queryBuilder.buildQuery(request);
     request.setCancelableQuery(cquery);
     try {
@@ -355,6 +357,7 @@ public final class CQueryEngine {
       if (request.isQueryCachePut()) {
         request.addDependentTables(cquery.dependentTables());
       }
+      request.unmodifiableFreeze(beanCollection);
       return beanCollection;
 
     } catch (SQLException e) {
@@ -387,6 +390,7 @@ public final class CQueryEngine {
         cquery.auditFind(bean);
       }
       request.executeSecondaryQueries(false);
+      request.unmodifiableFreeze(bean);
       return (T) bean;
     } catch (SQLException e) {
       throw cquery.createPersistenceException(e);

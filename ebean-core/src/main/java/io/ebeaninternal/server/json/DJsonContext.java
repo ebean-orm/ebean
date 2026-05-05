@@ -402,7 +402,13 @@ public final class DJsonContext implements SpiJsonContext {
   private WriteJson createWriteJson(JsonGenerator gen, JsonWriteOptions options) {
     FetchPath pathProps = (options == null) ? null : options.getPathProperties();
     Map<String, JsonWriteBeanVisitor<?>> visitors = (options == null) ? null : options.getVisitorMap();
-    return new WriteJson(server, gen, pathProps, visitors, determineObjectMapper(options), determineInclude(options));
+    return new WriteJson(server,
+      gen,
+      pathProps,
+      visitors,
+      determineObjectMapper(options),
+      determineInclude(options),
+      options == null || options.isIncludeLoadedImplicit());
   }
 
   private <T> void toJsonFromCollection(Collection<T> collection, String key, JsonGenerator gen, JsonWriteOptions options) throws IOException {
@@ -490,4 +496,5 @@ public final class DJsonContext implements SpiJsonContext {
     JsonConfig.Include include = options.getInclude();
     return (include != null) ? include : defaultInclude;
   }
+
 }

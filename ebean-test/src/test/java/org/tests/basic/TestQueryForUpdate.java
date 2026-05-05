@@ -2,14 +2,15 @@ package org.tests.basic;
 
 import io.ebean.*;
 import io.ebean.annotation.Platform;
+import io.ebean.annotation.TxIsolation;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.ForPlatform;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.Customer;
-import org.tests.model.basic.EBasic;
-import org.tests.model.basic.Order;
-import org.tests.model.basic.ResetBasicData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.tests.model.basic.*;
 
 import java.util.List;
 
@@ -17,6 +18,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestQueryForUpdate extends BaseTestCase {
+
+  private static final Logger log = LoggerFactory.getLogger(TestQueryForUpdate.class);
 
   @Test
   public void testForUpdate() {
@@ -34,9 +37,106 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
+    } else if (isDb2()) {
+      assertThat(sqlOf(query)).contains("with rs use and keep update locks");
     } else {
       assertThat(sqlOf(query)).contains("for update");
     }
+  }
+
+  // Nah, nothing to do with repeatable read here
+//  @ForPlatform(Platform.YUGABYTE)
+//  @Test
+//  void concurrentForUpdate() throws InterruptedException {
+//    ResetBasicData.reset();
+//
+//    Database db = DB.getDefault();
+//    Thread t1 = new Thread() {
+//      @Override
+//      public void run() {
+//        try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
+//          log.info("(REPEATABLE_READ) Thread: before find");
+//          List<Country> list = DB.find(Country.class)
+//            .usingTransaction(transaction)
+//            .forUpdate()
+//            .findList();
+//
+//          try {
+//            log.info("(REPEATABLE_READ) Thread: after find - size:{}, hold locks for some time", list.size());
+//            Thread.sleep(500);
+//          } catch (InterruptedException e) {
+//            throw new RuntimeException(e);
+//          }
+//          log.info("(REPEATABLE_READ) Thread: done, release locks");
+//        }
+//      }
+//    };
+//
+//    t1.start();
+//    Thread.sleep(100);
+//
+//    long start = System.currentTimeMillis();
+//    try (final Transaction transaction = db.createTransaction(TxIsolation.REPEATABLE_READ)) {
+//      log.info("(REPEATABLE_READ) Main: before find, should wait for locks to be released...");
+//      DB.find(Country.class)
+//        .usingTransaction(transaction)
+//        .forUpdate()
+//        .findList();
+//
+//      log.info("(REPEATABLE_READ) Main: complete");
+//    }
+//
+//    long exeMillis = System.currentTimeMillis() - start;
+//    assertThat(exeMillis).isGreaterThan(300);
+//  }
+
+//  @IgnorePlatform(Platform.YUGABYTE) // ignore this for yugabyte and see if everything else passes
+  @Test
+  public void testConcurrentForUpdate() throws InterruptedException {
+    ResetBasicData.reset();
+
+    Database db = DB.getDefault();
+    Thread t1 = new Thread(() -> {
+      try (final Transaction transaction = db.createTransaction()) {
+        log.info("Thread: before find");
+        List<Customer> list = DB.find(Customer.class)
+          .usingTransaction(transaction)
+          .forUpdate()
+          .findList();
+
+        try {
+          log.info("Thread: after find - rows locked:{}, hold for 700ms", list.size());
+          Thread.sleep(600); // 3000
+        } catch (InterruptedException e) {
+          throw new RuntimeException(e);
+        }
+        log.info("Thread: done, releasing locks");
+      } // transaction ended here via try-with-resources
+    });
+
+    t1.start();
+
+    Thread.sleep(100);
+
+    long start = System.currentTimeMillis();
+    try (final Transaction transaction = db.beginTransaction()) { // second transaction
+      if (isH2()) {
+        DB.sqlUpdate("SET LOCK_TIMEOUT 5000").execute();
+      }
+      log.info("Main: before find, should wait (blocked by other thread) ...");
+      DB.find(Customer.class)
+        .usingTransaction(transaction)
+        .forUpdate()
+        //.orderBy().desc("1") // this would help by the locks in DB2
+        .findList();
+
+      log.info("Main: complete");
+    } // end second transaction
+
+    long exeMillis = System.currentTimeMillis() - start;
+    assertThat(exeMillis)
+      .describedAs("select for update expected to wait")
+      .isGreaterThan(400); // 2500
   }
 
   @Test
@@ -55,6 +155,8 @@ public class TestQueryForUpdate extends BaseTestCase {
 
     if (isSqlServer()) {
       assertThat(sqlOf(query)).contains("with (updlock)");
+    } else if (isDb2()) {
+      assertThat(sqlOf(query)).contains("with rs use and keep update locks");
     } else if (!isOracle()) {
       // Oracle does not support FOR UPDATE with FETCH
       assertThat(sqlOf(query)).contains("for update");
@@ -88,6 +190,8 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sql.get(0)).contains("from o_order");
       if (isSqlServer()) {
         assertThat(sql.get(1)).contains("from o_customer t0 with (updlock) where t0.id = ?");
+      } else if (isDb2()) {
+        assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? with rs use and keep update locks");
       } else {
         assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
       }
@@ -123,6 +227,8 @@ public class TestQueryForUpdate extends BaseTestCase {
       assertThat(sql.get(0)).contains("from o_order");
       if (isSqlServer()) {
         assertThat(sql.get(1)).contains("from o_customer t0 with (updlock,nowait) where t0.id = ?");
+      } else if (isDb2()) {
+        assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? with rs use and keep update locks");
       } else {
         assertThat(sql.get(1)).contains("from o_customer t0 where t0.id = ? for update");
       }

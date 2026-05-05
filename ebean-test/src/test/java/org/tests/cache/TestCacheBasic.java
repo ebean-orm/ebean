@@ -29,7 +29,7 @@ public class TestCacheBasic extends BaseTestCase {
     Country c0 = DB.reference(Country.class, "NZ");
     ServerCacheStatistics statistics = countryCache.statistics(false);
     long hc = statistics.getHitCount();
-    assertEquals(1, hc);
+    assertEquals(0, hc); // Change behaviour, reference() no longer hits cache with unmodifiable
     assertNotNull(c0);
 
     // Country c1 = DB.reference(Country.class, "NZ");

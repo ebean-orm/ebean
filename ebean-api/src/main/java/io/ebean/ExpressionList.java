@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.search.*;
 
 import jakarta.persistence.NonUniqueResultException;
@@ -31,7 +31,7 @@ import java.util.function.Predicate;
  *
  * @see Query#where()
  */
-@NonNullApi
+@NullMarked
 public interface ExpressionList<T> {
 
   /**
@@ -54,14 +54,6 @@ public interface ExpressionList<T> {
   Query<T> orderById(boolean orderById);
 
   /**
-   * @deprecated migrate to {@link #orderBy(String)}
-   */
-  @Deprecated(since = "13.19", forRemoval = true)
-  default ExpressionList<T> order(String orderByClause) {
-    return orderBy(orderByClause);
-  }
-
-  /**
    * Set the order by clause replacing the existing order by clause if there is
    * one.
    * <p>
@@ -70,14 +62,6 @@ public interface ExpressionList<T> {
    * respectively.
    */
   ExpressionList<T> orderBy(String orderBy);
-
-  /**
-   * @deprecated migrate to {@link #orderBy()}.
-   */
-  @Deprecated(forRemoval = true)
-  default OrderBy<T> order() {
-    return orderBy();
-  }
 
   /**
    * Return the OrderBy so that you can append an ascending or descending
@@ -222,32 +206,12 @@ public interface ExpressionList<T> {
   int delete();
 
   /**
-   * Execute as a delete query deleting the 'root level' beans that match the predicates
-   * in the query.
-   * <p>
-   * Note that if the query includes joins then the generated delete statement may not be
-   * optimal depending on the database platform.
-   * </p>
-   *
-   * @return the number of rows that were deleted.
-   */
-  int delete(Transaction transaction);
-
-  /**
    * Execute as a update query.
    *
    * @return the number of rows that were updated.
    * @see UpdateQuery
    */
   int update();
-
-  /**
-   * Execute as a update query with the given transaction.
-   *
-   * @return the number of rows that were updated.
-   * @see UpdateQuery
-   */
-  int update(Transaction transaction);
 
   /**
    * Execute the query returning true if a row is found.
@@ -349,7 +313,7 @@ public interface ExpressionList<T> {
    *  List<String> names =
    *    DB.find(Customer.class)
    *      .select("name")
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .findSingleAttributeList();
    *
    * }</pre>
@@ -362,7 +326,7 @@ public interface ExpressionList<T> {
    *      .setDistinct(true)
    *      .select("name")
    *      .where().eq("status", Customer.Status.NEW)
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .setMaxRows(100)
    *      .findSingleAttributeList();
    *
@@ -1110,6 +1074,14 @@ public interface ExpressionList<T> {
   ExpressionList<T> like(String propertyName, String value);
 
   /**
+   * Is LIKE if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>likeIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> likeIfPresent(String propertyName, @Nullable String value);
+
+  /**
    * Case insensitive Like - property like value where the value contains the
    * SQL wild card characters % (percentage) and _ (underscore). Typically uses
    * a lower() function to make the expression case insensitive.
@@ -1117,15 +1089,39 @@ public interface ExpressionList<T> {
   ExpressionList<T> ilike(String propertyName, String value);
 
   /**
+   * Is case insensitive LIKE if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>ilikeIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> ilikeIfPresent(String propertyName, @Nullable String value);
+
+  /**
    * Starts With - property like value%.
    */
   ExpressionList<T> startsWith(String propertyName, String value);
+
+  /**
+   * Is STARTS WITH if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>startsWithIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> startsWithIfPresent(String propertyName, @Nullable String value);
 
   /**
    * Case insensitive Starts With - property like value%. Typically uses a
    * lower() function to make the expression case insensitive.
    */
   ExpressionList<T> istartsWith(String propertyName, String value);
+
+  /**
+   * Is case insensitive STARTS WITH if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>istartsWithIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> istartsWithIfPresent(String propertyName, @Nullable String value);
 
   /**
    * Ends With - property like %value.
@@ -1144,10 +1140,26 @@ public interface ExpressionList<T> {
   ExpressionList<T> contains(String propertyName, String value);
 
   /**
+   * Is CONTAINS if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>containsIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> containsIfPresent(String propertyName, @Nullable String value);
+
+  /**
    * Case insensitive Contains - property like %value%. Typically uses a lower()
    * function to make the expression case insensitive.
    */
   ExpressionList<T> icontains(String propertyName, String value);
+
+  /**
+   * Is case insensitive CONTAINS if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>icontainsIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> icontainsIfPresent(String propertyName, @Nullable String value);
 
   /**
    * In expression using pairs of value objects.
@@ -1707,7 +1719,7 @@ public interface ExpressionList<T> {
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
    *        .endAnd()
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .findList();
    * }</pre>
    */
@@ -1728,7 +1740,7 @@ public interface ExpressionList<T> {
    *    .or()
    *      .eq("status", Customer.Status.ACTIVE)
    *      .isNull("anniversary")
-   *    .order().asc("name")
+   *    .orderBy().asc("name")
    *    .findList();
    *
    * }</pre>
@@ -1748,7 +1760,7 @@ public interface ExpressionList<T> {
    *        .eq("status", Customer.Status.ACTIVE)
    *        .gt("id", 0)
    *        .endAnd()
-   *      .order().asc("name")
+   *      .orderBy().asc("name")
    *      .findList();
    *
    * }</pre>
@@ -1782,7 +1794,7 @@ public interface ExpressionList<T> {
    *       .gt("id", 1)
    *       .eq("anniversary", onAfter)
    *       .endNot()
-   *     .order()
+   *     .orderBy()
    *       .asc("name")
    *     .findList();
    *

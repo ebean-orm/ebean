@@ -3,16 +3,15 @@ package io.ebean.text.json;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
+import io.ebean.XBootstrapService;
 import io.ebean.service.SpiJsonService;
 
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import java.util.Set;
 
 /**
@@ -20,16 +19,7 @@ import java.util.Set;
  */
 public class EJson {
 
-  private static SpiJsonService plugin = init();
-
-  private static SpiJsonService init() {
-
-    Iterator<SpiJsonService> loader = ServiceLoader.load(SpiJsonService.class).iterator();
-    if (loader.hasNext()) {
-      return loader.next();
-    }
-    throw new IllegalStateException("No service implementation found for SpiJsonService?");
-  }
+  private static final SpiJsonService plugin = XBootstrapService.jsonService();
 
   /**
    * Write the nested Map/List as json.

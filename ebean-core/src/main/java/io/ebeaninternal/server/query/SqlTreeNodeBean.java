@@ -38,7 +38,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
   final boolean readId;
   final boolean readIdNormal;
   final boolean disableLazyLoad;
-  final boolean readOnly;
+  final boolean unmodifiable;
   final InheritInfo inheritInfo;
   final String prefix;
   final Map<String, String> pathMap;
@@ -92,11 +92,21 @@ class SqlTreeNodeBean implements SqlTreeNode {
     this.readId = !aggregationRoot && withId && desc.hasId();
     this.readIdNormal = readId && !temporalVersions;
     this.disableLazyLoad = common.disableLazyLoad() || !readIdNormal || desc.isRawSqlBased();
-    this.readOnly = common.readOnly();
+    this.unmodifiable = common.unmodifiable();
     this.partialObject = props.isPartialObject();
     this.properties = props.props();
     this.children = myChildren == null ? Collections.emptyList() : myChildren;
     this.pathMap = createPathMap(prefix, desc);
+  }
+
+  @Override
+  public String prefix() {
+    return prefix;
+  }
+
+  @Override
+  public void addChild(SqlTreeNode extraJoin) {
+    children.add(extraJoin);
   }
 
   @Override
@@ -163,7 +173,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
     }
     for (STreeProperty property : properties) {
       if (!property.isAggregation()) {
-        property.appendSelect(ctx, subQuery);
+        property.appendGroupBy(ctx, subQuery);
       }
     }
     for (SqlTreeNode child : children) {
@@ -379,16 +389,16 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
 
   @Override
-  public void unselectLobs() {
+  public void unselectLobsForPlatform() {
     if (children != null) {
       for (SqlTreeNode child : children) {
-        child.unselectLobs();
+        child.unselectLobsForPlatform();
       }
     }
     if (hasLob()) {
       List<STreeProperty> lst = new ArrayList<>();
       for (STreeProperty prop : properties) {
-        if (!prop.isDbLob()) {
+        if (!prop.isLobForPlatform()) {
           lst.add(prop);
         }
       }
@@ -399,7 +409,7 @@ class SqlTreeNodeBean implements SqlTreeNode {
 
   private boolean hasLob() {
     for (STreeProperty prop : properties) {
-      if (prop.isDbLob()) {
+      if (prop.isLobForPlatform()) {
         return true;
       }
     }

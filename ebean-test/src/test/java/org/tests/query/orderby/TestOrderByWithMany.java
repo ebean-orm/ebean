@@ -11,6 +11,7 @@ import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestOrderByWithMany extends BaseTestCase {
@@ -48,12 +49,12 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     // first one is the main query and others are lazy loading queries
     List<String> loggedSql = LoggedSql.stop();
-    assertTrue(loggedSql.size() > 1);
+    assertThat(loggedSql.size()).isGreaterThan(1);
 
     String lazyLoadSql = loggedSql.get(1);
     // contains the foreign key back to the parent bean (t0.order_id)
-    assertTrue(trimSql(lazyLoadSql, 2).contains("select t0.order_id, t0.id"));
-    assertTrue(lazyLoadSql.contains("order by t0.order_id, t0.id, t0.order_qty, t0.cretime desc"));
+    assertThat(trimSql(lazyLoadSql, 2)).contains(" t0.order_id, t0.id");
+    assertThat(lazyLoadSql).contains("order by t0.order_id, t0.id, t0.order_qty, t0.cretime desc");
 
   }
 
@@ -64,37 +65,37 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     String sql = query.getGeneratedSql();
 
-    assertTrue(sql.contains("order by t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc"));
+    assertThat(sql).contains("order by t0.id, t1.id asc, t1.order_qty asc, t1.cretime desc");
   }
 
   private void checkWithBuiltInMany() {
 
-    Query<Order> query = DB.find(Order.class).fetch("details").order().desc("customer.name");
+    Query<Order> query = DB.find(Order.class).fetch("details").orderBy().desc("customer.name");
 
     query.findList();
 
     String sql = query.getGeneratedSql();
 
     // t0.id inserted into the middle of the order by
-    assertTrue(sql.contains("order by t1.name desc, t0.id, t2.id asc"));
-    assertTrue(sql.contains("t2.id asc, t2.order_qty asc, t2.cretime desc"));
+    assertThat(sql).contains("order by t1.name desc, t0.id, t2.id asc");
+    assertThat(sql).contains("t2.id asc, t2.order_qty asc, t2.cretime desc");
   }
 
   private void checkAppendId() {
 
-    Query<Order> query = DB.find(Order.class).fetch("shipments").order().desc("customer.name");
+    Query<Order> query = DB.find(Order.class).fetch("shipments").orderBy().desc("customer.name");
 
     query.findList();
 
     String sql = query.getGeneratedSql();
 
     // append the id to ensure ordering of root level objects
-    assertTrue(sql.contains("order by t1.name desc, t0.id"));
+    assertThat(sql).contains("order by t1.name desc, t0.id");
   }
 
   private void checkNone() {
 
-    Query<Order> query = DB.find(Order.class).order().desc("customer.name");
+    Query<Order> query = DB.find(Order.class).orderBy().desc("customer.name");
 
     query.findList();
 
@@ -102,55 +103,55 @@ public class TestOrderByWithMany extends BaseTestCase {
 
     // no need to append id to order by as there is no 'many' included in the
     // query
-    assertTrue(sql.contains("order by t1.name desc"));
-    assertTrue(!sql.contains("order by t1.name desc,"));
+    assertThat(sql).contains("order by t1.name desc");
+    assertThat(sql).doesNotContain("order by t1.name desc,");
   }
 
   private void checkBoth() {
 
-    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").orderBy()
       .desc("customer.name, shipments.shipTime");
 
     query.findList();
 
     String sql = query.getGeneratedSql();
     // insert id into the middle of the order by
-    assertTrue(sql.contains("order by t1.name, t0.id, t2.ship_time desc"));
+    assertThat(sql).contains("order by t1.name, t0.id, t2.ship_time desc");
   }
 
   private void checkPrepend() {
 
-    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").orderBy()
       .desc("shipments.shipTime");
 
     query.findList();
 
     String sql = query.getGeneratedSql();
     // prepend id in order by
-    assertTrue(sql.contains("order by t0.id, t1.ship_time desc"));
+    assertThat(sql).contains("order by t0.id, t1.ship_time desc");
   }
 
   private void checkAlreadyIncluded() {
 
-    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").orderBy()
       .desc("id, shipments.shipTime");
 
     query.findList();
 
     String sql = query.getGeneratedSql();
     // prepend id in order by
-    assertTrue(sql.contains("order by t0.id, t1.ship_time desc"));
+    assertThat(sql).contains("order by t0.id, t1.ship_time desc");
   }
 
   private void checkAlreadyIncluded2() {
 
-    Query<Order> query = DB.find(Order.class).fetch("shipments").order()
+    Query<Order> query = DB.find(Order.class).fetch("shipments").orderBy()
       .desc("orderDate, id, shipments.shipTime");
 
     query.findList();
 
     String sql = query.getGeneratedSql();
     // prepend id in order by
-    assertTrue(sql.contains("order by t0.order_date, t0.id, t1.ship_time desc"));
+    assertThat(sql).contains("order by t0.order_date, t0.id, t1.ship_time desc");
   }
 }

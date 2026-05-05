@@ -1,6 +1,8 @@
 package io.ebean.querybean.generator;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.FilerException;
+import javax.annotation.processing.FilerException;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -20,13 +22,13 @@ public class Processor extends AbstractProcessor implements Constants {
 
   private ProcessingContext processingContext;
   private SimpleModuleInfoWriter moduleWriter;
+  private boolean initModuleWriter;
 
   public Processor() {
   }
 
   @Override
   public Set<String> getSupportedOptions() {
-
     Set<String> options =  new LinkedHashSet<>();
     options.add(KAPT_KOTLIN_GENERATED_OPTION);
     options.add(GENERATE_KOTLIN_CODE_OPTION);
@@ -47,6 +49,8 @@ public class Processor extends AbstractProcessor implements Constants {
     annotations.add(CONVERTER);
     annotations.add(EBEAN_COMPONENT);
     annotations.add(MODULEINFO);
+    annotations.add(TYPEQUERYBEAN);
+    annotations.add(GENERATED);
     return annotations;
   }
 
@@ -100,24 +104,26 @@ public class Processor extends AbstractProcessor implements Constants {
 
   private void initModuleInfoBean() {
     try {
-      if (moduleWriter == null) {
+      if (!initModuleWriter) {
         moduleWriter = new SimpleModuleInfoWriter(processingContext);
       }
+    } catch (FilerException e) {
+      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
     } catch (Throwable e) {
-      e.printStackTrace();
       processingContext.logError(null, "Failed to initialise EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
+    } finally {
+      initModuleWriter = true;
     }
   }
 
   private void writeModuleInfoBean() {
     try {
       if (moduleWriter == null) {
-        processingContext.logError(null, "EntityClassRegister was not initialised and not written");
+        processingContext.logNote(null, "EntityClassRegister skipped");
       } else {
         moduleWriter.write();
       }
     } catch (Throwable e) {
-      e.printStackTrace();
       processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
   }
@@ -125,8 +131,7 @@ public class Processor extends AbstractProcessor implements Constants {
   private void generateQueryBeans(Element element) {
     try {
       SimpleQueryBeanWriter beanWriter = new SimpleQueryBeanWriter((TypeElement) element, processingContext);
-      beanWriter.writeRootBean();
-      beanWriter.writeAssocBean();
+      beanWriter.writeBean();
     } catch (Throwable e) {
       processingContext.logError(element, "Error generating query beans: " + e);
     }

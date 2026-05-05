@@ -1,5 +1,6 @@
 package org.tests.model.composite;
 
+import io.ebean.UnmodifiableEntityException;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
@@ -8,11 +9,12 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-public class TestCompositeKeyUserClient extends BaseTestCase {
+class TestCompositeKeyUserClient extends BaseTestCase {
 
   @Test
-  public void test() {
+  void test() {
 
     CkeUser user0 = new CkeUser();
     user0.setUserPK(new CkeUserKey(20, "sally"));
@@ -28,6 +30,19 @@ public class TestCompositeKeyUserClient extends BaseTestCase {
     client.setNotes("try it");
     client.setClientPK(new CkeClientKey(20, "susan"));
     client.setUser(user1);
+
+    List<CkeUser> unmodifiable = DB.find(CkeUser.class)
+      .setUnmodifiable(true)
+      .where().eq("userPK.codCompany", 20)
+      .findList();
+
+    assertThat(unmodifiable).hasSize(2);
+    for (CkeUser ckeUser : unmodifiable) {
+      CkeUserKey userPK = ckeUser.getUserPK();
+      assertThatThrownBy(() -> userPK.setCodCompany(7))
+        .describedAs("EmbeddedId is unmodifiable")
+        .isInstanceOf(UnmodifiableEntityException.class);
+    }
 
     LoggedSql.start();
 

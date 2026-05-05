@@ -43,7 +43,7 @@ public class WriteJsonDirtyTest {
     JsonFactory jsonFactory = new JsonFactory();
     JsonGenerator generator = jsonFactory.createGenerator(writer);
 
-    WriteJson writeJson = new WriteJson(server, generator, null, null, null, null);
+    WriteJson writeJson = new WriteJson(server, generator, null, null, null, null, true);
     descriptor.jsonWriteDirty(writeJson, entityBean, dirtyProperties);
 
     generator.flush();

@@ -11,31 +11,23 @@ final class SqlServerSqlLimiter implements SqlLimiter {
 
   @Override
   public SqlLimitResponse limit(SqlLimitRequest request) {
-    String dbSql = request.getDbSql();
-    StringBuilder sb = new StringBuilder(50 + dbSql.length());
     int firstRow = request.getFirstRow();
     int maxRows = request.getMaxRows();
     if (firstRow < 1) {
       // just use top n
-      sb.append("select ");
-      if (request.isDistinct()) {
-        sb.append("distinct ");
-      }
-      sb.append("top ").append(maxRows).append(' ');
-      sb.append(dbSql);
-      return new SqlLimitResponse(sb.toString());
+      final var buffer = request.selectDistinct();
+      buffer.append("top ").append(maxRows).append(' ');
+      buffer.append(request.getDbSql());
+      return new SqlLimitResponse(buffer.toString());
     }
-    sb.append("select ");
-    if (request.isDistinct()) {
-      sb.append("distinct ");
-    }
-    sb.append(dbSql);
-    sb.append(' ').append("offset");
-    sb.append(' ').append(firstRow).append(" rows");
+    final var buffer = request.selectDistinct();
+    buffer.append(request.getDbSql());
+    buffer.append(' ').append("offset");
+    buffer.append(' ').append(firstRow).append(" rows");
     if (maxRows > 0) {
-      sb.append(" fetch next ").append(maxRows).append(" rows only");
+      buffer.append(" fetch next ").append(maxRows).append(" rows only");
     }
-    return new SqlLimitResponse(sb.toString());
+    return new SqlLimitResponse(buffer.toString());
   }
 
 }

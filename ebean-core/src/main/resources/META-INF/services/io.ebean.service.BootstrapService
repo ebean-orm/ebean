@@ -1,0 +1,5 @@
+io.ebeaninternal.server.DContainerFactory
+io.ebeaninternal.server.rawsql.DRawSqlService
+io.ebeaninternal.server.query.DFetchGroupService
+io.ebeaninternal.server.profile.DProfileLocationFactory
+io.ebeaninternal.server.profile.DMetricFactory

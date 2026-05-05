@@ -55,4 +55,9 @@ public interface LoadContext {
    * Use soft-references for streaming queries, so unreachable entries can be garbage collected.
    */
   void useReferences(boolean useReferences);
+
+  /**
+   * Return true to include a many as a secondary query for unmodified.
+   */
+  boolean includeSecondary(BeanPropertyAssocMany<?> many);
 }

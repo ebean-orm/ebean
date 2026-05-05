@@ -54,7 +54,7 @@ public class TestQueryFindIterate extends BaseTestCase {
       .where()
       .isNotNull("name")
       .setMaxRows(3)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findIterate();
 
     try {
@@ -138,9 +138,9 @@ public class TestQueryFindIterate extends BaseTestCase {
     List<String> loggedSql = LoggedSql.stop();
 
     assertEquals(3, loggedSql.size());
-    assertTrue(trimSql(loggedSql.get(0), 7).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name from o_order t0 join o_customer t1"));
-    assertTrue(trimSql(loggedSql.get(1), 7).contains("select t0.order_id, t0.id, t0.order_qty, t0.ship_qty, t0.unit_price"));
-    assertTrue(trimSql(loggedSql.get(2), 7).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship"));
+    assertThat(trimSql(loggedSql.get(0), 7)).contains(" t0.id, t0.status, t0.order_date, t1.id, t1.name from o_order t0 join o_customer t1");
+    assertThat(trimSql(loggedSql.get(1), 7)).contains(" t0.order_id, t0.id, t0.order_qty, t0.ship_qty, t0.unit_price");
+    assertThat(trimSql(loggedSql.get(2), 7)).contains(" t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship");
   }
 
   @Test
@@ -161,7 +161,7 @@ public class TestQueryFindIterate extends BaseTestCase {
       .fetch("customer", "name")
       .fetch("details")
       .where().gt("id", 0).le("id", 10)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findEach(order -> {
         Customer customer = order.getCustomer();
         order.getId();
@@ -172,9 +172,9 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     List<String> loggedSql = LoggedSql.stop();
 
-    assertEquals(2, loggedSql.size());
-    assertThat(trimSql(loggedSql.get(0), 7).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name, t2.id, t2.order_qty, t2.ship_qty"));
-    assertThat(trimSql(loggedSql.get(1), 7).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship"));
+    assertThat(loggedSql).hasSize(2);
+    assertThat(trimSql(loggedSql.get(0), 7)).contains("select t0.id, t0.status, t0.order_date, t1.id, t1.name, t2.id, t2.order_qty, t2.ship_qty");
+    assertThat(trimSql(loggedSql.get(1), 7)).contains("select t0.order_id, t0.id, t0.ship_time, t0.cretime, t0.updtime, t0.version, t0.order_id from or_order_ship");
   }
 
   @ForPlatform(Platform.H2)
@@ -228,12 +228,12 @@ public class TestQueryFindIterate extends BaseTestCase {
       dsPool = (DataSourcePool) server().dataSource();
     }
 
-    int startConns = dsPool.getStatus(false).getBusy();
+    int startConns = dsPool.status(false).busy();
     final Query<Customer> query = server().find(Customer.class)
       .where()
       .isNotNull("name")
       .setMaxRows(3)
-      .order().asc("id");
+      .orderBy().asc("id");
 
     if (withLoadBatch) {
       query.setLazyLoadBatchSize(1);
@@ -241,22 +241,22 @@ public class TestQueryFindIterate extends BaseTestCase {
 
     QueryIterator<Customer> queryIterator = query.findIterate();
 
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertTrue(queryIterator.hasNext());
     assertThat(queryIterator.next()).isNotNull();
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertTrue(queryIterator.hasNext());
     assertThat(queryIterator.next()).isNotNull();
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertTrue(queryIterator.hasNext());
     assertThat(queryIterator.next()).isNotNull();
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns + 1);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns + 1);
 
     assertFalse(queryIterator.hasNext());
-    assertThat(dsPool.getStatus(false).getBusy()).isEqualTo(startConns);
+    assertThat(dsPool.status(false).busy()).isEqualTo(startConns);
     try {
       queryIterator.next();
       fail("noSuchElementException expected");

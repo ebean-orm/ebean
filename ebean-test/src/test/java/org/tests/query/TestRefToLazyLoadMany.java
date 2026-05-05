@@ -1,7 +1,9 @@
 package org.tests.query;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
+import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Contact;
 import org.tests.model.basic.Customer;
@@ -9,6 +11,7 @@ import org.tests.model.basic.ResetBasicData;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestRefToLazyLoadMany extends BaseTestCase {
@@ -26,17 +29,23 @@ public class TestRefToLazyLoadMany extends BaseTestCase {
     assertEquals(3, DB.beanState(c).loadedProps().size());
 
     // now lazy load the contacts
-    contacts2.size();
+    int expectedSize = contacts2.size();
 
-    Customer c2 = DB.reference(Customer.class, c.getId());
+    try (Transaction transaction = DB.beginTransaction()) {
+      Customer c2 = DB.reference(Customer.class, c.getId());
 
-    // we only "loaded" the contacts BeanList and not all of c2
-    List<Contact> contacts = c2.getContacts();
-    // Set<String> loadedProps = DB.beanState(c2).getLoadedProps();
-    // assertEquals(1, loadedProps.size());
+      SpiTransaction spiTxn = (SpiTransaction)transaction;
+      spiTxn.persistenceContext().clear();
 
-    // now lazy load the contacts
-    contacts.size();
+      // we only "loaded" the contacts BeanList and not all of c2
+      List<Contact> contacts = c2.getContacts();
+      // Set<String> loadedProps = DB.beanState(c2).getLoadedProps();
+      // assertEquals(1, loadedProps.size());
 
+      // now lazy load the contacts
+      int lazyLoadedSize = contacts.size();
+
+      assertThat(lazyLoadedSize).isEqualTo(expectedSize);
+    }
   }
 }

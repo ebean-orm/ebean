@@ -2,12 +2,13 @@ package io.ebeaninternal.server.util;
 
 import java.util.ArrayList;
 import java.util.EmptyStackException;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * Stack based on ArrayList.
  */
-public class ArrayStack<E> {
+public class ArrayStack<E> implements Iterable<E> {
 
   private final List<E> list;
 
@@ -88,5 +89,10 @@ public class ArrayStack<E> {
 
   public boolean contains(E o) {
     return list.contains(o);
+  }
+
+  @Override
+  public Iterator<E> iterator() {
+    return list.iterator();
   }
 }

@@ -24,6 +24,7 @@ public class H2Platform extends DatabasePlatform {
     this.dbEncrypt = new H2DbEncrypt();
     this.historySupport = new H2HistorySupport();
     this.nativeUuidType = true;
+    this.selectCountWithColumnAlias = true;
     this.supportsDeleteTableAlias = true;
     this.inlineSqlUpdateLimit = true;
     this.dbDefaultValue.setNow("now()");

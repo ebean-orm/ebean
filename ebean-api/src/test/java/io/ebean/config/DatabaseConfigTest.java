@@ -75,6 +75,11 @@ class DatabaseConfigTest {
     props.setProperty("defaultServer", "false");
     props.setProperty("skipDataSourceCheck", "true");
     props.setProperty("readOnlyDatabase", "true");
+    props.setProperty("lengthCheck", "ON");
+    props.setProperty("includeLabelInSql", "false");
+    props.setProperty("lazyLoadBatchSize", "50");
+    props.setProperty("queryBatchSize", "60");
+    props.setProperty("shutdownHook", "false");
 
     props.setProperty("queryPlan.enable", "true");
     props.setProperty("queryPlan.thresholdMicros", "10000");
@@ -82,6 +87,7 @@ class DatabaseConfigTest {
     props.setProperty("queryPlan.capturePeriodSecs", "42");
     props.setProperty("queryPlan.captureMaxTimeMillis", "560");
     props.setProperty("queryPlan.captureMaxCount", "7");
+    props.setProperty("queryPlan.explain", "explain (verbose)");
 
     config.loadFromProperties(props);
 
@@ -95,6 +101,11 @@ class DatabaseConfigTest {
     assertTrue(settings.isLoadModuleInfo());
     assertTrue(settings.skipDataSourceCheck());
     assertTrue(settings.readOnlyDatabase());
+    assertFalse(settings.shutdownHook());
+    assertFalse(settings.isIncludeLabelInSql());
+    assertThat(settings.getLengthCheck()).isEqualTo(LengthCheck.ON);
+    assertThat(settings.getLazyLoadBatchSize()).isEqualTo(50);
+    assertThat(settings.getQueryBatchSize()).isEqualTo(60);
 
     assertTrue(settings.isIdGeneratorAutomatic());
     assertFalse(settings.getPlatformConfig().isCaseSensitiveCollation());
@@ -125,12 +136,18 @@ class DatabaseConfigTest {
     assertEquals(42, settings.getQueryPlanCapturePeriodSecs());
     assertEquals(560, settings.getQueryPlanCaptureMaxTimeMillis());
     assertEquals(7, settings.getQueryPlanCaptureMaxCount());
+    assertEquals("explain (verbose)", settings.getQueryPlanExplain());
 
     assertThat(settings.getMappingLocations()).containsExactly("classpath:/foo","bar");
 
-    config.setPersistBatch(PersistBatch.NONE);
-    config.setPersistBatchOnCascade(PersistBatch.NONE);
+    config.persistBatch(PersistBatch.NONE)
+      .persistBatchOnCascade(PersistBatch.NONE)
+      .lengthCheck(LengthCheck.ON)
+      .lengthCheck(LengthCheck.UTF8)
+      .queryPlanExplain("explain (buffers)");
 
+
+    assertThat(config.settings().getQueryPlanExplain()).isEqualTo("explain (buffers)");
     Properties props1 = new Properties();
     props1.setProperty("ebean.persistBatch", "ALL");
     props1.setProperty("ebean.persistBatchOnCascade", "ALL");
@@ -146,6 +163,7 @@ class DatabaseConfigTest {
 
     assertEquals(PersistBatch.ALL, settings.getPersistBatch());
     assertEquals(PersistBatch.ALL, settings.getPersistBatchOnCascade());
+    assertEquals(LengthCheck.UTF8, settings.getLengthCheck());
 
     config.setEnabledL2Regions("r0,orgs");
     assertEquals("r0,orgs", settings.getEnabledL2Regions());
@@ -156,6 +174,7 @@ class DatabaseConfigTest {
     DatabaseBuilder.Settings config = new DatabaseConfig().settings();
     assertTrue(config.isIdGeneratorAutomatic());
     assertTrue(config.isDefaultServer());
+    assertTrue(config.shutdownHook());
     assertFalse(config.isAutoPersistUpdates());
     assertFalse(config.skipDataSourceCheck());
 
@@ -167,6 +186,8 @@ class DatabaseConfigTest {
     assertTrue(config.getPlatformConfig().isCaseSensitiveCollation());
     assertTrue(config.isAutoLoadModuleInfo());
     assertTrue(config.isLoadModuleInfo());
+    assertThat(config.getLazyLoadBatchSize()).isEqualTo(100);
+    assertThat(config.getQueryBatchSize()).isEqualTo(100);
 
     assertFalse(config.isQueryPlanEnable());
     assertEquals(Long.MAX_VALUE, config.getQueryPlanThresholdMicros());
@@ -174,7 +195,12 @@ class DatabaseConfigTest {
     assertEquals(600, config.getQueryPlanCapturePeriodSecs());
     assertEquals(10000L, config.getQueryPlanCaptureMaxTimeMillis());
     assertEquals(10, config.getQueryPlanCaptureMaxCount());
+    assertThat(config.getQueryPlanExplain()).isNull();
+    assertThat(config.getLengthCheck()).isEqualTo(LengthCheck.OFF);
+    assertTrue(config.isIncludeLabelInSql());
 
+    config.shutdownHook(false);
+    assertFalse(config.shutdownHook());
     config.setLoadModuleInfo(false);
     assertFalse(config.isAutoLoadModuleInfo());
     assertFalse(config.isLoadModuleInfo());
@@ -182,6 +208,10 @@ class DatabaseConfigTest {
     assertTrue(config.isAutoPersistUpdates());
     config.setSkipDataSourceCheck(true);
     assertTrue(config.skipDataSourceCheck());
+    config.lazyLoadBatchSize(20);
+    assertThat(config.getLazyLoadBatchSize()).isEqualTo(20);
+    config.queryBatchSize(30);
+    assertThat(config.getQueryBatchSize()).isEqualTo(30);
   }
 
   @Test

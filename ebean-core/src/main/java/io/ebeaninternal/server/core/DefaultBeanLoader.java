@@ -63,16 +63,12 @@ final class DefaultBeanLoader {
     Object parentId = parentDesc.getId(parentBean);
     if (pc == null) {
       pc = new DefaultPersistenceContext();
-      parentDesc.contextPut(pc, parentId, parentBean);
     }
+    parentDesc.contextPutIfAbsent(pc, parentId, parentBean);
     boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching() && many.isUseCache();
     if (useManyIdCache) {
-      Boolean readOnly = null;
-      if (ebi.isReadOnly()) {
-        readOnly = Boolean.TRUE;
-      }
       final String parentKey = parentDesc.cacheKey(parentId);
-      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentKey, readOnly)) {
+      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentKey)) {
         return;
       }
     }
@@ -102,8 +98,8 @@ final class DefaultBeanLoader {
     query.setMode(Mode.LAZYLOAD_MANY);
     query.setLazyLoadManyPath(many.name());
     query.setPersistenceContext(pc);
-    if (ebi.isReadOnly()) {
-      query.setReadOnly(true);
+    if (many.hasOrderColumn()) {
+      query.orderBy(many.path() + "." +  many.fetchOrderBy());
     }
 
     server.findOne(query);
@@ -126,9 +122,7 @@ final class DefaultBeanLoader {
     if (loadRequest.checkEmpty()) {
       throw new RuntimeException("Nothing in batch?");
     }
-    final SpiQuery<?> query = server.createQuery(loadRequest.beanType());
-    query.usingTransaction(loadRequest.transaction());
-    loadRequest.configureQuery(query);
+    final SpiQuery<?> query = loadRequest.createQuery(server);
     loadRequest.postLoad(executeQuery(loadRequest, query));
   }
 
@@ -210,9 +204,6 @@ final class DefaultBeanLoader {
     if (embeddedOwnerIndex > -1 || mode == Mode.REFRESH_BEAN) {
       // make sure the query doesn't use the cache
       query.setBeanCacheMode(CacheMode.OFF);
-    }
-    if (ebi.isReadOnly()) {
-      query.setReadOnly(true);
     }
     if (Mode.REFRESH_BEAN == mode) {
       // explicitly state to load all properties on REFRESH.

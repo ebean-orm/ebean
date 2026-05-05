@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * SQL query binding (for SqlQuery and DtoQuery).
@@ -52,5 +52,10 @@ public interface SpiSqlBinding extends SpiCancelableQuery {
    * Return the hint for Statement.setFetchSize().
    */
   int getBufferFetchSizeHint();
+
+  /**
+   * Set the JDBC fetchSize buffer hint if not explicitly set.
+   */
+  void setDefaultFetchBuffer(int fetchSize);
 
 }

@@ -3,6 +3,7 @@ package org.tests.docstore;
 
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.text.json.JsonReadOptions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.Product;
@@ -16,19 +17,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class CustomerReportTest extends BaseTestCase {
 
-  @Test
-  public void testToJson() throws Exception {
+  @BeforeAll
+  static void before() {
     ResetBasicData.reset();
+  }
 
-
-
+  @Test
+  public void testToJson() {
     String json = server().json().toJson(getCustomerReport());
     assertThat(json).isEqualTo("{\"dtype\":\"CR\",\"friends\":[{\"id\":2},{\"id\":3}],\"customer\":{\"id\":1}}");
   }
 
   @Test
-  public void testFromJson() throws Exception {
-    ResetBasicData.reset();
+  public void testFromJson() {
     String json = "{\"dtype\":\"CR\",\"friends\":[{\"id\":2},{\"id\":3}],\"customer\":{\"id\":1}}";
 
     JsonReadOptions opts = new JsonReadOptions();
@@ -43,9 +44,7 @@ public class CustomerReportTest extends BaseTestCase {
 
 
   @Test
-  public void testEmbeddedDocs() throws Exception {
-    ResetBasicData.reset();
-
+  public void testEmbeddedDocs() {
     CustomerReport report = getCustomerReport();
     report.getEmbeddedReports().add(getProductReport());
 

@@ -13,9 +13,18 @@ import java.sql.SQLException;
 abstract class TransactionFactory {
 
   final TransactionManager manager;
+  private final boolean autoCommitMode;
 
   TransactionFactory(TransactionManager manager) {
     this.manager = manager;
+    this.autoCommitMode = manager.isAutoCommitMode();
+  }
+
+  /**
+   * Return a new transaction.
+   */
+  SpiTransaction createTransaction(boolean explicit, Connection connection) {
+    return autoCommitMode ? new JdbcAutoCommitTransaction(explicit, connection, manager) : new JdbcTransaction(explicit, connection, manager);
   }
 
   /**
@@ -34,7 +43,7 @@ abstract class TransactionFactory {
   /**
    * Set the Transaction Isolation level if required.
    */
-  final SpiTransaction setIsolationLevel(SpiTransaction t, boolean explicit, int isolationLevel) {
+  final SpiTransaction setIsolationLevel(SpiTransaction t, int isolationLevel) {
     if (isolationLevel > -1) {
       Connection connection = t.internalConnection();
       try {

@@ -9,10 +9,10 @@ import jakarta.persistence.PersistenceException;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class TestInvalidFetchPath extends BaseTestCase {
+class TestInvalidFetchPath extends BaseTestCase {
 
   @Test
-  public void invalidFetchPathAndProperties_expect_error() {
+  void invalidFetchPathAndProperties_expect_error() {
     assertThrows(PersistenceException.class, () ->
       DB.find(Customer.class)
         .fetch("notValidPath", "notHaveProps")
@@ -20,7 +20,7 @@ public class TestInvalidFetchPath extends BaseTestCase {
   }
 
   @Test
-  public void invalidFetchPath_expect_error() {
+  void invalidFetchPath_expect_error() {
     assertThrows(PersistenceException.class, () ->
       DB.find(Customer.class)
         .fetch("notValidPath")
@@ -28,9 +28,10 @@ public class TestInvalidFetchPath extends BaseTestCase {
   }
 
   @Test
-  public void fetchWithInvalidPropertyName_expect_allowed() {
-    DB.find(Customer.class)
-      .fetch("billingAddress", "invalidPropertyName")
-      .findList();
+  void fetchWithInvalidPropertyName_expect_error() {
+    assertThrows(PersistenceException.class, () ->
+      DB.find(Customer.class)
+        .fetch("billingAddress", "invalidPropertyName")
+        .findList());
   }
 }

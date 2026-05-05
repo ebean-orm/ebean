@@ -3,6 +3,7 @@ package org.tests.cache.personinfo;
 import io.ebean.annotation.WhenCreated;
 import io.ebean.annotation.WhenModified;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
@@ -16,6 +17,7 @@ public class PersonOther {
   @Size(max=128)
   private String id;
 
+  @Column(length = 60)
   private String email;
 
   @WhenCreated

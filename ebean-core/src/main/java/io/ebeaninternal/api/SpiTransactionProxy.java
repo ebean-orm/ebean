@@ -14,6 +14,7 @@ import io.ebeanservice.docstore.api.DocStoreTransaction;
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.time.Instant;
 
 /**
  * Proxy for an underlying SpiTransaction (most of the API).
@@ -28,8 +29,8 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public long startNanoTime() {
-    return transaction.startNanoTime();
+  public Instant startTime() {
+    return transaction.startTime();
   }
 
   @Override
@@ -169,11 +170,6 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public boolean isSkipCacheExplicit() {
-    return transaction.isSkipCacheExplicit();
-  }
-
-  @Override
   public boolean isSkipCache() {
     return transaction.isSkipCache();
   }
@@ -194,13 +190,13 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
-  public void registerDeleteBean(Integer hash) {
-    transaction.registerDeleteBean(hash);
+  public void registerDeleteBean(Class<?> type, Object id) {
+    transaction.registerDeleteBean(type, id);
   }
 
   @Override
-  public boolean isRegisteredDeleteBean(Integer hash) {
-    return transaction.isRegisteredDeleteBean(hash);
+  public boolean isRegisteredDeleteBean(Class<?> type, Object id) {
+    return transaction.isRegisteredDeleteBean(type, id);
   }
 
   @Override
@@ -446,5 +442,10 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   @Override
   public void postRollback(Throwable cause) {
     transaction.postRollback(cause);
+  }
+
+  @Override
+  public void deactivateExternal() {
+    transaction.deactivateExternal();
   }
 }

@@ -54,7 +54,6 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
 
   @Test
   public void testCascadeDelete2() {
-
     init();
 
     try (Transaction txn = DB.beginTransaction()) {
@@ -68,18 +67,14 @@ public class TestDeleteUnloadedChildren extends BaseTestCase {
 
   @Test
   public void testCascadeDelete3() {
-
     init();
 
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       EdExtendedParent extendedParent = DB.find(EdExtendedParent.class).where()
         .eq("name", "My second computer").findOne();
       extendedParent.getChildren().size();
       DB.delete(extendedParent);
-      DB.commitTransaction();
-    } finally {
-      DB.endTransaction();
+      txn.commit();
     }
   }
 

@@ -1,5 +1,6 @@
 package org.tests.basic;
 
+import io.ebean.Transaction;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
@@ -17,8 +18,7 @@ public class TestInheritRef extends BaseTestCase {
   @Test
   public void testAssocOne() {
 
-    DB.beginTransaction();
-    try {
+    try (Transaction txn = DB.beginTransaction()) {
       DB.createUpdate(Vehicle.class, "delete from vehicle");
 
       Car c = new Car();
@@ -52,9 +52,6 @@ public class TestInheritRef extends BaseTestCase {
 
       assertEquals(1, found);
       assertTrue(foundTruck.getCapacity() == 20D);
-
-    } finally {
-      DB.rollbackTransaction();
     }
   }
 }
