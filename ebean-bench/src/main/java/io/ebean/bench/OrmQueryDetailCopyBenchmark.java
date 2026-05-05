@@ -24,6 +24,7 @@ public class OrmQueryDetailCopyBenchmark {
 
   private OrmQueryDetail source;
   private OrmQueryDetail existing;
+  private StringBuilder hashBuilder;
 
   @Setup
   public void setup() {
@@ -36,6 +37,7 @@ public class OrmQueryDetailCopyBenchmark {
 
     existing = new OrmQueryDetail();
     existing.fetch("contacts", "firstName,lastName", null);
+    hashBuilder = new StringBuilder(256);
   }
 
   @Benchmark
@@ -46,5 +48,12 @@ public class OrmQueryDetailCopyBenchmark {
   @Benchmark
   public OrmQueryDetail copyExisting() {
     return source.copy(existing);
+  }
+
+  @Benchmark
+  public int queryPlanHash() {
+    hashBuilder.setLength(0);
+    source.queryPlanHash(hashBuilder);
+    return hashBuilder.length();
   }
 }

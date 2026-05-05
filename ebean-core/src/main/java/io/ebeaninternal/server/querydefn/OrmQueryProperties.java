@@ -432,10 +432,12 @@ public final class OrmQueryProperties implements Serializable {
       builder.append(path);
     }
     if (included != null) {
-      builder.append("/i").append(included);
+      builder.append("/i");
+      appendSet(builder, included);
     }
     if (secondaryQueryJoins != null) {
-      builder.append("/s").append(secondaryQueryJoins);
+      builder.append("/s");
+      appendSet(builder, secondaryQueryJoins);
     }
     if (filterMany != null) {
       builder.append("/f");
@@ -445,6 +447,20 @@ public final class OrmQueryProperties implements Serializable {
       builder.append("/c").append(fetchConfig.hashCode());
     }
     builder.append('}');
+  }
+
+  private static void appendSet(StringBuilder builder, Set<String> values) {
+    builder.append('[');
+    boolean first = true;
+    for (String value : values) {
+      if (first) {
+        first = false;
+      } else {
+        builder.append(", ");
+      }
+      builder.append(value);
+    }
+    builder.append(']');
   }
 
 }
