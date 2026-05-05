@@ -15,6 +15,7 @@ import io.ebeaninternal.server.expression.FilterExpressionList;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -87,7 +88,7 @@ public final class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
     this.allProperties = response.allProperties;
-    this.included = response.included;
+    this.included = immutableIncluded(response.included);
     if (fetchConfig != null) {
       this.fetchConfig = fetchConfig;
       this.cache = fetchConfig.isCache();
@@ -104,7 +105,7 @@ public final class OrmQueryProperties implements Serializable {
   OrmQueryProperties(String path, Set<String> included, FetchConfig fetchConfig) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    this.included = included;
+    this.included = immutableIncluded(included);
     this.allProperties = false;
     this.fetchConfig = fetchConfig;
     this.cache = fetchConfig.isCache();
@@ -130,7 +131,14 @@ public final class OrmQueryProperties implements Serializable {
     this.cache = source.cache;
     this.filterMany = source.filterMany;
     this.markForQueryJoin = source.markForQueryJoin;
-    this.included = (source.included == null) ? null : new LinkedHashSet<>(source.included);
+    this.included = source.included;
+  }
+
+  private static Set<String> immutableIncluded(Set<String> included) {
+    if (included == null) {
+      return null;
+    }
+    return Collections.unmodifiableSet(new LinkedHashSet<>(included));
   }
 
   /**
