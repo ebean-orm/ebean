@@ -33,6 +33,7 @@ public class FetchGroupSelectApplyBenchmark {
   private SpiFetchGroupQuery<DummyBean> reusableQueryNoFilter;
   private OrmQueryDetail existingDetailNoFilter;
   private OrmQueryDetail existingDetailWithFilter;
+  private SpiExpressionList<?> postApplyFilter;
 
   @Setup(Level.Trial)
   public void setup() {
@@ -52,6 +53,7 @@ public class FetchGroupSelectApplyBenchmark {
     existingDetailWithFilter = new OrmQueryDetail();
     existingDetailWithFilter.fetch("contacts", "firstName,lastName", null);
     existingDetailWithFilter.getChunk("contacts", false).setFilterMany(dummyFilterMany());
+    postApplyFilter = dummyFilterMany();
   }
 
   @Benchmark
@@ -68,6 +70,13 @@ public class FetchGroupSelectApplyBenchmark {
   @Benchmark
   public OrmQueryDetail applyToExistingDetail_withFilter() {
     return spiFetchGroup.detail(existingDetailWithFilter);
+  }
+
+  @Benchmark
+  public OrmQueryDetail applyToNewEmptyDetail_thenAddFilterMany() {
+    OrmQueryDetail detail = spiFetchGroup.detail(new OrmQueryDetail());
+    detail.getChunk("contacts", true).setFilterMany(postApplyFilter);
+    return detail;
   }
 
   @SuppressWarnings("unused")
