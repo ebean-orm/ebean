@@ -45,7 +45,7 @@ public final class OrmQueryDetail implements Serializable {
     for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
       copy.fetchPaths.put(entry.getKey(), entry.getValue().copy());
     }
-    if (existing != null) {
+    if (existing != null && !existing.fetchPaths.isEmpty()) {
       // transfer any existing filterMany expressions
       for (Map.Entry<String, OrmQueryProperties> entry : existing.fetchPaths.entrySet()) {
         var filterMany = entry.getValue().getFilterMany();

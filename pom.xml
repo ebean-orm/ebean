@@ -102,6 +102,12 @@
 
   <profiles>
     <profile>
+      <id>bench</id>
+      <modules>
+        <module>ebean-bench</module>
+      </modules>
+    </profile>
+    <profile>
       <id>ea</id>
     </profile>
     <profile>
@@ -138,4 +144,3 @@
   </profiles>
 
 </project>
-

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.LinkedHashSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 public class OrmQueryPropertiesTest {
 
@@ -44,6 +45,26 @@ public class OrmQueryPropertiesTest {
 
     assertThat(p1.getIncluded()).containsOnly("id", "name", "startDate");
     assertThat(p1.allProperties()).isFalse();
+  }
+
+  @Test
+  public void construct_with_propertySet_expect_defensiveCopy() {
+
+    LinkedHashSet<String> set = new LinkedHashSet<>();
+    set.add("name");
+    OrmQueryProperties p1 = new OrmQueryProperties(null, set);
+    set.add("status");
+
+    assertThat(p1.getIncluded()).containsOnly("name");
+  }
+
+  @Test
+  public void copy_expect_reuseIncludedSet() {
+
+    OrmQueryProperties p1 = new OrmQueryProperties(null, "id,name");
+    OrmQueryProperties p2 = p1.copy();
+
+    assertSame(p1.getIncluded(), p2.getIncluded());
   }
 
   @Test
