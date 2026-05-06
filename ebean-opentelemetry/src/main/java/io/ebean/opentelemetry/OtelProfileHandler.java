@@ -5,7 +5,6 @@ import io.ebean.plugin.Plugin;
 import io.ebean.plugin.SpiServer;
 import io.ebeaninternal.api.SpiProfileHandler;
 import io.ebeaninternal.server.transaction.ProfileStream;
-import io.ebeaninternal.server.transaction.TransactionProfile;
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
 import io.opentelemetry.api.trace.SpanKind;
@@ -39,8 +38,8 @@ public final class OtelProfileHandler implements SpiProfileHandler, Plugin {
 
   @Override
   public void configure(SpiServer server) {
-    if (this.tracer == null) {
-      this.tracer = GlobalOpenTelemetry.getTracer(INSTRUMENTATION_NAME);
+    if (tracer == null) {
+      tracer = GlobalOpenTelemetry.getTracer(INSTRUMENTATION_NAME);
     }
   }
 
@@ -79,11 +78,4 @@ public final class OtelProfileHandler implements SpiProfileHandler, Plugin {
     return new OtelProfileStream(tracer, txnSpan);
   }
 
-  /**
-   * The stream handles span lifecycle inline — nothing to do here.
-   */
-  @Override
-  public void collectTransactionProfile(TransactionProfile transactionProfile) {
-    // no-op: OtelProfileStream.end() already closed the span
-  }
 }

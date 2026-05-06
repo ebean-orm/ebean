@@ -501,7 +501,7 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
     active = false;
     manager.collectMetricReadOnly((System.nanoTime() - startNanos) / 1000L);
     if (profileStream != null) {
-      profileStream.end(manager, null);
+      profileStream.end(null);
     }
   }
 

@@ -11,18 +11,6 @@ import org.jspecify.annotations.Nullable;
 public interface SpiProfileHandler {
 
   /**
-   * Process the collected transaction profiling information.
-   * <p>
-   * Note that profileId and totalMicros are part of the profilingData but passed separately as the handler
-   * may filter what it processed based on this information (ignore short transactions, only process specific
-   * profileId transactions etc).
-   * </p>
-   *
-   * @param transactionProfile The transaction profile that has just been collected
-   */
-  void collectTransactionProfile(TransactionProfile transactionProfile);
-
-  /**
    * Create a profiling stream for this transaction, or return null to not profile this transaction.
    * <p>
    * The location is null for implicit read-only transactions (queries without an explicit transaction).

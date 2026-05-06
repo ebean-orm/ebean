@@ -28,5 +28,5 @@ public interface ProfileStream {
   /**
    * Transaction completed collect the profiling information.
    */
-  void end(TransactionManager manager, String label);
+  void end(String label);
 }

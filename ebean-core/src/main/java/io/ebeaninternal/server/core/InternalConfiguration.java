@@ -405,12 +405,7 @@ public final class InternalConfiguration {
     if (handler != null) {
       return plugin(handler);
     }
-
-    ProfilingConfig profilingConfig = config.getProfilingConfig();
-    if (!profilingConfig.isEnabled()) {
-      return new NoopProfileHandler();
-    }
-    return plugin(new DefaultProfileHandler(profilingConfig));
+    return new NoopProfileHandler();
   }
 
   /**
