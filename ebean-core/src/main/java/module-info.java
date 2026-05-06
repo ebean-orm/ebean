@@ -41,7 +41,7 @@ module io.ebean.core {
 
   exports io.ebeaninternal.server.cache;
 
-  exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.postgis.types;
+  exports io.ebeaninternal.api to io.ebean.ddl.generator, io.ebean.querybean, io.ebean.autotune, io.ebean.postgis, io.ebean.test, io.ebean.elastic, io.ebean.opentelemetry, io.ebean.spring.txn, io.ebean.postgis.types;
   exports io.ebeaninternal.api.json to io.ebean.test;
   exports io.ebeaninternal.server.autotune to io.ebean.autotune;
   exports io.ebeaninternal.server.core to io.ebean.test, io.ebean.elastic;
