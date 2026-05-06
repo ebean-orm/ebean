@@ -1,9 +1,8 @@
-package org.example.resource;
+package org.tests.resource;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
-import org.example.records.BaseModel;
 
 @Entity
 public class AttributeDescriptor extends BaseModel {

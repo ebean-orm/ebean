@@ -1,7 +1,6 @@
-package org.example.resource;
+package org.tests.resource;
 
 import jakarta.persistence.*;
-import org.example.records.BaseModel;
 
 @Entity
 public class Resource extends BaseModel {

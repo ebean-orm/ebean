@@ -77,6 +77,7 @@ module io.ebean.core {
   provides io.ebean.service.BootstrapService with
     io.ebeaninternal.server.DContainerFactory,
     io.ebeaninternal.server.query.DFetchGroupService,
+    io.ebeaninternal.server.cache.DImmutableCacheFactory,
     io.ebeaninternal.server.profile.DProfileLocationFactory,
     io.ebeaninternal.server.rawsql.DRawSqlService,
     io.ebeaninternal.server.profile.DMetricFactory;

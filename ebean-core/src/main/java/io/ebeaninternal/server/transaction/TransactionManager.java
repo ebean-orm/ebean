@@ -23,6 +23,7 @@ import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.profile.TimedProfileLocation;
 import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
@@ -369,6 +370,13 @@ public class TransactionManager implements SpiTransactionManager {
     RemoteTableMod tableMod = remoteEvent.getRemoteTableMod();
     if (tableMod != null) {
       changeSet.addInvalidate(tableMod.getTables());
+      for (String table : tableMod.getTables()) {
+        for (BeanDescriptor<?> descriptor : beanDescriptorManager.descriptors(table)) {
+          if (descriptor.hasImmutableCaches()) {
+            changeSet.addImmutableClear(descriptor);
+          }
+        }
+      }
     }
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
     if (tableIUDList != null) {

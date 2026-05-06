@@ -206,6 +206,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public void registerImmutableCache(ImmutableBeanCache<?> beanCache) {
+    BeanDescriptor<?> descriptor = descriptorManager.descriptor(beanCache.type());
+    if (descriptor != null) {
+      descriptor.registerImmutableCache(beanCache);
+    }
+  }
+
+  @Override
   public SpiLogManager log() {
     return logManager;
   }

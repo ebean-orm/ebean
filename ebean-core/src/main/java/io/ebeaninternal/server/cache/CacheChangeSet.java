@@ -136,6 +136,32 @@ public final class CacheChangeSet {
   }
 
   /**
+   * Clear immutable caches for this bean type.
+   */
+  public void addImmutableClear(BeanDescriptor<?> descriptor) {
+    entries.add(new CacheChangeImmutableClear(descriptor));
+  }
+
+  /**
+   * Remove a single id from immutable caches for this bean type.
+   */
+  public <T> void addImmutableRemove(BeanDescriptor<T> desc, Object id) {
+    if (id != null) {
+      addImmutableRemoveMany(desc, Collections.singleton(id));
+    }
+  }
+
+  /**
+   * Remove many ids from immutable caches for this bean type.
+   */
+  public <T> void addImmutableRemoveMany(BeanDescriptor<T> desc, Collection<Object> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return;
+    }
+    entries.add(new CacheChangeImmutableRemove(desc, ids));
+  }
+
+  /**
    * Update a bean entry.
    */
   public <T> void addBeanUpdate(BeanDescriptor<T> desc, String key, Map<String, Object> changes, boolean updateNaturalKey, long version) {

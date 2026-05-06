@@ -354,6 +354,7 @@ public final class CQueryEngine {
         cquery.auditFindMany();
       }
       request.executeSecondaryQueries(false);
+      request.populateFromImmutableCache();
       if (request.isQueryCachePut()) {
         request.addDependentTables(cquery.dependentTables());
       }
@@ -390,6 +391,7 @@ public final class CQueryEngine {
         cquery.auditFind(bean);
       }
       request.executeSecondaryQueries(false);
+      request.populateFromImmutableCache();
       request.unmodifiableFreeze(bean);
       return (T) bean;
     } catch (SQLException e) {

@@ -1,6 +1,9 @@
 package io.ebeaninternal.server.loadcontext;
 
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.CacheMode;
+import io.ebean.ImmutableBeanCache;
 import io.ebean.ProfileLocation;
 import io.ebean.bean.*;
 import io.ebeaninternal.api.*;
@@ -20,7 +23,19 @@ public final class DLoadContext implements LoadContext {
 
   private final SpiEbeanServer ebeanServer;
   private final BeanDescriptor<?> rootDescriptor;
+  /**
+   * Path based contexts used for +query secondary query execution.
+   */
   private final Map<String, DLoadBeanContext> beanMap = new HashMap<>();
+  /**
+   * Type based contexts used for assoc-one lazy loading registration.
+   */
+  private final Map<String, DLoadBeanContext> lazyBeanMap = new HashMap<>();
+  /**
+   * Type based sets used when lazy loading is disabled but immutable cache population should still occur.
+   */
+  private final Map<String, Set<EntityBeanIntercept>> immutableRefMap = new HashMap<>();
+  private final Map<Class<?>, ImmutableBeanCache<?>> immutableCaches;
   private final Map<String, DLoadManyContext> manyMap = new HashMap<>();
   private final DLoadBeanContext rootBeanContext;
   private final boolean asDraft;
@@ -69,6 +84,7 @@ public final class DLoadContext implements LoadContext {
     this.planLabel = null;
     this.profileLocation = null;
     this.profilingListener = null;
+    this.immutableCaches = Collections.emptyMap();
     this.rootBeanContext = new DLoadBeanContext(this, rootDescriptor, null, null);
     this.secondaryProperties = null;
   }
@@ -97,6 +113,7 @@ public final class DLoadContext implements LoadContext {
     this.profilingListener = query.profilingListener();
     this.planLabel = query.planLabel();
     this.profileLocation = query.profileLocation();
+    this.immutableCaches = query.immutableBeanCaches();
     this.secondaryProperties = query.isUnmodifiable() ? new HashSet<>() : null;
 
     ObjectGraphNode parentNode = query.parentNode();
@@ -246,17 +263,57 @@ public final class DLoadContext implements LoadContext {
 
   @Override
   public void register(String path, EntityBeanIntercept ebi) {
-    beanContext(path).register(ebi);
+    DLoadBeanContext context = pathBeanContext(path);
+    if (context != null) {
+      context.register(ebi);
+    } else {
+      lazyBeanContext(descriptor(ebi)).register(ebi);
+    }
   }
 
   @Override
   public void register(String path, EntityBeanIntercept ebi, BeanPropertyAssocOne<?> property) {
-    beanContextWithInherit(path, property).register(ebi);
+    DLoadBeanContext context = pathBeanContext(path);
+    if (context != null) {
+      context.register(ebi);
+    } else {
+      lazyBeanContext(property.targetDescriptor()).register(ebi);
+    }
   }
 
   @Override
   public void register(String path, BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
     manyContext(path, many).register(bc);
+  }
+
+  @Override
+  public void registerForImmutable(EntityBeanIntercept ebi) {
+    if (immutableCaches.isEmpty()) {
+      return;
+    }
+    BeanDescriptor<?> descriptor = descriptor(ebi);
+    if (immutableCaches.containsKey(descriptor.type())) {
+      immutableRefMap.computeIfAbsent(descriptor.fullName(), key -> new LinkedHashSet<>()).add(ebi);
+    }
+  }
+
+  @Override
+  public @Nullable EntityBean immutableBeanHit(BeanDescriptor<?> descriptor, Object id) {
+    if (!unmodifiable || immutableCaches.isEmpty()) {
+      return null;
+    }
+    ImmutableBeanCache<?> cache = immutableCaches.get(descriptor.type());
+    if (cache == null) {
+      return null;
+    }
+    Object bean = cache.getIfPresent(id);
+    if (bean instanceof EntityBean && descriptor.type().isInstance(bean)) {
+      EntityBean entityBean = (EntityBean) bean;
+      if (entityBean._ebean_getIntercept() instanceof InterceptReadOnly) {
+        return entityBean;
+      }
+    }
+    return null;
   }
 
   int batchSize(OrmQueryProperties props) {
@@ -267,16 +324,60 @@ public final class DLoadContext implements LoadContext {
     return batchSize == 0 ? defaultBatchSize : batchSize;
   }
 
-  DLoadBeanContext beanContext(String path) {
+  private DLoadBeanContext pathBeanContext(String path) {
     if (path == null) {
       return rootBeanContext;
     }
-    return beanMap.computeIfAbsent(path, p -> createBeanContext(p, null));
+    return beanMap.get(path);
   }
 
-  DLoadBeanContext beanContextWithInherit(String path, BeanPropertyAssocOne<?> property) {
-    String key = path + ":" + property.targetDescriptor().name();
-    return beanMap.computeIfAbsent(key, p -> createBeanContext(property, path));
+  private DLoadBeanContext lazyBeanContext(BeanDescriptor<?> descriptor) {
+    return lazyBeanMap.computeIfAbsent(descriptor.fullName(), p -> new DLoadBeanContext(this, descriptor, descriptor.name(), null));
+  }
+
+  @Override
+  public void populateFromImmutableCache() {
+    if (immutableCaches.isEmpty()) {
+      return;
+    }
+    for (Map.Entry<Class<?>, ImmutableBeanCache<?>> entry : immutableCaches.entrySet()) {
+      BeanDescriptor<?> descriptor = rootDescriptor.descriptor(entry.getKey());
+      if (descriptor == null) {
+        continue;
+      }
+      DLoadBeanContext context = lazyBeanMap.get(descriptor.fullName());
+      Map<Object, EntityBeanIntercept> interceptById = new LinkedHashMap<>();
+      if (context != null) {
+        for (EntityBeanIntercept ebi : context.bufferedBeans()) {
+          Object id = descriptor.id(ebi.owner());
+          if (id != null) {
+            interceptById.put(id, ebi);
+          }
+        }
+      }
+      Set<EntityBeanIntercept> immutableRefs = immutableRefMap.get(descriptor.fullName());
+      if (immutableRefs != null) {
+        for (EntityBeanIntercept ebi : immutableRefs) {
+          Object id = descriptor.id(ebi.owner());
+          if (id != null) {
+            interceptById.putIfAbsent(id, ebi);
+          }
+        }
+      }
+      if (!interceptById.isEmpty()) {
+        Map<Object, ?> hits = entry.getValue().getAll(interceptById.keySet());
+        for (Map.Entry<Object, ?> hit : hits.entrySet()) {
+          EntityBeanIntercept ebi = interceptById.get(hit.getKey());
+          Object bean = hit.getValue();
+          if (ebi != null && bean instanceof EntityBean) {
+            EntityBean cachedBean = (EntityBean) bean;
+            descriptor.merge(cachedBean, ebi.owner());
+            ebi.setLoadedFromCache(true);
+            ebi.setLoadedLazy();
+          }
+        }
+      }
+    }
   }
 
   private void registerSecondaryNode(boolean many, OrmQueryProperties props) {
@@ -306,8 +407,8 @@ public final class DLoadContext implements LoadContext {
     return new DLoadBeanContext(this, p.targetDescriptor(), path, queryProps);
   }
 
-  private DLoadBeanContext createBeanContext(BeanPropertyAssoc<?> property, String path) {
-    return new DLoadBeanContext(this, property.targetDescriptor(), path, null);
+  private BeanDescriptor<?> descriptor(EntityBeanIntercept ebi) {
+    return rootDescriptor.descriptor(ebi.owner().getClass());
   }
 
   private BeanProperty beanProperty(BeanDescriptor<?> desc, String path) {
@@ -332,6 +433,11 @@ public final class DLoadContext implements LoadContext {
     }
     if (disableReadAudit) {
       query.setDisableReadAuditing();
+    }
+    if (!immutableCaches.isEmpty()) {
+      for (ImmutableBeanCache<?> beanCache : immutableCaches.values()) {
+        query.putImmutableBeanCache(beanCache);
+      }
     }
     if (profilingListener != null) {
       query.setProfilingListener(profilingListener);

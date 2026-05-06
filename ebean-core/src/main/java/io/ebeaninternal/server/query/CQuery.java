@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.query;
 
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.CancelableQuery;
 import io.ebean.QueryIterator;
 import io.ebean.Version;
@@ -599,6 +601,16 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
     request.loadContext().register(path(many.name()), many, bc);
+  }
+
+  @Override
+  public void registerForImmutable(EntityBeanIntercept ebi) {
+    request.loadContext().registerForImmutable(ebi);
+  }
+
+  @Override
+  public @Nullable EntityBean immutableBeanHit(BeanDescriptor<?> descriptor, Object id) {
+    return request.loadContext().immutableBeanHit(descriptor, id);
   }
 
   @Override
