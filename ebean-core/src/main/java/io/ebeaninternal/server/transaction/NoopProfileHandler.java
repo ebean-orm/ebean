@@ -15,7 +15,7 @@ public final class NoopProfileHandler implements SpiProfileHandler {
   }
 
   @Override
-  public ProfileStream createProfileStream(@Nullable ProfileLocation location) {
+  public ProfileStream createProfileStream(@Nullable ProfileLocation location, String label) {
     // always return null
     return null;
   }

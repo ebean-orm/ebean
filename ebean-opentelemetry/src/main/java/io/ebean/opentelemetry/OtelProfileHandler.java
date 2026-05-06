@@ -33,7 +33,7 @@ public final class OtelProfileHandler implements SpiProfileHandler, Plugin {
   }
 
   /** For testing: inject tracer directly rather than using GlobalOpenTelemetry. */
-  OtelProfileHandler(Tracer tracer) {
+  public OtelProfileHandler(Tracer tracer) {
     this.tracer = tracer;
   }
 
@@ -60,28 +60,23 @@ public final class OtelProfileHandler implements SpiProfileHandler, Plugin {
    *
    * @param location the profile location for explicit {@code @Transactional} methods,
    *                 or null for implicit read-only transactions
+   * @param label the transaction label
    */
   @Override
-  public @Nullable ProfileStream createProfileStream(@Nullable ProfileLocation location) {
+  public @Nullable ProfileStream createProfileStream(@Nullable ProfileLocation location, @Nullable String label) {
     if (!Span.current().getSpanContext().isValid()) {
       // No active OTel trace context — don't create spans to avoid noise
       return null;
     }
-    String spanName;
-    boolean updateName;
-    if (location != null) {
-      spanName = location.label();
-      updateName = false;
-    } else {
-      // Implicit read-only transaction: name will be refined on the first query event
-      spanName = "ebean.transaction";
-      updateName = true;
-    }
-    Span txnSpan = tracer.spanBuilder(spanName)
+    String txnSpanName = location != null
+      ? "txn." + location.label()
+      : label != null ? "txn." + label : "ebean.txn";
+
+    Span txnSpan = tracer.spanBuilder(txnSpanName)
       .setSpanKind(SpanKind.INTERNAL)
       .setAttribute(OtelProfileStream.DB_SYSTEM, "ebean")
       .startSpan();
-    return new OtelProfileStream(tracer, txnSpan, updateName);
+    return new OtelProfileStream(tracer, txnSpan);
   }
 
   /**

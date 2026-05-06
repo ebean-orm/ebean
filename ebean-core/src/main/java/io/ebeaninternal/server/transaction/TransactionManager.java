@@ -302,7 +302,7 @@ public class TransactionManager implements SpiTransactionManager {
    */
   public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
     SpiTransaction t = transactionFactory.createReadOnlyTransaction(tenantId, useMaster);
-    ProfileStream stream = profileHandler.createProfileStream(null);
+    ProfileStream stream = profileHandler.createProfileStream(null, "readOnly");
     if (stream != null) {
       t.setProfileStream(stream);
     }
@@ -469,7 +469,7 @@ public class TransactionManager implements SpiTransactionManager {
    */
   public final SpiTransaction beginServerTransaction() {
     SpiTransaction t = createTransaction(false, -1);
-    ProfileStream stream = profileHandler.createProfileStream(null);
+    ProfileStream stream = profileHandler.createProfileStream(null, null);
     if (stream != null) {
       t.setProfileStream(stream);
     }
@@ -579,7 +579,7 @@ public class TransactionManager implements SpiTransactionManager {
       }
       transaction.setProfileLocation(profileLocation);
     }
-    ProfileStream stream = profileHandler.createProfileStream(profileLocation);
+    ProfileStream stream = profileHandler.createProfileStream(profileLocation, label);
     if (stream != null) {
       transaction.setProfileStream(stream);
     }

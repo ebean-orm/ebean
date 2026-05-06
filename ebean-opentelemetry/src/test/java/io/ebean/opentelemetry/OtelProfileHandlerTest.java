@@ -74,18 +74,18 @@ class OtelProfileHandlerTest {
   @Test
   void createProfileStream_noActiveContext_returnsNull() {
     // No span active on thread — should not create a stream
-    assertNull(handler.createProfileStream(null));
-    assertNull(handler.createProfileStream(mockLocation("SomeService.doWork")));
+    assertNull(handler.createProfileStream(null, null));
+    assertNull(handler.createProfileStream(mockLocation("SomeService.doWork"), null));
   }
 
   @Test
   void createProfileStream_withActiveContext_returnsStream() {
     Span parent = tracer.spanBuilder("parent").startSpan();
     try (Scope ignored = parent.makeCurrent()) {
-      var stream = handler.createProfileStream(null);
+      var stream = handler.createProfileStream(null, null);
       assertNotNull(stream);
       stream.addEvent("c", 0); // commit
-      stream.end(null);
+      stream.end(null, null);
     } finally {
       parent.end();
     }
@@ -95,15 +95,15 @@ class OtelProfileHandlerTest {
   void createProfileStream_withLocation_usesLabelAsSpanName() {
     Span parent = tracer.spanBuilder("parent").startSpan();
     try (Scope ignored = parent.makeCurrent()) {
-      var stream = handler.createProfileStream(mockLocation("OrderService.placeOrder"));
+      var stream = handler.createProfileStream(mockLocation("OrderService.placeOrder"), null);
       assertNotNull(stream);
       stream.addEvent("c", 0);
-      stream.end(null);
+      stream.end(null, null);
     } finally {
       parent.end();
     }
     // parent + txn span
-    SpanData txnSpan = findSpan("OrderService.placeOrder");
+    SpanData txnSpan = findSpan("txn.OrderService.placeOrder");
     assertNotNull(txnSpan, "Expected span named 'OrderService.placeOrder'");
     assertEquals("ebean", txnSpan.getAttributes().get(OtelProfileStream.DB_SYSTEM));
   }
@@ -116,16 +116,16 @@ class OtelProfileHandlerTest {
   void implicitTransaction_nameUpdatedOnFirstQueryEvent() {
     Span parent = tracer.spanBuilder("parent").startSpan();
     try (Scope ignored = parent.makeCurrent()) {
-      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(null);
+      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(null, null);
       assertNotNull(stream);
       // First query event should update the transaction span name
       stream.addQueryEvent("fm", stream.offset(), "Customer", 5, "qplan-1", "select ...");
       stream.addEvent("c", 0);
-      stream.end(null);
+      stream.end(null, null);
     } finally {
       parent.end();
     }
-    SpanData txnSpan = findSpan("find_many Customer");
+    SpanData txnSpan = findSpan("ebean.txn");
     assertNotNull(txnSpan, "Expected txn span renamed to 'find_many Customer'");
   }
 
@@ -137,41 +137,62 @@ class OtelProfileHandlerTest {
   void addQueryEvent_createsChildSpanWithAttributes() {
     Span parent = tracer.spanBuilder("http.get /orders").startSpan();
     try (Scope ignored = parent.makeCurrent()) {
-      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("OrderService.findAll"));
+      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("OrderService.findAll"), null);
       assertNotNull(stream);
       long offset = stream.offset();
       // Simulate some time passing then record a find_many
       stream.addQueryEvent("fm", offset, "Order", 42, "plan-abc", "select ...");
       stream.addEvent("c", 0);
-      stream.end(null);
+      stream.end(null, null);
     } finally {
       parent.end();
     }
 
-    SpanData querySpan = findSpan("find_many Order");
+    SpanData querySpan = findSpan("plan-abc");
     assertNotNull(querySpan, "Expected child span 'find_many Order'");
     assertEquals("ebean", querySpan.getAttributes().get(OtelProfileStream.DB_SYSTEM));
     assertEquals("find_many", querySpan.getAttributes().get(OtelProfileStream.DB_OPERATION));
     assertEquals("Order", querySpan.getAttributes().get(OtelProfileStream.EBEAN_BEAN_TYPE));
     assertEquals(42L, querySpan.getAttributes().get(OtelProfileStream.EBEAN_ROW_COUNT));
-    assertEquals("plan-abc", querySpan.getAttributes().get(OtelProfileStream.EBEAN_QUERY_ID));
+    assertEquals("select ...", querySpan.getAttributes().get(OtelProfileStream.DB_QUERY_TEXT));
   }
 
   @Test
   void addQueryEvent_multipleEvents_eachCreatesChildSpan() {
     Span parent = tracer.spanBuilder("parent").startSpan();
     try (Scope ignored = parent.makeCurrent()) {
-      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("MyService.doAll"));
+      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("MyService.doAll"), null);
       assertNotNull(stream);
       stream.addQueryEvent("fo", stream.offset(), "User", 1, "p1", "select from user");
       stream.addQueryEvent("fm", stream.offset(), "Order", 10, "p2", "select from order");
       stream.addEvent("c", 0);
-      stream.end(null);
+      stream.end(null, null);
     } finally {
       parent.end();
     }
-    assertNotNull(findSpan("find_one User"));
-    assertNotNull(findSpan("find_many Order"));
+    SpanData findOne = findSpan("p1");
+    SpanData findMany = findSpan("p2");
+    assertNotNull(findOne);
+    assertNotNull(findMany);
+    assertEquals("select from user", findOne.getAttributes().get(OtelProfileStream.DB_QUERY_TEXT));
+    assertEquals("select from order", findMany.getAttributes().get(OtelProfileStream.DB_QUERY_TEXT));
+  }
+
+  @Test
+  void addQueryEvent_emptySql_setsEmptyQueryTextAttribute() {
+    Span parent = tracer.spanBuilder("parent").startSpan();
+    try (Scope ignored = parent.makeCurrent()) {
+      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("MyService.emptySql"), null);
+      assertNotNull(stream);
+      stream.addQueryEvent("fo", stream.offset(), "User", 1, "p1", "");
+      stream.addEvent("c", 0);
+      stream.end(null, null);
+    } finally {
+      parent.end();
+    }
+    SpanData querySpan = findSpan("p1");
+    assertNotNull(querySpan);
+    assertEquals("", querySpan.getAttributes().get(OtelProfileStream.DB_QUERY_TEXT));
   }
 
   // ----------------------------------------------------------
@@ -182,12 +203,12 @@ class OtelProfileHandlerTest {
   void addPersistEvent_createsChildSpanWithAttributes() {
     Span parent = tracer.spanBuilder("parent").startSpan();
     try (Scope ignored = parent.makeCurrent()) {
-      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("CartService.checkout"));
+      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("CartService.checkout"), null);
       assertNotNull(stream);
       long offset = stream.offset();
       stream.addPersistEvent("i", offset, "Order", 1);
       stream.addEvent("c", 0);
-      stream.end(null);
+      stream.end(null, null);
     } finally {
       parent.end();
     }
@@ -206,14 +227,14 @@ class OtelProfileHandlerTest {
   void addEvent_commit_setsStatusOk() {
     Span parent = tracer.spanBuilder("parent").startSpan();
     try (Scope ignored = parent.makeCurrent()) {
-      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("Svc.ok"));
+      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("Svc.ok"), null);
       assertNotNull(stream);
       stream.addEvent("c", 0);
-      stream.end(null);
+      stream.end(null, null);
     } finally {
       parent.end();
     }
-    SpanData txnSpan = findSpan("Svc.ok");
+    SpanData txnSpan = findSpan("txn.Svc.ok");
     assertNotNull(txnSpan);
     assertEquals(StatusCode.OK, txnSpan.getStatus().getStatusCode());
   }
@@ -222,14 +243,14 @@ class OtelProfileHandlerTest {
   void addEvent_rollback_setsStatusError() {
     Span parent = tracer.spanBuilder("parent").startSpan();
     try (Scope ignored = parent.makeCurrent()) {
-      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("Svc.fail"));
+      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("Svc.fail"), null);
       assertNotNull(stream);
       stream.addEvent("r", 0);
-      stream.end(null);
+      stream.end(null, null);
     } finally {
       parent.end();
     }
-    SpanData txnSpan = findSpan("Svc.fail");
+    SpanData txnSpan = findSpan("txn.Svc.fail");
     assertNotNull(txnSpan);
     assertEquals(StatusCode.ERROR, txnSpan.getStatus().getStatusCode());
   }
@@ -242,14 +263,14 @@ class OtelProfileHandlerTest {
   void end_setsTotalMicrosAttribute() {
     Span parent = tracer.spanBuilder("parent").startSpan();
     try (Scope ignored = parent.makeCurrent()) {
-      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("Svc.timed"));
+      OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("Svc.timed"), null);
       assertNotNull(stream);
       stream.addEvent("c", 0);
-      stream.end(null);
+      stream.end(null, null);
     } finally {
       parent.end();
     }
-    SpanData txnSpan = findSpan("Svc.timed");
+    SpanData txnSpan = findSpan("txn.Svc.timed");
     assertNotNull(txnSpan);
     Long totalMicros = txnSpan.getAttributes().get(OtelProfileStream.EBEAN_TOTAL_MICROS);
     assertNotNull(totalMicros);

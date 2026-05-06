@@ -99,7 +99,7 @@ public final class DefaultProfileHandler implements SpiProfileHandler, Plugin {
    * are not profiled by the default file-based handler).
    */
   @Override
-  public ProfileStream createProfileStream(@Nullable ProfileLocation location) {
+  public ProfileStream createProfileStream(@Nullable ProfileLocation location, String label) {
     if (location == null) {
       return null;
     }

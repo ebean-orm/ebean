@@ -83,7 +83,7 @@ public final class DefaultProfileStream implements ProfileStream {
    * End the transaction profiling.
    */
   @Override
-  public void end(TransactionManager manager) {
+  public void end(TransactionManager manager, String label) {
     profile.setTotalMicros(offset());
     if (buffer != null) {
       profile.setData(buffer.toString());

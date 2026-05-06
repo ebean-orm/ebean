@@ -30,6 +30,7 @@ public interface SpiProfileHandler {
    * </p>
    *
    * @param location The profile location, or null for implicit transactions
+   * @param label The transaction label
    */
-  @Nullable ProfileStream createProfileStream(@Nullable ProfileLocation location);
+  @Nullable ProfileStream createProfileStream(@Nullable ProfileLocation location, @Nullable String label);
 }

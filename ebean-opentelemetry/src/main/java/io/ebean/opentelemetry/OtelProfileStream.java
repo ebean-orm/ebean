@@ -11,7 +11,7 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Context;
 
 import java.time.Instant;
-import java.util.concurrent.TimeUnit;
+import java.time.temporal.ChronoUnit;
 
 /**
  * OpenTelemetry implementation of ProfileStream.
@@ -24,25 +24,19 @@ final class OtelProfileStream implements ProfileStream {
   static final AttributeKey<String> DB_SYSTEM = AttributeKey.stringKey("db.system.name");
   static final AttributeKey<String> DB_OPERATION = AttributeKey.stringKey("db.operation.name");
   static final AttributeKey<String> DB_QUERY_TEXT = AttributeKey.stringKey("db.query.text");
+  static final AttributeKey<Long> DB_QUERY_TIME = AttributeKey.longKey("db.query.time");
   static final AttributeKey<String> EBEAN_BEAN_TYPE = AttributeKey.stringKey("ebean.bean_type");
   static final AttributeKey<Long> EBEAN_ROW_COUNT = AttributeKey.longKey("ebean.row_count");
-  static final AttributeKey<String> EBEAN_QUERY_ID = AttributeKey.stringKey("ebean.query_id");
   static final AttributeKey<Long> EBEAN_TOTAL_MICROS = AttributeKey.longKey("ebean.total_micros");
 
   private final Tracer tracer;
   private final Span txnSpan;
   private final long startNanos;
-  private final long startEpochNanos;
-  /** True when the transaction span name is still the generic fallback and can be updated. */
-  private boolean updateName;
 
-  OtelProfileStream(Tracer tracer, Span txnSpan, boolean updateName) {
+  OtelProfileStream(Tracer tracer, Span txnSpan) {
     this.tracer = tracer;
     this.txnSpan = txnSpan;
     this.startNanos = System.nanoTime();
-    Instant now = Instant.now();
-    this.startEpochNanos = now.getEpochSecond() * 1_000_000_000L + now.getNano();
-    this.updateName = updateName;
   }
 
   @Override
@@ -53,29 +47,31 @@ final class OtelProfileStream implements ProfileStream {
   @Override
   public void addQueryEvent(String event, long offset, String beanName, int beanCount, String queryId, String sql) {
     long exeMicros = offset() - offset;
+    var now = Instant.now();
     String operation = operationName(event);
-    maybeUpdateTxnName(operation, beanName);
-    Span child = childSpanBuilder(operation + " " + beanName, offset)
+    String name = queryId != null ? queryId : operation + " " + beanName;
+    Span child = childSpanBuilder(name, now.minus(exeMicros, ChronoUnit.MICROS))
       .setAttribute(DB_OPERATION, operation)
       .setAttribute(EBEAN_BEAN_TYPE, beanName)
       .setAttribute(EBEAN_ROW_COUNT, (long) beanCount)
-      .setAttribute(EBEAN_QUERY_ID, queryId)
       .setAttribute(DB_QUERY_TEXT, sql)
+      .setAttribute(DB_QUERY_TIME, exeMicros)
       .startSpan();
-    child.end(startEpochNanos + TimeUnit.MICROSECONDS.toNanos(offset + exeMicros), TimeUnit.NANOSECONDS);
+    child.end(now);
   }
 
   @Override
   public void addPersistEvent(String event, long offset, String beanName, int beanCount) {
     long exeMicros = offset() - offset;
+    var now = Instant.now();
     String operation = operationName(event);
-    maybeUpdateTxnName(operation, beanName);
-    Span child = childSpanBuilder(operation + " " + beanName, offset)
+    Span child = childSpanBuilder(operation + " " + beanName, now.minus(exeMicros, ChronoUnit.MICROS))
       .setAttribute(DB_OPERATION, operation)
       .setAttribute(EBEAN_BEAN_TYPE, beanName)
       .setAttribute(EBEAN_ROW_COUNT, (long) beanCount)
+      .setAttribute(DB_QUERY_TIME, exeMicros)
       .startSpan();
-    child.end(startEpochNanos + TimeUnit.MICROSECONDS.toNanos(offset + exeMicros), TimeUnit.NANOSECONDS);
+    child.end(now);
   }
 
   @Override
@@ -88,24 +84,20 @@ final class OtelProfileStream implements ProfileStream {
   }
 
   @Override
-  public void end(TransactionManager manager) {
+  public void end(TransactionManager manager, String label) {
     txnSpan.setAttribute(EBEAN_TOTAL_MICROS, offset());
+    if (label != null) {
+      txnSpan.updateName("txn." + label);
+    }
     txnSpan.end();
   }
 
-  private SpanBuilder childSpanBuilder(String name, long offsetMicros) {
+  private SpanBuilder childSpanBuilder(String name, Instant start) {
     return tracer.spanBuilder(name)
       .setParent(Context.current().with(txnSpan))
       .setSpanKind(SpanKind.INTERNAL)
       .setAttribute(DB_SYSTEM, "ebean")
-      .setStartTimestamp(startEpochNanos + TimeUnit.MICROSECONDS.toNanos(offsetMicros), TimeUnit.NANOSECONDS);
-  }
-
-  private void maybeUpdateTxnName(String operation, String beanName) {
-    if (updateName) {
-      updateName = false;
-      txnSpan.updateName(operation + " " + beanName);
-    }
+      .setStartTimestamp(start);
   }
 
   /**
