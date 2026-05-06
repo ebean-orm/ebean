@@ -319,8 +319,24 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(Set.class) && isValueTypeSimple(genericType)) {
       return ScalarTypeJsonSet.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), keepSource(prop));
     }
-    if (type.equals(Map.class) && isMapValueTypeObject(genericType)) {
-      return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource(prop));
+    if (type.equals(Map.class)) {
+      Type keyType = TypeReflectHelper.getMapKeyTypeRaw(genericType);
+      if (isMapValueTypeObject(genericType)) {
+        if (isEnumType(keyType)) {
+          return enumJsonMapType(
+            postgres,
+            dbType,
+            keyType,
+            keepSource(prop)
+          );
+        } else {
+          return ScalarTypeJsonMap.typeFor(
+            postgres,
+            dbType,
+            keepSource(prop)
+          );
+        }
+      }
     }
     if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
       ScalarTypeSet<?> typeSet = typeSets.get(type);
@@ -329,6 +345,24 @@ public final class DefaultTypeManager implements TypeManager {
       }
     }
     return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
+  }
+
+  @SuppressWarnings("unchecked")
+  private <E extends Enum<E>> ScalarTypeJsonMapEnum<E> enumJsonMapType(
+    boolean postgres,
+    int dbType,
+    Type keyType,
+    boolean keepSource
+  ) {
+    Class<E> enumClass = (Class<E>) asEnumClass(keyType);
+    ScalarType<E> enumScalarType = (ScalarType<E>) enumType(enumClass, null);
+
+    return ScalarTypeJsonMapEnum.typeFor(
+      postgres,
+      dbType,
+      enumScalarType,
+      keepSource
+    );
   }
 
   private boolean keepSource(DeployBeanProperty prop) {
@@ -560,6 +594,7 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private ScalarTypeEnum<?> enumTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
     Map<String, String> nameValueMap = new LinkedHashMap<>();
+    method.setAccessible(true);
     for (Enum<?> enumConstant : enumType.getEnumConstants()) {
       try {
         Object value = method.invoke(enumConstant);
