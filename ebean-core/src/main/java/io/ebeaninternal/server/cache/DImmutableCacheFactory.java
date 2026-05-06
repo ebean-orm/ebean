@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.cache;
 
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.BackgroundExecutor;
 import io.ebean.DB;
 import io.ebean.Database;
@@ -128,6 +130,13 @@ public final class DImmutableCacheFactory implements SpiImmutableCacheFactory {
     @Override
     public Class<T> type() {
       return type;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public @Nullable T getIfPresent(Object id) {
+      Object value = cache.get(id);
+      return value == null || value == MISS ? null : (T) value;
     }
 
     @Override

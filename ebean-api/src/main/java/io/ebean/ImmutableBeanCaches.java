@@ -1,6 +1,8 @@
 package io.ebean;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.service.SpiImmutableCacheFactory;
 
 import java.util.Collections;
@@ -191,6 +193,11 @@ public final class ImmutableBeanCaches {
     @Override
     public Class<T> type() {
       return type;
+    }
+
+    @Override
+    public @Nullable T getIfPresent(Object id) {
+      return cache.get(id);
     }
 
     @Override

@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
 import io.ebean.bean.EntityBean;
-import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.query.SqlJoinType;
 import io.ebeaninternal.server.query.SqlTreeJoin;
 
@@ -46,20 +45,17 @@ final class AssocOneHelpRefInherit extends AssocOneHelp {
     if (id == null) {
       return null;
     }
-    // check transaction context to see if it already exists
-    PersistenceContext pc = ctx.persistenceContext();
-    Object existing = desc.contextGet(pc, id);
-    if (existing != null) {
-      return existing;
-    }
-    // for inheritance hierarchy create the correct type for this row...
-    Object ref = desc.contextRef(pc, id, ctx.unmodifiable(), ctx.isDisableLazyLoading());
+    Object existing = contextGetOrImmutableHit(ctx, desc, id);
+    return existing != null ? existing : createRegisterRef(ctx, desc, id);
+  }
+
+  @Override
+  protected void registerReference(DbReadContext ctx, EntityBean ref) {
     if (!ctx.unmodifiable() && !ctx.isDisableLazyLoading()) {
-      ctx.registerBeanInherit(property, ((EntityBean) ref)._ebean_getIntercept());
+      ctx.registerBeanInherit(property, ref._ebean_getIntercept());
     } else {
-      ctx.registerForImmutable(((EntityBean) ref)._ebean_getIntercept());
+      ctx.registerForImmutable(ref._ebean_getIntercept());
     }
-    return ref;
   }
 
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {

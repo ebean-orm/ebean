@@ -211,7 +211,9 @@ class ResourceEntityTest {
   void find_unmodifiableUsingImmutableLabelCache_expect_readableRefsWithNoLazyLoadSql() {
 
     var cache = loadingLabelCache();
-    cache.getAll(Set.of(heightDescriptor.getName().id(), heightDescriptor.getDescription().id()));
+    Map<Object, Label> seeded = cache.getAll(Set.of(heightDescriptor.getName().id(), heightDescriptor.getDescription().id()));
+    Label cachedName = seeded.get(heightDescriptor.getName().id());
+    Label cachedDescription = seeded.get(heightDescriptor.getDescription().id());
 
     AttributeDescriptor one = DB.find(AttributeDescriptor.class)
       .setId(heightDescriptor.id())
@@ -220,6 +222,8 @@ class ResourceEntityTest {
       .findOne();
 
     assertThat(one).isNotNull();
+    assertThat(one.getName()).describedAs("cache hit during AssocOneHelp").isSameAs(cachedName);
+    assertThat(one.getDescription()).describedAs("cache hit during AssocOneHelp").isSameAs(cachedDescription);
     assertThat(DB.beanState(one.getName()).isUnmodifiable()).isTrue();
     assertThat(DB.beanState(one.getDescription()).isUnmodifiable()).isTrue();
 
@@ -235,7 +239,7 @@ class ResourceEntityTest {
   void find_unmodifiableUsingImmutableLabelCacheWithPartialHits_expect_backfillAndNoLazyLoadSql() {
 
     var cache = loadingLabelCache();
-    cache.getAll(Set.of(heightDescriptor.getName().id()));
+    Label cachedName = cache.getAll(Set.of(heightDescriptor.getName().id())).get(heightDescriptor.getName().id());
 
     AttributeDescriptor one = DB.find(AttributeDescriptor.class)
       .setId(heightDescriptor.id())
@@ -243,7 +247,11 @@ class ResourceEntityTest {
       .using(cache)
       .findOne();
 
+    Label cachedDescription = cache.getAll(Set.of(heightDescriptor.getDescription().id())).get(heightDescriptor.getDescription().id());
+
     assertThat(one).isNotNull();
+    assertThat(one.getName()).describedAs("cache hit during AssocOneHelp").isSameAs(cachedName);
+    assertThat(one.getDescription()).describedAs("cache hit during AssocOneHelp").isNotSameAs(cachedDescription);
     assertThat(DB.beanState(one.getName()).isUnmodifiable()).isTrue();
     assertThat(DB.beanState(one.getDescription()).isUnmodifiable()).isTrue();
 

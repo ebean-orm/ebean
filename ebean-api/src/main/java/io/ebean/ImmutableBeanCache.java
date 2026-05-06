@@ -1,6 +1,8 @@
 package io.ebean;
 
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
+
 import java.util.Map;
 import java.util.Set;
 
@@ -44,4 +46,13 @@ public interface ImmutableBeanCache<T> {
    * Return immutable cached beans by id (loading and populating misses as needed).
    */
   Map<Object, T> getAll(Set<Object> ids);
+
+  /**
+   * Return a cached bean for the given id if it is already present.
+   * <p>
+   * This does not trigger loading or record a miss.
+   */
+  default @Nullable T getIfPresent(Object id) {
+    return null;
+  }
 }

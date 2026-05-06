@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.loadcontext;
 
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.CacheMode;
 import io.ebean.ImmutableBeanCache;
 import io.ebean.ProfileLocation;
@@ -293,6 +295,25 @@ public final class DLoadContext implements LoadContext {
     if (immutableCaches.containsKey(descriptor.type())) {
       immutableRefMap.computeIfAbsent(descriptor.fullName(), key -> new LinkedHashSet<>()).add(ebi);
     }
+  }
+
+  @Override
+  public @Nullable EntityBean immutableBeanHit(BeanDescriptor<?> descriptor, Object id) {
+    if (!unmodifiable || immutableCaches.isEmpty()) {
+      return null;
+    }
+    ImmutableBeanCache<?> cache = immutableCaches.get(descriptor.type());
+    if (cache == null) {
+      return null;
+    }
+    Object bean = cache.getIfPresent(id);
+    if (bean instanceof EntityBean && descriptor.type().isInstance(bean)) {
+      EntityBean entityBean = (EntityBean) bean;
+      if (entityBean._ebean_getIntercept() instanceof InterceptReadOnly) {
+        return entityBean;
+      }
+    }
+    return null;
   }
 
   int batchSize(OrmQueryProperties props) {

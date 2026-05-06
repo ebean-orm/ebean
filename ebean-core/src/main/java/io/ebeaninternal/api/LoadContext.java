@@ -1,10 +1,14 @@
 package io.ebeaninternal.api;
 
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.bean.BeanCollection;
+import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
@@ -55,6 +59,12 @@ public interface LoadContext {
    * Register a bean as a candidate for immutable cache population.
    */
   void registerForImmutable(EntityBeanIntercept ebi);
+
+  /**
+   * Return an immutable cached bean for the given descriptor and id if already present.
+   */
+  @Nullable
+  EntityBean immutableBeanHit(BeanDescriptor<?> descriptor, Object id);
 
   /**
    * Use soft-references for streaming queries, so unreachable entries can be garbage collected.
