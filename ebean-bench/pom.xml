@@ -6,7 +6,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.5.0</version>
+    <version>16.6.0</version>
   </parent>
 
   <artifactId>ebean-bench</artifactId>
