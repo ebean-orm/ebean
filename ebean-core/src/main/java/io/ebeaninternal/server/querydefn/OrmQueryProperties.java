@@ -15,6 +15,7 @@ import io.ebeaninternal.server.expression.FilterExpressionList;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -33,6 +34,8 @@ public final class OrmQueryProperties implements Serializable {
   private final String path;
   private final boolean allProperties;
   private final Set<String> included;
+  private final String immutableHashPrefix;
+  private final String immutableHashSuffix;
   private final FetchConfig fetchConfig;
   private final boolean cache;
   /**
@@ -74,8 +77,10 @@ public final class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     this.allProperties = false;
     this.included = null;
+    this.immutableHashPrefix = buildImmutableQueryPlanHashPrefix(path, null);
     this.cache = false;
     this.fetchConfig = DEFAULT_FETCH;
+    this.immutableHashSuffix = buildImmutableQueryPlanHashSuffix(fetchConfig);
   }
 
   public OrmQueryProperties(String path, String rawProperties) {
@@ -87,7 +92,8 @@ public final class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     OrmQueryPropertiesParser.Response response = OrmQueryPropertiesParser.parse(rawProperties);
     this.allProperties = response.allProperties;
-    this.included = response.included;
+    this.included = immutableIncluded(response.included);
+    this.immutableHashPrefix = buildImmutableQueryPlanHashPrefix(path, this.included);
     if (fetchConfig != null) {
       this.fetchConfig = fetchConfig;
       this.cache = fetchConfig.isCache();
@@ -95,6 +101,7 @@ public final class OrmQueryProperties implements Serializable {
       this.cache = false;
       this.fetchConfig = DEFAULT_FETCH;
     }
+    this.immutableHashSuffix = buildImmutableQueryPlanHashSuffix(this.fetchConfig);
   }
 
   public OrmQueryProperties(String path, Set<String> included) {
@@ -104,10 +111,12 @@ public final class OrmQueryProperties implements Serializable {
   OrmQueryProperties(String path, Set<String> included, FetchConfig fetchConfig) {
     this.path = path;
     this.parentPath = SplitName.parent(path);
-    this.included = included;
+    this.included = immutableIncluded(included);
     this.allProperties = false;
+    this.immutableHashPrefix = buildImmutableQueryPlanHashPrefix(path, this.included);
     this.fetchConfig = fetchConfig;
     this.cache = fetchConfig.isCache();
+    this.immutableHashSuffix = buildImmutableQueryPlanHashSuffix(fetchConfig);
   }
 
   OrmQueryProperties(String path, OrmQueryProperties other, FetchConfig fetchConfig) {
@@ -115,8 +124,10 @@ public final class OrmQueryProperties implements Serializable {
     this.parentPath = SplitName.parent(path);
     this.allProperties = other.allProperties;
     this.included = other.included;
+    this.immutableHashPrefix = other.immutableHashPrefix;
     this.fetchConfig = fetchConfig;
     this.cache = fetchConfig.isCache();
+    this.immutableHashSuffix = buildImmutableQueryPlanHashSuffix(fetchConfig);
   }
 
   /**
@@ -130,7 +141,35 @@ public final class OrmQueryProperties implements Serializable {
     this.cache = source.cache;
     this.filterMany = source.filterMany;
     this.markForQueryJoin = source.markForQueryJoin;
-    this.included = (source.included == null) ? null : new LinkedHashSet<>(source.included);
+    this.included = source.included;
+    this.immutableHashPrefix = source.immutableHashPrefix;
+    this.immutableHashSuffix = source.fetchConfig == sourceFetchConfig
+      ? source.immutableHashSuffix
+      : buildImmutableQueryPlanHashSuffix(sourceFetchConfig);
+  }
+
+  private static Set<String> immutableIncluded(Set<String> included) {
+    if (included == null) {
+      return null;
+    }
+    return Collections.unmodifiableSet(new LinkedHashSet<>(included));
+  }
+
+  private static String buildImmutableQueryPlanHashPrefix(String path, Set<String> included) {
+    StringBuilder builder = new StringBuilder();
+    builder.append('{');
+    if (path != null) {
+      builder.append(path);
+    }
+    if (included != null) {
+      builder.append("/i");
+      appendSet(builder, included);
+    }
+    return builder.toString();
+  }
+
+  private static String buildImmutableQueryPlanHashSuffix(FetchConfig fetchConfig) {
+    return fetchConfig == null ? "" : "/c" + fetchConfig.hashCode();
   }
 
   /**
@@ -419,24 +458,31 @@ public final class OrmQueryProperties implements Serializable {
    * Calculate the query plan hash.
    */
   public void queryPlanHash(StringBuilder builder) {
-    builder.append('{');
-    if (path != null) {
-      builder.append(path);
-    }
-    if (included != null) {
-      builder.append("/i").append(included);
-    }
+    builder.append(immutableHashPrefix);
     if (secondaryQueryJoins != null) {
-      builder.append("/s").append(secondaryQueryJoins);
+      builder.append("/s");
+      appendSet(builder, secondaryQueryJoins);
     }
     if (filterMany != null) {
       builder.append("/f");
       filterMany.queryPlanHash(builder);
     }
-    if (fetchConfig != null) {
-      builder.append("/c").append(fetchConfig.hashCode());
-    }
+    builder.append(immutableHashSuffix);
     builder.append('}');
+  }
+
+  private static void appendSet(StringBuilder builder, Set<String> values) {
+    builder.append('[');
+    boolean first = true;
+    for (String value : values) {
+      if (first) {
+        first = false;
+      } else {
+        builder.append(", ");
+      }
+      builder.append(value);
+    }
+    builder.append(']');
   }
 
 }

@@ -1007,6 +1007,14 @@ public interface ExpressionList<T> {
   ExpressionList<T> like(String propertyName, String value);
 
   /**
+   * Is LIKE if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>likeIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> likeIfPresent(String propertyName, @Nullable String value);
+
+  /**
    * Case insensitive Like - property like value where the value contains the
    * SQL wild card characters % (percentage) and _ (underscore). Typically uses
    * a lower() function to make the expression case insensitive.
@@ -1014,15 +1022,39 @@ public interface ExpressionList<T> {
   ExpressionList<T> ilike(String propertyName, String value);
 
   /**
+   * Is case insensitive LIKE if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>ilikeIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> ilikeIfPresent(String propertyName, @Nullable String value);
+
+  /**
    * Starts With - property like value%.
    */
   ExpressionList<T> startsWith(String propertyName, String value);
+
+  /**
+   * Is STARTS WITH if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>startsWithIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> startsWithIfPresent(String propertyName, @Nullable String value);
 
   /**
    * Case insensitive Starts With - property like value%. Typically uses a
    * lower() function to make the expression case insensitive.
    */
   ExpressionList<T> istartsWith(String propertyName, String value);
+
+  /**
+   * Is case insensitive STARTS WITH if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>istartsWithIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> istartsWithIfPresent(String propertyName, @Nullable String value);
 
   /**
    * Ends With - property like %value.
@@ -1041,10 +1073,26 @@ public interface ExpressionList<T> {
   ExpressionList<T> contains(String propertyName, String value);
 
   /**
+   * Is CONTAINS if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>containsIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> containsIfPresent(String propertyName, @Nullable String value);
+
+  /**
    * Case insensitive Contains - property like %value%. Typically uses a lower()
    * function to make the expression case insensitive.
    */
   ExpressionList<T> icontains(String propertyName, String value);
+
+  /**
+   * Is case insensitive CONTAINS if value is non-null and otherwise no expression is added to the query.
+   * <p>
+   * This is effectively a helper method that allows a query to be built in fluid style where some predicates are
+   * effectively optional. We can use <code>icontainsIfPresent()</code> rather than having a separate if block.
+   */
+  ExpressionList<T> icontainsIfPresent(String propertyName, @Nullable String value);
 
   /**
    * In expression using pairs of value objects.

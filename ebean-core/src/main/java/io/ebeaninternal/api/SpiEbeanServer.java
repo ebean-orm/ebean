@@ -150,6 +150,12 @@ public interface SpiEbeanServer extends SpiServer, BeanCollectionLoader {
   void remoteTransactionEvent(RemoteTransactionEvent event);
 
   /**
+   * Register immutable bean cache with this server for transactional invalidation.
+   * Typically called when the cache is created.
+   */
+  void registerImmutableCache(ImmutableBeanCache<?> beanCache);
+
+  /**
    * Compile a query.
    */
   <T> CQuery<T> compileQuery(Type type, SpiQuery<T> query, Transaction transaction);

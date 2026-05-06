@@ -78,6 +78,32 @@ class TestEntityBuilderTest extends BaseTestCase {
   }
 
   @Test
+  void saveAll_insertsMultipleBeans_andAllCanBeFound() {
+    EBasic bean1 = builder.build(EBasic.class);
+    EBasic bean2 = builder.build(EBasic.class);
+    EBasic bean3 = builder.build(EBasic.class);
+
+    builder.saveAll(bean1, bean2, bean3);
+
+    assertThat(bean1.getId()).isNotNull();
+    assertThat(bean2.getId()).isNotNull();
+    assertThat(bean3.getId()).isNotNull();
+
+    assertThat(DB.find(EBasic.class, bean1.getId())).isNotNull();
+    assertThat(DB.find(EBasic.class, bean2.getId())).isNotNull();
+    assertThat(DB.find(EBasic.class, bean3.getId())).isNotNull();
+  }
+
+  @Test
+  void database_returnsTheDatabaseInstance() {
+    EBasic saved = builder.save(EBasic.class);
+
+    EBasic found = builder.database().find(EBasic.class, saved.getId());
+    assertThat(found).isNotNull();
+    assertThat(found.getName()).isEqualTo(saved.getName());
+  }
+
+  @Test
   void build_unknownClass_throwsIllegalArgumentException() {
     org.assertj.core.api.Assertions.assertThatThrownBy(() -> builder.build(String.class))
       .isInstanceOf(IllegalArgumentException.class)

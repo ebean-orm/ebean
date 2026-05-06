@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>16.5.0</version>
+  <version>16.6.0</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -50,8 +50,8 @@
     <ebean-migration.version>14.3.0</ebean-migration.version>
     <ebean-test-containers.version>8.0</ebean-test-containers.version>
     <ebean-datasource.version>10.5</ebean-datasource.version>
-    <ebean-agent.version>16.5.0</ebean-agent.version>
-    <ebean-maven-plugin.version>16.5.0</ebean-maven-plugin.version>
+    <ebean-agent.version>16.6.0</ebean-agent.version>
+    <ebean-maven-plugin.version>16.6.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
@@ -97,10 +97,17 @@
     <module>composites</module>
     <module>ebean-jackson-mapper</module>
     <module>ebean-spring-txn</module>
+    <module>ebean-opentelemetry</module>
     <module>ebean-core-json</module>
   </modules>
 
   <profiles>
+    <profile>
+      <id>bench</id>
+      <modules>
+        <module>ebean-bench</module>
+      </modules>
+    </profile>
     <profile>
       <id>ea</id>
     </profile>
@@ -138,4 +145,3 @@
   </profiles>
 
 </project>
-

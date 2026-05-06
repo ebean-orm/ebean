@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.query;
 
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.CancelableQuery;
 import io.ebean.QueryIterator;
 import io.ebean.Version;
@@ -174,11 +176,11 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.autoTuneProfiling = profilingListener != null;
     // set the generated sql back to the query
     // so its available to the user...
-    query.setGeneratedSql(queryPlan.sql());
     SqlTreePlan sqlTree = queryPlan.sqlTree();
     this.rootNode = sqlTree.rootNode();
     this.manyProperty = sqlTree.manyProperty();
     this.sql = queryPlan.sql();
+    query.setGeneratedSql(sql);
     this.rawSql = queryPlan.isRawSql();
     this.logWhereSql = queryPlan.logWhereSql();
     this.desc = request.descriptor();
@@ -535,7 +537,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   public void profile() {
     transaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), loadedBeanCount, query.profileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), loadedBeanCount, query.profileId(), query.getGeneratedSql());
   }
 
   QueryIterator<T> readIterate(int bufferSize, OrmQueryRequest<T> request) {
@@ -567,6 +569,16 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
     request.loadContext().register(path(many.name()), many, bc);
+  }
+
+  @Override
+  public void registerForImmutable(EntityBeanIntercept ebi) {
+    request.loadContext().registerForImmutable(ebi);
+  }
+
+  @Override
+  public @Nullable EntityBean immutableBeanHit(BeanDescriptor<?> descriptor, Object id) {
+    return request.loadContext().immutableBeanHit(descriptor, id);
   }
 
   @Override

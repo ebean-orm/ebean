@@ -330,16 +330,16 @@ public final class InternalConfiguration {
   }
 
   private SpiProfileHandler profileHandler() {
+    SpiProfileHandler handler = service(SpiProfileHandler.class);
+    if (handler != null) {
+      return plugin(handler);
+    }
 
     ProfilingConfig profilingConfig = config.getProfilingConfig();
     if (!profilingConfig.isEnabled()) {
       return new NoopProfileHandler();
     }
-    SpiProfileHandler handler = service(SpiProfileHandler.class);
-    if (handler == null) {
-      handler = new DefaultProfileHandler(profilingConfig);
-    }
-    return plugin(handler);
+    return plugin(new DefaultProfileHandler(profilingConfig));
   }
 
   /**

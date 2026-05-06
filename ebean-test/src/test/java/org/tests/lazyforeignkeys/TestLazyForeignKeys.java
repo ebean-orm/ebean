@@ -56,13 +56,12 @@ public class TestLazyForeignKeys extends BaseTestCase {
     assertTrue(rel1.getEntity2().isDeleted());
 
     List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(3);
-    assertSql(sql.get(0)).contains("select t0.id, t0.attr1, t0.id1, t0.id2, t0.cat_id from main_entity_relation t0");
+    assertThat(sql).hasSize(2);
+    assertSql(sql.get(0)).contains("select t0.id, t0.attr1, t0.id1, t0.id2, t1.species, t0.cat_id from main_entity_relation t0 left join animal t1 on t1.id = t0.cat_id");
     if (isSqlServer() || isOracle()) {
       assertSql(sql.get(1)).contains("select t0.id, t0.attr1, t0.attr2, CASE WHEN t0.id is null THEN 1 ELSE 0 END from main_entity t0");
     } else {
       assertSql(sql.get(1)).contains("select t0.id, t0.attr1, t0.attr2, t0.id is null from main_entity t0");
-      assertSql(sql.get(2)).contains("select t0.id, t0.attr1, t0.attr2, t0.id is null from main_entity t0");
     }
   }
 

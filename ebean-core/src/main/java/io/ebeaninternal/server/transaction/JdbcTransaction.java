@@ -827,7 +827,7 @@ class JdbcTransaction implements SpiTransaction, TxnProfileEventCodes {
       }
       manager.collectMetric(exeMicros);
       if (profileStream != null) {
-        profileStream.end(manager);
+        profileStream.end(manager, label);
       }
     }
   }

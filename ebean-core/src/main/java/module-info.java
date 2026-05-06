@@ -16,6 +16,7 @@ module io.ebean.core {
   uses io.ebeaninternal.api.GeoTypeProvider;
   uses io.ebeaninternal.api.SpiDdlGeneratorProvider;
   uses io.ebeaninternal.server.autotune.AutoTuneServiceProvider;
+  uses io.ebeaninternal.api.SpiProfileHandler;
   uses io.ebeaninternal.server.cluster.ClusterBroadcastFactory;
 
   requires transitive io.ebean.api;
@@ -62,12 +63,13 @@ module io.ebean.core {
   exports io.ebeaninternal.server.rawsql to io.ebean.test;
   exports io.ebeaninternal.server.json to io.ebean.test, io.ebean.elastic;
   exports io.ebeaninternal.server.type to io.ebean.postgis, io.ebean.test, io.ebean.postgis.types, io.ebean.pgvector;
-  exports io.ebeaninternal.server.transaction to io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.k8scache;
+  exports io.ebeaninternal.server.transaction to io.ebean.test, io.ebean.elastic, io.ebean.spring.txn, io.ebean.k8scache, io.ebean.opentelemetry;
   exports io.ebeaninternal.server.util to io.ebean.querybean;
 
   provides io.ebean.service.BootstrapService with
     io.ebeaninternal.server.DContainerFactory,
     io.ebeaninternal.server.query.DFetchGroupService,
+    io.ebeaninternal.server.cache.DImmutableCacheFactory,
     io.ebeaninternal.server.profile.DProfileLocationFactory,
     io.ebeaninternal.server.rawsql.DRawSqlService,
     io.ebeaninternal.server.profile.DMetricFactory;

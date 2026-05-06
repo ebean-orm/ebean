@@ -82,6 +82,8 @@ or [github discussions](https://github.com/ebean-orm/ebean/discussions)
 Goto [https://ebean.io/docs/](https://ebean.io/docs/)
 
 ## Guides
+Library reference (capabilities, scope, and AI guidance): [docs/LIBRARY.md](docs/LIBRARY.md)
+
 Step-by-step guides for common tasks: [docs/guides/](docs/guides/README.md)
 
 Available guides:

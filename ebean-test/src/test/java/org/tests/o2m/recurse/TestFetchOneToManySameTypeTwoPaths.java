@@ -3,9 +3,14 @@ package org.tests.o2m.recurse;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.FetchConfig;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestFetchOneToManySameTypeTwoPaths {
 
@@ -128,6 +133,34 @@ class TestFetchOneToManySameTypeTwoPaths {
       assertEquals(5, requestedCustomer.getItemB().getSubItems().size());
       System.out.println("here");
     }
+  }
+
+  @Test
+  void testLazyAssocOneSameTypeTwoPaths_singleQuery() {
+    Database server = DB.getDefault();
+
+    RMItem itemA = new RMItem("lazy-a");
+    server.save(itemA);
+    RMItem itemB = new RMItem("lazy-b");
+    server.save(itemB);
+
+    RMItemHolder holder = new RMItemHolder("holder-lazy");
+    holder.setItemA(itemA);
+    holder.setItemB(itemB);
+    server.save(holder);
+
+    RMItemHolder found = server.find(RMItemHolder.class)
+      .select("name,itemA,itemB")
+      .where().idEq(holder.getId())
+      .findOne();
+
+    LoggedSql.start();
+    assertNull(found.getItemA().getItemGroup());
+    assertNull(found.getItemB().getItemGroup());
+    List<String> sql = LoggedSql.stop();
+
+    assertEquals(1, sql.size());
+    assertTrue(sql.get(0).contains(" from rmitem "));
   }
 
 }

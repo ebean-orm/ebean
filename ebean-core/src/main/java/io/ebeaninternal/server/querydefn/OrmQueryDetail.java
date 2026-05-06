@@ -3,6 +3,7 @@ package io.ebeaninternal.server.querydefn;
 import io.ebean.FetchConfig;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
+import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQueryManyJoin;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
@@ -39,22 +40,44 @@ public final class OrmQueryDetail implements Serializable {
   /**
    * Return a deep copy of the OrmQueryDetail.
    */
-  public OrmQueryDetail copy(OrmQueryDetail existing) {
-    OrmQueryDetail copy = new OrmQueryDetail();
-    copy.baseProps = baseProps.copy();
+  public OrmQueryDetail copy(OrmQueryDetail priorState) {
+    return copyInto(new OrmQueryDetail(), priorState);
+  }
+
+  /**
+   * Copy this detail into the target detail.
+   */
+  public OrmQueryDetail copyInto(OrmQueryDetail target, OrmQueryDetail priorState) {
+    Map<String, SpiExpressionList<?>> existingFilters = priorState == null ? null : copyFilterMany(priorState.fetchPaths);
+
+    target.baseProps = baseProps.copy();
+    target.fetchPaths.clear();
     for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
-      copy.fetchPaths.put(entry.getKey(), entry.getValue().copy());
+      target.fetchPaths.put(entry.getKey(), entry.getValue().copy());
     }
-    if (existing != null) {
-      // transfer any existing filterMany expressions
-      for (Map.Entry<String, OrmQueryProperties> entry : existing.fetchPaths.entrySet()) {
-        var filterMany = entry.getValue().getFilterMany();
-        if (filterMany != null) {
-          copy.getChunk(entry.getKey(), true).setFilterMany(filterMany);
-        }
+    if (existingFilters != null && !existingFilters.isEmpty()) {
+      for (Map.Entry<String, SpiExpressionList<?>> entry : existingFilters.entrySet()) {
+        target.getChunk(entry.getKey(), true).setFilterMany(entry.getValue());
       }
     }
-    return copy;
+    return target;
+  }
+
+  private static Map<String, SpiExpressionList<?>> copyFilterMany(Map<String, OrmQueryProperties> fetchPaths) {
+    if (fetchPaths.isEmpty()) {
+      return Collections.emptyMap();
+    }
+    Map<String, SpiExpressionList<?>> filters = null;
+    for (Map.Entry<String, OrmQueryProperties> entry : fetchPaths.entrySet()) {
+      var filterMany = entry.getValue().getFilterMany();
+      if (filterMany != null) {
+        if (filters == null) {
+          filters = new LinkedHashMap<>();
+        }
+        filters.put(entry.getKey(), filterMany);
+      }
+    }
+    return filters == null ? Collections.emptyMap() : filters;
   }
 
   /**

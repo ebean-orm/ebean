@@ -344,6 +344,7 @@ public final class CQueryEngine {
         logFindManySummary(cquery);
       }
       request.executeSecondaryQueries(false);
+      request.populateFromImmutableCache();
       if (request.isQueryCachePut()) {
         request.addDependentTables(cquery.dependentTables());
       }
@@ -377,6 +378,7 @@ public final class CQueryEngine {
         logFindBeanSummary(cquery);
       }
       request.executeSecondaryQueries(false);
+      request.populateFromImmutableCache();
       request.unmodifiableFreeze(bean);
       return (T) bean;
     } catch (SQLException e) {

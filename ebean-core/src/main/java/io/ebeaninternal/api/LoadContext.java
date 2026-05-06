@@ -1,10 +1,14 @@
 package io.ebeaninternal.api;
 
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.bean.BeanCollection;
+import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.ObjectGraphNode;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.core.OrmQueryRequest;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 
@@ -52,7 +56,23 @@ public interface LoadContext {
   void register(String path, BeanPropertyAssocMany<?> many, BeanCollection<?> bc);
 
   /**
+   * Register a bean as a candidate for immutable cache population.
+   */
+  void registerForImmutable(EntityBeanIntercept ebi);
+
+  /**
+   * Return an immutable cached bean for the given descriptor and id if already present.
+   */
+  @Nullable
+  EntityBean immutableBeanHit(BeanDescriptor<?> descriptor, Object id);
+
+  /**
    * Return true to include a many as a secondary query for unmodified.
    */
   boolean includeSecondary(BeanPropertyAssocMany<?> many);
+
+  /**
+   * Populate buffered entity references from immutable bean caches.
+   */
+  void populateFromImmutableCache();
 }

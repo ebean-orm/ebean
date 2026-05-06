@@ -121,6 +121,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     }
   }
 
+  public void populateFromImmutableCache() {
+    if (loadContext != null) {
+      loadContext.populateFromImmutableCache();
+    }
+  }
+
   /**
    * For use with QueryIterator and secondary queries this returns the minimum
    * batch size that should be loaded before executing the secondary queries.

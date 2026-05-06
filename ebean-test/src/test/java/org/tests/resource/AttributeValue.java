@@ -1,9 +1,7 @@
-package org.example.resource;
+package org.tests.resource;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import org.example.records.BaseModel;
 
 @Entity
 public class AttributeValue extends BaseModel {

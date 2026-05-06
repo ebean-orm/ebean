@@ -17,7 +17,7 @@ class TestErrorBindLog extends BaseTestCase {
       DB.find(Order.class).where().gt("id", "JUNK").findList();
     } catch (PersistenceException e) {
       String msg = e.getMessage();
-      if (isHana() || isDb2()) {
+      if (isHana()) {
         assertThat(msg).contains("Error with property");
       } else {
         assertThat(msg).contains("Bind values:");
