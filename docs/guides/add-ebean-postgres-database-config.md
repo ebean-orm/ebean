@@ -1,4 +1,4 @@
-# Guide: Add Ebean ORM (PostgreSQL) to an Existing Maven Project — Step 2: Database Configuration
+# Guide: Add Ebean ORM (PostgreSQL) to an Existing Maven Project — Step 3: Database Configuration
 
 ## Purpose
 
