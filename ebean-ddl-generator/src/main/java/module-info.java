@@ -1,5 +1,6 @@
 module io.ebean.ddl.generator {
 
+  uses io.ebean.plugin.Plugin;
   exports io.ebean.dbmigration;
 
   provides io.ebean.dbmigration.DbMigration with io.ebeaninternal.dbmigration.DefaultDbMigration;
