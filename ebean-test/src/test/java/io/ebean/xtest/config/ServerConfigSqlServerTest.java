@@ -1,11 +1,8 @@
 package io.ebean.xtest.config;
 
-
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -27,7 +24,7 @@ public class ServerConfigSqlServerTest {
     // no explicit databasePlatformName set ..
     //props.setProperty("ebean.some_sqlserver.databasePlatformName", "sqlserver17");
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("some_sqlserver");
     config.loadFromProperties(props);
 
@@ -39,7 +36,7 @@ public class ServerConfigSqlServerTest {
     config.setRegister(false);
     config.addClass(EBasicVer.class);
 
-    Database sqlServer = DatabaseFactory.create(config);
+    Database sqlServer = config.build();
 
     assertThat(sqlServer).isNotNull();
     sqlServer.shutdown();
@@ -62,7 +59,7 @@ public class ServerConfigSqlServerTest {
 
     String name = "testsqlserver17";
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName(name);
 
     Properties props = props(name);
@@ -80,7 +77,7 @@ public class ServerConfigSqlServerTest {
     config.loadFromProperties(props);
     config.addClass(EBasicVer.class);
 
-    Database sqlServer = DatabaseFactory.create(config);
+    Database sqlServer = config.build();
 
     assertThat(sqlServer).isNotNull();
     sqlServer.shutdown();
@@ -95,7 +92,7 @@ public class ServerConfigSqlServerTest {
     Properties props = props(name);
     //props.setProperty("ebean.testsqlserver16.databasePlatformName", "sqlserver16");
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setDefaultServer(false);
     config.setRegister(false);
     config.setDdlGenerate(true);
@@ -106,7 +103,7 @@ public class ServerConfigSqlServerTest {
     config.loadFromProperties(props);
     config.addClass(EBasicVer.class);
 
-    Database sqlServer = DatabaseFactory.create(config);
+    Database sqlServer = config.build();
 
     assertThat(sqlServer).isNotNull();
     sqlServer.shutdown();

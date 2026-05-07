@@ -1,11 +1,9 @@
 package io.ebean.xtest.config;
 
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
 import io.ebean.annotation.Platform;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbIdentity;
 import io.ebean.config.dbplatform.IdType;
 import io.ebean.platform.h2.H2Platform;
@@ -89,7 +87,7 @@ public class PlatformNoGeneratedKeysTest {
 
   private static Database testH2Server() {
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("h2_noGeneratedKeys");
 
     OtherH2Platform platform = new OtherH2Platform();
@@ -101,10 +99,10 @@ public class PlatformNoGeneratedKeysTest {
     dbIdentity.setSelectLastInsertedIdTemplate("select identity() --{table}");
 
     config.setDatabasePlatform(platform);
-    config.getDataSourceConfig().setUsername("sa");
-    config.getDataSourceConfig().setPassword("");
-    config.getDataSourceConfig().setUrl("jdbc:h2:mem:withPCQuery;MODE=LEGACY");
-    config.getDataSourceConfig().setDriver("org.h2.Driver");
+    config.settings().getDataSourceConfig().setUsername("sa");
+    config.settings().getDataSourceConfig().setPassword("");
+    config.settings().getDataSourceConfig().setUrl("jdbc:h2:mem:withPCQuery;MODE=LEGACY");
+    config.settings().getDataSourceConfig().setDriver("org.h2.Driver");
 
     config.setDisableLazyLoading(true);
     config.setDisableL2Cache(true);
@@ -116,7 +114,7 @@ public class PlatformNoGeneratedKeysTest {
     config.addClass(BasicDraftableBean.class);
     config.loadFromProperties(); // trigger auto config for H2 1.x
 
-    return DatabaseFactory.create(config);
+    return config.build();
   }
 
   public static class OtherH2Platform extends H2Platform {

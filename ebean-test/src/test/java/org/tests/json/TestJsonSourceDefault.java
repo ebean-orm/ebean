@@ -1,13 +1,11 @@
 package org.tests.json;
 
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.ValuePair;
 import io.ebean.DatabaseBuilder;
 import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.Platform;
-import io.ebean.config.DatabaseConfig;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.tests.model.json.EBasicJsonList;
@@ -23,8 +21,8 @@ class TestJsonSourceDefault {
   @ForPlatform(Platform.H2)
   @Disabled
   void testDirtyValues_diffSource() {
-    DatabaseConfig config = new DatabaseConfig();
-    config.getDataSourceConfig()
+    DatabaseBuilder config = Database.builder();
+    config.settings().getDataSourceConfig()
       .setUsername("sa")
       .setPassword("")
       .setUrl("jdbc:h2:mem:testJsonSourceDirtyValues");
@@ -37,7 +35,7 @@ class TestJsonSourceDefault {
     config.setDdlExtra(false);
     config.addClass(EBasicJsonList.class);
     config.setJsonMutationDetection(MutationDetection.SOURCE);
-    Database db = DatabaseFactory.create(config);
+    Database db = config.build();
     try {
       assertThat(db).isNotNull();
 

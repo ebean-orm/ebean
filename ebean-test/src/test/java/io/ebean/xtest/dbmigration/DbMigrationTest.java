@@ -2,8 +2,8 @@ package io.ebean.xtest.dbmigration;
 
 import io.ebean.*;
 import io.ebean.annotation.Platform;
+import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.datasource.DataSourcePool;
 import io.ebean.xtest.BaseTestCase;
@@ -217,7 +217,7 @@ public class DbMigrationTest extends BaseTestCase {
     if (history == null) {
       return;
     }
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName(server().name());
     config.loadFromProperties(server().pluginApi().config().getProperties());
     config.setDataSource(server().dataSource());
@@ -227,7 +227,7 @@ public class DbMigrationTest extends BaseTestCase {
     config.setRegister(false);
     config.setPackages(Collections.singletonList("misc.migration.v1_1"));
 
-    Database tmpServer = DatabaseFactory.create(config);
+    Database tmpServer = config.build();
     try {
       EHistory hist = new misc.migration.v1_1.EHistory();
       hist.setId(2);
@@ -289,7 +289,7 @@ public class DbMigrationTest extends BaseTestCase {
 
   // do some history tests with V1.1 models
   private void testReservedKeywords() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName(server().name());
     config.loadFromProperties(server().pluginApi().config().getProperties());
     config.setDataSource(server().dataSource());
@@ -299,7 +299,7 @@ public class DbMigrationTest extends BaseTestCase {
     config.setRegister(false);
     config.setPackages(Collections.singletonList("misc.migration.v1_0"));
 
-    Database tmpServer = DatabaseFactory.create(config);
+    Database tmpServer = config.build();
     try {
       ETable table = new misc.migration.v1_0.ETable();
       table.setFrom("foo");

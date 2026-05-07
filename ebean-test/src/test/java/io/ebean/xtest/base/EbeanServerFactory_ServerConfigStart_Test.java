@@ -1,9 +1,7 @@
 package io.ebean.xtest.base;
 
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.event.ServerConfigStartup;
 import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;
@@ -46,7 +44,7 @@ public class EbeanServerFactory_ServerConfigStart_Test {
   @Test
   public void test() throws InterruptedException {
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("h2");
     config.loadFromProperties();
     config.setName("h2other");
@@ -65,7 +63,7 @@ public class EbeanServerFactory_ServerConfigStart_Test {
     MySpiLoggerFactory loggerFactory = new MySpiLoggerFactory();
     config.putServiceObject(SpiLoggerFactory.class, loggerFactory);
 
-    Database db = DatabaseFactory.create(config);
+    Database db = config.build();
 
     assertThat(loggerFactory.loggers).containsExactlyInAnyOrder("io.ebean.SQL", "io.ebean.SUM", "io.ebean.TXN");
 
@@ -77,7 +75,7 @@ public class EbeanServerFactory_ServerConfigStart_Test {
     // test server shutdown and restart using the same DatabaseConfig
     db.shutdown(true, false);
 
-    Database restartedServer = DatabaseFactory.create(config);
+    Database restartedServer = config.build();
     restartedServer.shutdown(true, false);
   }
 

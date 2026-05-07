@@ -12,13 +12,13 @@ to integrate with Springs JDBC Transaction manager.
 ## To use
 
 ```java
-DatabaseConfig config = new DatabaseConfig();
+DatabaseBuilder config = Database.builder();
 
 // set SpringJdbcTransactionManager ... as the external transaction manager
 config.setExternalTransactionManager(new SpringJdbcTransactionManager());
 
 ...
-Database database = DatabaseFactory.create(config);
+Database database = config.build();
 
 ```
 
