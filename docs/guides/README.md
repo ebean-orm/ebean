@@ -18,6 +18,12 @@ existing Maven project. Complete the steps in order.
 | 2 | [Test container setup](add-ebean-postgres-test-container.md) | Start a PostgreSQL (or PostGIS) Docker container for tests using `@TestScope @Factory` with Avaje Inject; verify the test database works with `mvn verify` before adding production configuration |
 | 3 | [Database configuration](add-ebean-postgres-database-config.md) | Configure the production Ebean `Database` bean using `DataSourceBuilder` and `DatabaseBuilder` with Avaje Inject |
 
+## Migration & upgrades
+
+| Guide | Description |
+|-------|-------------|
+| [Migrate to `Database.builder()`](migrating-to-database-builder.md) | Replace legacy `new DatabaseConfig()` and `DatabaseFactory.create(...)` code with `Database.builder()` and `DatabaseBuilder.build()`. Includes common rewrites, fluent builder equivalents, and manual-review cases for semi-automated upgrades |
+
 ## Entity beans
 
 | Guide | Description |
@@ -133,6 +139,7 @@ tasks are at: https://github.com/ebean-orm/ebean/tree/HEAD/docs/guides/
 Key guides (fetch and follow these when performing the relevant task):
 - Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md
 - Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
+- Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
 - Immutable bean cache for read-only references: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/immutable-bean-cache.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
@@ -158,6 +165,7 @@ tasks are at: https://github.com/ebean-orm/ebean/tree/HEAD/docs/guides/
 Key guides (fetch and follow these when performing the relevant task):
 - Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md
 - Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
+- Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md

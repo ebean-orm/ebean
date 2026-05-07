@@ -1,16 +1,11 @@
 package io.ebean.xtest.event;
 
-
 import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
-import io.ebean.DatabaseFactory;
 import io.ebean.Transaction;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanDeleteIdRequest;
 import io.ebean.event.BeanPersistAdapter;
-import io.ebean.event.BeanPersistController;
 import io.ebean.event.BeanPersistRequest;
-import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,7 +146,7 @@ public class BeanPersistControllerTest {
   }
 
   private Database createDatabase(PersistAdapter persistAdapter) {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("h2ebasicver");
     config.setRegister(false);
     config.setDefaultServer(false);
@@ -165,7 +160,7 @@ public class BeanPersistControllerTest {
     config.addClass(UTDetail.class);
 
     config.add(persistAdapter);
-    return DatabaseFactory.create(config);
+    return config.build();
   }
 
   static class PersistAdapter extends BeanPersistAdapter {

@@ -1,7 +1,6 @@
 package org.example;
 
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.annotation.PersistBatch;
 import io.ebean.DatabaseBuilder;
 import org.springframework.beans.factory.FactoryBean;
@@ -33,7 +32,7 @@ public class EbeanServerFactoryBean implements InitializingBean, FactoryBean<Dat
 
     serverConfig.setPersistBatch(PersistBatch.ALL);
     // Create the new EbeanServer using the configuration
-    this.ebeanServer = DatabaseFactory.create(serverConfig);
+    this.ebeanServer = serverConfig.build();
   }
 
   public Database getObject() throws Exception {
