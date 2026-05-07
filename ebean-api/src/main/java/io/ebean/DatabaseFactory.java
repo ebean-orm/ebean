@@ -68,7 +68,7 @@ public final class DatabaseFactory {
    *
    * @deprecated migrate to {@link DatabaseBuilder#build()}.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public static Database create(DatabaseBuilder builder) {
     lock.lock();
     try {

@@ -539,12 +539,12 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    *
    * @deprecated prefer {@link Database#builder()} and configure the returned {@link DatabaseBuilder}.
    */
-  @Deprecated
+  @Deprecated(forRemoval = true)
   public DatabaseConfig() {
   }
 
   @Override
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings("removal")
   public Database build() {
     return DatabaseFactory.create(this);
   }
