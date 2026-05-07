@@ -539,8 +539,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   private SlowQueryListener slowQueryListener;
 
-  private ProfilingConfig profilingConfig = new ProfilingConfig();
-
   /**
    * The mappingLocations for searching xml mapping.
    */
@@ -1025,17 +1023,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public DatabaseConfig setReadAuditPrepare(ReadAuditPrepare readAuditPrepare) {
     this.readAuditPrepare = readAuditPrepare;
-    return this;
-  }
-
-  @Override
-  public ProfilingConfig getProfilingConfig() {
-    return profilingConfig;
-  }
-
-  @Override
-  public DatabaseConfig setProfilingConfig(ProfilingConfig profilingConfig) {
-    this.profilingConfig = profilingConfig;
     return this;
   }
 
@@ -2137,7 +2124,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   protected void loadSettings(PropertiesWrapper p) {
     dbSchema = p.get("dbSchema", dbSchema);
-    profilingConfig.loadSettings(p, name);
     platformConfig.loadSettings(p);
     if (platformConfig.isAllQuotedIdentifiers()) {
       adjustNamingConventionForAllQuoted();

@@ -9,13 +9,9 @@ import org.jspecify.annotations.Nullable;
  */
 public final class NoopProfileHandler implements SpiProfileHandler {
 
+  @Nullable
   @Override
-  public void collectTransactionProfile(TransactionProfile transactionProfile) {
-    // do nothing
-  }
-
-  @Override
-  public ProfileStream createProfileStream(@Nullable ProfileLocation location, String label) {
+  public ProfileStream createProfileStream(@Nullable ProfileLocation location, @Nullable String label) {
     // always return null
     return null;
   }
