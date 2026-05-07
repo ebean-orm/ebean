@@ -169,7 +169,7 @@ public final class OrmQueryProperties implements Serializable {
   }
 
   private static String buildImmutableQueryPlanHashSuffix(FetchConfig fetchConfig) {
-    return fetchConfig == null ? "" : "/c" + fetchConfig.hashCode();
+    return fetchConfig == null ? "}" : "/c" + fetchConfig.hashCode() + '}';
   }
 
   /**
@@ -468,7 +468,6 @@ public final class OrmQueryProperties implements Serializable {
       filterMany.queryPlanHash(builder);
     }
     builder.append(immutableHashSuffix);
-    builder.append('}');
   }
 
   private static void appendSet(StringBuilder builder, Set<String> values) {

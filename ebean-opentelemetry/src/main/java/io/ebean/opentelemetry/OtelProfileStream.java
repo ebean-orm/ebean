@@ -84,7 +84,7 @@ final class OtelProfileStream implements ProfileStream {
   }
 
   @Override
-  public void end(TransactionManager manager, String label) {
+  public void end(String label) {
     txnSpan.setAttribute(EBEAN_TOTAL_MICROS, offset());
     if (label != null) {
       txnSpan.updateName("txn." + label);

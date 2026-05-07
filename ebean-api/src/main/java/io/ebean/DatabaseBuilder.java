@@ -724,19 +724,6 @@ public interface DatabaseBuilder {
   DatabaseBuilder setReadAuditPrepare(ReadAuditPrepare readAuditPrepare);
 
   /**
-   * Set the configuration for profiling.
-   */
-  default DatabaseBuilder profilingConfig(ProfilingConfig profilingConfig) {
-    return setProfilingConfig(profilingConfig);
-  }
-
-  /**
-   * @deprecated migrate to {@link #profilingConfig(ProfilingConfig)}.
-   */
-  @Deprecated
-  DatabaseBuilder setProfilingConfig(ProfilingConfig profilingConfig);
-
-  /**
    * Set the suffix appended to the base table to derive the view that contains the union
    * of the base table and the history table in order to support asOf queries.
    */
@@ -2489,11 +2476,6 @@ public interface DatabaseBuilder {
      * Return the tenancy catalog provider.
      */
     TenantCatalogProvider getTenantCatalogProvider();
-
-    /**
-     * Return the configuration for profiling.
-     */
-    ProfilingConfig getProfilingConfig();
 
     /**
      * Return the DB schema to use.
