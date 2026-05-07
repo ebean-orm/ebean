@@ -982,7 +982,7 @@ public interface DatabaseBuilder {
    * <p>
    * Use this to override the default known aggregation functions.
    */
-  DatabaseConfig aggregateFormulaContext(AggregateFormulaContext aggregateFormulaContext);
+  DatabaseBuilder aggregateFormulaContext(AggregateFormulaContext aggregateFormulaContext);
 
   /**
    * Set to true if all DB column and table names should use quoted identifiers.
@@ -2221,7 +2221,7 @@ public interface DatabaseBuilder {
    *
    * @param includeLabelInSql When true include a SQL inline comment in generated SELECT queries.
    */
-  DatabaseConfig includeLabelInSql(boolean includeLabelInSql);
+  DatabaseBuilder includeLabelInSql(boolean includeLabelInSql);
 
   /**
    * Set the naming convention to apply to metrics names.
@@ -2239,7 +2239,7 @@ public interface DatabaseBuilder {
   /**
    * Sets the length check mode.
    */
-  DatabaseConfig lengthCheck(LengthCheck lengthCheck);
+  DatabaseBuilder lengthCheck(LengthCheck lengthCheck);
 
   /**
    * Provides read access (getters) for the DatabaseBuilder configuration

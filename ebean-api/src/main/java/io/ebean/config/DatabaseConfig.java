@@ -535,9 +535,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private Function<String, String> metricNaming = MetricNamingMatch.INSTANCE;
 
   /**
-   * Construct the concrete {@link DatabaseBuilder} implementation used by {@link Database#builder()}.
-   *
-   * @deprecated prefer {@link Database#builder()} and configure the returned {@link DatabaseBuilder}.
+   * @deprecated migrate to {@link Database#builder()} and configure the returned {@link DatabaseBuilder}.
    */
   @Deprecated(forRemoval = true)
   public DatabaseConfig() {

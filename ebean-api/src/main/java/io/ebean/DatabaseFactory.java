@@ -64,8 +64,6 @@ public final class DatabaseFactory {
   }
 
   /**
-   * Create using the {@link DatabaseBuilder} configuration.
-   *
    * @deprecated migrate to {@link DatabaseBuilder#build()}.
    */
   @Deprecated(forRemoval = true)

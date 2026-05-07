@@ -96,12 +96,13 @@ public interface Database {
    *   // from application.properties / application.yaml
    *
    *   Database db = Database.builder()
+   *     .name("db")
    *     .loadFromProperties()
    *     .build();
    *
    * }</pre>
    */
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings("removal")
   static DatabaseBuilder builder() {
     return new DatabaseConfig();
   }
