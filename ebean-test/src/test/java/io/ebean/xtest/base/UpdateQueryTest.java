@@ -437,4 +437,14 @@ public class UpdateQueryTest extends BaseTestCase {
 
     return b0.getId();
   }
+
+  @Test
+  public void timeoutPropagation() {
+    int timeout = 7;
+
+    var updateQuery = DB.update(Customer.class)
+      .setTimeout(timeout);
+
+    assertThat(updateQuery.getTimeout()).isEqualTo(timeout);
+  }
 }

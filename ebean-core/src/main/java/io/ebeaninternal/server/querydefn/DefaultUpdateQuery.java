@@ -84,4 +84,15 @@ public final class DefaultUpdateQuery<T> implements UpdateQuery<T> {
   public int update() {
     return query.update();
   }
+
+  @Override
+  public int getTimeout() {
+    return query.timeout();
+  }
+
+  @Override
+  public UpdateQuery<T> setTimeout(int secs) {
+    query.setTimeout(secs);
+    return this;
+  }
 }
