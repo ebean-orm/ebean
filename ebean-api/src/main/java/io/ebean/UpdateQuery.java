@@ -205,4 +205,20 @@ public interface UpdateQuery<T> {
    */
   int update();
 
+  /**
+   * Return the timeout used to execute this statement.
+   */
+  int getTimeout();
+
+  /**
+   * Set a timeout on this query.
+   * <p>
+   * This will typically result in a call to setQueryTimeout() on a
+   * preparedStatement. If the timeout occurs an exception will be thrown - this
+   * will be a SQLException wrapped up in a PersistenceException.
+   * </p>
+   *
+   * @param secs the query timeout limit in seconds. Zero means there is no limit.
+   */
+  UpdateQuery<T> setTimeout(int secs);
 }
