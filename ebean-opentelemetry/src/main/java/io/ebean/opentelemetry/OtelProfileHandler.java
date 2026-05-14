@@ -63,7 +63,7 @@ public final class OtelProfileHandler implements SpiProfileHandler, Plugin {
    */
   @Override
   public @Nullable ProfileStream createProfileStream(@Nullable ProfileLocation location, @Nullable String label) {
-    if (!Span.current().getSpanContext().isValid()) {
+    if (!Span.current().isRecording()) {
       // No active OTel trace context — don't create spans to avoid noise
       return null;
     }

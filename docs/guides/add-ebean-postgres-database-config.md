@@ -148,13 +148,17 @@ Database database(Configuration config) {
     return Database.builder()
         .name("db")
         .dataSourceBuilder(dataSource)
-        .skipDataSourceCheck(true)
         .build();
 }
 ```
 
 If the project has a dedicated config-wrapper class (a `@Component` that reads config
 keys), accept it as a parameter instead of `Configuration`.
+
+> **Note:** Injecting `Configuration` requires that `avaje-config` is properly wired
+> into the DI context. If you encounter "No dependency provided for
+> io.avaje.config.Configuration" errors, use `Config.get(...)` static access instead
+> (as shown in Step 2).
 
 ---
 
