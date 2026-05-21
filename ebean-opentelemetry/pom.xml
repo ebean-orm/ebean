@@ -12,7 +12,7 @@
   <description>Ebean OpenTelemetry integration - transaction and query tracing via SpiProfileHandler</description>
 
   <properties>
-    <opentelemetry.version>1.51.0</opentelemetry.version>
+    <opentelemetry.version>1.62.0</opentelemetry.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
