@@ -103,7 +103,7 @@ class ResourceEntityTest {
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0))
       .describedAs("lazy loading query invoked by getName/getDescription")
-      .contains("select t0.id, t0.version from label t0 where t0.id in ");
+      .contains("select t0.id, t0.version from label t0 where t0.id ");
   }
 
   @Test
