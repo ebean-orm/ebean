@@ -32,7 +32,7 @@ public final class BeanCollectionUtil {
     if (o instanceof BeanCollection<?>) {
       BeanCollection<?> bc = (BeanCollection<?>) o;
       if (!bc.isPopulated()) {
-        return null;
+        return bc.getLazyAddedEntries(true);
       }
       // For maps this is a collection of Map.Entry, otherwise it
       // returns a collection of beans

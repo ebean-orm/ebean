@@ -20,18 +20,13 @@ import java.util.Map.Entry;
  */
 public class BeanMapHelp<T> extends BaseCollectionHelp<T> {
 
-  private final BeanPropertyAssocMany<T> many;
-  private final BeanDescriptor<T> targetDescriptor;
-  private final String propertyName;
   private final BeanProperty beanProperty;
 
   /**
    * When help is attached to a specific many property.
    */
   BeanMapHelp(BeanPropertyAssocMany<T> many) {
-    this.many = many;
-    this.targetDescriptor = many.targetDescriptor();
-    this.propertyName = many.name();
+    super(many);
     this.beanProperty = targetDescriptor.beanProperty(many.mapKey());
   }
 

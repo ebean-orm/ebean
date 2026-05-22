@@ -11,7 +11,7 @@ import java.util.Collection;
 abstract class BaseCollectionHelp<T> implements BeanCollectionHelp<T> {
 
   final BeanPropertyAssocMany<T> many;
-  private final BeanDescriptor<T> targetDescriptor;
+  final BeanDescriptor<T> targetDescriptor;
   final String propertyName;
   BeanCollectionLoader loader;
 
@@ -19,12 +19,6 @@ abstract class BaseCollectionHelp<T> implements BeanCollectionHelp<T> {
     this.many = many;
     this.targetDescriptor = many.targetDescriptor();
     this.propertyName = many.name();
-  }
-
-   BaseCollectionHelp() {
-    this.many = null;
-    this.targetDescriptor = null;
-    this.propertyName = null;
   }
 
   @Override
