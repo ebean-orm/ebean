@@ -24,6 +24,12 @@ existing Maven project. Complete the steps in order.
 |-------|-------------|
 | [Migrate to `Database.builder()`](migrating-to-database-builder.md) | Replace legacy `new DatabaseConfig()` and `DatabaseFactory.create(...)` code with `Database.builder()` and `DatabaseBuilder.build()`. Includes common rewrites, fluent builder equivalents, and manual-review cases for semi-automated upgrades |
 
+## Observability
+
+| Guide | Description |
+|-------|-------------|
+| [Ebean OpenTelemetry tracing](add-ebean-opentelemetry.md) | Add `ebean-opentelemetry`, register `GlobalOpenTelemetry` once before Ebean databases are built, and troubleshoot missing spans or double-registration errors |
+
 ## Entity beans
 
 | Guide | Description |
@@ -142,6 +148,7 @@ Key guides (fetch and follow these when performing the relevant task):
 - Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
 - Immutable bean cache for read-only references: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/immutable-bean-cache.md
+- Ebean OpenTelemetry tracing: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-opentelemetry.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md
 - DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md
