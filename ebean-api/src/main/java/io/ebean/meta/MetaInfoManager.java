@@ -10,11 +10,22 @@ public interface MetaInfoManager {
   /**
    * Return the metrics for the database instance.
    * <p>
-   * This will reset the metrics (reset counters back to zero etc) and
-   * will only return the non-empty metrics.
+   * This is equivalent to {@link #collectMetrics(boolean)} with reset set to true.
+   * It will reset the metrics (reset counters back to zero etc) and will only return
+   * the non-empty metrics.
    * </p>
    */
   ServerMetrics collectMetrics();
+
+  /**
+   * Return the metrics for the database instance using the given reset behavior.
+   * <p>
+   * When reset is false, count and total values remain cumulative between collections.
+   * </p>
+   */
+  default ServerMetrics collectMetrics(boolean reset) {
+    return collectMetrics();
+  }
 
   /**
    * Visit the metrics resetting and collecting/reporting as desired.
