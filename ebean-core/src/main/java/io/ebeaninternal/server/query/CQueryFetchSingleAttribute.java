@@ -165,7 +165,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   public void profile() {
     transaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId(), query.getGeneratedSql());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId(), queryPlan.hash(), query.getGeneratedSql());
   }
 
   Set<String> dependentTables() {
