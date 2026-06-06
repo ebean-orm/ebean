@@ -406,13 +406,6 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   /**
-   * Process the collected transaction profiling information.
-   */
-  final void profileCollect(TransactionProfile transactionProfile) {
-    profileHandler.collectTransactionProfile(transactionProfile);
-  }
-
-  /**
    * Collect execution time for an explicit transaction.
    */
   final void collectMetric(long exeMicros) {

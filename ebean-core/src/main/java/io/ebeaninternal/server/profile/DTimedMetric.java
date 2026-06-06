@@ -17,7 +17,7 @@ final class DTimedMetric implements TimedMetric {
   private final String name;
   private final LongAdder count = new LongAdder();
   private final LongAdder total = new LongAdder();
-  private final LongAccumulator max = new LongAccumulator(Math::max, Long.MIN_VALUE);
+  private final LongAccumulator max = new LongAccumulator(Math::max, 0);
   private boolean collected;
   private String reportName;
 
@@ -84,11 +84,8 @@ final class DTimedMetric implements TimedMetric {
    */
   private DTimeMetricStats stats(boolean reset, String name, long countSum) {
     try {
-      if (reset) {
-        return new DTimeMetricStats(name, collected, countSum, total.sumThenReset(), max.getThenReset());
-      } else {
-        return new DTimeMetricStats(name, collected, countSum, total.sum(), max.get());
-      }
+      final long totalSum = reset ? total.sumThenReset() : total.sum();
+      return new DTimeMetricStats(name, collected, countSum, totalSum, max.getThenReset());
     } finally {
       collected = true;
     }

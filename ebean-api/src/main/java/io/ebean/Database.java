@@ -23,11 +23,18 @@ import java.util.concurrent.Callable;
 /**
  * Provides the API for fetching and saving beans to a particular database.
  *
+ * <h5>Constructing a Database</h5>
+ * <p>
+ * Databases are typically constructed via {@link #builder()} and {@link DatabaseBuilder#build()}.
+ * They can also be automatically constructed on demand using configuration information in
+ * the application.properties file. The underlying implementation is provided by
+ * {@link DatabaseFactory}.
+ *
  * <h5>Registration with the DB singleton</h5>
  * <p>
- * When a Database instance is created it can be registered with the DB
- * singleton (see {@link DatabaseConfig#setRegister(boolean)}). The DB
- * singleton is essentially a map of Database's that have been registered
+ * When a Database instance is created it can be registered with the {@link DB}
+ * singleton (see {@link DatabaseBuilder#register(boolean)}). The {@link DB}
+ * singleton is essentially a map of {@link Database}'s that have been registered
  * with it.
  * <p>
  * The Database can then be retrieved later via {@link DB#byName(String)}.
@@ -35,16 +42,10 @@ import java.util.concurrent.Callable;
  * <h5>The 'default' Database</h5>
  * <p>
  * One Database can be designated as the 'default' or 'primary' Database
- * (see {@link DatabaseConfig#setDefaultServer(boolean)}). Many methods on DB
+ * (see {@link DatabaseBuilder#defaultDatabase(boolean)}). Many methods on {@link DB}
  * such as {@link DB#find(Class)} etc are actually just a convenient way to
  * call methods on the 'default/primary' Database.
  *
- * <h5>Constructing a Database</h5>
- * <p>
- * Databases are constructed by the DatabaseFactory. They can be created
- * programmatically via {@link DatabaseFactory#create(DatabaseBuilder)} or they
- * can be automatically constructed on demand using configuration information in
- * the application.properties file.
  *
  * <h5>Example: Get a Database</h5>
  * <pre>{@code
@@ -80,6 +81,7 @@ import java.util.concurrent.Callable;
  * method. Example: a single thread requires more than one transaction.
  *
  * @see DB
+ * @see DatabaseBuilder
  * @see DatabaseFactory
  * @see DatabaseConfig
  */
@@ -94,11 +96,13 @@ public interface Database {
    *   // from application.properties / application.yaml
    *
    *   Database db = Database.builder()
+   *     .name("db")
    *     .loadFromProperties()
    *     .build();
    *
    * }</pre>
    */
+  @SuppressWarnings("removal")
   static DatabaseBuilder builder() {
     return new DatabaseConfig();
   }

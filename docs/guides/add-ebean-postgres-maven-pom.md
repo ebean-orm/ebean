@@ -85,7 +85,7 @@ already exist:
 ```xml
 <properties>
     <!-- add this line; use latest stable from https://github.com/ebean-orm/ebean/releases -->
-    <ebean.version>17.2.0</ebean.version>
+    <ebean.version>17.5.0</ebean.version>
 </properties>
 ```
 
@@ -141,7 +141,16 @@ for Postgres test instances:
     <version>${ebean.version}</version>
     <scope>test</scope>
 </dependency>
+<dependency>
+    <groupId>io.avaje</groupId>
+    <artifactId>junit</artifactId>
+    <version>1.8</version>
+    <scope>test</scope>
+</dependency>
 ```
+
+The `io.avaje:junit` bundle includes JUnit Jupiter (API + engine) and AssertJ,
+avoiding the need to declare those dependencies separately.
 
 ---
 
@@ -156,12 +165,12 @@ annotation processor. Skip this step if the user chose Spring or no DI.
 <dependency>
     <groupId>io.avaje</groupId>
     <artifactId>avaje-inject</artifactId>
-    <version>11.5</version>
+    <version>12.5</version>
 </dependency>
 <dependency>
     <groupId>io.avaje</groupId>
     <artifactId>avaje-inject-test</artifactId>
-    <version>11.5</version>
+    <version>12.5</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -185,7 +194,7 @@ the final `<annotationProcessorPaths>` block should include both:
     <path> <!-- generate avaje-inject DI code -->
         <groupId>io.avaje</groupId>
         <artifactId>avaje-inject-generator</artifactId>
-        <version>11.5</version>
+        <version>12.5</version>
     </path>
 </annotationProcessorPaths>
 ```

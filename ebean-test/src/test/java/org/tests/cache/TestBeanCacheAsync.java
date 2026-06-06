@@ -5,7 +5,6 @@ import io.ebean.config.*;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebeaninternal.server.cache.DefaultServerCachePlugin;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.OCachedBean;
@@ -63,7 +62,7 @@ public class TestBeanCacheAsync extends BaseTestCase {
 
   @Test
   public void findById_with_tenant() throws InterruptedException {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName(DB.getDefault().name());
     config.loadFromProperties();
     config.setDataSource(DB.getDefault().dataSource());
@@ -79,7 +78,7 @@ public class TestBeanCacheAsync extends BaseTestCase {
         new MdcBackgroundExecutorWrapper().with(new TenantCopyBackgroundExecutorWrapper()));
     tenantId.set("4711");
 
-    Database db = DatabaseFactory.create(config);
+    Database db = config.build();
     try {
       OCachedBean bean = new OCachedBean();
       bean.setName("findById");

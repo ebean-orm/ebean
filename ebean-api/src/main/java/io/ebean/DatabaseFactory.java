@@ -8,18 +8,18 @@ import jakarta.persistence.PersistenceException;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * Creates Database instances.
+ * Low-level factory for creating {@link Database} instances.
  * <p>
- * This uses either DatabaseConfig or properties in the application.properties file to
- * configure and create a Database instance.
+ * Most applications should prefer {@link Database#builder()} together with {@link DatabaseBuilder#build()}.
+ * This factory remains for legacy creation entry points plus container lifecycle methods.
  * <p>
- * The Database instance can either be registered with the DB singleton or
- * not. The DB singleton effectively holds a map of Database by a name.
- * If the Database is registered with the DB singleton you can retrieve it
+ * The Database instance can either be registered with the {@link DB} singleton or
+ * not. The {@link DB} singleton effectively holds a map of {@link Database} by name.
+ * If the Database is registered with the {@link DB} singleton you can retrieve it
  * later via {@link DB#byName(String)}.
  * <p>
  * One Database can be nominated as the 'default/primary' Database. Many
- * methods on the DB singleton such as {@link DB#find(Class)} are just a
+ * methods on the {@link DB} singleton such as {@link DB#find(Class)} are just a
  * convenient way of using the 'default/primary' Database.
  */
 public final class DatabaseFactory {
@@ -36,7 +36,8 @@ public final class DatabaseFactory {
    * Initialise the container with clustering configuration.
    * <p>
    * Call this prior to creating any Database instances or alternatively set the
-   * ContainerConfig on the DatabaseConfig when creating the first Database instance.
+   * {@link ContainerConfig} on the first {@link DatabaseBuilder} via
+   * {@link DatabaseBuilder#containerConfig(ContainerConfig)}.
    */
   public static void initialiseContainer(ContainerConfig containerConfig) {
     lock.lock();
@@ -48,8 +49,11 @@ public final class DatabaseFactory {
   }
 
   /**
-   * Create using properties to configure the database.
+   * Create using configuration loaded from properties for the given database name.
+   *
+   * @deprecated migrate to {@code Database.builder().name(name).loadFromProperties().build()}.
    */
+  @Deprecated
   public static Database create(String name) {
     lock.lock();
     try {
@@ -60,18 +64,9 @@ public final class DatabaseFactory {
   }
 
   /**
-   * Create using the DatabaseConfig object to configure the database.
-   *
-   * <pre>{@code
-   *
-   *   DatabaseConfig config = new DatabaseConfig();
-   *   config.setName("db");
-   *   config.loadProperties();
-   *
-   *   Database database = DatabaseFactory.create(config);
-   *
-   * }</pre>
+   * @deprecated migrate to {@link DatabaseBuilder#build()}.
    */
+  @Deprecated(forRemoval = true)
   public static Database create(DatabaseBuilder builder) {
     lock.lock();
     try {
@@ -97,7 +92,8 @@ public final class DatabaseFactory {
   }
 
   /**
-   * Create using the DatabaseConfig additionally specifying a classLoader to use as the context class loader.
+   * Create using the {@link DatabaseBuilder}, additionally specifying a classLoader to use as the
+   * context class loader.
    */
   public static Database createWithContextClassLoader(DatabaseBuilder config, ClassLoader classLoader) {
     lock.lock();

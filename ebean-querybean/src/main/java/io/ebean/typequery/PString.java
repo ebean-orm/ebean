@@ -27,6 +27,35 @@ public final class PString<R> extends PBaseComparable<R, String> {
   }
 
   /**
+   * Is equal to if the value is non-null and not blank, otherwise no expression is added to the query.
+   * <p>
+   * This is like {@code eqIfPresent()} but additionally treats an empty or whitespace-only value as
+   * "not present". When present, the value is trimmed before being used in the equal to expression.
+   * <p>
+   * This is a helper for building queries in fluid style where a String predicate is effectively
+   * optional, avoiding a separate {@code if} block and {@code trimToNull()} style helper.
+   *
+   * <pre>{@code
+   *   List<Customer> customers = new QCustomer()
+   *     .name.eqIfNotBlank(nameFilter)
+   *     .status.eqIfPresent(statusFilter)
+   *     .findList();
+   * }</pre>
+   *
+   * @param value the value which can be null or blank
+   * @return the root query bean instance
+   */
+  public R eqIfNotBlank(@Nullable String value) {
+    if (value != null) {
+      String trimmed = value.trim();
+      if (!trimmed.isEmpty()) {
+        expr().eq(_name, trimmed);
+      }
+    }
+    return _root;
+  }
+
+  /**
    * Case insensitive is equal to.
    *
    * @param value the equal to bind value

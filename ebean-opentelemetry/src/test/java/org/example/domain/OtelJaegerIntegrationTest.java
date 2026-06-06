@@ -2,7 +2,6 @@ package org.example.domain;
 
 import io.ebean.Database;
 import io.ebean.Transaction;
-import io.ebean.config.ProfilingConfig;
 import io.ebean.datasource.DataSourceBuilder;
 import io.ebean.datasource.DataSourcePool;
 import io.ebean.opentelemetry.OtelProfileHandler;
@@ -123,9 +122,6 @@ class OtelJaegerIntegrationTest {
   }
 
   private Database createDatabase(Tracer tracer) {
-    ProfilingConfig profilingConfig = new ProfilingConfig();
-    profilingConfig.setEnabled(true);
-
     DataSourcePool ds = DataSourceBuilder.create()
       .url("jdbc:h2:mem:otelit;DB_CLOSE_DELAY=-1")
       .username("sa")
@@ -140,7 +136,6 @@ class OtelJaegerIntegrationTest {
       .loadFromProperties()
       .ddlGenerate(true)
       .ddlRun(true)
-      .profilingConfig(profilingConfig)
       .putServiceObject(SpiProfileHandler.class, new OtelProfileHandler(tracer))
       .addClass(OtelOrder.class)
       .dataSource(ds)

@@ -1,9 +1,7 @@
 package io.ebeaninternal.dbmigration.model.build;
 
-
 import io.ebean.DB;
-import io.ebean.DatabaseFactory;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.Database;
 import io.ebean.config.DbConstraintNaming;
 import io.ebean.platform.h2.H2Platform;
 import io.ebean.platform.sqlserver.SqlServer17Platform;
@@ -53,27 +51,25 @@ public class ModelBuildBeanVisitorTest extends BaseTestCase {
 
     ModelContainer model = new ModelContainer();
 
-    DatabaseConfig config = new DatabaseConfig();
-    config.setName("h2");
-    config.loadFromProperties();
-    config.setName("h2other");
-    config.setAllQuotedIdentifiers(true);
-    config.setDdlGenerate(false);
-    config.setDdlRun(false);
-    config.setDdlExtra(false);
-    config.setDefaultServer(false);
-    config.setRegister(false);
-
-    config.addClass(CKeyDetail.class);
-    config.addClass(CKeyParent.class);
-    config.addClass(CKeyAssoc.class);
-    config.addClass(CKeyParentId.class);
-    config.setDbOffline(true);
-    config.setDatabasePlatform(new SqlServer17Platform());
-
-    final SpiEbeanServer database = (SpiEbeanServer) DatabaseFactory.create(config);
+    final SpiEbeanServer database = (SpiEbeanServer) Database.builder()
+      .name("h2")
+      .loadFromProperties()
+      .name("h2other")
+      .allQuotedIdentifiers(true)
+      .ddlGenerate(false)
+      .ddlRun(false)
+      .ddlExtra(false)
+      .defaultDatabase(false)
+      .register(false)
+      .addClass(CKeyDetail.class)
+      .addClass(CKeyParent.class)
+      .addClass(CKeyAssoc.class)
+      .addClass(CKeyParentId.class)
+      .offline(true)
+      .databasePlatform(new SqlServer17Platform())
+      .build();
     try {
-      ModelBuildContext ctx = new ModelBuildContext(model, config.getDatabasePlatform(), config.getConstraintNaming(), true);
+      ModelBuildContext ctx = new ModelBuildContext(model, database.config().getDatabasePlatform(), database.config().getConstraintNaming(), true);
 
       ModelBuildBeanVisitor addTable = new ModelBuildBeanVisitor(ctx);
 

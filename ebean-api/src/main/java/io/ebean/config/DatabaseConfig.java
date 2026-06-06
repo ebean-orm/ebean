@@ -29,38 +29,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * The configuration used for creating a Database.
- * <p>
- * Used to programmatically construct an Database and optionally register it
- * with the DB singleton.
- * <p>
- * If you just use DB thout this programmatic configuration Ebean will read
- * the application.properties file and take the configuration from there. This usually
- * includes searching the class path and automatically registering any entity
- * classes and listeners etc.
- * <pre>{@code
- *
- * DatabaseConfig config = new DatabaseConfig();
- *
- * // read the ebean.properties and load
- * // those settings into this DatabaseConfig object
- * config.loadFromProperties();
- *
- * // explicitly register the entity beans to avoid classpath scanning
- * config.addClass(Customer.class);
- * config.addClass(User.class);
- *
- * Database db = DatabaseFactory.create(config);
- *
- * }</pre>
+ * Deprecated migrate to {@link Database#builder()} rather than constructing {@code DatabaseConfig} directly.
  *
  * <p>
- * Note that DatabaseConfigProvider provides a standard Java ServiceLoader mechanism that can
- * be used to apply configuration to the DatabaseConfig.
+ * Note that {@link DatabaseConfigProvider} provides a standard Java ServiceLoader mechanism that can
+ * be used to apply configuration to the {@link DatabaseBuilder}.
  *
  * @author emcgreal
  * @author rbygrave
- * @see DatabaseFactory
+ * @see Database#builder()
  */
 public class DatabaseConfig implements DatabaseBuilder.Settings {
 
@@ -525,8 +502,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   private SlowQueryListener slowQueryListener;
 
-  private ProfilingConfig profilingConfig = new ProfilingConfig();
-
   /**
    * The mappingLocations for searching xml mapping.
    */
@@ -546,12 +521,14 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private Function<String, String> metricNaming = MetricNamingMatch.INSTANCE;
 
   /**
-   * Construct a Database Configuration for programmatically creating an Database.
+   * @deprecated migrate to {@link Database#builder()} and configure the returned {@link DatabaseBuilder}.
    */
+  @Deprecated(forRemoval = true)
   public DatabaseConfig() {
   }
 
   @Override
+  @SuppressWarnings("removal")
   public Database build() {
     return DatabaseFactory.create(this);
   }
@@ -989,17 +966,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public DatabaseConfig setChangeLogAsync(boolean changeLogAsync) {
     this.changeLogAsync = changeLogAsync;
-    return this;
-  }
-
-  @Override
-  public ProfilingConfig getProfilingConfig() {
-    return profilingConfig;
-  }
-
-  @Override
-  public DatabaseConfig setProfilingConfig(ProfilingConfig profilingConfig) {
-    this.profilingConfig = profilingConfig;
     return this;
   }
 
@@ -2072,7 +2038,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   protected void loadSettings(PropertiesWrapper p) {
     dbSchema = p.get("dbSchema", dbSchema);
-    profilingConfig.loadSettings(p, name);
     platformConfig.loadSettings(p);
     if (platformConfig.isAllQuotedIdentifiers()) {
       adjustNamingConventionForAllQuoted();

@@ -3,6 +3,7 @@ package org.tests.resource;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "a_resource")
 public class Resource extends BaseModel {
   @ManyToOne(cascade = CascadeType.ALL)
   private Label name;

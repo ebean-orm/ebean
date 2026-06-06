@@ -90,4 +90,30 @@ public class DTimedMetricTest {
       assertThat(result.get(0).total()).isEqualTo(410);
     }
   }
+
+  @Test
+  void collectCumulativeResetsMax() {
+    DTimedMetric metric = new DTimedMetric("org.timed");
+    metric.add(560);
+    metric.add(500);
+
+    DTimeMetricStats stats = metric.collect(false);
+    assertThat(stats.count()).isEqualTo(2);
+    assertThat(stats.total()).isEqualTo(1060);
+    assertThat(stats.max()).isEqualTo(560);
+
+    stats = metric.collect(false);
+    assertThat(stats.count()).isEqualTo(2);
+    assertThat(stats.total()).isEqualTo(1060);
+    assertThat(stats.max()).isEqualTo(0);
+
+    metric.add(160);
+    metric.add(100);
+    metric.add(150);
+
+    stats = metric.collect(false);
+    assertThat(stats.count()).isEqualTo(5);
+    assertThat(stats.total()).isEqualTo(1470);
+    assertThat(stats.max()).isEqualTo(160);
+  }
 }
