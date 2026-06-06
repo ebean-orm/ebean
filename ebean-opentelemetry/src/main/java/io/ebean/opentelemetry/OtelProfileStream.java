@@ -26,6 +26,7 @@ final class OtelProfileStream implements ProfileStream {
   static final AttributeKey<String> DB_QUERY_TEXT = AttributeKey.stringKey("db.query.text");
   static final AttributeKey<Long> DB_QUERY_TIME = AttributeKey.longKey("db.query.time");
   static final AttributeKey<String> EBEAN_BEAN_TYPE = AttributeKey.stringKey("ebean.bean_type");
+  static final AttributeKey<String> EBEAN_QUERY_HASH = AttributeKey.stringKey("ebean.query_hash");
   static final AttributeKey<Long> EBEAN_ROW_COUNT = AttributeKey.longKey("ebean.row_count");
   static final AttributeKey<Long> EBEAN_TOTAL_MICROS = AttributeKey.longKey("ebean.total_micros");
 
@@ -45,18 +46,21 @@ final class OtelProfileStream implements ProfileStream {
   }
 
   @Override
-  public void addQueryEvent(String event, long offset, String beanName, int beanCount, String queryId, String sql) {
+  public void addQueryEvent(String event, long offset, String beanName, int beanCount, String queryId, String hash, String sql) {
     long exeMicros = offset() - offset;
     var now = Instant.now();
     String operation = operationName(event);
     String name = queryId != null ? queryId : operation + " " + beanName;
-    Span child = childSpanBuilder(name, now.minus(exeMicros, ChronoUnit.MICROS))
+    SpanBuilder builder = childSpanBuilder(name, now.minus(exeMicros, ChronoUnit.MICROS))
       .setAttribute(DB_OPERATION, operation)
       .setAttribute(EBEAN_BEAN_TYPE, beanName)
       .setAttribute(EBEAN_ROW_COUNT, (long) beanCount)
       .setAttribute(DB_QUERY_TEXT, sql)
-      .setAttribute(DB_QUERY_TIME, exeMicros)
-      .startSpan();
+      .setAttribute(DB_QUERY_TIME, exeMicros);
+    if (hash != null) {
+      builder.setAttribute(EBEAN_QUERY_HASH, hash);
+    }
+    Span child = builder.startSpan();
     child.end(now);
   }
 
