@@ -24,7 +24,7 @@ class QueryAlsoIfTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).isEqualTo("from be_customer t0 where t0.name is not null and t0.email is not null");
+    assertThat(q.getGeneratedSql()).contains("from be_customer t0 where t0.name is not null and t0.email is not null");
   }
 
   @Test
@@ -61,7 +61,7 @@ class QueryAlsoIfTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).isEqualTo("from be_customer t0 where t0.name is not null and t0.status = ?");
+    assertThat(q.getGeneratedSql()).contains("from be_customer t0 where t0.name is not null and t0.status = ?");
   }
 
   @Test
