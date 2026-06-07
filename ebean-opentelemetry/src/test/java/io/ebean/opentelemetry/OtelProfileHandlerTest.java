@@ -156,6 +156,7 @@ class OtelProfileHandlerTest {
     assertEquals(42L, querySpan.getAttributes().get(OtelProfileStream.EBEAN_ROW_COUNT));
     assertEquals("select ...", querySpan.getAttributes().get(OtelProfileStream.DB_QUERY_TEXT));
     assertEquals("abc123hash", querySpan.getAttributes().get(OtelProfileStream.EBEAN_QUERY_HASH));
+    assertEquals("plan-abc", querySpan.getAttributes().get(OtelProfileStream.EBEAN_QUERY_LABEL));
   }
 
   @Test
@@ -185,17 +186,18 @@ class OtelProfileHandlerTest {
     try (Scope ignored = parent.makeCurrent()) {
       OtelProfileStream stream = (OtelProfileStream) handler.createProfileStream(mockLocation("MyService.emptySql"), null);
       assertNotNull(stream);
-      stream.addQueryEvent("fo", stream.offset(), "User", 1, "p1", null, "");
+      stream.addQueryEvent("fo", stream.offset(), "User", 1, null, null, "");
       stream.addEvent("c", 0);
       stream.end(null);
     } finally {
       parent.end();
     }
-    SpanData querySpan = findSpan("p1");
+    SpanData querySpan = findSpan("find_one User");
     assertNotNull(querySpan);
     assertEquals("", querySpan.getAttributes().get(OtelProfileStream.DB_QUERY_TEXT));
-    // null hash should not set the attribute
+    // null hash / label should not set the attributes
     assertNull(querySpan.getAttributes().get(OtelProfileStream.EBEAN_QUERY_HASH));
+    assertNull(querySpan.getAttributes().get(OtelProfileStream.EBEAN_QUERY_LABEL));
   }
 
   // ----------------------------------------------------------

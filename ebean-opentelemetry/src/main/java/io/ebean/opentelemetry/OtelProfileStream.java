@@ -26,6 +26,7 @@ final class OtelProfileStream implements ProfileStream {
   static final AttributeKey<String> DB_QUERY_TEXT = AttributeKey.stringKey("db.query.text");
   static final AttributeKey<Long> DB_QUERY_TIME = AttributeKey.longKey("db.query.time");
   static final AttributeKey<String> EBEAN_BEAN_TYPE = AttributeKey.stringKey("ebean.bean_type");
+  static final AttributeKey<String> EBEAN_QUERY_LABEL = AttributeKey.stringKey("ebean.query_label");
   static final AttributeKey<String> EBEAN_QUERY_HASH = AttributeKey.stringKey("ebean.query_hash");
   static final AttributeKey<Long> EBEAN_ROW_COUNT = AttributeKey.longKey("ebean.row_count");
   static final AttributeKey<Long> EBEAN_TOTAL_MICROS = AttributeKey.longKey("ebean.total_micros");
@@ -59,6 +60,9 @@ final class OtelProfileStream implements ProfileStream {
       .setAttribute(DB_QUERY_TIME, exeMicros);
     if (hash != null) {
       builder.setAttribute(EBEAN_QUERY_HASH, hash);
+    }
+    if (queryId != null) {
+      builder.setAttribute(EBEAN_QUERY_LABEL, queryId);
     }
     Span child = builder.startSpan();
     child.end(now);
