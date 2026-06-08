@@ -231,6 +231,9 @@ Prometheus, StatsD) without needing the bean type in the name.
 For the integration setup, see the avaje-metrics guide
 [`add-ebean-metrics.md`](https://github.com/avaje/avaje-metrics/blob/master/docs/guides/add-ebean-metrics.md).
 
+To capture the database execution plan (`EXPLAIN`) for slow queries identified by these
+metrics, see [Ebean query plan capture](ebean-query-plan-capture.md).
+
 ---
 
 ## Troubleshooting
