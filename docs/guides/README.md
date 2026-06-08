@@ -29,6 +29,7 @@ existing Maven project. Complete the steps in order.
 | Guide | Description |
 |-------|-------------|
 | [Ebean OpenTelemetry tracing](add-ebean-opentelemetry.md) | Add `ebean-opentelemetry`, register `GlobalOpenTelemetry` once before Ebean databases are built, and troubleshoot missing spans or double-registration errors |
+| [Ebean query metrics and naming](ebean-query-metrics.md) | How Ebean query metric names are derived from `setLabel(..)` and profile locations; secondary (lazy/query) load naming; inline SQL comments; collecting metrics at runtime; mapping to avaje-metrics tags |
 
 ## Entity beans
 
@@ -149,6 +150,7 @@ Key guides (fetch and follow these when performing the relevant task):
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
 - Immutable bean cache for read-only references: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/immutable-bean-cache.md
 - Ebean OpenTelemetry tracing: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-opentelemetry.md
+- Query metrics and naming: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/ebean-query-metrics.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md
 - DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md
