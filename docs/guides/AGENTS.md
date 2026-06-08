@@ -14,6 +14,8 @@ Key guides (fetch and follow when performing the relevant task):
 - Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
+- Query metrics and naming: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/ebean-query-metrics.md
+- Query plan capture: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/ebean-query-plan-capture.md
 - Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md
 - DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md
 - Lombok with entity beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/lombok-with-ebean-entity-beans.md
