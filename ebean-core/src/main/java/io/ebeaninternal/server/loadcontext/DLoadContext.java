@@ -135,10 +135,12 @@ public final class DLoadContext implements LoadContext {
    * path and load mode. This is the parent query's full plan name (without the
    * leading "orm.").
    * <p>
-   * For a root query that is the bean type combined with the plan label. For a
-   * parent that is itself a secondary query the plan label already carries the
-   * full name, so it is used as-is (avoiding a duplicate bean type prefix on
-   * nested lazy loads).
+   * For a root query with an explicit {@code setLabel(..)} that is the bean type
+   * combined with the label (for disambiguation). For a profile location the
+   * label is already a unique, type-independent identifier so it is used as-is.
+   * For a parent that is itself a secondary query the plan label already carries
+   * the full name, so it is used as-is (avoiding a duplicate prefix on nested
+   * lazy loads).
    */
   @Nullable
   private String deriveNamePrefix(SpiQuery<?> query) {
@@ -147,9 +149,15 @@ public final class DLoadContext implements LoadContext {
       return null;
     }
     if (query.loadMode() != null) {
+      // parent is itself a secondary - label already carries the full name
       return label;
     }
-    return CQueryPlan.planLabelWithType(label, rootDescriptor.simpleName());
+    if (query.label() != null) {
+      // explicit setLabel - prefix the bean type for disambiguation
+      return CQueryPlan.planLabelWithType(label, rootDescriptor.simpleName());
+    }
+    // profile location - already a unique, type-independent identifier
+    return label;
   }
 
   /**

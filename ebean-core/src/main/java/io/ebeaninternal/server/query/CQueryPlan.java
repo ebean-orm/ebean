@@ -127,19 +127,23 @@ public class CQueryPlan implements SpiQueryPlan {
   }
 
   private String deriveName(String label, SpiQuery<?> query, String simpleName) {
-    return deriveName(label, query.loadMode() != null, query.type().label(), simpleName);
+    return deriveName(label, query.loadMode() != null, query.label() != null, query.type().label(), simpleName);
   }
 
   /**
    * Derive the query plan / metric name.
    *
-   * @param label     the query plan label (null for an unlabelled query)
-   * @param secondary true if this is a secondary query (lazy or query load) where the label
-   *                  already carries the parent profile path, so the bean type is not prefixed
-   * @param typeLabel the query type label (used only when there is no plan label)
+   * @param label      the query plan label (null for an unlabelled query)
+   * @param secondary  true if this is a secondary query (lazy or query load) where the label
+   *                   already carries the parent profile path, so the bean type is not prefixed
+   * @param explicitLabel true if the label came from an explicit {@code setLabel(..)} (as opposed
+   *                   to a profile location). An explicit label is prefixed with the bean type for
+   *                   disambiguation; a profile location is already a unique, type-independent
+   *                   identifier and is used as-is.
+   * @param typeLabel  the query type label (used only when there is no plan label)
    * @param simpleName the bean descriptor simple name
    */
-  static String deriveName(String label, boolean secondary, String typeLabel, String simpleName) {
+  static String deriveName(String label, boolean secondary, boolean explicitLabel, String typeLabel, String simpleName) {
     if (label == null) {
       return Str.add("orm.", simpleName, ".", typeLabel);
     }
@@ -148,15 +152,21 @@ public class CQueryPlan implements SpiQueryPlan {
       // name plus the path and load mode, so use it verbatim
       return Str.add("orm.", label);
     }
-    return Str.add("orm.", planLabelWithType(label, simpleName));
+    if (explicitLabel) {
+      return Str.add("orm.", planLabelWithType(label, simpleName));
+    }
+    // profile location - already a unique, type-independent identifier
+    return Str.add("orm.", label);
   }
 
   /**
-   * Combine the bean type simple name with the (non-null) plan label.
+   * Combine the bean type simple name with an explicit (non-null) {@code setLabel}.
    * <p>
-   * Used for a root query name and to build the parent prefix that secondary
-   * (lazy/query) loads extend. A profile location label that already starts with
-   * the bean type is used as-is to avoid duplicating the type.
+   * Used for a root query name and the parent prefix that secondary (lazy/query)
+   * loads extend, when the name comes from an explicit label. The bean type is
+   * prefixed for disambiguation, except when the label already starts with the
+   * bean type (avoiding duplication). Profile locations are not routed through
+   * here - they are unique identifiers and used as-is.
    */
   public static String planLabelWithType(String label, String simpleName) {
     int pos = simpleName.indexOf('.');

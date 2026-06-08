@@ -11,35 +11,36 @@ class CQueryPlanNameTest {
 
   @Test
   void deriveName_root_unlabelled() {
-    assertThat(CQueryPlan.deriveName(null, false, "findList", "Customer"))
+    assertThat(CQueryPlan.deriveName(null, false, false, "findList", "Customer"))
       .isEqualTo("orm.Customer.findList");
   }
 
   @Test
   void deriveName_root_explicitLabel() {
-    assertThat(CQueryPlan.deriveName("custMain", false, "findList", "Customer"))
+    assertThat(CQueryPlan.deriveName("custMain", false, true, "findList", "Customer"))
       .isEqualTo("orm.Customer.custMain");
   }
 
   @Test
   void deriveName_root_profileLocation_startsWithBeanType() {
-    // profile location label already starts with the bean type - not duplicated
-    assertThat(CQueryPlan.deriveName("CustomerFinder.byName", false, "findList", "Customer"))
+    // profile location used as-is (no bean type prefix)
+    assertThat(CQueryPlan.deriveName("CustomerFinder.byName", false, false, "findList", "Customer"))
       .isEqualTo("orm.CustomerFinder.byName");
   }
 
   @Test
   void deriveName_root_profileLocation_differentClass() {
-    assertThat(CQueryPlan.deriveName("DataLoader.loadAll", false, "findList", "Customer"))
-      .isEqualTo("orm.Customer.DataLoader.loadAll");
+    // profile location is a unique, type-independent identifier - not prefixed with the bean type
+    assertThat(CQueryPlan.deriveName("DataLoader.loadAll", false, false, "findList", "Customer"))
+      .isEqualTo("orm.DataLoader.loadAll");
   }
 
   @Test
   void deriveName_secondary_usesLabelVerbatim() {
     // secondary query label already carries the full parent name + path + load mode
-    assertThat(CQueryPlan.deriveName("Customer.custMain.contacts.lazy", true, "findList", "Contact"))
+    assertThat(CQueryPlan.deriveName("Customer.custMain.contacts.lazy", true, true, "findList", "Contact"))
       .isEqualTo("orm.Customer.custMain.contacts.lazy");
-    assertThat(CQueryPlan.deriveName("CustomerFinder.byName.contacts.lazy", true, "findList", "Contact"))
+    assertThat(CQueryPlan.deriveName("CustomerFinder.byName.contacts.lazy", true, true, "findList", "Contact"))
       .isEqualTo("orm.CustomerFinder.byName.contacts.lazy");
   }
 
