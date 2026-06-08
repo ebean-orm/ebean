@@ -5,9 +5,12 @@ import io.ebean.RowMapper;
 import io.ebean.SqlRow;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanInit;
 import io.ebean.metric.MetricFactory;
 import io.ebean.metric.TimedMetricMap;
+import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.server.core.RelationalQueryEngine;
 import io.ebeaninternal.server.core.RelationalQueryRequest;
@@ -20,6 +23,7 @@ import jakarta.persistence.PersistenceException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -32,17 +36,20 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   private final String dbTrueValue;
   private final boolean binaryOptimizedUUID;
   private final boolean autoCommitFalseOnFindIterate;
+  private final boolean queryPlanCapture;
   private final TimedMetricMap timedMetricMap;
+  private final ConcurrentHashMap<String, SqlQueryPlan> plans = new ConcurrentHashMap<>();
   private final int defaultFetchSizeFindEach;
   private final int defaultFetchSizeFindList;
 
   public DefaultRelationalQueryEngine(Binder binder, String dbTrueValue, boolean binaryOptimizedUUID,
                                       int defaultFetchSizeFindEach, int defaultFetchSizeFindList,
-                                      boolean autoCommitFalseOnFindIterate) {
+                                      boolean autoCommitFalseOnFindIterate, boolean queryPlanCapture) {
     this.binder = binder;
     this.dbTrueValue = dbTrueValue == null ? "true" : dbTrueValue;
     this.binaryOptimizedUUID = binaryOptimizedUUID;
     this.autoCommitFalseOnFindIterate = autoCommitFalseOnFindIterate;
+    this.queryPlanCapture = queryPlanCapture;
     this.timedMetricMap = MetricFactory.get().createTimedMetricMap("sql.query.");
     this.defaultFetchSizeFindEach = defaultFetchSizeFindEach;
     this.defaultFetchSizeFindList = defaultFetchSizeFindList;
@@ -51,6 +58,27 @@ public final class DefaultRelationalQueryEngine implements RelationalQueryEngine
   @Override
   public void collect(String label, long exeMicros) {
     timedMetricMap.add(label, exeMicros);
+  }
+
+  @Override
+  public boolean captureActive() {
+    return queryPlanCapture;
+  }
+
+  @Override
+  public SqlQueryPlan obtainPlan(String label, String sql, SpiEbeanServer server) {
+    return plans.computeIfAbsent(label + ':' + sql,
+      key -> new SqlQueryPlan(server, "sql.query." + label, sql));
+  }
+
+  @Override
+  public void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
+    for (SqlQueryPlan plan : plans.values()) {
+      if (request.includeHash(plan.hash())) {
+        plan.queryPlanInit(request.thresholdMicros(plan.hash()));
+        list.add(plan.createMeta(null, null));
+      }
+    }
   }
 
   @Override

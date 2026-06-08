@@ -32,7 +32,30 @@ Two ways to trigger phase 2:
 - **On demand** — call the `MetaInfoManager` API to arm and collect plans yourself
   (this is what remote tooling such as ebean-insight uses).
 
-Only `orm.` SELECT-style queries are plan capable — raw SQL and update/DML metrics are not.
+Plan capable queries are:
+
+- **ORM entity SELECT queries** (`orm.*` metrics) — captured via the per-entity `BeanDescriptor`.
+- **Native-SQL `DtoQuery`** (`dto.*` metrics) — a `DtoQuery` created from a SQL string
+  (`DB.findDto(MyDto.class, "select ...")`) has its own bind capture and is `EXPLAIN`'d directly.
+- **ORM-backed `DtoQuery`** (`Query.asDto(...)`) — captured via the *underlying* ORM query plan
+  (`orm.*`), not the `dto.*` plan. The `dto.*` plan itself is **not** armed in this case, so it
+  does not double-count in `queryPlanInit`.
+- **Native-SQL `SqlQuery`** (`sql.query.*` metrics) — a **labelled** `SqlQuery`
+  (`DB.sqlQuery("select ...").setLabel("myLabel")`) has its own bind capture and is `EXPLAIN`'d
+  directly. A label is required: without `setLabel(...)` the query produces no metric and no plan.
+
+Specifically **excluded** are:
+
+- **Update / DML** — `orm.update.*`, `iud.*`, `sql.update.*`, `sql.call.*`.
+
+Bind capture is wired into the ORM query path (per-entity `BeanDescriptor`), the native-SQL DTO
+path (per-DTO `DtoBeanDescriptor`), and the native-SQL `SqlQuery` path (the relational query
+engine); the init/collect API iterates all three. DML — even though it produces timing metrics —
+never captures bind values and cannot be `EXPLAIN`'d.
+
+> **Cost when disabled:** SqlQuery plan capture is fully gated on the `queryPlan.enable` master
+> switch. When capture is disabled no `SqlQuery` plans are created or cached, so labelled queries
+> incur no extra cost beyond their existing timing metric.
 
 ---
 
@@ -200,7 +223,11 @@ logger. Set a listener, or enable `INFO` logging for `io.ebean.QUERYPLAN`.
 `queryPlanCapturePeriodSecs`, tighten `queryPlanCaptureMaxTimeMillis`, or override
 `queryPlanExplain` to a non-ANALYZE form.
 
-### An update/DML metric never offers plan capture
+### An unlabelled SqlQuery or update metric never offers plan capture
 
-Only `orm.` SELECT-style queries are plan capable. `orm.update.*`, `iud.*`, `sql.update.*`
-and similar write metrics are intentionally excluded.
+ORM entity SELECT queries (`orm.*`), native-SQL `DtoQuery` (`dto.*`) and native-SQL
+**labelled** `SqlQuery` (`sql.query.*`) are plan capable. ORM-backed DTO queries
+(`Query.asDto(...)`) are captured via their underlying ORM plan (`orm.*`), not the `dto.*` plan.
+An unlabelled `SqlQuery` produces no metric and no plan — add `setLabel(...)` to make it
+capturable. Write metrics (`orm.update.*`, `iud.*`, `sql.update.*`, `sql.call.*`) have no bind
+capture and are intentionally excluded.

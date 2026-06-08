@@ -20,7 +20,7 @@ Ebean records timing and counter metrics for the work it does. Every metric has 
 | Prefix | What it measures | Example name |
 |---|---|---|
 | `orm.` | Entity (ORM) query | `orm.Customer.findList`, `orm.CustomerFinder.byName` |
-| `dto.` | DTO query | `dto.CustomerDto_byEmail` |
+| `dto.` | DTO query | `dto.CustomerDto.byEmail` |
 | `sql.query.` | Raw SQL query | `sql.query.<label>` |
 | `sql.update.` / `sql.call.` | Raw SQL update / stored procedure call | `sql.update.<label>` |
 | `orm.update.` | ORM update statement | `orm.update.<label>` |
@@ -61,13 +61,17 @@ List<Customer> customers = DB.find(Customer.class)
 // metric name: orm.Customer.custMain
 ```
 
-DTO queries support `setLabel(..)` too (the label should be unique to the DTO type):
+DTO queries support `setLabel(..)` too, and follow the **same naming convention** as
+ORM queries — an explicit label is prefixed with the DTO type, a profile location is
+used as-is, and an unlabelled DTO query uses just the DTO type:
 
 ```java
 DB.findDto(CustomerDto.class, sql)
   .setLabel("byEmail")
   .findList();
-// metric name: dto.CustomerDto_byEmail
+// metric name: dto.CustomerDto.byEmail
+//   profile location only ->  dto.<location>      (no type prefix)
+//   unlabelled            ->  dto.CustomerDto
 ```
 
 ### Step 2 - Use a profile location (preferred for finders / query beans)

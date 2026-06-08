@@ -2,13 +2,15 @@ package io.ebeaninternal.server.dto;
 
 import io.ebean.core.type.DataReader;
 import io.ebean.meta.MetricVisitor;
+import io.ebeaninternal.api.SpiQueryPlan;
+import io.ebeaninternal.server.bind.capture.BindCapture;
 
 import java.sql.SQLException;
 
 /**
  * Knows how to read and map rows into a Bean.
  */
-public interface DtoQueryPlan {
+public interface DtoQueryPlan extends SpiQueryPlan {
 
   /**
    * Read the row data and return the DTO bean.
@@ -19,6 +21,22 @@ public interface DtoQueryPlan {
    * Add an event to the query execution statistics.
    */
   void collect(long exeMicros);
+
+  /**
+   * Return true if the bind values for this (native SQL) query should be
+   * captured in order to later collect the database query plan.
+   */
+  boolean collectFor(long exeMicros);
+
+  /**
+   * Return true if this plan supports query plan capture (native SQL only).
+   */
+  boolean supportsPlanCapture();
+
+  /**
+   * Set the captured bind values used to later collect the database query plan.
+   */
+  void setBind(BindCapture bindCapture, long exeMicros, long startNanos);
 
   /**
    * Visit the metric (if not empty).
