@@ -1,6 +1,7 @@
 package io.ebean.xtest.base;
 
 import io.ebean.DB;
+import io.ebean.ProfileLocation;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.QueryPlanInit;
 import io.ebean.meta.QueryPlanRequest;
@@ -61,6 +62,16 @@ class DtoQueryPlanCaptureTest extends BaseTestCase {
       .findList();
   }
 
+  private static final ProfileLocation planLoc = ProfileLocation.create();
+
+  private List<DCustPlanCapture> runNativeWithLocation() {
+    return DB.getDefault()
+      .findDto(DCustPlanCapture.class, "select id, name from o_customer where id >= ?")
+      .setParameter(0)
+      .setProfileLocation(planLoc)
+      .findList();
+  }
+
   @Test
   void nativeDtoQuery_capturesQueryPlan() {
     ResetBasicData.reset();
@@ -100,6 +111,43 @@ class DtoQueryPlanCaptureTest extends BaseTestCase {
 
     assertThat(dtoPlan).as("captured a native DTO query plan").isNotNull();
     assertThat(dtoPlan.sql()).contains("from o_customer where id > ?");
+    assertThat(dtoPlan.plan()).isNotEmpty();
+  }
+
+  @Test
+  void nativeDtoQuery_withProfileLocation_capturesQueryPlan() {
+    ResetBasicData.reset();
+
+    // build the plan first (default threshold -> no capture yet)
+    assertThat(runNativeWithLocation()).isNotEmpty();
+
+    // unlabelled DTO query uses the profile location as the plan name (no type prefix)
+    String expectedLabel = "dto." + planLoc.label();
+
+    QueryPlanInit init = new QueryPlanInit();
+    init.setAll(true);
+    init.thresholdMicros(1);
+    List<MetaQueryPlan> armed = DB.getDefault().metaInfo().queryPlanInit(init);
+
+    assertThat(armed)
+      .as("native DTO plan named after its profile location is armed")
+      .anyMatch(p -> expectedLabel.equals(p.label()));
+
+    // run again now that the plan is armed -> bind values captured
+    assertThat(runNativeWithLocation()).isNotEmpty();
+
+    QueryPlanRequest request = new QueryPlanRequest();
+    request.maxCount(1000);
+    request.maxTimeMillis(10_000);
+    List<MetaQueryPlan> plans = DB.getDefault().metaInfo().queryPlanCollectNow(request);
+
+    MetaQueryPlan dtoPlan = plans.stream()
+      .filter(p -> expectedLabel.equals(p.label()))
+      .findFirst()
+      .orElse(null);
+
+    assertThat(dtoPlan).as("captured a profile-location DTO query plan").isNotNull();
+    assertThat(dtoPlan.sql()).contains("from o_customer where id >= ?");
     assertThat(dtoPlan.plan()).isNotEmpty();
   }
 }
