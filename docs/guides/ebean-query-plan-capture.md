@@ -32,7 +32,24 @@ Two ways to trigger phase 2:
 - **On demand** — call the `MetaInfoManager` API to arm and collect plans yourself
   (this is what remote tooling such as ebean-insight uses).
 
-Only `orm.` SELECT-style queries are plan capable — raw SQL and update/DML metrics are not.
+Plan capable queries are:
+
+- **ORM entity SELECT queries** (`orm.*` metrics) — captured via the per-entity `BeanDescriptor`.
+- **Native-SQL `DtoQuery`** (`dto.*` metrics) — a `DtoQuery` created from a SQL string
+  (`DB.findDto(MyDto.class, "select ...")`) has its own bind capture and is `EXPLAIN`'d directly.
+- **ORM-backed `DtoQuery`** (`Query.asDto(...)`) — captured via the *underlying* ORM query plan
+  (`orm.*`), not the `dto.*` plan. The `dto.*` plan itself is **not** armed in this case, so it
+  does not double-count in `queryPlanInit`.
+
+Specifically **excluded** are:
+
+- **`SqlQuery`** / raw SQL (`sql.query.*`) — raw SQL queries have no bind capture.
+- **Update / DML** — `orm.update.*`, `iud.*`, `sql.update.*`, `sql.call.*`.
+
+Bind capture is wired into the ORM query path (per-entity `BeanDescriptor`) and the native-SQL
+DTO path (per-DTO `DtoBeanDescriptor`); the init/collect API iterates both. Raw `SqlQuery` and
+DML — even though they produce timing metrics — never capture bind values and cannot be
+`EXPLAIN`'d.
 
 ---
 
@@ -200,7 +217,10 @@ logger. Set a listener, or enable `INFO` logging for `io.ebean.QUERYPLAN`.
 `queryPlanCapturePeriodSecs`, tighten `queryPlanCaptureMaxTimeMillis`, or override
 `queryPlanExplain` to a non-ANALYZE form.
 
-### An update/DML metric never offers plan capture
+### A SqlQuery or update metric never offers plan capture
 
-Only `orm.` SELECT-style queries are plan capable. `orm.update.*`, `iud.*`, `sql.update.*`
-and similar write metrics are intentionally excluded.
+ORM entity SELECT queries (`orm.*`) and native-SQL `DtoQuery` (`dto.*`) are plan capable.
+ORM-backed DTO queries (`Query.asDto(...)`) are captured via their underlying ORM plan
+(`orm.*`), not the `dto.*` plan. Raw `SqlQuery` (`sql.query.*`) and write metrics
+(`orm.update.*`, `iud.*`, `sql.update.*`, `sql.call.*`) have no bind capture and are
+intentionally excluded.

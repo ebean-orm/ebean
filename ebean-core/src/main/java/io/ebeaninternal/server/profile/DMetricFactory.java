@@ -28,8 +28,8 @@ public final class DMetricFactory implements MetricFactory {
   }
 
   @Override
-  public QueryPlanMetric createQueryPlanMetric(Class<?> type, String label, ProfileLocation profileLocation, String sql) {
-    return new DQueryPlanMetric(new DQueryPlanMeta(type, label, profileLocation, sql), new DTimedMetric(label));
+  public QueryPlanMetric createQueryPlanMetric(Class<?> type, String name, String label, ProfileLocation profileLocation, String sql, String hash) {
+    return new DQueryPlanMetric(new DQueryPlanMeta(type, name, label, profileLocation, sql, hash), new DTimedMetric(label));
   }
 
 }

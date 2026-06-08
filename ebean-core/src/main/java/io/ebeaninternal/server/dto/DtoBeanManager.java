@@ -1,9 +1,12 @@
 package io.ebeaninternal.server.dto;
 
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanInit;
 import io.ebeaninternal.server.type.TypeManager;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -49,6 +52,16 @@ public final class DtoBeanManager {
   public void visitMetrics(MetricVisitor visitor) {
     for (DtoBeanDescriptor value : descriptorMap.values()) {
       value.visit(visitor);
+    }
+  }
+
+  /**
+   * Arm bind capture for matching (native SQL) DTO query plans.
+   */
+  @SuppressWarnings("unchecked")
+  public void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
+    for (DtoBeanDescriptor value : descriptorMap.values()) {
+      value.queryPlanInit(request, list);
     }
   }
 }
