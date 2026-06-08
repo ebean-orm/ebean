@@ -32,7 +32,15 @@ Two ways to trigger phase 2:
 - **On demand** — call the `MetaInfoManager` API to arm and collect plans yourself
   (this is what remote tooling such as ebean-insight uses).
 
-Only `orm.` SELECT-style queries are plan capable — raw SQL and update/DML metrics are not.
+Only ORM entity SELECT queries are plan capable. Specifically **excluded** are:
+
+- **`DtoQuery`** (`dto.*` metrics) — DTO queries have no bind capture.
+- **`SqlQuery`** / raw SQL (`sql.query.*`) — raw SQL queries have no bind capture.
+- **Update / DML** — `orm.update.*`, `iud.*`, `sql.update.*`, `sql.call.*`.
+
+Bind capture is wired only into the ORM query path (per-entity `BeanDescriptor`), and the
+init/collect API iterates ORM entity descriptors only, so DTO and raw SQL queries — even
+though they produce timing metrics — never capture bind values and cannot be `EXPLAIN`'d.
 
 ---
 
@@ -200,7 +208,8 @@ logger. Set a listener, or enable `INFO` logging for `io.ebean.QUERYPLAN`.
 `queryPlanCapturePeriodSecs`, tighten `queryPlanCaptureMaxTimeMillis`, or override
 `queryPlanExplain` to a non-ANALYZE form.
 
-### An update/DML metric never offers plan capture
+### A DtoQuery, SqlQuery or update metric never offers plan capture
 
-Only `orm.` SELECT-style queries are plan capable. `orm.update.*`, `iud.*`, `sql.update.*`
-and similar write metrics are intentionally excluded.
+Only ORM entity SELECT queries are plan capable. `DtoQuery` (`dto.*`), raw `SqlQuery`
+(`sql.query.*`), and write metrics (`orm.update.*`, `iud.*`, `sql.update.*`, `sql.call.*`)
+have no bind capture and are intentionally excluded.

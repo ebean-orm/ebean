@@ -273,6 +273,12 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
     return null;
   }
 
+  @Nullable
+  @Override
+  public String explicitLabel() {
+    return label;
+  }
+
   @Override
   public void obtainLocation() {
     if (profileLocation != null) {

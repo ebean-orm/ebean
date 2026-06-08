@@ -316,7 +316,7 @@ class DtoQueryTest extends BaseTestCase {
     MetaQueryMetric queryMetric = stats.get(0);
     assertThat(queryMetric.label()).isEqualTo("basic");
     assertThat(queryMetric.count()).isEqualTo(3);
-    assertThat(queryMetric.name()).isEqualTo("dto.DCust_basic");
+    assertThat(queryMetric.name()).isEqualTo("dto.DCust.basic");
 
     server().findDto(DCust.class, "select c4.id, c4.name from o_customer c4 where lower(c4.name) = :name")
       .setLabel("basic2")
@@ -331,7 +331,7 @@ class DtoQueryTest extends BaseTestCase {
     log.info("stats " + stats);
 
     String asJson = metric2.asJson().withHash(false).withNewLine(false).json();
-    assertThat(asJson).contains("dto.DCust_basic2");
+    assertThat(asJson).contains("dto.DCust.basic2");
   }
 
   @Test

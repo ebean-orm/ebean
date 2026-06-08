@@ -34,6 +34,6 @@ public interface MetricFactory extends BootstrapService {
   /**
    * Create a Timed metric.
    */
-  QueryPlanMetric createQueryPlanMetric(Class<?> type, String label, ProfileLocation profileLocation, String sql);
+  QueryPlanMetric createQueryPlanMetric(Class<?> type, String name, String label, ProfileLocation profileLocation, String sql, String hash);
 
 }
