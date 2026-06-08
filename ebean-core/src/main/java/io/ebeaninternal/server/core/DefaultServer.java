@@ -2278,6 +2278,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     }
     List<MetaQueryPlan> list = descriptorManager.queryPlanInit(initRequest);
     dtoBeanManager.queryPlanInit(initRequest, list);
+    relationalQueryEngine.queryPlanInit(initRequest, list);
     return list;
   }
 

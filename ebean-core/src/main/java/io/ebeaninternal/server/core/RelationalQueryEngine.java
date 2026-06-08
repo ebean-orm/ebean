@@ -4,7 +4,11 @@ package io.ebeaninternal.server.core;
 import io.ebean.RowConsumer;
 import io.ebean.RowMapper;
 import io.ebean.SqlRow;
+import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.MetricVisitor;
+import io.ebean.meta.QueryPlanInit;
+import io.ebeaninternal.api.SpiEbeanServer;
+import io.ebeaninternal.server.query.SqlQueryPlan;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -56,6 +60,23 @@ public interface RelationalQueryEngine {
    * Collect SQL query execution statistics.
    */
   void collect(String label, long exeMicros);
+
+  /**
+   * Return true if query plan capture is enabled (the master switch). When false
+   * no SqlQuery plans are created or cached, so labelled queries incur no extra cost.
+   */
+  boolean captureActive();
+
+  /**
+   * Obtain (creating and caching if necessary) the query plan for a labelled
+   * native SqlQuery, used to capture bind values for database query plan collection.
+   */
+  SqlQueryPlan obtainPlan(String label, String sql, SpiEbeanServer server);
+
+  /**
+   * Initiate query plan bind capture for matching SqlQuery plans.
+   */
+  void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list);
 
   /**
    * Visit the metrics.
