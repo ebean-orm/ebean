@@ -24,6 +24,7 @@ public final class DtoMappingRequest {
   private final DtoColumn[] columnMeta;
   private final String name;
   private final String hash;
+  private final boolean nativeSql;
 
   public DtoMappingRequest(SpiEbeanServer server, SpiDtoQuery<?> query, String sql, DtoColumn[] columnMeta) {
     this.server = server;
@@ -33,6 +34,7 @@ public final class DtoMappingRequest {
     this.sql = sql;
     this.relaxedMode = query.isRelaxedMode();
     this.columnMeta = columnMeta;
+    this.nativeSql = query.ormQuery() == null;
     this.name = deriveName(type.getSimpleName(), query.explicitLabel(), profileLocation);
     String loc = profileLocation == null ? null : profileLocation.location();
     this.hash = Md5.hash(sql, name, loc);
@@ -87,11 +89,20 @@ public final class DtoMappingRequest {
   }
 
   /**
-   * Create the bind capture for the given (native SQL) query plan. Returns the
-   * NOOP capture when query plan collection is disabled.
+   * Return true if this is a native SQL DtoQuery (capturable). ORM-backed DTO
+   * queries capture their query plan via the underlying ORM query plan instead.
+   */
+  public boolean nativeSql() {
+    return nativeSql;
+  }
+
+  /**
+   * Create the bind capture for the given query plan. Returns the NOOP capture
+   * for ORM-backed DTO queries (captured via the ORM plan) or when query plan
+   * collection is disabled.
    */
   public SpiQueryBindCapture createBindCapture(SpiQueryPlan queryPlan) {
-    return server.createQueryBindCapture(queryPlan);
+    return nativeSql ? server.createQueryBindCapture(queryPlan) : SpiQueryBindCapture.NOOP;
   }
 
   public QueryPlanMetric createMetric() {

@@ -19,6 +19,7 @@ abstract class DtoQueryPlanBase implements DtoQueryPlan, SpiQueryPlan {
   private final String hash;
   private final String sql;
   private final ProfileLocation profileLocation;
+  private final boolean nativeSql;
   private final SpiQueryBindCapture bindCapture;
 
   DtoQueryPlanBase(DtoMappingRequest request) {
@@ -29,6 +30,7 @@ abstract class DtoQueryPlanBase implements DtoQueryPlan, SpiQueryPlan {
     this.hash = request.hash();
     this.sql = request.sql();
     this.profileLocation = request.profileLocation();
+    this.nativeSql = request.nativeSql();
     this.bindCapture = request.createBindCapture(this);
   }
 
@@ -40,6 +42,11 @@ abstract class DtoQueryPlanBase implements DtoQueryPlan, SpiQueryPlan {
   @Override
   public boolean collectFor(long exeMicros) {
     return bindCapture.collectFor(exeMicros);
+  }
+
+  @Override
+  public boolean supportsPlanCapture() {
+    return nativeSql;
   }
 
   @Override

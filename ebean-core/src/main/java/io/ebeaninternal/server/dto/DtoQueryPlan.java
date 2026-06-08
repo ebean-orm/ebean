@@ -29,6 +29,11 @@ public interface DtoQueryPlan extends SpiQueryPlan {
   boolean collectFor(long exeMicros);
 
   /**
+   * Return true if this plan supports query plan capture (native SQL only).
+   */
+  boolean supportsPlanCapture();
+
+  /**
    * Set the captured bind values used to later collect the database query plan.
    */
   void setBind(BindCapture bindCapture, long exeMicros, long startNanos);

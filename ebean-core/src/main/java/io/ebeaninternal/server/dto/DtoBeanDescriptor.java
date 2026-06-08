@@ -51,7 +51,7 @@ public final class DtoBeanDescriptor<T> {
    */
   public void queryPlanInit(QueryPlanInit request, List<MetaQueryPlan> list) {
     for (DtoQueryPlan plan : plans.values()) {
-      if (request.includeHash(plan.hash())) {
+      if (plan.supportsPlanCapture() && request.includeHash(plan.hash())) {
         plan.queryPlanInit(request.thresholdMicros(plan.hash()));
         list.add(plan.createMeta(null, null));
       }
