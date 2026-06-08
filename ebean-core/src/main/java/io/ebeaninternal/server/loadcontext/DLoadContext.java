@@ -11,6 +11,7 @@ import io.ebeaninternal.server.autotune.ProfilingListener;
 import io.ebeaninternal.server.core.OrmQueryRequest;
 import io.ebeaninternal.server.deploy.*;
 import io.ebeaninternal.server.el.ElPropertyValue;
+import io.ebeaninternal.server.query.CQueryPlan;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 
 import java.sql.Timestamp;
@@ -53,7 +54,7 @@ public final class DLoadContext implements LoadContext {
    */
   private final String relativePath;
   private final ObjectGraphOrigin origin;
-  private final String planLabel;
+  private final String namePrefix;
   private final ProfileLocation profileLocation;
   private final ProfilingListener profilingListener;
   private final Map<String, ObjectGraphNode> nodePathMap = new HashMap<>();
@@ -81,7 +82,7 @@ public final class DLoadContext implements LoadContext {
     this.disableReadAudit = false;
     this.includeSoftDeletes = false;
     this.relativePath = null;
-    this.planLabel = null;
+    this.namePrefix = null;
     this.profileLocation = null;
     this.profilingListener = null;
     this.immutableCaches = Collections.emptyMap();
@@ -111,7 +112,7 @@ public final class DLoadContext implements LoadContext {
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.useBeanCache = query.beanCacheMode();
     this.profilingListener = query.profilingListener();
-    this.planLabel = query.planLabel();
+    this.namePrefix = deriveNamePrefix(query);
     this.profileLocation = query.profileLocation();
     this.immutableCaches = query.immutableBeanCaches();
     this.secondaryProperties = query.isUnmodifiable() ? new HashSet<>() : null;
@@ -130,10 +131,41 @@ public final class DLoadContext implements LoadContext {
   }
 
   /**
-   * Return the query plan label of the origin query.
+   * Build the name prefix that secondary (lazy/query) loads extend with their
+   * path and load mode. This is the parent query's full plan name (without the
+   * leading "orm.").
+   * <p>
+   * For a root query with an explicit {@code setLabel(..)} that is the bean type
+   * combined with the label (for disambiguation). For a profile location the
+   * label is already a unique, type-independent identifier so it is used as-is.
+   * For a parent that is itself a secondary query the plan label already carries
+   * the full name, so it is used as-is (avoiding a duplicate prefix on nested
+   * lazy loads).
    */
-  String planLabel() {
-    return planLabel;
+  @Nullable
+  private String deriveNamePrefix(SpiQuery<?> query) {
+    final String label = query.planLabel();
+    if (label == null) {
+      return null;
+    }
+    if (query.loadMode() != null) {
+      // parent is itself a secondary - label already carries the full name
+      return label;
+    }
+    if (query.label() != null) {
+      // explicit setLabel - prefix the bean type for disambiguation
+      return CQueryPlan.planLabelWithType(label, rootDescriptor.simpleName());
+    }
+    // profile location - already a unique, type-independent identifier
+    return label;
+  }
+
+  /**
+   * Return the parent name prefix that secondary queries extend, or null.
+   */
+  @Nullable
+  String namePrefix() {
+    return namePrefix;
   }
 
   /**

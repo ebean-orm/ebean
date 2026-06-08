@@ -255,9 +255,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final void setProfilePath(String label, String relativePath, @Nullable ProfileLocation profileLocation) {
+  public final void setProfilePath(String parentName, String relativePath, @Nullable ProfileLocation profileLocation) {
     this.profileLocation = profileLocation;
-    this.label = (profileLocation == null ? label : profileLocation.label()) + '_' + relativePath;
+    // 'parentName' is the parent query's full plan name (bean type + label, or
+    // the full name of a parent secondary query) so extend it directly.
+    this.label = parentName + '.' + relativePath;
   }
 
   @Override
