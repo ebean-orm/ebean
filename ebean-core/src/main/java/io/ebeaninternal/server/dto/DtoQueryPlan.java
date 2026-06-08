@@ -2,6 +2,7 @@ package io.ebeaninternal.server.dto;
 
 import io.ebean.core.type.DataReader;
 import io.ebean.meta.MetricVisitor;
+import io.ebeaninternal.api.SpiQueryPlan;
 import io.ebeaninternal.server.bind.capture.BindCapture;
 
 import java.sql.SQLException;
@@ -9,7 +10,7 @@ import java.sql.SQLException;
 /**
  * Knows how to read and map rows into a Bean.
  */
-public interface DtoQueryPlan {
+public interface DtoQueryPlan extends SpiQueryPlan {
 
   /**
    * Read the row data and return the DTO bean.

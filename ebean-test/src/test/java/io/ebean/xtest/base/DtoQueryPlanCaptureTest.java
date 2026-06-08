@@ -30,25 +30,32 @@ class DtoQueryPlanCaptureTest extends BaseTestCase {
     }
   }
 
+  private List<DCustPlanCapture> runQuery() {
+    return DB.getDefault()
+      .findDto(DCustPlanCapture.class, "select id, name from o_customer where id > ?")
+      .setParameter(0)
+      .setLabel("custDtoPlan")
+      .findList();
+  }
+
   @Test
   void nativeDtoQuery_capturesQueryPlan() {
     ResetBasicData.reset();
 
-    // arm bind capture with a very low threshold so new (DTO) plans capture
+    // build the DTO plan first (default threshold -> no capture yet)
+    assertThat(runQuery()).isNotEmpty();
+
+    // arming an already-built DTO plan should return its meta
     QueryPlanInit init = new QueryPlanInit();
     init.setAll(true);
     init.thresholdMicros(1);
-    DB.getDefault().metaInfo().queryPlanInit(init);
+    List<MetaQueryPlan> armed = DB.getDefault().metaInfo().queryPlanInit(init);
+    assertThat(armed)
+      .as("queryPlanInit includes the (already built) DTO plan")
+      .anyMatch(p -> "dto.DCustPlanCapture.custDtoPlan".equals(p.label()));
 
-    // native SQL DtoQuery - creates the DTO plan with the low threshold and captures bind values
-    for (int i = 0; i < 3; i++) {
-      List<DCustPlanCapture> list = DB.getDefault()
-        .findDto(DCustPlanCapture.class, "select id, name from o_customer where id > ?")
-        .setParameter(0)
-        .setLabel("custDtoPlan")
-        .findList();
-      assertThat(list).isNotEmpty();
-    }
+    // run again now that the plan is armed -> bind values captured
+    assertThat(runQuery()).isNotEmpty();
 
     QueryPlanRequest request = new QueryPlanRequest();
     request.maxCount(1000);
