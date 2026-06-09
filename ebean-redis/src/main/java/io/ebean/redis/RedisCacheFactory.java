@@ -18,6 +18,8 @@ import io.ebeaninternal.server.cache.DefaultServerQueryCache;
 import redis.clients.jedis.BinaryJedisPubSub;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisSentinelPool;
+import redis.clients.jedis.util.Pool;
 import redis.clients.jedis.util.SafeEncoder;
 
 import java.io.*;
@@ -62,7 +64,7 @@ final class RedisCacheFactory implements ServerCacheFactory {
   private final EncodeBeanData encodeBeanData = new EncodeBeanData();
   private final EncodeSerializable encodeSerializable = new EncodeSerializable();
   private final BackgroundExecutor executor;
-  private final JedisPool jedisPool;
+  private final Pool<Jedis> jedisPool;
   private final NearCacheNotify nearCacheNotify;
   private final TimedMetric metricOutNearCache;
   private final TimedMetric metricOutTableMod;
@@ -87,25 +89,34 @@ final class RedisCacheFactory implements ServerCacheFactory {
     if (config.isDisableL2Cache()) {
       this.jedisPool = null;
     } else {
-      this.jedisPool = getJedisPool(config);
+      this.jedisPool = getPool(config);
       new DaemonTopicRunner(jedisPool, new CacheDaemonTopic()).run();
     }
   }
 
   /**
-   * Return the JedisPool to use (only 1 at this stage).
+   * Return the connection pool to use.
    */
-  private JedisPool getJedisPool(DatabaseBuilder.Settings config) {
+  private Pool<Jedis> getPool(DatabaseBuilder.Settings config) {
     JedisPool jedisPool = config.getServiceObject(JedisPool.class);
     if (jedisPool != null) {
       return jedisPool;
+    }
+    JedisSentinelPool sentinelPool = config.getServiceObject(JedisSentinelPool.class);
+    if (sentinelPool != null) {
+      return sentinelPool;
     }
     RedisConfig redisConfig = config.getServiceObject(RedisConfig.class);
     if (redisConfig == null) {
       redisConfig = new RedisConfig();
     }
     redisConfig.loadProperties(config.getProperties());
-    log.log(INFO, "using l2cache redis host {0}:{1}", redisConfig.getServer(), redisConfig.getPort());
+    if (redisConfig.getMode() == RedisConfig.Mode.SENTINEL) {
+      log.log(INFO, "using l2cache redis sentinel master {0} sentinels {1}",
+        redisConfig.getMasterName(), redisConfig.getSentinels());
+    } else {
+      log.log(INFO, "using l2cache redis host {0}:{1}", redisConfig.getServer(), redisConfig.getPort());
+    }
     return redisConfig.createPool();
   }
 
@@ -262,6 +273,12 @@ final class RedisCacheFactory implements ServerCacheFactory {
   private void processTableNotify(String rawMessage) {
     long nanos = System.nanoTime();
     try {
+      if (listener == null) {
+        if (logger.isLoggable(DEBUG)) {
+          logger.log(DEBUG, "Ignoring tableMod, listener not registered yet: {0}", rawMessage);
+        }
+        return;
+      }
       if (logger.isLoggable(DEBUG)) {
         logger.log(DEBUG, "processTableNotify {0}", rawMessage);
       }
