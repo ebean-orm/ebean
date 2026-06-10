@@ -131,6 +131,49 @@ List<Customer> customers = new QCustomer()
   .findList();
 ```
 
+### Optional predicates - prefer conditional helpers over `if` blocks
+
+When a filter is driven by a nullable/optional parameter, use the built-in
+conditional helpers instead of wrapping predicates in `if` blocks. The query
+stays fluent and reads top-to-bottom, and no predicate is added when the value
+is absent.
+
+| Helper | Adds predicate when | Resulting SQL |
+|--------|---------------------|---------------|
+| `eqIfPresent(v)` | `v != null` | `prop = ?` |
+| `eqIfNotBlank(v)` (String) | `v` non-null and not blank (value is trimmed) | `prop = ?` |
+| `eqOrNull(v)` | always | `(prop = ? or prop is null)` |
+| `inOrEmpty(coll)` | `coll` non-empty | `prop in (...)` (no predicate when empty) |
+| `likeIfPresent` / `ilikeIfPresent` / `startsWithIfPresent` / `istartsWithIfPresent` / `containsIfPresent` / `icontainsIfPresent` (String) | `v != null` | the match expression |
+
+```java
+// Instead of building the query with if blocks:
+QCustomer q = new QCustomer();
+if (name != null && !name.isBlank()) {
+  q.name.eq(name.trim());
+}
+if (status != null) {
+  q.status.eq(status);
+}
+List<Customer> customers = q.findList();
+
+// Prefer the conditional helpers:
+List<Customer> customers = new QCustomer()
+  .name.eqIfNotBlank(name)
+  .status.eqIfPresent(status)
+  .findList();
+```
+
+Use `eqOrNull(v)` when a null column value should also match - for example an
+"any environment" row stored with `env_id is null` should surface under any env
+filter - instead of a hand-rolled `or()/eq()/isNull()/endOr()` block:
+
+```java
+List<CaptureRequest> rows = new QCaptureRequest()
+  .env.name.eqOrNull(envFilter)   // env_name = ? or env_name is null
+  .findList();
+```
+
 ### Agent rule
 
 When adding a new query:
@@ -140,6 +183,10 @@ When adding a new query:
 3. Traverse relationships instead of writing manual join SQL
 4. Keep property references type-safe; avoid string property names unless the API
    specifically requires them
+5. For optional filters, reach for `eqIfPresent` / `eqIfNotBlank` / `inOrEmpty`
+   before writing an `if (param != null)` block, and use `eqOrNull` instead of a
+   manual `or()/eq()/isNull()/endOr()` when the intent is "match this value or a
+   null column"
 
 ---
 
