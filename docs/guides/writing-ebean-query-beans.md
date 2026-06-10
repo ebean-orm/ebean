@@ -77,6 +77,7 @@ often the right query shape.
 | Check if at least one row exists | `exists()` | Cheapest choice for boolean existence checks |
 | Load exactly one row by ID or unique key | `findOne()` | Only use when the predicate is truly unique |
 | Load a list of entity beans | `findList()` | Default for list screens and domain logic |
+| Stream rows, usually to map into another type | `findStream()` | Prefer over `findList().stream()`; streams from the JDBC cursor, then `.map(...).toList()` |
 | Count matching rows | `findCount()` | Prefer over loading entities just to count |
 | Load a page plus optional total row count | `findPagedList()` | Use when the caller needs pagination metadata |
 | Return DTO/read-model rows | `asDto(...).findList()` | Prefer this over partially loaded entities for API/view models |
@@ -98,6 +99,21 @@ Customer customer = new QCustomer()
 ```
 
 Do **not** use `findOne()` for predicates that can match multiple rows.
+
+### Example - stream and map to another type
+
+Use `findStream()` (not `findList().stream()`) when you immediately transform
+each row into another type. It streams from the JDBC cursor rather than
+materialising the full entity list first.
+
+```java
+List<PendingPlan> pending = new QCaptureRequest()
+  .collectedAt.isNull()
+  .orderBy().requestedAt.asc()
+  .findStream()
+  .map(r -> new PendingPlan(r.app().getName(), r.hash()))
+  .toList();
+```
 
 ---
 
