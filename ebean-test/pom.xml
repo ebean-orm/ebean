@@ -318,6 +318,19 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- Allow ByteBuddy/Mockito to instrument enhanced entity beans on JDK
+               class file versions it does not yet officially support (e.g. early-access
+               JDKs), avoiding ClassFormatError. Set via systemPropertyVariables so the
+               inherited argLine (agent loading / coverage) is preserved. -->
+          <systemPropertyVariables>
+            <net.bytebuddy.experimental>true</net.bytebuddy.experimental>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
