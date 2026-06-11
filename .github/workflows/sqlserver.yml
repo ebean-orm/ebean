@@ -35,4 +35,4 @@ jobs:
           ~/.m2
         key: build-${{ env.cache-name }}
     - name: sqlserver 2022
-      run: mvn -T 8 clean test -Dprops.file=testconfig/ebean-sqlserver.properties
+      run: mvn -T 1C clean test -Dprops.file=testconfig/ebean-sqlserver.properties
