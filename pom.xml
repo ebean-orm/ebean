@@ -39,7 +39,7 @@
   </developers>
 
   <properties>
-    <jackson.version>2.15.0</jackson.version>
+    <jackson.version>2.22.0</jackson.version>
     <h2database.version>2.2.220</h2database.version>
     <ebean-persistence-api.version>3.1</ebean-persistence-api.version>
     <ebean-types.version>3.0</ebean-types.version>
