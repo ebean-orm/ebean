@@ -14,6 +14,7 @@ import io.ebeaninternal.server.transaction.RemoteTransactionEvent;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.ResetBasicData;
 import org.tests.model.basic.VwCustomer;
 
 import java.sql.Date;
@@ -35,6 +36,8 @@ class ResourceEntityTest {
 
   @BeforeAll
   static void setup() {
+    ResetBasicData.reset();
+
     Locale en = Locale.GERMAN;
     Locale de = Locale.ENGLISH;
 
@@ -589,23 +592,26 @@ class ResourceEntityTest {
     customerEntity.setStatus(Customer.Status.ACTIVE);
     customerEntity.setAnniversary(new Date(System.currentTimeMillis()));
     DB.save(customerEntity);
-
-    ImmutableBeanCache<VwCustomer> cache = ImmutableBeanCaches.loading(VwCustomer.class, DB.getDefault(), FetchGroup.of(VwCustomer.class, "name"));
     Object existingId = customerEntity.getId();
+    try {
+      ImmutableBeanCache<VwCustomer> cache = ImmutableBeanCaches.loading(VwCustomer.class, DB.getDefault(), FetchGroup.of(VwCustomer.class, "name"));
 
-    LoggedSql.start();
-    cache.getAll(Set.of(existingId));
-    List<String> initialLoadSql = LoggedSql.stop();
-    assertThat(initialLoadSql.stream().filter(sql -> sql.contains(" from o_customer "))).hasSize(1);
+      LoggedSql.start();
+      cache.getAll(Set.of(existingId));
+      List<String> initialLoadSql = LoggedSql.stop();
+      assertThat(initialLoadSql.stream().filter(sql -> sql.contains(" from o_customer "))).hasSize(1);
 
-    DB.sqlUpdate("update o_customer set name = name where id = ?")
-      .setParameter(existingId)
-      .execute();
+      DB.sqlUpdate("update o_customer set name = name where id = ?")
+        .setParameter(existingId)
+        .execute();
 
-    LoggedSql.start();
-    cache.getAll(Set.of(existingId));
-    List<String> postTouchSql = LoggedSql.stop();
-    assertThat(postTouchSql.stream().filter(sql -> sql.contains(" from o_customer "))).hasSize(1);
+      LoggedSql.start();
+      cache.getAll(Set.of(existingId));
+      List<String> postTouchSql = LoggedSql.stop();
+      assertThat(postTouchSql.stream().filter(sql -> sql.contains(" from o_customer "))).hasSize(1);
+    } finally {
+      DB.delete(Customer.class, existingId);
+    }
   }
 
   @Test
