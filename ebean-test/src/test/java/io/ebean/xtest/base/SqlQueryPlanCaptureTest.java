@@ -20,7 +20,7 @@ class SqlQueryPlanCaptureTest extends BaseTestCase {
 
   private List<SqlRow> runQuery() {
     return DB.getDefault()
-      .sqlQuery("select id, name from o_customer where id > ?")
+      .sqlQuery("select id, name from o_customer where id > ? and 'something' = 'something' ")
       .setParameter(0)
       .setLabel("custSqlPlan")
       .findList();
