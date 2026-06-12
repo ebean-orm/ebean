@@ -643,13 +643,13 @@ class ResourceEntityTest {
   }
   
   @Test
-  void a_find_fetchQuerySecondary_inheritsImmutableCache_expect_noLabelLazyLoadSql() {
+  void find_fetchQuerySecondary_inheritsImmutableCache_expect_noLabelOrLabelTextLazyLoadSql() {
 
     var cache = loadingLabelAndLabelTextCache();
 
     AttributeValueOwner owner = DB.find(AttributeValueOwner.class)
       .setId(resource.getAttributeValueOwner().id())
-      .fetchQuery("attributeValues", "intValue")
+      .fetchQuery("attributeValues")
       .fetch("attributeValues.attributeDescriptor", "name,description")
       .using(cache)
       .setUnmodifiable(true)
@@ -677,7 +677,7 @@ class ResourceEntityTest {
 
     AttributeValueOwner owner = DB.find(AttributeValueOwner.class)
       .setId(resource.getAttributeValueOwner().id())
-      .fetchLazy("attributeValues", "intValue, name")
+      .fetchLazy("attributeValues", "intValue")
       .fetch("attributeValues.attributeDescriptor", "name,description")
       .using(cache)
       .findOne();
