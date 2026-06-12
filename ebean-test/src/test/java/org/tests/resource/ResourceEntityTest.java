@@ -68,8 +68,14 @@ class ResourceEntityTest {
     resource.getName().addLabelText(de, "R1_de");
 
     resource.setAttributeValueOwner(new AttributeValueOwner());
-    resource.getAttributeValueOwner().addAttributeValue(new AttributeValue(1, heightDescriptor));
-    resource.getAttributeValueOwner().addAttributeValue(new AttributeValue(2, widthDescriptor));
+    AttributeValue av1 = new AttributeValue(new Label(), 1, heightDescriptor);
+    av1.getName().addLabelText(de, "AV1 DE");
+    av1.getName().addLabelText(en, "AV1 EN");
+    AttributeValue av2 = new AttributeValue(new Label(), 2, widthDescriptor);
+    av2.getName().addLabelText(de, "AV2 DE");
+    av2.getName().addLabelText(en, "AV2 EN");
+    resource.getAttributeValueOwner().addAttributeValue(av1);
+    resource.getAttributeValueOwner().addAttributeValue(av2);
 
     DB.save(resource);
   }
@@ -635,6 +641,34 @@ class ResourceEntityTest {
 
     assertThat(sql).isEmpty();
   }
+  
+  @Test
+  void a_find_fetchQuerySecondary_inheritsImmutableCache_expect_noLabelLazyLoadSql() {
+
+    var cache = loadingLabelAndLabelTextCache();
+
+    AttributeValueOwner owner = DB.find(AttributeValueOwner.class)
+      .setId(resource.getAttributeValueOwner().id())
+      .fetchQuery("attributeValues", "intValue")
+      .fetch("attributeValues.attributeDescriptor", "name,description")
+      .using(cache)
+      .setUnmodifiable(true)
+      .findOne();
+
+    assertThat(owner).isNotNull();
+    assertThat(owner.getAttributeValues()).hasSize(2);
+
+    LoggedSql.start();
+    owner.getAttributeValues().stream().forEach(v->
+    	v.getName().getLabelTexts().stream().forEach(t->{
+    		assertThat(t.getLocaleText()).isNotBlank();
+    	})
+    );
+    accessDescriptorLabels(owner);
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).isEmpty();
+  }
 
   @Test
   void find_fetchLazySecondary_inheritsImmutableCache_expect_noLabelLazyLoadSql() {
@@ -659,6 +693,8 @@ class ResourceEntityTest {
 
     assertThat(sql).isEmpty();
   }
+  
+  
 
   private ImmutableBeanCache<Label> labelCache(Map<Object, Label> cachedLabels, Set<Object> cacheLookups) {
     return new ImmutableBeanCache<>() {
@@ -682,8 +718,19 @@ class ResourceEntityTest {
     };
   }
 
+  private ImmutableBeanCache<Label> loadingLabelAndLabelTextCache() {
+	FetchGroup<Label> fetchGroup =  FetchGroup.of(Label.class)
+			.select("version")
+			.fetch("labelTexts")
+			.build();
+	
+    return ImmutableBeanCaches.loading(Label.class, DB.getDefault(), 
+    		fetchGroup);
+  }
+  
   private ImmutableBeanCache<Label> loadingLabelCache() {
-    return ImmutableBeanCaches.loading(Label.class, DB.getDefault(), FetchGroup.of(Label.class, "version"));
+	  return ImmutableBeanCaches.loading(Label.class, DB.getDefault(), 
+			  FetchGroup.of(Label.class, "version"));
   }
 
   private ImmutableBeanCache<Label> loadingLabelWithTextsCache() {

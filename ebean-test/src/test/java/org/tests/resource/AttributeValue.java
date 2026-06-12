@@ -1,5 +1,6 @@
 package org.tests.resource;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
@@ -8,6 +9,9 @@ public class AttributeValue extends BaseModel {
   private String stringValue;
   private int intValue;
 
+  @ManyToOne(cascade = CascadeType.ALL)
+  private Label name;
+  
   @ManyToOne
   private AttributeDescriptor attributeDescriptor;
 
@@ -25,12 +29,14 @@ public class AttributeValue extends BaseModel {
   public AttributeValue() {
   }
 
-  public AttributeValue(String stringValue, AttributeDescriptor attributeDescriptor) {
-    this.stringValue = stringValue;
+  public AttributeValue(Label name, String stringValue, AttributeDescriptor attributeDescriptor) {
+	this.name = name;
+	this.stringValue = stringValue;
     this.attributeDescriptor = attributeDescriptor;
   }
 
-  public AttributeValue(int intValue, AttributeDescriptor attributeDescriptor) {
+  public AttributeValue(Label name, int intValue, AttributeDescriptor attributeDescriptor) {
+		this.name = name;
     this.intValue = intValue;
     this.attributeDescriptor = attributeDescriptor;
   }
@@ -57,5 +63,13 @@ public class AttributeValue extends BaseModel {
 
   public void setAttributeDescriptor(AttributeDescriptor attributeDescriptor) {
     this.attributeDescriptor = attributeDescriptor;
+  }
+  
+  public Label getName() {
+	return name;
+  }
+
+  public void setName(Label name) {
+	this.name = name;
   }
 }
