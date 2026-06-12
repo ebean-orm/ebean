@@ -77,7 +77,7 @@ often the right query shape.
 | Check if at least one row exists | `exists()` | Cheapest choice for boolean existence checks |
 | Load exactly one row by ID or unique key | `findOne()` | Only use when the predicate is truly unique |
 | Load a list of entity beans | `findList()` | Default for list screens and domain logic |
-| Stream rows, usually to map into another type | `findStream()` | Prefer over `findList().stream()`; streams from the JDBC cursor, then `.map(...).toList()` |
+| Stream rows, usually to map into another type | `findStream()` | For large/unbounded results streamed from the JDBC cursor; close via try-with-resources. For small/bounded results prefer `findList().stream()` |
 | Count matching rows | `findCount()` | Prefer over loading entities just to count |
 | Load a page plus optional total row count | `findPagedList()` | Use when the caller needs pagination metadata |
 | Return DTO/read-model rows | `asDto(...).findList()` | Prefer this over partially loaded entities for API/view models |
@@ -102,18 +102,40 @@ Do **not** use `findOne()` for predicates that can match multiple rows.
 
 ### Example - stream and map to another type
 
-Use `findStream()` (not `findList().stream()`) when you immediately transform
-each row into another type. It streams from the JDBC cursor rather than
-materialising the full entity list first.
+Choose based on result size and how you consume it:
+
+- **`findList().stream()`** — executes the query, materialises the rows,
+  **releases the connection**, then streams over an in-memory list. No open
+  database resources and no try-with-resources needed. Prefer this for small or
+  bounded results (e.g. when you apply `setMaxRows`) that you collect anyway.
+- **`findStream()`** — streams rows directly from the JDBC cursor, holding a
+  connection (and an implicit transaction) open for the **whole lifetime of the
+  stream pipeline**. It must be closed with try-with-resources. Prefer it when
+  the result may be large, when you want constant memory, or when you want to
+  short-circuit (`limit`, `findFirst`, `takeWhile`) without loading everything.
 
 ```java
+// small, bounded result fully collected -> findList().stream()
 List<PendingPlan> pending = new QCaptureRequest()
   .collectedAt.isNull()
   .orderBy().requestedAt.asc()
-  .findStream()
+  .findList()
+  .stream()
   .map(r -> new PendingPlan(r.app().getName(), r.hash()))
   .toList();
+
+// large/unbounded result streamed from the cursor -> findStream() + try-with-resources
+try (Stream<Customer> stream = new QCustomer()
+  .status.equalTo(Status.NEW)
+  .findStream()) {
+  stream
+    .map(...)
+    .forEach(...);
+}
 ```
+
+For processing large results one bean at a time, `findEach()` is often the
+simplest choice because it closes the underlying resources automatically.
 
 ---
 
