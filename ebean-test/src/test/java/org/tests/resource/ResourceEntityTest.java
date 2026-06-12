@@ -677,7 +677,7 @@ class ResourceEntityTest {
 
     AttributeValueOwner owner = DB.find(AttributeValueOwner.class)
       .setId(resource.getAttributeValueOwner().id())
-      .fetchLazy("attributeValues", "intValue")
+      .fetchLazy("attributeValues", "intValue, name")
       .fetch("attributeValues.attributeDescriptor", "name,description")
       .using(cache)
       .findOne();
