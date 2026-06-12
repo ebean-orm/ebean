@@ -20,15 +20,27 @@ class SqlQueryPlanCaptureTest extends BaseTestCase {
 
   private List<SqlRow> runQuery() {
     return DB.getDefault()
-      .sqlQuery("select id, name from o_customer where id > ?")
+      .sqlQuery("select id, name from o_customer where id > ? and 'something' = 'something' ")
       .setParameter(0)
       .setLabel("custSqlPlan")
       .findList();
   }
 
+  private void drainCapturedPlans() {
+    QueryPlanRequest drain = new QueryPlanRequest();
+    drain.maxCount(100_000);
+    drain.maxTimeMillis(30_000);
+    DB.getDefault().metaInfo().queryPlanCollectNow(drain);
+  }
+
   @Test
   void sqlQuery_capturesQueryPlan() {
     ResetBasicData.reset();
+
+    // drain any query plans captured by earlier tests in the suite, otherwise the
+    // shared (process-global) capture map can exhaust the collect budget below before
+    // our custSqlPlan is reached (order dependent).
+    drainCapturedPlans();
 
     // build the plan first (default threshold -> no capture yet)
     assertThat(runQuery()).isNotEmpty();

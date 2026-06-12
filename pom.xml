@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>16.10.0</version>
+  <version>16.11.0-RC1</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -39,7 +39,7 @@
   </developers>
 
   <properties>
-    <jackson.version>2.15.0</jackson.version>
+    <jackson.version>2.22.0</jackson.version>
     <h2database.version>2.2.220</h2database.version>
     <ebean-persistence-api.version>3.1</ebean-persistence-api.version>
     <ebean-types.version>3.0</ebean-types.version>
@@ -49,9 +49,9 @@
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>14.3.0</ebean-migration.version>
     <ebean-test-containers.version>8.0</ebean-test-containers.version>
-    <ebean-datasource.version>10.5</ebean-datasource.version>
-    <ebean-agent.version>16.10.0</ebean-agent.version>
-    <ebean-maven-plugin.version>16.10.0</ebean-maven-plugin.version>
+    <ebean-datasource.version>10.7</ebean-datasource.version>
+    <ebean-agent.version>16.7.0</ebean-agent.version>
+    <ebean-maven-plugin.version>16.7.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 

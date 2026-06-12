@@ -250,6 +250,40 @@ For each future set of entity bean changes:
 4. Review the generated `.sql` to confirm it reflects the intended changes
 5. Commit both files
 
+### Protecting hand-edited and non-versioned migrations across regeneration
+
+`GenerateDbMigration` regenerates the apply SQL and model XML from the **current
+entity model**. It can therefore overwrite content you did not change in the
+entity beans, including:
+
+- **hand-edited DDL** in a generated versioned `.sql` file, and
+- **repeatable** (`R__*.sql`) scripts that the generator also derives from the
+  model (e.g. view definitions in `extra-ddl.xml`, built-in partitioning helpers).
+
+**Init scripts (`I__*.sql`) are write-once.** If an init script already exists on
+disk the generator **does not** rewrite it, so hand-tuned init DDL (partition
+functions, `UNLOGGED` tables, triggers, seed data) is preserved across
+regeneration. The trade-off: to pick up an upstream change to a built-in init
+script (e.g. the partition helper) you must **delete the file first**, then
+regenerate. Repeatable scripts are always regenerated.
+
+To avoid losing manual work:
+
+- Prefer an **init** (`I__`) script for hand-maintained DDL the entity model
+  cannot express — it is isolated and now protected from regeneration.
+- For **versioned** `.sql` and **repeatable** `R__` scripts that the generator
+  produces, review the diff after **every** regeneration and **restore** any
+  clobbered hand-tuning (e.g. `git checkout dbmigration/...`) before committing.
+- If your build maintains a migration index file (e.g. `idx_*.migrations`),
+  re-check that the new migration is listed and filenames match after renaming a
+  generated file.
+
+> **Run the generator from the module directory.** The output path set via
+> `setPathToResources(...)` is resolved relative to the **working directory**.
+> Run `GenerateDbMigration` with the working directory set to the module that owns
+> `src/main/resources` (e.g. `cd server` first). Note that `mvn exec:java` does
+> **not** honour a configured `workingDirectory`, so set the cwd yourself.
+
 ---
 
 ## Understanding the output files
