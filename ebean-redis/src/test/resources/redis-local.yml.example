@@ -1,0 +1,30 @@
+# Copy to redis-local.yml and adjust for your local Redis deployment.
+# Integration tests skip automatically when redis-local.yml is missing or Redis is unreachable.
+# Multiple documents separated by --- ; one document per mode.
+
+ebean:
+  redis:
+    mode: standalone
+    server: localhost
+    port: 6379
+    ssl: false
+    minIdle: 0
+    maxIdle: 8
+    maxTotal: 8
+    maxWaitMillis: 3000
+    timeout: 1000
+    password: changeme
+
+---
+ebean:
+  redis:
+    mode: sentinel
+    sentinels: localhost:26379,localhost:26380,localhost:26381
+    masterName: mymaster
+    ssl: false
+    minIdle: 0
+    maxIdle: 8
+    maxTotal: 8
+    maxWaitMillis: 3000
+    timeout: 1000
+    password: changeme

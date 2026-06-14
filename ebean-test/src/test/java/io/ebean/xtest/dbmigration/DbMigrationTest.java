@@ -51,7 +51,7 @@ public class DbMigrationTest extends BaseTestCase {
     Platform.YUGABYTE,
   })
   @Test
-  public void testRunMigration() throws IOException, SQLException {
+  public void testRunMigration() throws IOException, SQLException, InterruptedException {
     // Shutdown and reconnect - this prevents postgres from lock up
     ((DataSourcePool)server().dataSource()).offline();
     ((DataSourcePool)server().dataSource()).online();
@@ -208,7 +208,7 @@ public class DbMigrationTest extends BaseTestCase {
   }
 
   // do some history tests with V1.1 models
-  private void testVersioning() {
+  private void testVersioning() throws InterruptedException {
     if (isOracle()) {
       System.err.println("FIXME: Oracle history support seems to be broken");
       return;
@@ -233,6 +233,9 @@ public class DbMigrationTest extends BaseTestCase {
       hist.setId(2);
       hist.setTestString(42L);
       tmpServer.save(hist);
+      // ensure a distinct period start time so SQL Server temporal records a
+      // non zero-duration history row (otherwise the prior version is omitted)
+      Thread.sleep(20);
       hist = tmpServer.find(EHistory.class).where().eq("testString", 42L).findOne();
       assert hist != null;
       hist.setTestString(45L);
@@ -250,6 +253,9 @@ public class DbMigrationTest extends BaseTestCase {
       hist2.setTestString2("bar1");
       hist2.setTestString3("baz1");
       tmpServer.save(hist2);
+      // ensure a distinct period start time so SQL Server temporal records a
+      // non zero-duration history row (otherwise the prior version is omitted)
+      Thread.sleep(20);
       hist2.setTestString("foo2");
       hist2.setTestString2("bar2");
       tmpServer.save(hist2);

@@ -397,12 +397,21 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   /**
-   * Write (or override) the "repeatable" migration script.
+   * Write the "repeatable" or "init" migration script.
+   * <p>
+   * Repeatable ({@code R__}) scripts are always (re)written from their source
+   * (typically {@code extra-ddl.xml} views), but an init ({@code I__}) script is
+   * only written when it does not already exist. Init scripts run once to
+   * bootstrap a database and can be hand-tuned after first generation.
    */
-  private void writeExtraDdl(File migrationDir, DdlScript script) throws IOException {
+  void writeExtraDdl(File migrationDir, DdlScript script) throws IOException {
     String fullName = repeatableMigrationName(script.isInit(), script.getName());
-    logger.log(DEBUG, "writing repeatable script {0}", fullName);
     File file = new File(migrationDir, fullName);
+    if (script.isInit() && file.exists()) {
+      logger.log(DEBUG, "skip existing init script {0}", fullName);
+      return;
+    }
+    logger.log(DEBUG, "writing repeatable script {0}", fullName);
     try (Writer writer = IOUtils.newWriter(file)) {
       writer.write(script.getValue());
       writer.flush();

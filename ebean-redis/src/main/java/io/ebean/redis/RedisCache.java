@@ -13,8 +13,8 @@ import io.ebean.metric.TimedMetricStats;
 import io.ebean.redis.encode.Encode;
 import io.ebean.redis.encode.EncodePrefixKey;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.Transaction;
+import redis.clients.jedis.util.Pool;
 import redis.clients.jedis.params.ScanParams;
 import redis.clients.jedis.params.SetParams;
 import redis.clients.jedis.resps.ScanResult;
@@ -32,7 +32,7 @@ final class RedisCache implements ServerCache {
   private static final String CURSOR_0 = "0";
   private static final byte[] CURSOR_0_BYTES = SafeEncoder.encode(CURSOR_0);
 
-  private final JedisPool jedisPool;
+  private final Pool<Jedis> jedisPool;
   private final String cacheKey;
   private final EncodePrefixKey keyEncode;
   private final Encode valueEncode;
@@ -47,7 +47,7 @@ final class RedisCache implements ServerCache {
   private final CountMetric hitCount;
   private final CountMetric missCount;
 
-  RedisCache(JedisPool jedisPool, ServerCacheConfig config, Encode valueEncode) {
+  RedisCache(Pool<Jedis> jedisPool, ServerCacheConfig config, Encode valueEncode) {
     this.jedisPool = jedisPool;
     this.cacheKey = config.getCacheKey();
     this.keyEncode = new EncodePrefixKey(config.getCacheKey());
