@@ -19,6 +19,7 @@ final class MetricsAsJson implements ServerMetricsAsJson {
   private Comparator<MetaTimedMetric> sortBy = SortMetric.NAME;
   private int listCounter;
   private int objKeyCounter;
+  private boolean v2;
 
   MetricsAsJson(ServerMetrics metrics) {
     this.metrics = metrics;
@@ -64,6 +65,13 @@ final class MetricsAsJson implements ServerMetricsAsJson {
   @Override
   public void write(Appendable buffer) {
     writer = buffer;
+    collect();
+  }
+
+  @Override
+  public void writeV2(Appendable buffer) {
+    this.v2 = true;
+    this.writer = buffer;
     collect();
   }
 
@@ -151,12 +159,26 @@ final class MetricsAsJson implements ServerMetricsAsJson {
   }
 
   private void metricStart(MetaMetric metric) throws IOException {
+    metricStart(metric, null);
+  }
+
+  private void metricStart(MetaMetric metric, String beanType) throws IOException {
     if (listCounter++ > 0) {
       writer.append(',').append(newLine);
     }
     objStart();
-    key("name");
-    val(metric.name());
+    if (v2) {
+      MetricNamingV2.Mapped mapped = MetricNamingV2.map(metric.name(), beanType);
+      key("name");
+      val(mapped.name());
+      if (!mapped.tags().isEmpty()) {
+        key("tags");
+        val(mapped.tags());
+      }
+    } else {
+      key("name");
+      val(metric.name());
+    }
   }
 
   private void metricEnd() throws IOException {
@@ -180,7 +202,8 @@ final class MetricsAsJson implements ServerMetricsAsJson {
   }
 
   private void logQuery(MetaQueryMetric metric) throws IOException {
-    metricStart(metric);
+    Class<?> beanType = metric.type();
+    metricStart(metric, beanType == null ? null : beanType.getSimpleName());
     appendTiming(metric);
     if (withHash) {
       append("hash", metric.hash());

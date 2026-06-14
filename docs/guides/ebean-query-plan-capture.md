@@ -63,6 +63,15 @@ never captures bind values and cannot be `EXPLAIN`'d.
 
 Bind capture is the master switch; nothing is captured until it is on.
 
+> **Security — bind values may contain PII.** Bind capture records the **actual
+> parameter values** used by slow query executions, and those values are stored
+> and shown verbatim in the captured plan output (alongside the SQL and EXPLAIN
+> plan). They can therefore contain personal or otherwise sensitive data. Capture
+> is opt-in and off by default (`queryPlan.enable=false`): only enable it where
+> that data exposure is acceptable, restrict who can read captured plans, and
+> prefer arming specific query hashes (Step 3) over a low global threshold so you
+> capture the minimum needed.
+
 ```java
 Database database = Database.builder()
   .queryPlanEnable(true)               // turn on bind capture
