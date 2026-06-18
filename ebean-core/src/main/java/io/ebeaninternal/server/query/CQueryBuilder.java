@@ -321,6 +321,13 @@ final class CQueryBuilder {
     return lastFound;
   }
 
+  static String inlineSqlCommentLabel(String label, ProfileLocation profileLocation, boolean secondary, String simpleName) {
+    if (label != null) {
+      return secondary ? label : CQueryPlan.planLabelWithType(label, simpleName);
+    }
+    return profileLocation == null ? null : profileLocation.label();
+  }
+
   private String wrapSelectCount(String sql) {
     sql = "select count(*) from ( " + sql + ")";
     if (selectCountWithAlias) {
@@ -645,13 +652,9 @@ final class CQueryBuilder {
       if (type == SpiQuery.Type.SQ_EX || type == SpiQuery.Type.SQ_EXISTS) {
         return "";
       }
-      final var label = query.label();
+      final var label = CQueryBuilder.inlineSqlCommentLabel(query.label(), query.profileLocation(), query.loadMode() != null, request.descriptor().simpleName());
       if (label != null) {
         return dbPlatform.inlineSqlComment(label);
-      }
-      final var profileLocation = query.profileLocation();
-      if (profileLocation != null) {
-        return dbPlatform.inlineSqlComment(profileLocation.label());
       }
       return "";
     }
