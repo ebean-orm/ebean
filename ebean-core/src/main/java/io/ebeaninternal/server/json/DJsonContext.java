@@ -1,12 +1,9 @@
 package io.ebeaninternal.server.json;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.PrettyPrinter;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
+import io.avaje.json.JsonWriter;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.FetchPath;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.JsonConfig;
@@ -28,7 +25,6 @@ import io.ebeaninternal.util.ParamTypeHelper.TypeInfo;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Type;
@@ -45,30 +41,22 @@ import java.util.Set;
  */
 public final class DJsonContext implements SpiJsonContext {
 
-  private static final PrettyPrinter PRETTY_PRINTER = new Pretty();
-
   private final SpiEbeanServer server;
-  private final JsonFactory jsonFactory;
+  private final JsonStream jsonStream;
   private final Object defaultObjectMapper;
   private final JsonConfig.Include defaultInclude;
   private final DJsonScalar jsonScalar;
 
-  private static class Pretty extends DefaultPrettyPrinter {
-    Pretty() {
-      _objectFieldValueSeparatorWithSpaces = ": ";
-    }
-  }
-
-  public DJsonContext(SpiEbeanServer server, JsonFactory jsonFactory, TypeManager typeManager) {
+  public DJsonContext(SpiEbeanServer server, JsonStream jsonStream, TypeManager typeManager) {
     this.server = server;
-    this.jsonFactory = (jsonFactory != null) ? jsonFactory : new JsonFactory();
+    this.jsonStream = jsonStream;
     this.defaultObjectMapper = this.server.config().getObjectMapper();
     this.defaultInclude = this.server.config().getJsonInclude();
     this.jsonScalar = new DJsonScalar(typeManager);
   }
 
   @Override
-  public void writeScalar(JsonGenerator generator, Object scalarValue) throws IOException {
+  public void writeScalar(JsonWriter generator, Object scalarValue) throws IOException {
     jsonScalar.write(generator, scalarValue);
   }
 
@@ -78,31 +66,34 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   @Override
-  public JsonGenerator createGenerator(Writer writer) throws JsonIOException {
+  public JsonWriter createGenerator(Writer writer) throws JsonIOException {
+    JsonWriter jsonWriter = stream().writer(writer);
+    jsonWriter.serializeNulls(defaultInclude == JsonConfig.Include.ALL);
+    jsonWriter.serializeEmpty(defaultInclude != JsonConfig.Include.NON_EMPTY);
+    return jsonWriter;
+  }
+
+  @Override
+  public JsonReader createParser(Reader reader) throws JsonIOException {
     try {
-      return jsonFactory.createGenerator(writer);
+      return createParser(readAll(reader));
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
   }
 
-  @Override
-  public JsonParser createParser(Reader reader) throws JsonIOException {
-    try {
-      return jsonFactory.createParser(reader);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+  private JsonStream stream() {
+    return (jsonStream != null) ? jsonStream : JsonStream.builder().build();
   }
 
   @Override
   public <T> T toBean(Class<T> cls, String json) throws JsonIOException {
-    return toBean(cls, new StringReader(json));
+    return toBean(cls, createParser(json));
   }
 
   @Override
   public <T> T toBean(Class<T> cls, String json, JsonReadOptions options) throws JsonIOException {
-    return toBean(cls, new StringReader(json), options);
+    return toBean(cls, createParser(json), options);
   }
 
   @Override
@@ -116,15 +107,15 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   @Override
-  public <T> T toBean(Class<T> cls, JsonParser parser) throws JsonIOException {
+  public <T> T toBean(Class<T> cls, JsonReader parser) throws JsonIOException {
     return toBean(cls, parser, null);
   }
 
   @Override
-  public <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+  public <T> T toBean(Class<T> cls, JsonReader parser, JsonReadOptions options) throws JsonIOException {
     BeanDescriptor<T> desc = getDescriptor(cls);
     try {
-      return desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), false), null, null);
+      return desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), false, stream()), null, null);
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
@@ -132,12 +123,12 @@ public final class DJsonContext implements SpiJsonContext {
 
   @Override
   public <T> void toBean(T target, String json) throws JsonIOException {
-    toBean(target, new StringReader(json));
+    toBean(target, createParser(json));
   }
 
   @Override
   public <T> void toBean(T target, String json, JsonReadOptions options) throws JsonIOException {
-    toBean(target, new StringReader(json), options);
+    toBean(target, createParser(json), options);
   }
 
   @Override
@@ -151,42 +142,42 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   @Override
-  public <T> void toBean(T target, JsonParser parser) throws JsonIOException {
+  public <T> void toBean(T target, JsonReader parser) throws JsonIOException {
     toBean(target, parser, null);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> void toBean(T target, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+  public <T> void toBean(T target, JsonReader parser, JsonReadOptions options) throws JsonIOException {
     BeanDescriptor<T> desc = (BeanDescriptor<T>) getDescriptor(target.getClass());
     try {
-      desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), target != null), null, target);
+      desc.jsonRead(new ReadJson(desc, parser, options, determineObjectMapper(options), target != null, stream()), null, target);
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
   }
 
   @Override
-  public <T> DJsonBeanReader<T> createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+  public <T> DJsonBeanReader<T> createBeanReader(Class<T> cls, JsonReader parser, JsonReadOptions options) throws JsonIOException {
     BeanDescriptor<T> desc = getDescriptor(cls);
-    return new DJsonBeanReader<>(desc, new ReadJson(desc, parser, options, determineObjectMapper(options), false));
+    return new DJsonBeanReader<>(desc, new ReadJson(desc, parser, options, determineObjectMapper(options), false, stream()));
   }
 
   @Override
-  public <T> DJsonBeanReader<T> createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException {
+  public <T> DJsonBeanReader<T> createBeanReader(BeanType<T> beanType, JsonReader parser, JsonReadOptions options) throws JsonIOException {
     BeanDescriptor<T> desc = (BeanDescriptor<T>) beanType;
-    SpiJsonReader readJson = new ReadJson(desc, parser, options, determineObjectMapper(options), false);
+    SpiJsonReader readJson = new ReadJson(desc, parser, options, determineObjectMapper(options), false, stream());
     return new DJsonBeanReader<>(desc, readJson);
   }
 
   @Override
   public <T> List<T> toList(Class<T> cls, String json) throws JsonIOException {
-    return toList(cls, new StringReader(json));
+    return toList(cls, createParser(json));
   }
 
   @Override
   public <T> List<T> toList(Class<T> cls, String json, JsonReadOptions options) throws JsonIOException {
-    return toList(cls, new StringReader(json), options);
+    return toList(cls, createParser(json), options);
   }
 
   @Override
@@ -200,35 +191,30 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   @Override
-  public <T> List<T> toList(Class<T> cls, JsonParser src) throws JsonIOException {
+  public <T> List<T> toList(Class<T> cls, JsonReader src) throws JsonIOException {
     return toList(cls, src, null);
   }
 
   @Override
-  public <T> List<T> toList(Class<T> cls, JsonParser src, JsonReadOptions options) throws JsonIOException {
+  public <T> List<T> toList(Class<T> cls, JsonReader src, JsonReadOptions options) throws JsonIOException {
     BeanDescriptor<T> desc = getDescriptor(cls);
-    SpiJsonReader readJson = new ReadJson(desc, src, options, determineObjectMapper(options), false);
+    SpiJsonReader readJson = new ReadJson(desc, src, options, determineObjectMapper(options), false, stream());
     try {
-
-      JsonToken currentToken = src.getCurrentToken();
-      if (currentToken != JsonToken.START_ARRAY) {
-        JsonToken event = src.nextToken();
-        if (event != JsonToken.START_ARRAY) {
-          throw new JsonParseException(src, "Expecting start_array event but got " + event);
-        }
+      if (src.isNullValue()) {
+        return null;
       }
-
+      Token currentToken = src.currentToken();
+      if (currentToken != Token.BEGIN_ARRAY) {
+        throw new JsonIOException("Expecting BEGIN_ARRAY but got " + currentToken);
+      }
       List<T> list = new ArrayList<>();
-      do {
-        // CHECKME: Should we update the list
+      src.beginArray();
+      while (src.hasNextElement()) {
         T bean = desc.jsonRead(readJson, null, null);
-        if (bean == null) {
-          break;
-        } else {
+        if (bean != null) {
           list.add(bean);
         }
-      } while (true);
-
+      }
       return list;
     } catch (IOException e) {
       throw new JsonIOException(e);
@@ -237,7 +223,7 @@ public final class DJsonContext implements SpiJsonContext {
 
   @Override
   public Object toObject(Type genericType, String json) throws JsonIOException {
-    return toObject(genericType, createParser(new StringReader(json)));
+    return toObject(genericType, createParser(json));
   }
 
   @Override
@@ -245,8 +231,22 @@ public final class DJsonContext implements SpiJsonContext {
     return toObject(genericType, createParser(json));
   }
 
+  private JsonReader createParser(String json) {
+    return stream().reader(json);
+  }
+
+  private String readAll(Reader reader) throws IOException {
+    StringBuilder builder = new StringBuilder();
+    char[] buffer = new char[2048];
+    int len;
+    while ((len = reader.read(buffer)) != -1) {
+      builder.append(buffer, 0, len);
+    }
+    return builder.toString();
+  }
+
   @Override
-  public Object toObject(Type genericType, JsonParser jsonParser) throws JsonIOException {
+  public Object toObject(Type genericType, JsonReader jsonParser) throws JsonIOException {
     TypeInfo info = ParamTypeHelper.getTypeInfo(genericType);
     ManyType manyType = info.getManyType();
     switch (manyType) {
@@ -262,19 +262,19 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   @Override
-  public void toJson(Object value, JsonGenerator generator) throws JsonIOException {
+  public void toJson(Object value, JsonWriter generator) throws JsonIOException {
     // generator passed in so don't close it
     toJsonNoClose(value, generator, null);
   }
 
   @Override
-  public void toJson(Object value, JsonGenerator generator, FetchPath fetchPath) throws JsonIOException {
+  public void toJson(Object value, JsonWriter generator, FetchPath fetchPath) throws JsonIOException {
     // generator passed in so don't close it
     toJsonNoClose(value, generator, JsonWriteOptions.pathProperties(fetchPath));
   }
 
   @Override
-  public void toJson(Object o, JsonGenerator generator, JsonWriteOptions options) throws JsonIOException {
+  public void toJson(Object o, JsonWriter generator, JsonWriteOptions options) throws JsonIOException {
     // generator passed in so don't close it
     toJsonNoClose(o, generator, options);
   }
@@ -303,9 +303,9 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   /**
-   * Write to the JsonGenerator and close when complete.
+   * Write to the JsonWriter and close when complete.
    */
-  private void toJsonWithClose(Object o, JsonGenerator generator, JsonWriteOptions options) throws JsonIOException {
+  private void toJsonWithClose(Object o, JsonWriter generator, JsonWriteOptions options) throws JsonIOException {
     try {
       toJsonInternal(o, generator, options);
       generator.close();
@@ -315,9 +315,9 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   /**
-   * Write to the JsonGenerator and without closing it (as it was created externally).
+   * Write to the JsonWriter and without closing it (as it was created externally).
    */
-  private void toJsonNoClose(Object o, JsonGenerator generator, JsonWriteOptions options) throws JsonIOException {
+  private void toJsonNoClose(Object o, JsonWriter generator, JsonWriteOptions options) throws JsonIOException {
     try {
       toJsonInternal(o, generator, options);
     } catch (IOException e) {
@@ -342,9 +342,9 @@ public final class DJsonContext implements SpiJsonContext {
 
   private String toJsonString(Object value, JsonWriteOptions options, boolean pretty) throws JsonIOException {
     StringWriter writer = new StringWriter(500);
-    try (JsonGenerator gen = createGenerator(writer)) {
+    try (JsonWriter gen = createGenerator(writer)) {
       if (pretty) {
-        gen.setPrettyPrinter(PRETTY_PRINTER);
+        gen.pretty(true);
       }
       toJsonInternal(value, gen, options);
     } catch (IOException e) {
@@ -354,29 +354,23 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   @SuppressWarnings("unchecked")
-  private void toJsonInternal(Object value, JsonGenerator gen, JsonWriteOptions options) throws IOException {
+  private void toJsonInternal(Object value, JsonWriter gen, JsonWriteOptions options) throws IOException {
     if (value == null) {
-      gen.writeNull();
+      gen.nullValue();
     } else if (value instanceof Number) {
-      gen.writeNumber(((Number) value).doubleValue());
+      gen.jsonValue(value);
     } else if (value instanceof Boolean) {
-      gen.writeBoolean((Boolean) value);
+      gen.value((Boolean) value);
     } else if (value instanceof String) {
-      gen.writeString((String) value);
-
-      // } else if (o instanceof JsonElement) {
-
+      gen.value((String) value);
     } else if (value instanceof Map<?, ?>) {
       toJsonFromMap((Map<Object, Object>) value, gen, options);
-
     } else if (value instanceof Collection<?>) {
       toJsonFromCollection((Collection<?>) value, null, gen, options);
-
     } else if (value instanceof EntityBean) {
       BeanDescriptor<?> d = getDescriptor(value.getClass());
       WriteJson writeJson = createWriteJson(gen, options);
       d.jsonWrite(writeJson, (EntityBean) value, null);
-
     } else {
       jsonScalar.write(gen, value);
     }
@@ -385,8 +379,8 @@ public final class DJsonContext implements SpiJsonContext {
   @Override
   public SpiJsonReader createJsonRead(BeanType<?> beanType, String json) {
     BeanDescriptor<?> desc = (BeanDescriptor<?>) beanType;
-    JsonParser parser = createParser(new StringReader(json));
-    return new ReadJson(desc, parser, null, defaultObjectMapper, false);
+    JsonReader parser = createParser(json);
+    return new ReadJson(desc, parser, null, defaultObjectMapper, false, stream());
   }
 
   @Override
@@ -395,11 +389,11 @@ public final class DJsonContext implements SpiJsonContext {
   }
 
   @Override
-  public SpiJsonWriter createJsonWriter(JsonGenerator gen, JsonWriteOptions options) {
+  public SpiJsonWriter createJsonWriter(JsonWriter gen, JsonWriteOptions options) {
     return createWriteJson(gen, options);
   }
 
-  private WriteJson createWriteJson(JsonGenerator gen, JsonWriteOptions options) {
+  private WriteJson createWriteJson(JsonWriter gen, JsonWriteOptions options) {
     FetchPath pathProps = (options == null) ? null : options.getPathProperties();
     Map<String, JsonWriteBeanVisitor<?>> visitors = (options == null) ? null : options.getVisitorMap();
     return new WriteJson(server,
@@ -411,46 +405,50 @@ public final class DJsonContext implements SpiJsonContext {
       options == null || options.isIncludeLoadedImplicit());
   }
 
-  private <T> void toJsonFromCollection(Collection<T> collection, String key, JsonGenerator gen, JsonWriteOptions options) throws IOException {
+  private <T> void toJsonFromCollection(Collection<T> collection, String key, JsonWriter gen, JsonWriteOptions options) throws IOException {
     if (key != null) {
-      gen.writeFieldName(key);
+      gen.name(key);
     }
-    gen.writeStartArray();
+    gen.beginArray();
     WriteJson writeJson = createWriteJson(gen, options);
     for (T bean : collection) {
-      BeanDescriptor<?> d = getDescriptor(bean.getClass());
-      d.jsonWrite(writeJson, (EntityBean) bean, null);
+      if (bean == null) {
+        gen.nullValue();
+      } else if (bean instanceof EntityBean) {
+        BeanDescriptor<?> d = getDescriptor(bean.getClass());
+        d.jsonWrite(writeJson, (EntityBean) bean, null);
+      } else {
+        EJson.write(bean, gen);
+      }
     }
-    gen.writeEndArray();
+    gen.endArray();
   }
 
-  private void toJsonFromMap(Map<Object, Object> map, JsonGenerator gen, JsonWriteOptions options) throws IOException {
+  private void toJsonFromMap(Map<Object, Object> map, JsonWriter gen, JsonWriteOptions options) throws IOException {
     Set<Entry<Object, Object>> entrySet = map.entrySet();
     Iterator<Entry<Object, Object>> it = entrySet.iterator();
 
     WriteJson writeJson = createWriteJson(gen, options);
-    gen.writeStartObject();
+    gen.beginObject();
 
     while (it.hasNext()) {
       Entry<Object, Object> entry = it.next();
       String key = entry.getKey().toString();
       Object value = entry.getValue();
       if (value == null) {
-        gen.writeNullField(key);
+        gen.name(key);
+        gen.nullValue();
+      } else if (value instanceof Collection<?>) {
+        toJsonFromCollection((Collection<?>) value, key, gen, options);
+      } else if (value instanceof EntityBean) {
+        BeanDescriptor<?> d = getDescriptor(value.getClass());
+        d.jsonWrite(writeJson, (EntityBean) value, key);
       } else {
-        if (value instanceof Collection<?>) {
-          toJsonFromCollection((Collection<?>) value, key, gen, options);
-
-        } else if (value instanceof EntityBean) {
-          BeanDescriptor<?> d = getDescriptor(value.getClass());
-          d.jsonWrite(writeJson, (EntityBean) value, key);
-
-        } else {
-          EJson.write(entry, gen);
-        }
+        gen.name(key);
+        EJson.write(value, gen);
       }
     }
-    gen.writeEndObject();
+    gen.endObject();
   }
 
   /**

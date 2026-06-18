@@ -1,212 +1,149 @@
 package io.ebeaninternal.json;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import io.avaje.json.stream.JsonStream;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.util.Collection;
-import java.util.Date;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
+/**
+ * Utility to write simple java Maps/Lists as JSON.
+ */
 final class EJsonWriter {
 
-  /**
-   * Base jsonFactory implementation used when it is not passed in.
-   */
-  static final JsonFactory jsonFactory = new JsonFactory();
-  private final JsonGenerator jsonGenerator;
+  private static final JsonStream JSON_STREAM = JsonStream.builder().build();
 
-  private EJsonWriter(JsonGenerator jsonGenerator) {
-    this.jsonGenerator = jsonGenerator;
+  private EJsonWriter() {
   }
 
+  /**
+   * Convert object to Json content.
+   */
   static String write(Object object) throws IOException {
-    StringWriter writer = new StringWriter(200);
-    write(object, writer).close();
+    StringWriter writer = new StringWriter();
+    write(object, writer);
     return writer.toString();
   }
 
-  static JsonGenerator write(Object object, Writer writer) throws IOException {
-    JsonGenerator generator = jsonFactory.createGenerator(writer);
-    write(object, generator);
-    generator.flush();
-    return generator;
+  /**
+   * Convert object to Json content.
+   */
+  static io.avaje.json.JsonWriter write(Object object, Writer writer) throws IOException {
+    io.avaje.json.JsonWriter jsonWriter = JSON_STREAM.writer(writer);
+    jsonWriter.serializeNulls(true);
+    write(object, jsonWriter);
+    jsonWriter.flush();
+    return jsonWriter;
   }
 
-  static void write(Object object, JsonGenerator jsonGenerator) {
-    new EJsonWriter(jsonGenerator).writeJson(object);
-  }
-
-  static void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator) throws IOException {
-    new EJsonWriter(jsonGenerator).writeCollection(null, collection);
-  }
-
-  private void writeJson(Object object) {
-    writeJson(null, object);
-  }
-
-  @SuppressWarnings("unchecked")
-  private void writeJson(String name, Object object) {
-    try {
-      if (object == null) {
-        writeNull(name);
-
-      } else if (object instanceof Number) {
-        writeNumber(name, (Number) object);
-
-      } else if (object instanceof String) {
-        writeString(name, (String) object);
-
-      } else if (object instanceof Map) {
-        writeMap(name, (Map<Object, Object>) object);
-
-      } else if (object instanceof Collection) {
-        writeCollection(name, (Collection<Object>) object);
-
-      } else if (object instanceof Boolean) {
-        writeBoolean(name, (Boolean) object);
-
-      } else if (object instanceof Date) {
-        writeDate(name, (Date) object);
-
-      } else if (object instanceof Map.Entry<?, ?>) {
-        Map.Entry<?, ?> entry = (Map.Entry<?, ?>) object;
-        writeJson(entry.getKey().toString(), entry.getValue());
-
-      } else {
-        writeString(name, object.toString());
-      }
-
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+  /**
+   * Convert object to Json content.
+   */
+  static void write(Object object, io.avaje.json.JsonWriter jsonWriter) throws IOException {
+    if (object == null) {
+      jsonWriter.nullValue();
+      return;
     }
-  }
-
-  private void writeBoolean(String name, Boolean object) throws IOException {
-    if (name == null) {
-      jsonGenerator.writeBoolean(object);
-    } else {
-      jsonGenerator.writeBooleanField(name, object);
+    if (object instanceof String) {
+      jsonWriter.value((String) object);
+      return;
     }
-  }
-
-  private void writeDate(String name, Date object) throws IOException {
-    if (name == null) {
-      jsonGenerator.writeNumber(object.getTime());
-    } else {
-      jsonGenerator.writeNumberField(name, object.getTime());
+    if (object instanceof Integer) {
+      jsonWriter.value((Integer) object);
+      return;
     }
-  }
-
-  private void writeNumber(String name, Number object) throws IOException {
-
     if (object instanceof Long) {
-      writeLong(name, object);
-
-    } else if (object instanceof Integer) {
-      writeInteger(name, object);
-
-    } else if (object instanceof Double) {
-      writeDouble(name, object);
-
-    } else if (object instanceof BigDecimal) {
-      writeBigDecimal(name, object);
-
-    } else if (object instanceof BigInteger) {
-      writeBigInteger(name, object);
-
-    } else {
-      writeGeneralNumber(name, object);
+      jsonWriter.value((Long) object);
+      return;
     }
+    if (object instanceof Double) {
+      jsonWriter.value((Double) object);
+      return;
+    }
+    if (object instanceof Float) {
+      jsonWriter.value((Float) object);
+      return;
+    }
+    if (object instanceof BigDecimal) {
+      jsonWriter.value((BigDecimal) object);
+      return;
+    }
+    if (object instanceof Boolean) {
+      jsonWriter.value((Boolean) object);
+      return;
+    }
+    if (object instanceof Map<?, ?>) {
+      writeMap((Map<?, ?>) object, jsonWriter);
+      return;
+    }
+    if (object instanceof Collection<?>) {
+      writeCollection((Collection<?>) object, jsonWriter);
+      return;
+    }
+
+    jsonWriter.value(object.toString());
   }
 
-  private void writeGeneralNumber(String name, Number object) throws IOException {
-    writeBigDecimal(name, new BigDecimal(object.toString()));
+  /**
+   * Write map as Json content.
+   */
+  private static void writeMap(Map<?, ?> map, io.avaje.json.JsonWriter jsonWriter) throws IOException {
+    jsonWriter.beginObject();
+    for (Map.Entry<?, ?> entry : map.entrySet()) {
+      String fieldName = (String) entry.getKey();
+      Object value = entry.getValue();
+      jsonWriter.name(fieldName);
+      write(value, jsonWriter);
+    }
+    jsonWriter.endObject();
   }
 
-  private void writeBigDecimal(String name, Number object) throws IOException {
-    if (name == null) {
-      jsonGenerator.writeNumber((BigDecimal) object);
-    } else {
-      jsonGenerator.writeNumberField(name, (BigDecimal) object);
+  /**
+   * Write list as Json content.
+   */
+  static void writeCollection(Collection<?> list, io.avaje.json.JsonWriter jsonWriter) throws IOException {
+    jsonWriter.beginArray();
+    for (Object element : list) {
+      write(element, jsonWriter);
     }
+    jsonWriter.endArray();
   }
 
-  private void writeBigInteger(String name, Number object) throws IOException {
-    if (name == null) {
-      jsonGenerator.writeNumber((BigInteger) object);
-    } else {
-      jsonGenerator.writeNumberField(name, object.longValue());
-    }
+  /**
+   * Convert map to Json content.
+   */
+  static String write(Map<String, Object> map) throws IOException {
+    StringWriter writer = new StringWriter();
+    write(map, writer);
+    return writer.toString();
   }
 
-  private void writeDouble(String name, Number object) throws IOException {
-    if (name == null) {
-      jsonGenerator.writeNumber((Double) object);
-    } else {
-      jsonGenerator.writeNumberField(name, (Double) object);
-    }
+  /**
+   * Convert map to Json content.
+   */
+  static io.avaje.json.JsonWriter write(Map<String, Object> map, Writer writer) throws IOException {
+    io.avaje.json.JsonWriter jsonWriter = JSON_STREAM.writer(writer);
+    jsonWriter.serializeNulls(true);
+    write(map, jsonWriter);
+    jsonWriter.flush();
+    return jsonWriter;
   }
 
-  private void writeLong(String name, Number object) throws IOException {
-    if (name == null) {
-      jsonGenerator.writeNumber((Long) object);
-    } else {
-      jsonGenerator.writeNumberField(name, (Long) object);
+  /**
+   * Convert map to Json content.
+   */
+  static void write(Map<String, Object> map, io.avaje.json.JsonWriter jsonWriter) throws IOException {
+    jsonWriter.beginObject();
+    Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator();
+    while (it.hasNext()) {
+      Map.Entry<String, Object> entry = it.next();
+      jsonWriter.name(entry.getKey());
+      write(entry.getValue(), jsonWriter);
     }
-  }
-
-  private void writeInteger(String name, Number object) throws IOException {
-    if (name == null) {
-      jsonGenerator.writeNumber((Integer) object);
-    } else {
-      jsonGenerator.writeNumberField(name, (Integer) object);
-    }
-  }
-
-  private void writeNull(String name) throws IOException {
-    if (name == null) {
-      jsonGenerator.writeNull();
-    } else {
-      jsonGenerator.writeNullField(name);
-    }
-  }
-
-  private void writeString(String name, String object) throws IOException {
-    if (name == null) {
-      jsonGenerator.writeString(object);
-    } else {
-      jsonGenerator.writeStringField(name, object);
-    }
-  }
-
-  private void writeCollection(String name, Collection<Object> collection) throws IOException {
-    if (name != null) {
-      jsonGenerator.writeFieldName(name);
-    }
-    jsonGenerator.writeStartArray();
-    for (Object object : collection) {
-      writeJson(null, object);
-    }
-    jsonGenerator.writeEndArray();
-  }
-
-  private void writeMap(String name, Map<Object, Object> map) throws IOException {
-
-    if (name != null) {
-      jsonGenerator.writeFieldName(name);
-    }
-    jsonGenerator.writeStartObject();
-    Set<Entry<Object, Object>> entrySet = map.entrySet();
-    for (Entry<Object, Object> entry : entrySet) {
-      writeJson(entry.getKey().toString(), entry.getValue());
-    }
-    jsonGenerator.writeEndObject();
+    jsonWriter.endObject();
   }
 }

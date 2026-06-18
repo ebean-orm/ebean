@@ -1,6 +1,7 @@
 package org.tests.text.json;
 
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebean.xtest.BaseTestCase;
@@ -185,9 +186,9 @@ public class TestJsonBeanDescriptorParse extends BaseTestCase {
 
   private SpiJsonReader createRead(SpiEbeanServer server, BeanDescriptor<Customer> descriptor) {
     StringReader reader = new StringReader("{\"id\":123,\"name\":\"Hello Rob\"}");
-    JsonParser parser = server.json().createParser(reader);
+    JsonReader parser = server.json().createParser(reader);
 
-    return new ReadJson(descriptor, parser, null, null, false);
+    return new ReadJson(descriptor, parser, null, null, false, JsonStream.builder().build());
   }
 
 }

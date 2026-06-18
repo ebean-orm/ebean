@@ -1,8 +1,8 @@
 package io.ebean.core.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
+import io.avaje.json.JsonWriter;
 import io.ebean.config.JsonConfig;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
@@ -83,20 +83,31 @@ public abstract class ScalarTypeBaseDate<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public T jsonRead(JsonParser parser) throws IOException {
-    if (JsonToken.VALUE_NUMBER_INT == parser.getCurrentToken()) {
-      return convertFromMillis(parser.getLongValue());
-    } else {
-      return convertFromDate(Date.valueOf(parser.getText()));
+  public T jsonRead(JsonReader parser) throws IOException {
+    Token token = parser.currentToken();
+    if (Token.NUMBER == token) {
+      return convertFromMillis(parser.readLong());
     }
+    if (Token.STRING == token) {
+      return convertFromDate(Date.valueOf(parser.readString()));
+    }
+
+    String raw = parser.readRaw();
+    if (raw == null || "null".equals(raw)) {
+      return null;
+    }
+    if (raw.length() > 1 && raw.charAt(0) == '"' && raw.charAt(raw.length() - 1) == '"') {
+      return convertFromDate(Date.valueOf(raw.substring(1, raw.length() - 1)));
+    }
+    return convertFromMillis(Long.parseLong(raw));
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, T value) throws IOException {
+  public void jsonWrite(JsonWriter writer, T value) throws IOException {
     if (mode == JsonConfig.Date.ISO8601) {
-      writer.writeString(toIsoFormat(value));
+      writer.value(toIsoFormat(value));
     } else {
-      writer.writeNumber(convertToMillis(value));
+      writer.value(convertToMillis(value));
     }
   }
 

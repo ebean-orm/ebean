@@ -1,29 +1,25 @@
 package io.ebeaninternal.json;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.ModifyAwareType;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import java.util.*;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 final class EJsonReader {
 
-  static final JsonFactory json = new JsonFactory();
-  private final JsonParser parser;
-  private final boolean modifyAware;
-  private final ModifyAwareFlag modifyAwareOwner;
-  private int depth;
-  private Stack stack;
-  private Context currentContext;
+  private EJsonReader() {
+  }
 
-  EJsonReader(JsonParser parser, boolean modifyAware) {
-    this.parser = parser;
-    this.modifyAware = modifyAware;
-    this.modifyAwareOwner = modifyAware ? new ModifyAwareFlag() : null;
+  private static JsonReader reader(String content) {
+    return JsonStream.builder().build().reader(content);
   }
 
   @SuppressWarnings("unchecked")
@@ -47,12 +43,12 @@ final class EJsonReader {
   }
 
   @SuppressWarnings("unchecked")
-  static Map<String, Object> parseObject(JsonParser parser) throws IOException {
+  static Map<String, Object> parseObject(JsonReader parser) throws IOException {
     return (Map<String, Object>) parse(parser);
   }
 
   @SuppressWarnings("unchecked")
-  static Map<String, Object> parseObject(JsonParser parser, JsonToken token) throws IOException {
+  static Map<String, Object> parseObject(JsonReader parser, Token token) throws IOException {
     return (Map<String, Object>) parse(parser, token, false);
   }
 
@@ -72,285 +68,137 @@ final class EJsonReader {
   }
 
   @SuppressWarnings("unchecked")
-  static List<Object> parseList(JsonParser parser, boolean modifyAware) throws IOException {
-    return (List<Object>) parse(parser, modifyAware);
+  static List<Object> parseList(JsonReader parser, boolean modifyAware) throws IOException {
+    return (List<Object>) parse(parser, null, modifyAware);
   }
 
   static Object parse(String json) throws IOException {
-    if (json == null) {
-      return null;
-    }
-    return parse(new StringReader(json));
+    return parseRawJson(json, null);
   }
 
   static Object parse(String json, boolean modifyAware) throws IOException {
-    if (json == null) {
-      return null;
-    }
-    return parse(new StringReader(json), modifyAware);
+    return parseRawJson(json, modifyAware ? new ModifyAwareFlag() : null);
   }
 
   static Object parse(Reader reader) throws IOException {
-    return parse(json.createParser(reader));
+    return parseRawJson(readAll(reader), null);
   }
 
   static Object parse(Reader reader, boolean modifyAware) throws IOException {
-    return parse(json.createParser(reader), modifyAware);
+    return parseRawJson(readAll(reader), modifyAware ? new ModifyAwareFlag() : null);
   }
 
-  static Object parse(JsonParser parser) throws IOException {
+  static Object parse(JsonReader parser) throws IOException {
     return parse(parser, null, false);
   }
 
-  static Object parse(JsonParser parser, boolean modifyAware) throws IOException {
+  static Object parse(JsonReader parser, boolean modifyAware) throws IOException {
     return parse(parser, null, modifyAware);
   }
 
-  static Object parse(JsonParser parser, JsonToken token, boolean modifyAware) throws IOException {
-    return new EJsonReader(parser, modifyAware).parseJson(token);
-  }
-
-  private void startArray() {
-    depth++;
-    stack.push(currentContext);
-    currentContext = modifyAware ? new ArrayContext(modifyAwareOwner) : new ArrayContext();
-  }
-
-  private void startObject() {
-    depth++;
-    stack.push(currentContext);
-    currentContext = modifyAware ? new ObjectContext(modifyAwareOwner) : new ObjectContext();
-  }
-
-  private void endArray() {
-    end();
-  }
-
-  private void endObject() {
-    end();
-  }
-
-  private void end() {
-    depth--;
-    if (!stack.isEmpty()) {
-      currentContext = stack.pop(currentContext);
+  static Object parse(JsonReader parser, Token token, boolean modifyAware) throws IOException {
+    ModifyAwareType owner = modifyAware ? new ModifyAwareFlag() : null;
+    Token effectiveToken = token == null ? parser.currentToken() : token;
+    if (effectiveToken == null) {
+      return parseRawJson(parser.readRaw(), owner);
     }
-    if (modifyAwareOwner != null) {
-      modifyAwareOwner.setMarkedDirty(false);
-    }
+    return parseValue(parser, effectiveToken, owner);
   }
 
-  private void setValue(Object value) {
-    currentContext.setValue(value);
-  }
-
-  private void setValueNull() {
-    currentContext.setValueNull();
-  }
-
-  private Object parseJson(JsonToken token) throws IOException {
-
+  private static Object parseValue(JsonReader parser, Token token, ModifyAwareType owner) throws IOException {
     if (token == null) {
-      token = parser.nextToken();
-      // if it is a simple value just return it
-      switch (token) {
-        case VALUE_NULL:
+      token = parser.currentToken();
+      if (token == null) {
+        if (parser.isNullValue()) {
           return null;
-        case VALUE_FALSE:
-          return Boolean.FALSE;
-        case VALUE_TRUE:
-          return Boolean.TRUE;
-        case VALUE_STRING:
-          return parser.getText();
-        case VALUE_NUMBER_INT:
-          return parser.getLongValue();
-        case VALUE_NUMBER_FLOAT:
-          return parser.getDecimalValue();
+        }
+        return parseRawJson(parser.readRaw(), owner);
       }
     }
-
-    // it is a object or array, process the first JsonToken
-    stack = new Stack();
-    processJsonToken(token);
-
-    // process the rest of the object or array
-    while (depth > 0) {
-      token = parser.nextToken();
-      processJsonToken(token);
+    if (token == Token.BEGIN_OBJECT) {
+      return parseObjectValue(parser, owner);
     }
-
-    return currentContext.getValue();
+    if (token == Token.BEGIN_ARRAY) {
+      return parseArrayValue(parser, owner);
+    }
+    if (token == Token.NUMBER) {
+      BigDecimal value = parser.readDecimal();
+      return value.scale() <= 0 ? value.longValue() : value;
+    }
+    if (token == Token.STRING) {
+      return parser.readString();
+    }
+    if (token == Token.BOOLEAN) {
+      return parser.readBoolean();
+    }
+    if (token == Token.NULL) {
+      parser.isNullValue();
+      return null;
+    }
+    return parseRawJson(parser.readRaw(), owner);
   }
 
-  /**
-   * Process the JsonToken for objects and arrays.
-   */
-  private void processJsonToken(JsonToken token) throws IOException {
-    switch (token) {
-      case START_ARRAY:
-        startArray();
-        break;
-
-      case START_OBJECT:
-        startObject();
-        break;
-
-      case FIELD_NAME:
-        currentContext.setKey(parser.getCurrentName());
-        break;
-
-      case VALUE_STRING:
-        setValue(parser.getValueAsString());
-        break;
-
-      case VALUE_NUMBER_INT:
-        setValue(parser.getLongValue());
-        break;
-
-      case VALUE_NUMBER_FLOAT:
-        setValue(parser.getDecimalValue());
-        break;
-
-      case VALUE_TRUE:
-        setValue(Boolean.TRUE);
-        break;
-
-      case VALUE_FALSE:
-        setValue(Boolean.FALSE);
-        break;
-
-      case VALUE_NULL:
-        setValueNull();
-        break;
-
-      case END_OBJECT:
-        endObject();
-        break;
-
-      case END_ARRAY:
-        endArray();
-        break;
-
-      default:
-        break;
+  private static Object parseRawJson(String json, ModifyAwareType owner) throws IOException {
+    if (json == null) {
+      return null;
     }
+    String content = json.trim();
+    if (content.isEmpty()) {
+      return null;
+    }
+    JsonReader parser = reader(content);
+    Token token = parser.currentToken();
+    return parseValue(parser, token, owner);
   }
 
-  private static final class Stack {
+  private static String readAll(Reader reader) throws IOException {
+    StringBuilder builder = new StringBuilder();
+    char[] buffer = new char[2048];
+    int len;
+    while ((len = reader.read(buffer)) != -1) {
+      builder.append(buffer, 0, len);
+    }
+    return builder.toString();
+  }
 
-    private Context head;
+  private static Map<String, Object> parseObjectValue(JsonReader parser, ModifyAwareType owner) throws IOException {
+    Map<String, Object> map = owner == null
+      ? new LinkedHashMap<>()
+      : new ModifyAwareMap<>(owner, new LinkedHashMap<>());
 
-    private void push(Context context) {
-      if (context != null) {
-        context.next = head;
-        head = context;
+    parser.beginObject();
+    while (parser.hasNextField()) {
+      String fieldName = parser.nextField();
+      map.put(fieldName, parseValue(parser, parser.currentToken(), owner));
+      if (owner != null) {
+        owner.setMarkedDirty(false);
       }
     }
+    parser.endObject();
+    if (owner != null) {
+      owner.setMarkedDirty(false);
+    }
+    return map;
+  }
 
-    private Context pop(Context endingContext) {
-      if (head == null) {
-        throw new NoSuchElementException();
+  private static List<Object> parseArrayValue(JsonReader parser, ModifyAwareType owner) throws IOException {
+    List<Object> list = owner == null
+      ? new ArrayList<>()
+      : new ModifyAwareList<>(owner, new ArrayList<>());
+
+    parser.beginArray();
+    while (parser.hasNextElement()) {
+      Token elementToken = parser.currentToken();
+      Object elementValue = parseValue(parser, elementToken, owner);
+      list.add(elementValue);
+      if (owner != null) {
+        owner.setMarkedDirty(false);
       }
-      Context temp = head;
-      head = head.next;
-      temp.popContext(endingContext);
-      return temp;
     }
-
-    private boolean isEmpty() {
-      return head == null;
+    parser.endArray();
+    if (owner != null) {
+      owner.setMarkedDirty(false);
     }
-  }
-
-  private abstract static class Context {
-    Context next;
-
-    abstract void popContext(Context temp);
-
-    abstract Object getValue();
-
-    abstract void setValue(Object value);
-
-    abstract void setKey(String key);
-
-    abstract void setValueNull();
-  }
-
-  private static class ObjectContext extends Context {
-
-    private final Map<String, Object> map;
-
-    private String key;
-
-    ObjectContext() {
-      map = new LinkedHashMap<>();
-    }
-
-    ObjectContext(ModifyAwareType owner) {
-      map = new ModifyAwareMap<>(owner, new LinkedHashMap<>());
-    }
-
-    @Override
-    public void popContext(Context temp) {
-      setValue(temp.getValue());
-    }
-
-    @Override
-    Object getValue() {
-      return map;
-    }
-
-    @Override
-    void setValue(Object value) {
-      map.put(key, value);
-    }
-
-    @Override
-    void setKey(String key) {
-      this.key = key;
-    }
-
-    @Override
-    void setValueNull() {
-      map.put(key, null);
-    }
-  }
-
-  private static class ArrayContext extends Context {
-
-    private final List<Object> values;
-
-    ArrayContext() {
-      values = new ArrayList<>();
-    }
-
-    ArrayContext(ModifyAwareType owner) {
-      values = new ModifyAwareList<>(owner, new ArrayList<>());
-    }
-
-    @Override
-    public void popContext(Context temp) {
-      values.add(temp.getValue());
-    }
-
-    @Override
-    Object getValue() {
-      return values;
-    }
-
-    @Override
-    void setValue(Object value) {
-      values.add(value);
-    }
-
-    @Override
-    void setValueNull() {
-      // ignore
-    }
-
-    @Override
-    void setKey(String key) {
-      // not expected
-    }
+    return list;
   }
 }

@@ -1,7 +1,7 @@
 package io.ebean.xtest.json;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.ModifyAwareType;
 import io.ebean.text.json.EJson;
 import io.ebean.util.IOUtils;
@@ -20,14 +20,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class EJsonTests {
 
+  private static final JsonStream JSON_STREAM = JsonStream.builder().build();
+
   @Test
   public void test_map_simple() throws IOException {
 
-    JsonFactory factory = new JsonFactory();
-
     String jsonInput = "{\"name\":\"rob\",\"age\":12}";
-
-    JsonParser jsonParser = factory.createParser(jsonInput);
+    JsonReader jsonParser = JSON_STREAM.reader(jsonInput);
 
     Object result = EJson.parse(jsonParser);
 
@@ -56,11 +55,8 @@ public class EJsonTests {
   @Test
   public void test_parseObject() throws IOException {
 
-    JsonFactory factory = new JsonFactory();
-
     String jsonInput = "{\"name\":\"rob\",\"age\":12}";
-
-    JsonParser jsonParser = factory.createParser(jsonInput);
+    JsonReader jsonParser = JSON_STREAM.reader(jsonInput);
 
     Map<String, Object> map = EJson.parseObject(jsonParser);
 
@@ -168,8 +164,7 @@ public class EJsonTests {
 
     String jsonInput = "[\"name\",\"rob\",12,13]";
 
-    JsonFactory jsonFactory = new JsonFactory();
-    JsonParser parser = jsonFactory.createParser(jsonInput);
+    JsonReader parser = JSON_STREAM.reader(jsonInput);
 
     List<Object> list = EJson.parseList(parser);
 

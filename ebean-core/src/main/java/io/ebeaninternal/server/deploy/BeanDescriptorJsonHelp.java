@@ -1,10 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
 import io.ebean.bean.EntityBean;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.api.json.SpiJsonReader;
@@ -34,7 +31,8 @@ final class BeanDescriptorJsonHelp<T> {
       InheritInfo localInheritInfo = inheritInfo.readType(bean.getClass());
       String discValue = localInheritInfo.getDiscriminatorStringValue();
       String discColumn = localInheritInfo.getDiscriminatorColumn();
-      writeJson.gen().writeStringField(discColumn, discValue);
+      writeJson.gen().name(discColumn);
+      writeJson.gen().value(discValue);
       localInheritInfo.desc().jsonWriteProperties(writeJson, bean);
     }
     writeJson.writeEndObject();
@@ -66,44 +64,38 @@ final class BeanDescriptorJsonHelp<T> {
 
   @SuppressWarnings("unchecked")
   T jsonRead(SpiJsonReader jsonRead, String path, boolean withInheritance, T target) throws IOException {
-    JsonParser parser = jsonRead.parser();
-    //noinspection StatementWithEmptyBody
-    if (parser.getCurrentToken() == JsonToken.START_OBJECT) {
-      // start object token read by Jackson already
-    } else {
-      // check for null or start object
-      JsonToken token = parser.nextToken();
-      if (JsonToken.VALUE_NULL == token || JsonToken.END_ARRAY == token) {
-        return null;
-      }
-      if (JsonToken.START_OBJECT != token) {
-        throw new JsonParseException(parser, "Unexpected token " + token + " - expecting start_object", parser.getCurrentLocation());
-      }
+    JsonReader parser = jsonRead.parser();
+    if (parser.isNullValue()) {
+      return null;
+    }
+    Token token = parser.currentToken();
+    if (token != Token.BEGIN_OBJECT) {
+      throw new IllegalStateException("Unexpected token " + token + " - expecting BEGIN_OBJECT at: " + parser.location());
     }
 
     if (desc.inheritInfo == null || !withInheritance) {
       return jsonReadObject(jsonRead, path, target);
     }
 
-    ObjectNode node = jsonRead.mapper().readTree(parser);
-    if (node.isNull()) {
+    Map<String, Object> node = EJson.parseObject(parser);
+    if (node == null) {
       return null;
     }
-    JsonParser newParser = node.traverse();
-    SpiJsonReader newReader = jsonRead.forJson(newParser);
 
     // check for the discriminator value to determine the correct sub type
     String discColumn = inheritInfo.getRoot().getDiscriminatorColumn();
-    JsonNode discNode = node.get(discColumn);
-    if (discNode == null || discNode.isNull()) {
+    Object discValue = node.get(discColumn);
+    String rawObject = EJson.write(node);
+    SpiJsonReader newReader = jsonRead.forJson(rawObject);
+    if (discValue == null) {
       if (!desc.isAbstractType()) {
         return desc.jsonReadObject(newReader, path, target);
       }
       String msg = "Error reading inheritance discriminator - expected [" + discColumn + "] but no json key?";
-      throw new JsonParseException(newParser, msg, parser.getCurrentLocation());
+      throw new IllegalStateException(msg);
     }
 
-    BeanDescriptor<T> inheritDesc = (BeanDescriptor<T>) inheritInfo.readType(discNode.asText()).desc();
+    BeanDescriptor<T> inheritDesc = (BeanDescriptor<T>) inheritInfo.readType(String.valueOf(discValue)).desc();
     return inheritDesc.jsonReadObject(newReader, path, target);
   }
 
@@ -124,35 +116,30 @@ final class BeanDescriptorJsonHelp<T> {
     if (path != null) {
       readJson.pushPath(path);
     }
+    JsonReader parser = readJson.parser();
+    parser.beginObject();
+
     // unmapped properties, send to JsonReadBeanVisitor later
     Map<String, Object> unmappedProperties = null;
-    do {
-      JsonParser parser = readJson.parser();
-      JsonToken event = parser.nextToken();
-      if (JsonToken.FIELD_NAME == event) {
-        String key = parser.getCurrentName();
-        BeanProperty p = desc.beanProperty(key);
-        if (p != null) {
-          if (p.isVersion() && readJson.update() ) {
-            // skip version prop during update
-            p.jsonRead(readJson);
-          } else {
-            p.jsonRead(readJson, bean);
-          }
+    while (parser.hasNextField()) {
+      String key = parser.nextField();
+      BeanProperty p = desc.beanProperty(key);
+      if (p != null) {
+        if (p.isVersion() && readJson.update()) {
+          // skip version prop during update
+          p.jsonRead(readJson);
         } else {
-          // read an unmapped property
-          if (unmappedProperties == null) {
-            unmappedProperties = new LinkedHashMap<>();
-          }
-          unmappedProperties.put(key, EJson.parse(parser));
+          p.jsonRead(readJson, bean);
         }
-      } else if (JsonToken.END_OBJECT == event) {
-        break;
       } else {
-        throw new RuntimeException("Unexpected token " + event + " - expecting key or end_object at: " + parser.getCurrentLocation());
+        // read an unmapped property
+        if (unmappedProperties == null) {
+          unmappedProperties = new LinkedHashMap<>();
+        }
+        unmappedProperties.put(key, EJson.parse(parser));
       }
-
-    } while (true);
+    }
+    parser.endObject();
 
     if (unmappedProperties != null) {
       desc.setUnmappedJson(bean, unmappedProperties);

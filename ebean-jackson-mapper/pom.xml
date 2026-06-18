@@ -20,6 +20,13 @@
     </dependency>
 
     <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-json-core</artifactId>
+      <version>${avaje-json-core.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-core</artifactId>
       <version>${jackson.version}</version>

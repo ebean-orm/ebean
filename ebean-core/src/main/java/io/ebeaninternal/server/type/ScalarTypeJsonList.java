@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.*;
 import io.ebean.text.TextException;
@@ -182,12 +182,12 @@ final class ScalarTypeJsonList {
     }
 
     @Override
-    public final List jsonRead(JsonParser parser) throws IOException {
-      return EJson.parseList(parser, parser.getCurrentToken());
+    public final List jsonRead(JsonReader parser) throws IOException {
+      return EJson.parseList(parser, parser.currentToken());
     }
 
     @Override
-    public final void jsonWrite(JsonGenerator writer, List value) throws IOException {
+    public final void jsonWrite(JsonWriter writer, List value) throws IOException {
       EJson.write(value, writer);
     }
   }

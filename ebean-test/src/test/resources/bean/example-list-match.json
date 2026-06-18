@@ -1,13 +1,16 @@
-[ {
-  "id": "*",
-  "name": "something",
-  "other": null,
-  "whenModified": "*",
-  "version": 1
-}, {
-  "id": "*",
-  "name": "other",
-  "other": null,
-  "whenModified": "*",
-  "version": 1
-} ]
+[
+  {
+    "id": "*",
+    "name": "something",
+    "other": null,
+    "whenModified": "*",
+    "version": 1
+  },
+  {
+    "id": "*",
+    "name": "other",
+    "other": null,
+    "whenModified": "*",
+    "version": 1
+  }
+]

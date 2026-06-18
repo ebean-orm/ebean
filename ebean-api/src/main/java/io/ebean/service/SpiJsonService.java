@@ -1,8 +1,8 @@
 package io.ebean.service;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
+import io.avaje.json.JsonWriter;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -32,12 +32,12 @@ public interface SpiJsonService extends BootstrapService {
   /**
    * Write the nested Map/List as json to the jsonGenerator.
    */
-  void write(Object object, JsonGenerator jsonGenerator) throws IOException;
+  void write(Object object, JsonWriter jsonGenerator) throws IOException;
 
   /**
    * Write the collection as json array to the jsonGenerator.
    */
-  void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator) throws IOException;
+  void writeCollection(Collection<Object> collection, JsonWriter jsonGenerator) throws IOException;
 
   /**
    * Parse the json and return as a Map additionally specifying if the returned map should
@@ -61,17 +61,17 @@ public interface SpiJsonService extends BootstrapService {
   Map<String, Object> parseObject(Reader reader) throws IOException;
 
   /**
-   * Parse the json and return as a Map taking a JsonParser.
+   * Parse the json and return as a Map taking a JsonReader.
    */
-  Map<String, Object> parseObject(JsonParser parser) throws IOException;
+  Map<String, Object> parseObject(JsonReader parser) throws IOException;
 
   /**
-   * Parse the json and return as a Map taking a JsonParser and a starting token.
+   * Parse the json and return as a Map taking a JsonReader and a starting token.
    * <p>
    * Used when the first token is checked to see if the value is null prior to calling this.
    * </p>
    */
-  Map<String, Object> parseObject(JsonParser parser, JsonToken token) throws IOException;
+  Map<String, Object> parseObject(JsonReader parser, Token token) throws IOException;
 
   /**
    * Parse the json and return as a modify aware List.
@@ -89,14 +89,14 @@ public interface SpiJsonService extends BootstrapService {
   List<Object> parseList(Reader reader) throws IOException;
 
   /**
-   * Parse the json and return as a List taking a JsonParser.
+   * Parse the json and return as a List taking a JsonReader.
    */
-  List<Object> parseList(JsonParser parser) throws IOException;
+  List<Object> parseList(JsonReader parser) throws IOException;
 
   /**
    * Parse the json returning as a List taking into account the current token.
    */
-  <T> List<T> parseList(JsonParser parser, JsonToken currentToken) throws IOException;
+  <T> List<T> parseList(JsonReader parser, Token currentToken) throws IOException;
 
   /**
    * Parse the json and return as a List or Map.
@@ -111,7 +111,7 @@ public interface SpiJsonService extends BootstrapService {
   /**
    * Parse the json and return as a List or Map.
    */
-  Object parse(JsonParser parser) throws IOException;
+  Object parse(JsonReader parser) throws IOException;
 
   /**
    * Parse the json returning a Set that might be modify aware.
@@ -121,5 +121,5 @@ public interface SpiJsonService extends BootstrapService {
   /**
    * Parse the json returning as a Set taking into account the current token.
    */
-  <T> Set<T> parseSet(JsonParser parser, JsonToken currentToken) throws IOException;
+  <T> Set<T> parseSet(JsonReader parser, Token currentToken) throws IOException;
 }

@@ -23,6 +23,7 @@ existing Maven project. Complete the steps in order.
 | Guide | Description |
 |-------|-------------|
 | [Migrate to `Database.builder()`](migrating-to-database-builder.md) | Replace legacy `new DatabaseConfig()` and `DatabaseFactory.create(...)` code with `Database.builder()` and `DatabaseBuilder.build()`. Includes common rewrites, fluent builder equivalents, and manual-review cases for semi-automated upgrades |
+| [Migrate JSON APIs from Jackson core to avaje-json-core](migrating-json-jackson-core-to-avaje-json-core.md) | Cut over `JsonParser`/`JsonGenerator`/`JsonFactory` usage to `JsonReader`/`JsonWriter`/`JsonStream`, including `DatabaseBuilder`/`DatabaseConfig` JSON config changes and validation checklist |
 
 ## Observability
 

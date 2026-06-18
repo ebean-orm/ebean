@@ -20,10 +20,9 @@
     </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-      <optional>true</optional>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-json-core</artifactId>
+      <version>${avaje-json-core.version}</version>
     </dependency>
 
     <!-- Provided scope for Postgres JSON/JSONB support -->

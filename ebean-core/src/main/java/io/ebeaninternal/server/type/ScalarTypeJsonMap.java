@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
@@ -235,13 +235,13 @@ abstract class ScalarTypeJsonMap extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public final void jsonWrite(JsonGenerator writer, Map value) throws IOException {
+  public final void jsonWrite(JsonWriter writer, Map value) throws IOException {
     EJson.write(value, writer);
   }
 
   @Override
-  public final Map jsonRead(JsonParser parser) throws IOException {
-    return EJson.parseObject(parser, parser.getCurrentToken());
+  public final Map jsonRead(JsonReader parser) throws IOException {
+    return EJson.parseObject(parser, parser.currentToken());
   }
 
   @Override

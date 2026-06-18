@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -102,16 +102,17 @@ final class ScalarTypeFile extends ScalarTypeBase<File> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, File value) throws IOException {
-    InputStream is = getInputStream(value);
-    writer.writeBinary(is, (int) value.length());
+  public void jsonWrite(JsonWriter writer, File value) throws IOException {
+    try (InputStream is = getInputStream(value)) {
+      writer.value(is.readAllBytes());
+    }
   }
 
   @Override
-  public File jsonRead(JsonParser parser) throws IOException {
+  public File jsonRead(JsonReader parser) throws IOException {
     File tempFile = File.createTempFile(prefix, suffix, directory);
     try (OutputStream os = getOutputStream(tempFile)) {
-      parser.readBinaryValue(os);
+      os.write(parser.readBinary());
       os.flush();
     }
     return tempFile;

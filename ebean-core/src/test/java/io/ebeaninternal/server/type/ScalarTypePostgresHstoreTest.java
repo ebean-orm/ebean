@@ -1,9 +1,9 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
+import io.avaje.json.JsonWriter;
+import io.avaje.json.stream.JsonStream;
 import io.ebeaninternal.json.ModifyAwareMap;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,7 @@ public class ScalarTypePostgresHstoreTest {
 
   ScalarTypePostgresHstore hstore = new ScalarTypePostgresHstore();
 
-  JsonFactory jsonFactory = new JsonFactory();
+  JsonStream jsonStream = JsonStream.builder().build();
 
   @Test
   public void testIsMutable() {
@@ -72,25 +72,25 @@ public class ScalarTypePostgresHstoreTest {
 
   @SuppressWarnings("unchecked")
   private Map<String, Object> parseHstore(String json) throws IOException {
-    JsonParser parser = jsonFactory.createParser(json);
+    JsonReader parser = jsonStream.reader(json);
     // BeanProperty reads the first token checking for null so
     // simulate that here
-    JsonToken token = parser.nextToken();
-    assertEquals(JsonToken.START_OBJECT, token);
+    Token token = parser.currentToken();
+    assertEquals(Token.BEGIN_OBJECT, token);
     return (Map<String, Object>) hstore.jsonRead(parser);
   }
 
   private String generateJson(Map<String, Object> map) throws IOException {
 
     StringWriter writer = new StringWriter();
-    JsonGenerator generator = jsonFactory.createGenerator(writer);
+    JsonWriter generator = jsonStream.writer(writer);
     // wrap in an object to form proper json
-    generator.writeStartObject();
-    generator.writeFieldName("key");
+    generator.beginObject();
+    generator.name("key");
 
     hstore.jsonWrite(generator, map);
 
-    generator.writeEndObject();
+    generator.endObject();
     generator.flush();
 
     return writer.toString();
