@@ -184,6 +184,7 @@ database.save(customer);
 | Add PostgreSQL test container support | [add-ebean-postgres-test-container.md](guides/add-ebean-postgres-test-container.md) |
 | Generate DB migrations | [add-ebean-db-migration-generation.md](guides/add-ebean-db-migration-generation.md) |
 | Migrate JSON APIs from Jackson core to avaje-json-core | [migrating-json-jackson-core-to-avaje-json-core.md](guides/migrating-json-jackson-core-to-avaje-json-core.md) |
+| Know which `@DbJson` types need Jackson vs built-in | [dbjson-mapping-support.md](guides/dbjson-mapping-support.md) |
 | Model entity beans correctly | [entity-bean-creation.md](guides/entity-bean-creation.md) |
 | Use Lombok safely with entities | [lombok-with-ebean-entity-beans.md](guides/lombok-with-ebean-entity-beans.md) |
 | Write type-safe query bean queries | [writing-ebean-query-beans.md](guides/writing-ebean-query-beans.md) |
