@@ -320,6 +320,10 @@ public final class DefaultTypeManager implements TypeManager {
       return ScalarTypeJsonSet.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), keepSource(prop));
     }
     if (type.equals(Map.class) && isMapValueTypeObject(genericType)) {
+      Type keyType = TypeReflectHelper.getMapKeyTypeRaw(genericType);
+      if (isEnumType(keyType)) {
+        return enumJsonMapType(postgres, dbType, keyType, keepSource(prop));
+      }
       return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource(prop));
     }
     if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
@@ -336,6 +340,13 @@ public final class DefaultTypeManager implements TypeManager {
       prop.setMutationDetection(jsonManager.mutationDetection());
     }
     return prop.getMutationDetection() == MutationDetection.SOURCE;
+  }
+
+  @SuppressWarnings("unchecked")
+  private ScalarType<?> enumJsonMapType(boolean postgres, int dbType, Type keyType, boolean keepSource) {
+    Class<? extends Enum<?>> enumClass = asEnumClass(keyType);
+    ScalarType<? extends Enum<?>> enumScalarType = (ScalarType<? extends Enum<?>>) enumType(enumClass, null);
+    return ScalarTypeJsonMapEnum.typeFor(postgres, dbType, enumScalarType, keepSource);
   }
 
   private DocPropertyType docPropertyType(DeployBeanProperty prop, Class<?> type) {
@@ -560,6 +571,7 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private ScalarTypeEnum<?> enumTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
     Map<String, String> nameValueMap = new LinkedHashMap<>();
+    method.setAccessible(true);
     for (Enum<?> enumConstant : enumType.getEnumConstants()) {
       try {
         Object value = method.invoke(enumConstant);

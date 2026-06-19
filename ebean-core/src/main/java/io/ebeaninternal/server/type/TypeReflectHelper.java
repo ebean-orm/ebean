@@ -38,6 +38,14 @@ public final class TypeReflectHelper {
   }
 
   /**
+   * Return the raw type of the map key (first type argument).
+   */
+  public static Type getMapKeyTypeRaw(Type genericType) {
+    Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
+    return typeArgs[0];
+  }
+
+  /**
    * Return the value type of a collection type (list, set, map values).
    */
   public static Type getValueType(Type collectionType) {

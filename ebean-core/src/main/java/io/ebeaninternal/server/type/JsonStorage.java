@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.PostgresHelper;
@@ -39,6 +40,11 @@ interface JsonStorage {
   String read(DataReader reader) throws SQLException;
 
   /**
+   * The JDBC type reported by a ScalarType using this storage.
+   */
+  int jdbcType();
+
+  /**
    * Bind the given non-null raw JSON content.
    */
   void bind(DataBinder binder, String rawJson) throws SQLException;
@@ -52,6 +58,11 @@ interface JsonStorage {
     @Override
     public String read(DataReader reader) throws SQLException {
       return reader.getString();
+    }
+
+    @Override
+    public int jdbcType() {
+      return Types.VARCHAR;
     }
 
     @Override
@@ -69,6 +80,11 @@ interface JsonStorage {
     @Override
     public String read(DataReader reader) throws SQLException {
       return reader.getStringFromStream();
+    }
+
+    @Override
+    public int jdbcType() {
+      return Types.CLOB;
     }
 
     @Override
@@ -103,6 +119,11 @@ interface JsonStorage {
     }
 
     @Override
+    public int jdbcType() {
+      return Types.BLOB;
+    }
+
+    @Override
     public void bind(DataBinder binder, String rawJson) throws SQLException {
       binder.setBytes(rawJson.getBytes(StandardCharsets.UTF_8));
     }
@@ -115,14 +136,21 @@ interface JsonStorage {
 
   final class Postgres implements JsonStorage {
     private final String pgType;
+    private final int jdbcType;
 
     Postgres(String pgType) {
       this.pgType = pgType;
+      this.jdbcType = PostgresHelper.JSONB_TYPE.equals(pgType) ? DbPlatformType.JSONB : DbPlatformType.JSON;
     }
 
     @Override
     public String read(DataReader reader) throws SQLException {
       return reader.getString();
+    }
+
+    @Override
+    public int jdbcType() {
+      return jdbcType;
     }
 
     @Override

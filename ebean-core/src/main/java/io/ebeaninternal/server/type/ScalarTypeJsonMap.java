@@ -17,34 +17,38 @@ import java.util.Map;
  * or Postgres JSON / JSONB.
  */
 @SuppressWarnings("rawtypes")
-final class ScalarTypeJsonMap extends ScalarTypeJsonValue<Map> {
+class ScalarTypeJsonMap extends ScalarTypeJsonValue<Map> {
 
   /**
    * Return the ScalarType for the requested dbType and platform.
    */
   static ScalarTypeJsonMap typeFor(boolean postgres, int dbType, boolean keepSource) {
+    return new ScalarTypeJsonMap(storageFor(postgres, dbType), keepSource);
+  }
+
+  /**
+   * Select the storage strategy for the given dbType and platform. Shared with the
+   * enum-key Map variant.
+   */
+  static JsonStorage storageFor(boolean postgres, int dbType) {
     switch (dbType) {
       case Types.VARCHAR:
-        return new ScalarTypeJsonMap(Types.VARCHAR, JsonStorage.VARCHAR, keepSource);
+        return JsonStorage.VARCHAR;
       case Types.BLOB:
-        return new ScalarTypeJsonMap(Types.BLOB, JsonStorage.BLOB, keepSource);
+        return JsonStorage.BLOB;
       case Types.CLOB:
-        return new ScalarTypeJsonMap(Types.CLOB, JsonStorage.CLOB, keepSource);
+        return JsonStorage.CLOB;
       case DbPlatformType.JSONB:
-        return postgres
-          ? new ScalarTypeJsonMap(DbPlatformType.JSONB, JsonStorage.postgres(PostgresHelper.JSONB_TYPE), keepSource)
-          : new ScalarTypeJsonMap(Types.CLOB, JsonStorage.CLOB, keepSource);
+        return postgres ? JsonStorage.postgres(PostgresHelper.JSONB_TYPE) : JsonStorage.CLOB;
       case DbPlatformType.JSON:
-        return postgres
-          ? new ScalarTypeJsonMap(DbPlatformType.JSON, JsonStorage.postgres(PostgresHelper.JSON_TYPE), keepSource)
-          : new ScalarTypeJsonMap(Types.CLOB, JsonStorage.CLOB, keepSource);
+        return postgres ? JsonStorage.postgres(PostgresHelper.JSON_TYPE) : JsonStorage.CLOB;
       default:
         throw new IllegalStateException("Unknown dbType " + dbType);
     }
   }
 
-  private ScalarTypeJsonMap(int jdbcType, JsonStorage storage, boolean keepSource) {
-    super(Map.class, jdbcType, storage, keepSource, true, null, DocPropertyType.OBJECT);
+  ScalarTypeJsonMap(JsonStorage storage, boolean keepSource) {
+    super(Map.class, storage.jdbcType(), storage, keepSource, true, null, DocPropertyType.OBJECT);
   }
 
   @Override
