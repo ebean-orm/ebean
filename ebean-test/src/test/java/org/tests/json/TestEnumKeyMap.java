@@ -47,6 +47,9 @@ class TestEnumKeyMap extends BaseTestCase {
     Map<Status, Object> statusData;
 
     @DbJson
+    Map<Status, String> statusLabels;
+
+    @DbJson
     Map<Priority, String> priorityLabels;
 
     public EnumMapBean(Long id) {
@@ -108,6 +111,29 @@ class TestEnumKeyMap extends BaseTestCase {
     assertThat(found.priorityLabels).hasSize(3);
     assertThat(found.priorityLabels.get(Priority.LOW)).isEqualTo("Not urgent");
     assertThat(found.priorityLabels.get(Priority.HIGH)).isEqualTo("Urgent - immediate action required");
+  }
+
+  @Test
+  void testEnumKeyMapWithStringValue() {
+    EnumMapBean bean = new EnumMapBean(4L);
+
+    Map<Status, String> statusLabels = new LinkedHashMap<>();
+    statusLabels.put(Status.ACTIVE, "on");
+    statusLabels.put(Status.INACTIVE, "off");
+    bean.statusLabels = statusLabels;
+
+    DB.save(bean);
+
+    EnumMapBean found = DB.find(EnumMapBean.class, 4L);
+    assertThat(found.statusLabels).hasSize(2);
+    assertThat(found.statusLabels.get(Status.ACTIVE)).isEqualTo("on");
+    assertThat(found.statusLabels.get(Status.INACTIVE)).isEqualTo("off");
+
+    found.statusLabels.put(Status.PENDING, "wait");
+    DB.save(found);
+    assertThat(DB.find(EnumMapBean.class, 4L).statusLabels)
+      .hasSize(3)
+      .containsEntry(Status.PENDING, "wait");
   }
 
   @Test
