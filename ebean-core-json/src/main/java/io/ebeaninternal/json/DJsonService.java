@@ -3,10 +3,13 @@ package io.ebeaninternal.json;
 import io.avaje.json.JsonReader;
 import io.avaje.json.JsonReader.Token;
 import io.avaje.json.JsonWriter;
+import io.avaje.json.mapper.JsonMapper;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.service.SpiJsonService;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -16,98 +19,136 @@ import java.util.Set;
 
 /**
  * Utility that converts between JSON content and simple java Maps/Lists.
+ * <p>
+ * Backed by avaje {@link JsonMapper} using {@link EbeanJsonAdapter} which
+ * preserves Ebean's modify-aware collection and number semantics.
  */
 public final class DJsonService implements SpiJsonService {
 
+  private static final JsonStream JSON_STREAM = JsonStream.builder().build();
+  private static final JsonMapper MAPPER = JsonMapper.builder().jsonStream(JSON_STREAM).build();
+
+  private static final JsonMapper.Type<Object> PLAIN = MAPPER.type(EbeanJsonAdapter.PLAIN);
+  private static final JsonMapper.Type<Object> MODIFY_AWARE = MAPPER.type(EbeanJsonAdapter.MODIFY_AWARE);
+
+  private static JsonMapper.Type<Object> type(boolean modifyAware) {
+    return modifyAware ? MODIFY_AWARE : PLAIN;
+  }
+
+  private static boolean blank(String content) {
+    return content == null || content.trim().isEmpty();
+  }
+
+  private static String readAll(Reader reader) throws IOException {
+    StringBuilder builder = new StringBuilder();
+    char[] buffer = new char[2048];
+    int len;
+    while ((len = reader.read(buffer)) != -1) {
+      builder.append(buffer, 0, len);
+    }
+    return builder.toString();
+  }
+
   @Override
   public String write(Object object) throws IOException {
-    return EJsonWriter.write(object);
+    StringWriter writer = new StringWriter();
+    write(object, writer);
+    return writer.toString();
   }
 
   @Override
   public void write(Object object, Writer writer) throws IOException {
-    EJsonWriter.write(object, writer);
+    JsonWriter jsonWriter = JSON_STREAM.writer(writer);
+    jsonWriter.serializeNulls(true);
+    PLAIN.toJson(object, jsonWriter);
+    jsonWriter.flush();
   }
 
   @Override
   public void write(Object object, JsonWriter jsonWriter) throws IOException {
-    EJsonWriter.write(object, jsonWriter);
+    PLAIN.toJson(object, jsonWriter);
   }
 
   @Override
   public void writeCollection(Collection<Object> collection, JsonWriter jsonWriter) throws IOException {
-    EJsonWriter.writeCollection(collection, jsonWriter);
+    EbeanJsonAdapter.writeCollection(jsonWriter, collection);
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public Map<String, Object> parseObject(String json, boolean modifyAware) throws IOException {
-    return EJsonReader.parseObject(json, modifyAware);
+    return blank(json) ? null : (Map<String, Object>) type(modifyAware).fromJson(json);
   }
 
   @Override
   public Map<String, Object> parseObject(String json) throws IOException {
-    return EJsonReader.parseObject(json);
+    return parseObject(json, false);
   }
 
   @Override
   public Map<String, Object> parseObject(Reader reader, boolean modifyAware) throws IOException {
-    return EJsonReader.parseObject(reader, modifyAware);
+    return parseObject(readAll(reader), modifyAware);
   }
 
   @Override
   public Map<String, Object> parseObject(Reader reader) throws IOException {
-    return EJsonReader.parseObject(reader);
+    return parseObject(reader, false);
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public Map<String, Object> parseObject(JsonReader parser) throws IOException {
-    return EJsonReader.parseObject(parser);
+    return (Map<String, Object>) PLAIN.fromJson(parser);
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public Map<String, Object> parseObject(JsonReader parser, Token token) throws IOException {
-    return EJsonReader.parseObject(parser, token);
+    return (Map<String, Object>) EbeanJsonAdapter.read(parser, token, false);
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public <T> List<T> parseList(String json, boolean modifyAware) throws IOException {
-    return EJsonReader.parseList(json, modifyAware);
+    return blank(json) ? null : (List<T>) type(modifyAware).fromJson(json);
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public List<Object> parseList(String json) throws IOException {
-    return EJsonReader.parseList(json);
+    return (List<Object>) parseList(json, false);
   }
 
   @Override
   public List<Object> parseList(Reader reader) throws IOException {
-    return EJsonReader.parseList(reader);
+    return parseList(readAll(reader));
   }
 
   @Override
+  @SuppressWarnings("unchecked")
   public List<Object> parseList(JsonReader parser) throws IOException {
-    return EJsonReader.parseList(parser, false);
+    return (List<Object>) PLAIN.fromJson(parser);
   }
 
   @Override
   @SuppressWarnings("unchecked")
   public <T> List<T> parseList(JsonReader parser, Token currentToken) throws IOException {
-    return (List<T>) EJsonReader.parse(parser, currentToken, false);
+    return (List<T>) EbeanJsonAdapter.read(parser, currentToken, false);
   }
 
   @Override
   public Object parse(String json) throws IOException {
-    return EJsonReader.parse(json);
+    return blank(json) ? null : PLAIN.fromJson(json);
   }
 
   @Override
   public Object parse(Reader reader) throws IOException {
-    return EJsonReader.parse(reader);
+    return parse(readAll(reader));
   }
 
   @Override
   public Object parse(JsonReader parser) throws IOException {
-    return EJsonReader.parse(parser);
+    return PLAIN.fromJson(parser);
   }
 
   @Override
