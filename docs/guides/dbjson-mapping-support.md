@@ -71,7 +71,7 @@ requires `ebean-jackson-mapper`:
 - **Non-`String`/non-enum map keys** — for example `Map<Integer,Object>`, `Map<UUID,String>`.
 - **POJOs, records, and any other custom type.**
 
-> **Jackson marker annotation override:** if the property type carries a Jackson annotation
+> **Jackson marker annotation override:** if the **field or getter** carries a Jackson annotation
 > (anything meta-annotated with `com.fasterxml.jackson.annotation.JacksonAnnotation`), Ebean
 > uses the `ObjectMapper` path even when the type would otherwise be handled built-in.
 
