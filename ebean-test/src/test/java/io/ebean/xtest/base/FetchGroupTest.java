@@ -31,7 +31,7 @@ public class FetchGroupTest extends BaseTestCase {
 
     query.findList();
 
-    assertThat(sqlOf(query)).contains("select /* hello */ t0.id, t0.name, t0.status from");
+    assertThat(sqlOf(query)).contains("select /* Customer.hello */ t0.id, t0.name, t0.status from");
   }
 
 

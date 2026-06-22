@@ -212,7 +212,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSql.stop();
-    assertSql(sql.get(0)).contains("select /*+ SomeHint */ /* explicitId */ t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+    assertSql(sql.get(0)).contains("select /*+ SomeHint */ /* Contact.explicitId */ t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
       + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
   }
 
@@ -298,11 +298,11 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     List<String> sql = LoggedSql.stop();
 
     if (isSqlServer()) {
-      assertSql(sql.get(0)).contains("select /* emailFullName */ top 10 t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+      assertSql(sql.get(0)).contains("select /* Contact.emailFullName */ top 10 t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
         + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
 
     } else {
-      assertSql(sql.get(0)).contains("select /* emailFullName */ t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+      assertSql(sql.get(0)).contains("select /* Contact.emailFullName */ t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
         + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
     }
   }
