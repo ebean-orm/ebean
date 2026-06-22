@@ -1,7 +1,7 @@
 package io.ebean.pgvector;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -85,12 +85,12 @@ abstract class ScalarTypePGbase<T extends PGobject> implements ScalarType<T> {
   }
 
   @Override
-  public T jsonRead(JsonParser parser) {
+  public T jsonRead(JsonReader parser) {
     return null;
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, T value) {
+  public void jsonWrite(JsonWriter writer, T value) {
 
   }
 }

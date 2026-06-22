@@ -319,7 +319,11 @@ public final class DefaultTypeManager implements TypeManager {
     if (type.equals(Set.class) && isValueTypeSimple(genericType)) {
       return ScalarTypeJsonSet.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), keepSource(prop));
     }
-    if (type.equals(Map.class) && isMapValueTypeObject(genericType)) {
+    if (type.equals(Map.class) && isBuiltinJsonMap(genericType)) {
+      Type keyType = TypeReflectHelper.getMapKeyTypeRaw(genericType);
+      if (isEnumType(keyType)) {
+        return enumJsonMapType(postgres, dbType, keyType, keepSource(prop));
+      }
       return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource(prop));
     }
     if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
@@ -336,6 +340,13 @@ public final class DefaultTypeManager implements TypeManager {
       prop.setMutationDetection(jsonManager.mutationDetection());
     }
     return prop.getMutationDetection() == MutationDetection.SOURCE;
+  }
+
+  @SuppressWarnings("unchecked")
+  private ScalarType<?> enumJsonMapType(boolean postgres, int dbType, Type keyType, boolean keepSource) {
+    Class<? extends Enum<?>> enumClass = asEnumClass(keyType);
+    ScalarType<? extends Enum<?>> enumScalarType = (ScalarType<? extends Enum<?>>) enumType(enumClass, null);
+    return ScalarTypeJsonMapEnum.typeFor(postgres, dbType, enumScalarType, keepSource);
   }
 
   private DocPropertyType docPropertyType(DeployBeanProperty prop, Class<?> type) {
@@ -365,11 +376,24 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   /**
-   * Return true if value parameter type of the map is Object.
+   * Return true if the Map is handled by the built-in JSON support: a String or enum key
+   * with a String, Object or wildcard value. Such values round-trip through EJson without
+   * type coercion. Other maps (typed values, or non-String/enum keys) use the object mapper.
    */
-  private boolean isMapValueTypeObject(Type genericType) {
+  private boolean isBuiltinJsonMap(Type genericType) {
+    if (!(genericType instanceof ParameterizedType)) {
+      return false;
+    }
     Type[] typeArgs = ((ParameterizedType) genericType).getActualTypeArguments();
-    return Object.class.equals(typeArgs[1]) || "?".equals(typeArgs[1].toString());
+    return isJsonMapKeyType(typeArgs[0]) && isJsonMapValueType(typeArgs[1]);
+  }
+
+  private boolean isJsonMapKeyType(Type keyType) {
+    return String.class.equals(keyType) || isEnumType(keyType);
+  }
+
+  private boolean isJsonMapValueType(Type valueType) {
+    return Object.class.equals(valueType) || String.class.equals(valueType) || "?".equals(valueType.toString());
   }
 
   private ScalarType<?> createJsonObjectMapperType(DeployBeanProperty prop, int dbType, DocPropertyType docType) {
@@ -560,6 +584,7 @@ public final class DefaultTypeManager implements TypeManager {
    */
   private ScalarTypeEnum<?> enumTypeDbValue(Class<? extends Enum<?>> enumType, Method method, boolean integerType, int length, boolean withConstraint) {
     Map<String, String> nameValueMap = new LinkedHashMap<>();
+    method.setAccessible(true);
     for (Enum<?> enumConstant : enumType.getEnumConstants()) {
       try {
         Object value = method.invoke(enumConstant);

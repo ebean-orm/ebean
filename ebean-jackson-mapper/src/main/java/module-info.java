@@ -2,6 +2,7 @@ import io.ebean.jackson.mapper.ScalarJsonJacksonMapper;
 
 module io.ebean.jackson.mapper {
 
+  requires io.avaje.json;
   requires io.ebean.core.type;
   requires com.fasterxml.jackson.annotation;
   requires com.fasterxml.jackson.core;

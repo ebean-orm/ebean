@@ -5,8 +5,8 @@ import java.io.DataOutput;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
@@ -84,12 +84,12 @@ class ScalarTypeNotFound implements ScalarType<Void> {
   }
 
   @Override
-  public Void jsonRead(JsonParser parser) throws IOException {
+  public Void jsonRead(JsonReader parser) throws IOException {
     throw new UnsupportedOperationException();
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, Void value) throws IOException {
+  public void jsonWrite(JsonWriter writer, Void value) throws IOException {
     throw new UnsupportedOperationException();
   }
 

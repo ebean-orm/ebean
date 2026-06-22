@@ -1,9 +1,7 @@
 [ {
   "name": "something",
-  "other": null,
   "version": 1
 }, {
   "name": "other",
-  "other": null,
   "version": 1
 } ]

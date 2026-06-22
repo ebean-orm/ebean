@@ -1,190 +1,170 @@
 package io.ebeaninternal.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
+import io.avaje.json.JsonWriter;
+import io.avaje.json.mapper.JsonMapper;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.service.SpiJsonService;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
-import java.util.*;
+import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Utility that converts between JSON content and simple java Maps/Lists.
+ * <p>
+ * Backed by avaje {@link JsonMapper} using {@link EbeanJsonAdapter} which
+ * preserves Ebean's modify-aware collection and number semantics.
  */
 public final class DJsonService implements SpiJsonService {
 
-  /**
-   * Write the nested Map/List as json.
-   */
+  private static final JsonStream JSON_STREAM = JsonStream.builder().build();
+  private static final JsonMapper MAPPER = JsonMapper.builder().jsonStream(JSON_STREAM).build();
+
+  private static final JsonMapper.Type<Object> PLAIN = MAPPER.type(EbeanJsonAdapter.PLAIN);
+  private static final JsonMapper.Type<Object> MODIFY_AWARE = MAPPER.type(EbeanJsonAdapter.MODIFY_AWARE);
+
+  private static JsonMapper.Type<Object> type(boolean modifyAware) {
+    return modifyAware ? MODIFY_AWARE : PLAIN;
+  }
+
+  private static boolean blank(String content) {
+    return content == null || content.trim().isEmpty();
+  }
+
+  private static String readAll(Reader reader) throws IOException {
+    StringBuilder builder = new StringBuilder();
+    char[] buffer = new char[2048];
+    int len;
+    while ((len = reader.read(buffer)) != -1) {
+      builder.append(buffer, 0, len);
+    }
+    return builder.toString();
+  }
+
   @Override
   public String write(Object object) throws IOException {
-    return EJsonWriter.write(object);
+    StringWriter writer = new StringWriter();
+    write(object, writer);
+    return writer.toString();
   }
 
-  /**
-   * Write the nested Map/List as json to the writer.
-   */
   @Override
   public void write(Object object, Writer writer) throws IOException {
-    EJsonWriter.write(object, writer);
+    JsonWriter jsonWriter = JSON_STREAM.writer(writer);
+    jsonWriter.serializeNulls(true);
+    PLAIN.toJson(object, jsonWriter);
+    jsonWriter.flush();
   }
 
-  /**
-   * Write the nested Map/List as json to the jsonGenerator.
-   */
   @Override
-  public void write(Object object, JsonGenerator jsonGenerator) throws IOException {
-    EJsonWriter.write(object, jsonGenerator);
+  public void write(Object object, JsonWriter jsonWriter) throws IOException {
+    PLAIN.toJson(object, jsonWriter);
   }
 
-  /**
-   * Write the collection as json array to the jsonGenerator.
-   */
   @Override
-  public void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator) throws IOException {
-    EJsonWriter.writeCollection(collection, jsonGenerator);
+  public void writeCollection(Collection<Object> collection, JsonWriter jsonWriter) throws IOException {
+    EbeanJsonAdapter.writeCollection(jsonWriter, collection);
   }
 
-  /**
-   * Parse the json and return as a Map additionally specifying if the returned map should be modify
-   * aware meaning that it can detect when it has been modified.
-   */
-  @Override
-  public Map<String, Object> parseObject(String json, boolean modifyAware) throws IOException {
-    return EJsonReader.parseObject(json, modifyAware);
-  }
-
-  /**
-   * Parse the json and return as a Map.
-   */
-  @Override
-  public Map<String, Object> parseObject(String json) throws IOException {
-    return EJsonReader.parseObject(json);
-  }
-
-  /**
-   * Parse the json and return as a Map taking a reader.
-   */
-  @Override
-  public Map<String, Object> parseObject(Reader reader, boolean modifyAware) throws IOException {
-    return EJsonReader.parseObject(reader, modifyAware);
-  }
-
-  /**
-   * Parse the json and return as a Map taking a reader.
-   */
-  @Override
-  public Map<String, Object> parseObject(Reader reader) throws IOException {
-    return EJsonReader.parseObject(reader);
-  }
-
-  /**
-   * Parse the json and return as a Map taking a JsonParser.
-   */
-  @Override
-  public Map<String, Object> parseObject(JsonParser parser) throws IOException {
-    return EJsonReader.parseObject(parser);
-  }
-
-  /**
-   * Parse the json and return as a Map taking a JsonParser and a starting token.
-   *
-   * <p>Used when the first token is checked to see if the value is null prior to calling this.
-   */
-  @Override
-  public Map<String, Object> parseObject(JsonParser parser, JsonToken token) throws IOException {
-    return EJsonReader.parseObject(parser, token);
-  }
-
-  /**
-   * Parse the json and return as a modify aware List.
-   */
-  @Override
-  public <T> List<T> parseList(String json, boolean modifyAware) throws IOException {
-    return EJsonReader.parseList(json, modifyAware);
-  }
-
-  /**
-   * Parse the json and return as a List.
-   */
-  @Override
-  public List<Object> parseList(String json) throws IOException {
-    return EJsonReader.parseList(json);
-  }
-
-  /**
-   * Parse the json and return as a List taking a Reader.
-   */
-  @Override
-  public List<Object> parseList(Reader reader) throws IOException {
-    return EJsonReader.parseList(reader);
-  }
-
-  /**
-   * Parse the json and return as a List taking a JsonParser.
-   */
-  @Override
-  public List<Object> parseList(JsonParser parser) throws IOException {
-    return EJsonReader.parseList(parser, false);
-  }
-
-  /**
-   * Parse the json returning as a List taking into account the current token.
-   */
   @Override
   @SuppressWarnings("unchecked")
-  public <T> List<T> parseList(JsonParser parser, JsonToken currentToken) throws IOException {
-    return (List<T>) EJsonReader.parse(parser, currentToken, false);
+  public Map<String, Object> parseObject(String json, boolean modifyAware) throws IOException {
+    return blank(json) ? null : (Map<String, Object>) type(modifyAware).fromJson(json);
   }
 
-  /**
-   * Parse the json and return as a List or Map.
-   */
+  @Override
+  public Map<String, Object> parseObject(String json) throws IOException {
+    return parseObject(json, false);
+  }
+
+  @Override
+  public Map<String, Object> parseObject(Reader reader, boolean modifyAware) throws IOException {
+    return parseObject(readAll(reader), modifyAware);
+  }
+
+  @Override
+  public Map<String, Object> parseObject(Reader reader) throws IOException {
+    return parseObject(reader, false);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> parseObject(JsonReader parser) throws IOException {
+    return (Map<String, Object>) PLAIN.fromJson(parser);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public Map<String, Object> parseObject(JsonReader parser, Token token) throws IOException {
+    return (Map<String, Object>) EbeanJsonAdapter.read(parser, token, false);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> List<T> parseList(String json, boolean modifyAware) throws IOException {
+    return blank(json) ? null : (List<T>) type(modifyAware).fromJson(json);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<Object> parseList(String json) throws IOException {
+    return (List<Object>) parseList(json, false);
+  }
+
+  @Override
+  public List<Object> parseList(Reader reader) throws IOException {
+    return parseList(readAll(reader));
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public List<Object> parseList(JsonReader parser) throws IOException {
+    return (List<Object>) PLAIN.fromJson(parser);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public <T> List<T> parseList(JsonReader parser, Token currentToken) throws IOException {
+    return (List<T>) EbeanJsonAdapter.read(parser, currentToken, false);
+  }
+
   @Override
   public Object parse(String json) throws IOException {
-    return EJsonReader.parse(json);
+    return blank(json) ? null : PLAIN.fromJson(json);
   }
 
-  /**
-   * Parse the json and return as a List or Map.
-   */
   @Override
   public Object parse(Reader reader) throws IOException {
-    return EJsonReader.parse(reader);
+    return parse(readAll(reader));
   }
 
-  /**
-   * Parse the json and return as a List or Map.
-   */
   @Override
-  public Object parse(JsonParser parser) throws IOException {
-    return EJsonReader.parse(parser);
+  public Object parse(JsonReader parser) throws IOException {
+    return PLAIN.fromJson(parser);
   }
 
-  /**
-   * Parse the json returning a Set that might be modify aware.
-   */
   @Override
   public <T> Set<T> parseSet(String json, boolean modifyAware) throws IOException {
     List<T> list = parseList(json, modifyAware);
     if (list == null) {
       return null;
     }
-
     if (modifyAware) {
       return ((ModifyAwareList<T>) list).asSet();
-    } else {
-      return new LinkedHashSet<>(list);
     }
+    return new LinkedHashSet<>(list);
   }
 
-  /**
-   * Parse the json returning as a Set taking into account the current token.
-   */
   @Override
-  public <T> Set<T> parseSet(JsonParser parser, JsonToken currentToken) throws IOException {
+  public <T> Set<T> parseSet(JsonReader parser, Token currentToken) throws IOException {
     return new LinkedHashSet<>(parseList(parser, currentToken));
   }
 }

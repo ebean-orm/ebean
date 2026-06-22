@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import io.avaje.json.JsonWriter;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.server.type.TypeManager;
 
@@ -19,21 +19,18 @@ public final class DJsonScalar {
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  public void write(JsonGenerator gen, Object value) throws IOException {
+  public void write(JsonWriter gen, Object value) throws IOException {
     if (value instanceof String) {
-      gen.writeString((String) value);
+      gen.value((String) value);
 
     } else if (value instanceof List) {
       // expected for @DbArray values
       List list = (List)value;
-      gen.writeRaw('[');
+      gen.beginArray();
       for (int i = 0; i < list.size(); i++) {
-        if (i > 0) {
-          gen.writeRaw(',');
-        }
         write(gen, list.get(i));
       }
-      gen.writeRaw(']');
+      gen.endArray();
 
     } else {
       ScalarType scalarType = typeManager.type(value.getClass());

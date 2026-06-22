@@ -102,8 +102,8 @@ public class DbJson {
     public PrettyJson replace(String... propertyNames) {
       for (String propertyName : propertyNames) {
         String placeholder = "\"" + propertyName + "\": " + placeHolder;
-        rawJson = rawJson.replaceAll("\"" + propertyName + "\": (\\d+)", placeholder);
-        rawJson = rawJson.replaceAll("\"" + propertyName + "\": \"(.*?)\"", placeholder);
+        rawJson = rawJson.replaceAll("\"" + propertyName + "\":\\s*(\\d+)", placeholder);
+        rawJson = rawJson.replaceAll("\"" + propertyName + "\":\\s*\"(.*?)\"", placeholder);
       }
       return this;
     }
@@ -134,7 +134,9 @@ public class DbJson {
      * Normalise line ending characters to just use new line.
      */
     private String lineEnd(String content) {
-      return content.replace("\r\n", "\n");
+      return content
+        .replace("\r\n", "\n")
+        .replaceAll("\"([^\"]+)\":\\s+", "\"$1\": ");
     }
 
     /**

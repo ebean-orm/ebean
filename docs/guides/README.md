@@ -23,6 +23,7 @@ existing Maven project. Complete the steps in order.
 | Guide | Description |
 |-------|-------------|
 | [Migrate to `Database.builder()`](migrating-to-database-builder.md) | Replace legacy `new DatabaseConfig()` and `DatabaseFactory.create(...)` code with `Database.builder()` and `DatabaseBuilder.build()`. Includes common rewrites, fluent builder equivalents, and manual-review cases for semi-automated upgrades |
+| [Migrate JSON APIs from Jackson core to avaje-json-core](migrating-json-jackson-core-to-avaje-json-core.md) | Cut over `JsonParser`/`JsonGenerator`/`JsonFactory` usage to `JsonReader`/`JsonWriter`/`JsonStream`, including `DatabaseBuilder`/`DatabaseConfig` JSON config changes and validation checklist |
 
 ## Observability
 
@@ -38,6 +39,7 @@ existing Maven project. Complete the steps in order.
 |-------|-------------|
 | [Entity Bean Creation](entity-bean-creation.md) | How to generate clean, idiomatic Ebean entity beans for AI agents; patterns and anti-patterns; field visibility and accessor guidance; minimal boilerplate |
 | [Lombok with Ebean entity beans](lombok-with-ebean-entity-beans.md) | Which Lombok annotations to use and avoid on entity beans; why `@Data` is incompatible with Ebean; how to use `@Getter` + `@Setter` + `@Accessors(chain = true)` |
+| [`@DbJson` mapping support (built-in vs Jackson)](dbjson-mapping-support.md) | Which `@DbJson` / `@DbJsonB` property types are handled by the built-in avaje-json-core support versus which require `ebean-jackson-mapper` (Jackson `ObjectMapper`); supported `String`/`List`/`Set`/`Map` matrix; enum-key and `@DbArray` notes |
 
 ## Querying
 

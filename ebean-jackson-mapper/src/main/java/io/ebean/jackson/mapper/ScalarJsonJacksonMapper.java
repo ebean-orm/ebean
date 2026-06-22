@@ -1,13 +1,13 @@
 package io.ebean.jackson.mapper;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass;
 import com.fasterxml.jackson.databind.introspect.AnnotatedField;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.core.type.*;
 import io.ebean.text.TextException;
@@ -221,13 +221,20 @@ public final class ScalarJsonJacksonMapper implements ScalarJsonMapper {
     }
 
     @Override
-    public final T jsonRead(JsonParser parser) throws IOException {
-      return objectReader.readValue(parser, deserType);
+    public final T jsonRead(JsonReader parser) throws IOException {
+      if (parser.isNullValue()) {
+        return null;
+      }
+      return objectReader.readValue(parser.readRaw(), deserType);
     }
 
     @Override
-    public final void jsonWrite(JsonGenerator writer, T value) throws IOException {
-      objectWriter.writeValue(writer, value);
+    public final void jsonWrite(JsonWriter writer, T value) throws IOException {
+      if (value == null) {
+        writer.nullValue();
+      } else {
+        writer.rawValue(objectWriter.writeValueAsString(value));
+      }
     }
 
     @Override

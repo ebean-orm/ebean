@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarTypeBase;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 
 import jakarta.persistence.EnumType;
 import java.io.DataInput;
@@ -228,20 +228,19 @@ final class ScalarTypeEnumStandard {
     }
 
     @Override
-    public Object jsonRead(JsonParser parser) throws IOException {
-      if (parser.getCodec() != null) {
-        return parser.readValueAs(enumType);
-      } else {
-        return parse(parser.getValueAsString());
+    public Object jsonRead(JsonReader parser) throws IOException {
+      if (parser.isNullValue()) {
+        return null;
       }
+      return parse(parser.readString());
     }
 
     @Override
-    public void jsonWrite(JsonGenerator writer, Object value) throws IOException {
-      if (writer.getCodec() != null) {
-        writer.writeObject(value);
+    public void jsonWrite(JsonWriter writer, Object value) throws IOException {
+      if (value == null) {
+        writer.nullValue();
       } else {
-        writer.writeString(formatValue(value));
+        writer.value(formatValue(value));
       }
     }
 

@@ -792,10 +792,17 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   private BeanChange updateBeanChange(PersistRequestBean<T> request) {
     try {
-      BeanChangeJson changeJson = new BeanChangeJson(this, request.isStatelessUpdate());
-      request.intercept().addDirtyPropertyValues(changeJson);
-      changeJson.flush();
-      return beanChange(ChangeType.UPDATE, request.beanId(), changeJson.newJson(), changeJson.oldJson());
+      BeanChangeJson newValues = new BeanChangeJson(this, true);
+      request.intercept().addDirtyPropertyValues(newValues);
+      newValues.flush();
+      String oldData = null;
+      if (!request.isStatelessUpdate()) {
+        BeanChangeJson oldValues = new BeanChangeJson(this, false);
+        request.intercept().addDirtyPropertyValues(oldValues);
+        oldValues.flush();
+        oldData = oldValues.json();
+      }
+      return beanChange(ChangeType.UPDATE, request.beanId(), newValues.json(), oldData);
     } catch (RuntimeException e) {
       log.log(ERROR, "Failed to write ChangeLog entry for update", e);
       return null;

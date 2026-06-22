@@ -138,14 +138,6 @@
 <!--      <optional>true</optional>-->
 <!--    </dependency>-->
 
-    <!-- Jackson core used internally by Ebean -->
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-      <optional>true</optional>
-    </dependency>
-
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>

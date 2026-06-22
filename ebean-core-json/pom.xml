@@ -19,12 +19,10 @@
       <version>16.11.1</version>
     </dependency>
 
-    <!-- Jackson core used internally by Ebean -->
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-      <optional>true</optional>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-json-core</artifactId>
+      <version>${avaje-json-core.version}</version>
     </dependency>
 
   </dependencies>

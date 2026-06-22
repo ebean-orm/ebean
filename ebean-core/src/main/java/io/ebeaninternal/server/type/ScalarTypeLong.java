@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -87,13 +87,13 @@ final class ScalarTypeLong extends ScalarTypeBase<Long> {
   }
 
   @Override
-  public Long jsonRead(JsonParser parser) throws IOException {
-    return parser.getLongValue();
+  public Long jsonRead(JsonReader parser) throws IOException {
+    return parser.readLong();
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, Long value) throws IOException {
-    writer.writeNumber(value);
+  public void jsonWrite(JsonWriter writer, Long value) throws IOException {
+    writer.value(value);
   }
 
   @Override
