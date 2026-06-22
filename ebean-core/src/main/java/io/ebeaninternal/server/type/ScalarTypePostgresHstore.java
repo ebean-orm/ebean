@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
@@ -102,16 +102,16 @@ final class ScalarTypePostgresHstore extends ScalarTypeBase<Map> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, Map value) throws IOException {
+  public void jsonWrite(JsonWriter writer, Map value) throws IOException {
     EJson.write(value, writer);
   }
 
   @Override
-  public Map jsonRead(JsonParser parser) throws IOException {
+  public Map jsonRead(JsonReader parser) throws IOException {
     // at this point the BeanProperty has read the START_OBJECT token
     // to check for a null value. Pass the START_OBJECT token through to
     // the EJson parsing so that it knows the first token has been read
-    return EJson.parseObject(parser, parser.getCurrentToken());
+    return EJson.parseObject(parser, parser.currentToken());
   }
 
   @Override

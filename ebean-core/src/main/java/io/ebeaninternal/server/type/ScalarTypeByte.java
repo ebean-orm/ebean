@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -9,7 +9,6 @@ import io.ebean.core.type.ScalarTypeBase;
 import io.ebean.text.TextException;
 import io.ebean.core.type.BasicTypeConverter;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
@@ -55,15 +54,13 @@ final class ScalarTypeByte extends ScalarTypeBase<Byte> {
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, Byte value) throws IOException {
-    writer.writeBinary(new byte[]{value});
+  public void jsonWrite(JsonWriter writer, Byte value) throws IOException {
+    writer.value(new byte[]{value});
   }
 
   @Override
-  public Byte jsonRead(JsonParser parser) throws IOException {
-    ByteArrayOutputStream os = new ByteArrayOutputStream();
-    parser.readBinaryValue(os);
-    byte[] bytes = os.toByteArray();
+  public Byte jsonRead(JsonReader parser) throws IOException {
+    byte[] bytes = parser.readBinary();
     if (bytes.length == 0) {
       return null;
     } else {

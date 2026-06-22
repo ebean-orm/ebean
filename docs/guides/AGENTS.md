@@ -12,6 +12,7 @@ Key guides (fetch and follow when performing the relevant task):
 - Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md
 - Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
 - Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
+- Migrate JSON APIs from Jackson core to avaje-json-core: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-json-jackson-core-to-avaje-json-core.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Query metrics and naming: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/ebean-query-metrics.md

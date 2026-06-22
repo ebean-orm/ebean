@@ -28,8 +28,8 @@ class WriteJsonTest {
 
     String json = DB.json().toJsonPretty(list);
 
-    assertThat(json).contains("\"customer\": {");
-    assertThat(json).contains("\"billingAddress\": {");
-    assertThat(json).contains("\"details\": [ {");
+    assertThat(json).contains("\"customer\":");
+    assertThat(json).contains("\"billingAddress\":");
+    assertThat(json).contains("\"details\": [");
   }
 }

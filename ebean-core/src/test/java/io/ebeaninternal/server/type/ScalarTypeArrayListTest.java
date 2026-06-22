@@ -1,8 +1,7 @@
 package io.ebeaninternal.server.type;
 
-
-import com.fasterxml.jackson.core.JsonParser;
-import io.ebean.DB;
+import io.avaje.json.JsonReader;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarType;
 import io.ebean.text.json.EJson;
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -143,9 +141,10 @@ public class ScalarTypeArrayListTest extends BasePlatformArrayTypeFactoryTest {
     input.add(UUID.randomUUID());
     String asJson = EJson.write(input);
 
-    JsonParser parser = DB.json().createParser(new StringReader(asJson));
-
-    Object parsed = scalarType.jsonRead(parser);
-    assertThat(parsed).isEqualTo(input);
+    try (JsonReader parser = JsonStream.builder().build().reader(asJson)) {
+      parser.beginArray();
+      Object parsed = scalarType.jsonRead(parser);
+      assertThat(parsed).isEqualTo(input);
+    }
   }
 }

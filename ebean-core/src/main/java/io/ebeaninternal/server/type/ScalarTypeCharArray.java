@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarTypeBaseVarchar;
@@ -72,7 +72,7 @@ final class ScalarTypeCharArray extends ScalarTypeBaseVarchar<char[]> {
   }
 
   @Override
-  public char[] jsonRead(JsonParser parser) throws IOException {
-    return parser.getValueAsString().toCharArray();
+  public char[] jsonRead(JsonReader parser) throws IOException {
+    return parser.readString().toCharArray();
   }
 }

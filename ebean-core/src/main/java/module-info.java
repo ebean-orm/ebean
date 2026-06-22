@@ -25,12 +25,12 @@ module io.ebean.core {
   requires transitive io.ebean.ddl.runner;
   requires io.avaje.classpath.scanner.api;
   requires io.avaje.classpath.scanner;
+  requires io.avaje.json;
   requires io.ebean.types;
 
   requires static io.avaje.jsr305x;
   requires static io.ebean.core.json;
   requires static com.fasterxml.jackson.annotation;
-  requires static com.fasterxml.jackson.core;
   requires static com.fasterxml.jackson.databind;
   requires static jakarta.validation;
   requires static jakarta.transaction;

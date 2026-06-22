@@ -2,8 +2,11 @@ package io.ebeaninternal.server.deploy;
 
 import io.ebean.PersistenceIOException;
 import io.ebean.bean.BeanDiffVisitor;
+import io.ebean.config.JsonConfig;
 import io.ebeaninternal.api.json.SpiJsonWriter;
+import io.ebeaninternal.server.json.WriteJson;
 import io.ebeaninternal.server.util.ArrayStack;
+import io.avaje.json.stream.JsonStream;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -13,26 +16,18 @@ import java.io.StringWriter;
  */
 final class BeanChangeJson implements BeanDiffVisitor {
 
-  private final StringWriter newData;
-  private final StringWriter oldData;
-  private final SpiJsonWriter newJson;
-  private final SpiJsonWriter oldJson;
+  private final StringWriter data;
+  private final SpiJsonWriter json;
+  private final boolean writeNew;
   private final ArrayStack<BeanDescriptor<?>> stack = new ArrayStack<>();
   private BeanDescriptor<?> descriptor;
 
-  BeanChangeJson(BeanDescriptor<?> descriptor, boolean statelessUpdate) {
+  BeanChangeJson(BeanDescriptor<?> descriptor, boolean writeNew) {
     this.descriptor = descriptor;
-    this.newData = new StringWriter(200);
-    this.newJson = descriptor.createJsonWriter(newData);
-    newJson.writeStartObject();
-    if (statelessUpdate) {
-      this.oldJson = null;
-      this.oldData = null;
-    } else {
-      this.oldData = new StringWriter(200);
-      this.oldJson = descriptor.createJsonWriter(oldData);
-      oldJson.writeStartObject();
-    }
+    this.writeNew = writeNew;
+    this.data = new StringWriter(200);
+    this.json = new WriteJson(JsonStream.builder().build().writer(data), JsonConfig.Include.ALL);
+    json.writeStartObject();
   }
 
   @Override
@@ -40,10 +35,7 @@ final class BeanChangeJson implements BeanDiffVisitor {
     try {
       BeanProperty prop = descriptor.propertiesIndex[position];
       if (prop.isDbUpdatable()) {
-        prop.jsonWriteValue(newJson, newVal);
-        if (oldJson != null) {
-          prop.jsonWriteValue(oldJson, oldVal);
-        }
+        prop.jsonWriteValue(json, writeNew ? newVal : oldVal);
       }
     } catch (IOException e) {
       throw new PersistenceIOException(e);
@@ -55,18 +47,12 @@ final class BeanChangeJson implements BeanDiffVisitor {
     stack.push(descriptor);
     BeanPropertyAssocOne<?> embedded = (BeanPropertyAssocOne<?>)descriptor.propertiesIndex[position];
     descriptor = embedded.targetDescriptor();
-    newJson.writeStartObject(embedded.name());
-    if (oldJson != null) {
-      oldJson.writeStartObject(embedded.name());
-    }
+    json.writeStartObject(embedded.name());
   }
 
   @Override
   public void visitPop() {
-    newJson.writeEndObject();
-    if (oldJson != null) {
-      oldJson.writeEndObject();
-    }
+    json.writeEndObject();
     descriptor = stack.pop();
   }
 
@@ -75,28 +61,14 @@ final class BeanChangeJson implements BeanDiffVisitor {
    */
   void flush() {
     try {
-      newJson.writeEndObject();
-      newJson.flush();
-      if (oldJson != null) {
-        oldJson.writeEndObject();
-        oldJson.flush();
-      }
+      json.writeEndObject();
+      json.flush();
     } catch (IOException e) {
       throw new PersistenceIOException(e);
     }
   }
 
-  /**
-   * Return the new values JSON.
-   */
-  String newJson() {
-    return newData.toString();
-  }
-
-  /**
-   * Return the old values JSON.
-   */
-  String oldJson() {
-    return oldData == null ? null : oldData.toString();
+  String json() {
+    return data.toString();
   }
 }

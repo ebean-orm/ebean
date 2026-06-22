@@ -1,8 +1,8 @@
 package io.ebeaninternal.api.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.PersistenceContext;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
@@ -14,7 +14,9 @@ public interface SpiJsonReader {
 
   PersistenceContext persistenceContext();
 
-  SpiJsonReader forJson(JsonParser moreJson);
+  SpiJsonReader forJson(JsonReader moreJson);
+
+  SpiJsonReader forJson(String moreJson);
 
   <T> void persistenceContextPut(Object beanId, T currentBean);
 
@@ -22,9 +24,9 @@ public interface SpiJsonReader {
 
   ObjectMapper mapper();
 
-  JsonParser parser();
+  JsonReader parser();
 
-  JsonToken nextToken() throws IOException;
+  Token nextToken() throws IOException;
 
   void pushPath(String path);
 

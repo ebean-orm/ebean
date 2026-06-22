@@ -1,7 +1,7 @@
 package io.ebean.config;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import io.avaje.config.Config;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.*;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.PersistBatch;
@@ -406,7 +406,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    * The default PersistenceContextScope used if one is not explicitly set on a query.
    */
   private PersistenceContextScope persistenceContextScope = PersistenceContextScope.TRANSACTION;
-  private JsonFactory jsonFactory;
+  private JsonStream jsonStream;
   private boolean localTimeWithNanos;
   private boolean durationWithNanos;
   private int maxCallStack = 5;
@@ -617,13 +617,13 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public JsonFactory getJsonFactory() {
-    return jsonFactory;
+  public JsonStream getJsonStream() {
+    return jsonStream;
   }
 
   @Override
-  public DatabaseConfig setJsonFactory(JsonFactory jsonFactory) {
-    this.jsonFactory = jsonFactory;
+  public DatabaseConfig setJsonStream(JsonStream jsonStream) {
+    this.jsonStream = jsonStream;
     return this;
   }
 

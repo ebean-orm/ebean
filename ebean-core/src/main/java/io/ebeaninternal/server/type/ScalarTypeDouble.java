@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -77,13 +77,13 @@ final class ScalarTypeDouble extends ScalarTypeBase<Double> {
   }
 
   @Override
-  public Double jsonRead(JsonParser parser) throws IOException {
-    return parser.getDoubleValue();
+  public Double jsonRead(JsonReader parser) throws IOException {
+    return parser.readDouble();
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, Double value) throws IOException {
-    writer.writeNumber(value);
+  public void jsonWrite(JsonWriter writer, Double value) throws IOException {
+    writer.value(value);
   }
 
   @Override

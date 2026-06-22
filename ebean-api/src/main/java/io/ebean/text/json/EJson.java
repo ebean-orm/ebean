@@ -1,8 +1,7 @@
 package io.ebean.text.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
 import io.ebean.XBootstrapService;
 import io.ebean.service.SpiJsonService;
 
@@ -38,14 +37,14 @@ public class EJson {
   /**
    * Write the nested Map/List as json to the jsonGenerator.
    */
-  public static void write(Object object, JsonGenerator jsonGenerator) throws IOException {
+  public static void write(Object object, io.avaje.json.JsonWriter jsonGenerator) throws IOException {
     plugin.write(object, jsonGenerator);
   }
 
   /**
    * Write the collection as json array to the jsonGenerator.
    */
-  public static void writeCollection(Collection<Object> collection, JsonGenerator jsonGenerator) throws IOException {
+  public static void writeCollection(Collection<Object> collection, io.avaje.json.JsonWriter jsonGenerator) throws IOException {
     plugin.writeCollection(collection, jsonGenerator);
   }
 
@@ -79,19 +78,19 @@ public class EJson {
   }
 
   /**
-   * Parse the json and return as a Map taking a JsonParser.
+   * Parse the json and return as a Map taking a JsonReader.
    */
-  public static Map<String, Object> parseObject(JsonParser parser) throws IOException {
+  public static Map<String, Object> parseObject(JsonReader parser) throws IOException {
     return plugin.parseObject(parser);
   }
 
   /**
-   * Parse the json and return as a Map taking a JsonParser and a starting token.
+   * Parse the json and return as a Map taking a JsonReader and a starting token.
    * <p>
    * Used when the first token is checked to see if the value is null prior to calling this.
    * </p>
    */
-  public static Map<String, Object> parseObject(JsonParser parser, JsonToken token) throws IOException {
+  public static Map<String, Object> parseObject(JsonReader parser, Token token) throws IOException {
     return plugin.parseObject(parser, token);
   }
 
@@ -117,16 +116,16 @@ public class EJson {
   }
 
   /**
-   * Parse the json and return as a List taking a JsonParser.
+   * Parse the json and return as a List taking a JsonReader.
    */
-  public static List<Object> parseList(JsonParser parser) throws IOException {
+  public static List<Object> parseList(JsonReader parser) throws IOException {
     return plugin.parseList(parser);
   }
 
   /**
    * Parse the json returning as a List taking into account the current token.
    */
-  public static <T> List<T> parseList(JsonParser parser, JsonToken currentToken) throws IOException {
+  public static <T> List<T> parseList(JsonReader parser, Token currentToken) throws IOException {
     return plugin.parseList(parser, currentToken);
   }
 
@@ -147,7 +146,7 @@ public class EJson {
   /**
    * Parse the json and return as a List or Map.
    */
-  public static Object parse(JsonParser parser) throws IOException {
+  public static Object parse(JsonReader parser) throws IOException {
     return plugin.parse(parser);
   }
 
@@ -161,7 +160,7 @@ public class EJson {
   /**
    * Parse the json returning as a Set taking into account the current token.
    */
-  public static <T> Set<T> parseSet(JsonParser parser, JsonToken currentToken) throws IOException {
+  public static <T> Set<T> parseSet(JsonReader parser, Token currentToken) throws IOException {
     return plugin.parseSet(parser, currentToken);
   }
 }

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
-import com.fasterxml.jackson.core.JsonToken;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
 import io.ebean.DataIntegrityException;
 import io.ebean.ModifyAwareType;
 import io.ebean.ValuePair;
@@ -1359,14 +1360,14 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public Object jsonRead(SpiJsonReader ctx) throws IOException {
-    JsonToken event = ctx.nextToken();
-    if (JsonToken.VALUE_NULL == event) {
+    JsonReader parser = ctx.parser();
+    if (parser.isNullValue()) {
       return null;
     } else {
       // expect to read non-null json value
       Object objValue;
       if (scalarType != null) {
-        objValue = scalarType.jsonRead(ctx.parser());
+        objValue = scalarType.jsonRead(parser);
       } else {
         try {
           objValue = ctx.readValueUsingObjectMapper(propertyType);

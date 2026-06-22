@@ -8,6 +8,7 @@ module io.ebean.api {
 
   requires transitive java.sql;
   requires transitive io.avaje.config;
+  requires transitive io.avaje.json;
   requires transitive org.jspecify;
   requires transitive jakarta.persistence.api;
   requires transitive io.ebean.annotation;
@@ -16,7 +17,6 @@ module io.ebean.api {
 
   requires static org.slf4j;
   requires static io.ebean.types;
-  requires static com.fasterxml.jackson.core;
   requires static com.fasterxml.jackson.databind;
 
   exports io.ebean;

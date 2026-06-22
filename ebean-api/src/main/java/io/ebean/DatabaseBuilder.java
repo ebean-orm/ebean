@@ -1,6 +1,6 @@
 package io.ebean;
 
-import com.fasterxml.jackson.core.JsonFactory;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.annotation.*;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.*;
@@ -358,18 +358,18 @@ public interface DatabaseBuilder {
   DatabaseBuilder putServiceObject(Object configObject);
 
   /**
-   * Set the Jackson JsonFactory to use.
+   * Set the JsonStream to use.
    * <p>
    * If not set a default implementation will be used.
    */
-  default DatabaseBuilder jsonFactory(JsonFactory jsonFactory) {
-    return setJsonFactory(jsonFactory);
+  default DatabaseBuilder jsonStream(JsonStream jsonStream) {
+    return setJsonStream(jsonStream);
   }
 
   /**
-   * @deprecated migrate to {@link #jsonFactory(JsonFactory)}.
+   * @deprecated migrate to {@link #jsonStream(JsonStream)}.
    */
-  DatabaseBuilder setJsonFactory(JsonFactory jsonFactory);
+  DatabaseBuilder setJsonStream(JsonStream jsonStream);
 
   /**
    * Set the JSON format to use for DateTime types.
@@ -2210,11 +2210,11 @@ public interface DatabaseBuilder {
     boolean isAutoLoadModuleInfo();
 
     /**
-     * Return the Jackson JsonFactory to use.
+     * Return the JsonStream to use.
      * <p>
      * If not set a default implementation will be used.
      */
-    JsonFactory getJsonFactory();
+    JsonStream getJsonStream();
 
     /**
      * Get the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.

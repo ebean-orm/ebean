@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
@@ -156,13 +156,13 @@ public class ScalarTypeWrapper<B, S> implements ScalarType<B> {
   }
 
   @Override
-  public B jsonRead(JsonParser parser) throws IOException {
+  public B jsonRead(JsonReader parser) throws IOException {
     S object = scalarType.jsonRead(parser);
     return converter.wrapValue(object);
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, B beanValue) throws IOException {
+  public void jsonWrite(JsonWriter writer, B beanValue) throws IOException {
     S unwrapValue = converter.unwrapValue(beanValue);
     scalarType.jsonWrite(writer, unwrapValue);
   }

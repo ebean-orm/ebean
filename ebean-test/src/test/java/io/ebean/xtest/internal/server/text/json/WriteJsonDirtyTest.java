@@ -1,7 +1,7 @@
 package io.ebean.xtest.internal.server.text.json;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import io.avaje.json.JsonWriter;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.DB;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -19,6 +19,8 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class WriteJsonDirtyTest {
+
+  private static final JsonStream JSON_STREAM = JsonStream.builder().build();
 
   @Test
   public void test() throws IOException {
@@ -40,14 +42,12 @@ public class WriteJsonDirtyTest {
     boolean[] dirtyProperties = entityBean._ebean_getIntercept().dirtyProperties();
 
     StringWriter writer = new StringWriter();
-    JsonFactory jsonFactory = new JsonFactory();
-    JsonGenerator generator = jsonFactory.createGenerator(writer);
+    JsonWriter generator = JSON_STREAM.writer(writer);
 
     WriteJson writeJson = new WriteJson(server, generator, null, null, null, null, true);
     descriptor.jsonWriteDirty(writeJson, entityBean, dirtyProperties);
 
     generator.flush();
-    generator.close();
 
     String jsonContent = writer.toString();
     assertTrue(jsonContent.contains("\"name\":"));

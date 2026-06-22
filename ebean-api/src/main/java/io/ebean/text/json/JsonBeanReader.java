@@ -1,6 +1,6 @@
 package io.ebean.text.json;
 
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
 import io.ebean.bean.PersistenceContext;
 
 /**
@@ -25,9 +25,9 @@ public interface JsonBeanReader<T> {
   }
   
   /**
-   * Create a new reader taking the context from the existing one but using a new JsonParser.
+   * Create a new reader taking the context from the existing one but using a new JsonReader.
    */
-  JsonBeanReader<T> forJson(JsonParser moreJson);
+  JsonBeanReader<T> forJson(JsonReader moreJson);
 
   /**
    * Add a bean explicitly to the persistence context.

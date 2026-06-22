@@ -1,7 +1,8 @@
 package io.ebean.core.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
+import io.avaje.json.JsonWriter;
 import io.ebean.config.JsonConfig;
 
 import java.io.DataInput;
@@ -99,35 +100,53 @@ public abstract class ScalarTypeBaseDateTime<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public T jsonRead(JsonParser parser) throws IOException {
-    switch (parser.getCurrentToken()) {
-      case VALUE_NUMBER_INT: {
-        return convertFromMillis(parser.getLongValue());
-      }
-      case VALUE_NUMBER_FLOAT: {
-        BigDecimal value = parser.getDecimalValue();
-        Timestamp timestamp = ScalarTypeUtils.toTimestamp(value);
-        return convertFromTimestamp(timestamp);
-      }
-      default: {
-        return fromJsonISO8601(parser.getText());
-      }
+  public T jsonRead(JsonReader parser) throws IOException {
+    Token token = parser.currentToken();
+    if (token == Token.NUMBER) {
+      return readNumber(parser.readDecimal());
     }
+    if (token == Token.STRING) {
+      return fromStringValue(parser.readString());
+    }
+
+    String raw = parser.readRaw();
+    if (raw == null || "null".equals(raw)) {
+      return null;
+    }
+    if (raw.length() > 1 && raw.charAt(0) == '"' && raw.charAt(raw.length() - 1) == '"') {
+      return fromStringValue(raw.substring(1, raw.length() - 1));
+    }
+    return readNumber(new BigDecimal(raw));
+  }
+
+  private T fromStringValue(String value) {
+    if (value.indexOf('-') == -1 && Character.isDigit(value.charAt(0))) {
+      return readNumber(new BigDecimal(value));
+    }
+    return fromJsonISO8601(value);
+  }
+
+  private T readNumber(BigDecimal value) {
+    if (value.scale() <= 0) {
+      return convertFromMillis(value.longValue());
+    }
+    Timestamp timestamp = ScalarTypeUtils.toTimestamp(value);
+    return convertFromTimestamp(timestamp);
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, T value) throws IOException {
+  public void jsonWrite(JsonWriter writer, T value) throws IOException {
     switch (mode) {
       case ISO8601: {
-        writer.writeString(toJsonISO8601(value));
+        writer.value(toJsonISO8601(value));
         break;
       }
       case NANOS: {
-        writer.writeNumber(toJsonNanos(value));
+        writer.value(toJsonNanos(value));
         break;
       }
       default: {
-        writer.writeNumber(convertToMillis(value));
+        writer.value(convertToMillis(value));
       }
     }
   }

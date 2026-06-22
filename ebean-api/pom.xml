@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.11.1</version>
+    <version>18.0.0</version>
   </parent>
 
   <name>ebean api</name>
@@ -70,15 +70,13 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- Jackson core used internally by Ebean -->
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-      <optional>true</optional>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-json-core</artifactId>
+      <version>${avaje-json-core.version}</version>
     </dependency>
 
-    <!-- provided scope for JsonNode support -->
+    <!-- Jackson databind remains for ObjectMapper compatibility paths -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
