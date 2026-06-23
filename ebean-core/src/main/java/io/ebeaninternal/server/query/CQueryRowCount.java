@@ -13,7 +13,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
@@ -138,10 +137,6 @@ final class CQueryRowCount implements SpiProfileTransactionEvent, CancelableQuer
     transaction()
       .profileStream()
       .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId(), queryPlan.hash(), query.getGeneratedSql());
-  }
-
-  Set<String> dependentTables() {
-    return queryPlan.dependentTables();
   }
 
   @Override
