@@ -40,6 +40,7 @@ existing Maven project. Complete the steps in order.
 | [Entity Bean Creation](entity-bean-creation.md) | How to generate clean, idiomatic Ebean entity beans for AI agents; patterns and anti-patterns; field visibility and accessor guidance; minimal boilerplate |
 | [Lombok with Ebean entity beans](lombok-with-ebean-entity-beans.md) | Which Lombok annotations to use and avoid on entity beans; why `@Data` is incompatible with Ebean; how to use `@Getter` + `@Setter` + `@Accessors(chain = true)` |
 | [`@DbJson` mapping support (built-in vs Jackson)](dbjson-mapping-support.md) | Which `@DbJson` / `@DbJsonB` property types are handled by the built-in avaje-json-core support versus which require `ebean-jackson-mapper` (Jackson `ObjectMapper`); supported `String`/`List`/`Set`/`Map` matrix; enum-key and `@DbArray` notes |
+| [Derived / formula properties (`@Formula`, `@Formula2`)](derived-formula-properties.md) | Read-only computed properties: physical-SQL `@Formula` (with `${ta}` and hand-written joins) versus logical path-based `@Formula2` (auto-resolved joins); use in `select`/`where`/`orderBy`; default inclusion and the `@Transient` opt-out |
 
 ## Querying
 

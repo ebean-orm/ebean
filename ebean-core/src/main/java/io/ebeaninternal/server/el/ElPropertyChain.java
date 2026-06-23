@@ -9,6 +9,8 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -23,6 +25,9 @@ import java.util.Arrays;
  * </p>
  */
 public final class ElPropertyChain implements ElPropertyValue {
+
+  /** Matches placeholders of the form ${} or ${path} (e.g. ${parent}) used by @Formula2. */
+  private static final Pattern PLACEHOLDER = Pattern.compile("\\$\\{([^}]*)}");
 
   private final String prefix;
   private final String placeHolder;
@@ -94,9 +99,18 @@ public final class ElPropertyChain implements ElPropertyValue {
     if (!el.contains("${}")) {
       // typically a secondary table property
       return el.replace("${", "${" + prefix + ".");
-    } else {
-      return el.replace(ROOT_ELPREFIX, "${" + prefix + "}");
     }
+    // prefix the root placeholder ${} as well as any path placeholders ${path}
+    // (e.g. ${parent} used by a @Formula2 property referenced via a path)
+    Matcher matcher = PLACEHOLDER.matcher(el);
+    StringBuilder sb = new StringBuilder();
+    while (matcher.find()) {
+      String path = matcher.group(1);
+      String replacement = path.isEmpty() ? "${" + prefix + "}" : "${" + prefix + "." + path + "}";
+      matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
   }
 
   /**
