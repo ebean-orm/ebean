@@ -4,7 +4,6 @@ import io.ebean.bean.BeanCollection;
 import io.ebean.common.BeanSet;
 
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 final class ElementHelpSet implements ElementHelp {
 
@@ -15,7 +14,7 @@ final class ElementHelpSet implements ElementHelp {
 
   private static class Collector implements ElementCollector {
 
-    private final Set<Object> set = new LinkedHashSet<>();
+    private final LinkedHashSet<Object> set = new LinkedHashSet<>();
 
     @Override
     public void addElement(Object element) {

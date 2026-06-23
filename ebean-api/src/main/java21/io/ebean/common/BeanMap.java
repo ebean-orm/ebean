@@ -7,7 +7,7 @@ import java.util.*;
 /**
  * Map capable of lazy loading and modification aware.
  */
-public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Map<K, E> {
+public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements SequencedMap<K, E> {
 
   private static final long serialVersionUID = 1L;
 
@@ -333,5 +333,100 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   public Collection<E> values() {
     init();
     return modifyListening ? new ModifyCollection<>(this, map.values()) : map.values();
+  }
+
+  // -----------------------------------------------------//
+  // SequencedMap (Java 21+)
+  // -----------------------------------------------------//
+
+  @Override
+  public SequencedMap<K, E> reversed() {
+    init();
+    if (modifyListening) {
+      throw new UnsupportedOperationException("Not supported on modify listening map");
+    }
+    return map.reversed();
+  }
+
+  @Override
+  public Entry<K, E> firstEntry() {
+    init();
+    return map.firstEntry();
+  }
+
+  @Override
+  public Entry<K, E> lastEntry() {
+    init();
+    return map.lastEntry();
+  }
+
+  @Override
+  public Entry<K, E> pollFirstEntry() {
+    init();
+    Entry<K, E> entry = map.pollFirstEntry();
+    if (modifyListening && entry != null) {
+      modifyRemoval(entry.getValue());
+    }
+    return entry;
+  }
+
+  @Override
+  public Entry<K, E> pollLastEntry() {
+    init();
+    Entry<K, E> entry = map.pollLastEntry();
+    if (modifyListening && entry != null) {
+      modifyRemoval(entry.getValue());
+    }
+    return entry;
+  }
+
+  @Override
+  public E putFirst(K key, E value) {
+    init();
+    if (modifyListening) {
+      E oldBean = map.putFirst(key, value);
+      if (value != oldBean) {
+        // register the add of the new and the removal of the old
+        modifyAddition(value);
+        modifyRemoval(oldBean);
+      }
+      return oldBean;
+    } else {
+      return map.putFirst(key, value);
+    }
+  }
+
+  @Override
+  public E putLast(K key, E value) {
+    init();
+    if (modifyListening) {
+      E oldBean = map.putLast(key, value);
+      if (value != oldBean) {
+        // register the add of the new and the removal of the old
+        modifyAddition(value);
+        modifyRemoval(oldBean);
+      }
+      return oldBean;
+    } else {
+      return map.putLast(key, value);
+    }
+  }
+
+  @Override
+  public SequencedSet<K> sequencedKeySet() {
+    init();
+    return map.sequencedKeySet();
+  }
+
+  @Override
+  public SequencedCollection<E> sequencedValues() {
+    init();
+    return map.sequencedValues();
+  }
+
+  @Override
+  public SequencedSet<Entry<K, E>> sequencedEntrySet() {
+    init();
+    return map.sequencedEntrySet();
   }
 }

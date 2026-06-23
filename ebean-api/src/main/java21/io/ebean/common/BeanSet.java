@@ -2,13 +2,12 @@ package io.ebean.common;
 
 import io.ebean.bean.*;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * Set capable of lazy loading and modification aware.
  */
-public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E>, BeanCollectionAdd {
+public final class BeanSet<E> extends AbstractBeanCollection<E> implements SequencedSet<E>, BeanCollectionAdd {
 
   private static final long serialVersionUID = 1L;
 
@@ -350,6 +349,71 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     init();
     //noinspection SuspiciousToArrayCall
     return set.toArray(array);
+  }
+
+  // -----------------------------------------------------//
+  // SequencedSet (Java 21+)
+  // -----------------------------------------------------//
+
+  @Override
+  public SequencedSet<E> reversed() {
+    init();
+    if (modifyListening) {
+      throw new UnsupportedOperationException("Not supported on modify listening set");
+    }
+    return set.reversed();
+  }
+
+  @Override
+  public void addFirst(E bean) {
+    init();
+    if (modifyListening) {
+      modifyAddition(bean);
+    }
+    set.addFirst(bean);
+  }
+
+  @Override
+  public void addLast(E bean) {
+    init();
+    if (modifyListening) {
+      modifyAddition(bean);
+    }
+    set.addLast(bean);
+  }
+
+  @Override
+  public E getFirst() {
+    init();
+    return set.getFirst();
+  }
+
+  @Override
+  public E getLast() {
+    init();
+    return set.getLast();
+  }
+
+  @Override
+  public E removeFirst() {
+    init();
+    if (modifyListening) {
+      E bean = set.removeFirst();
+      modifyRemoval(bean);
+      return bean;
+    }
+    return set.removeFirst();
+  }
+
+  @Override
+  public E removeLast() {
+    init();
+    if (modifyListening) {
+      E bean = set.removeLast();
+      modifyRemoval(bean);
+      return bean;
+    }
+    return set.removeLast();
   }
 
 }

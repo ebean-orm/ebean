@@ -1,12 +1,9 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.EntityBean;
-import io.ebeaninternal.api.SpiEbeanServer;
-import io.ebeaninternal.api.SpiQuery;
 import io.ebeaninternal.api.json.SpiJsonWriter;
 import io.ebeaninternal.server.query.CQueryCollectionAdd;
 
@@ -34,7 +31,7 @@ public interface BeanCollectionHelp<T> extends CQueryCollectionAdd<T> {
    * For Map's this needs to take the mapKey.
    * </p>
    */
-  BeanCollectionAdd getBeanCollectionAdd(Object bc, String mapKey);
+  BeanCollectionAdd collectionAdd(Object bc, String mapKey);
 
   /**
    * Create an empty collection of the correct type without a parent bean.
