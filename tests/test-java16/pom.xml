@@ -11,7 +11,7 @@
   <artifactId>test-java16</artifactId>
 
   <properties>
-    <maven.compiler.release>17</maven.compiler.release>
+    <maven.compiler.release>21</maven.compiler.release>
   </properties>
 
   <dependencies>
@@ -50,6 +50,16 @@
         <artifactId>ebean-maven-plugin</artifactId>
         <version>${ebean-maven-plugin.version}</version>
         <executions>
+          <execution>
+            <id>main</id>
+            <phase>process-classes</phase>
+            <configuration>
+              <transformArgs>debug=0</transformArgs>
+            </configuration>
+            <goals>
+              <goal>enhance</goal>
+            </goals>
+          </execution>
           <execution>
             <id>test</id>
             <phase>process-test-classes</phase>
