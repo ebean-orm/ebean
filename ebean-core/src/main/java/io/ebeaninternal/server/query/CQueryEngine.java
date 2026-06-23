@@ -105,7 +105,6 @@ public final class CQueryEngine {
         request.transaction().logSummary(rcQuery.summary());
       }
       if (request.isQueryCachePut()) {
-        request.addDependentTables(rcQuery.dependentTables());
         if (collection instanceof List) {
           collection = (A) Collections.unmodifiableList((List<?>) collection);
           request.putToQueryCache(collection);
@@ -163,7 +162,6 @@ public final class CQueryEngine {
         request.transaction().logSummary(rcQuery.summary());
       }
       if (request.isQueryCachePut()) {
-        request.addDependentTables(rcQuery.dependentTables());
         request.putToQueryCache(count);
       }
       return count;
@@ -345,9 +343,6 @@ public final class CQueryEngine {
       }
       request.executeSecondaryQueries(false);
       request.populateFromImmutableCache();
-      if (request.isQueryCachePut()) {
-        request.addDependentTables(cquery.dependentTables());
-      }
       request.unmodifiableFreeze(beanCollection);
       return beanCollection;
 

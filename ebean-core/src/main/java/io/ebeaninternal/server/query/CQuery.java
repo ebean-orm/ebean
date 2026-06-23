@@ -676,8 +676,4 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   public void handleLoadError(String fullName, Exception e) {
     query.handleLoadError(fullName, e);
   }
-
-  public Set<String> dependentTables() {
-    return queryPlan.dependentTables();
-  }
 }
