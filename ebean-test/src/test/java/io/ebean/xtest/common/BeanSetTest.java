@@ -17,16 +17,16 @@ public class BeanSetTest {
   Product object2 = new Product(2);
   Product object3 = new Product(3);
 
-  private Set<Object> all() {
-    Set<Object> all = new LinkedHashSet<>();
+  private LinkedHashSet<Object> all() {
+    LinkedHashSet<Object> all = new LinkedHashSet<>();
     all.add(new Product(1));
     all.add(new Product(2));
     all.add(new Product(3));
     return all;
   }
 
-  private Set<Object> some() {
-    Set<Object> some = new LinkedHashSet<>();
+  private LinkedHashSet<Object> some() {
+    LinkedHashSet<Object> some = new LinkedHashSet<>();
     some.add(new Product(2));
     some.add(new Product(3));
     return some;

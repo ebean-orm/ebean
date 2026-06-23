@@ -51,6 +51,16 @@
         <version>${ebean-maven-plugin.version}</version>
         <executions>
           <execution>
+            <id>main</id>
+            <phase>process-classes</phase>
+            <configuration>
+              <transformArgs>debug=0</transformArgs>
+            </configuration>
+            <goals>
+              <goal>enhance</goal>
+            </goals>
+          </execution>
+          <execution>
             <id>test</id>
             <phase>process-test-classes</phase>
             <configuration>
