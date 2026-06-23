@@ -22,6 +22,8 @@ public final class CQueryPlanStats {
   CQueryPlanStats(CQueryPlan queryPlan) {
     this.queryPlan = queryPlan;
     this.timedMetric = queryPlan.createTimedMetric();
+    // treat newly built plan as recently used to avoid trim
+    this.lastQueryTime = System.currentTimeMillis();
   }
 
   /**
