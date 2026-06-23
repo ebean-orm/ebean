@@ -144,6 +144,7 @@ public class DeployBeanProperty {
   private String aggregationParsed;
   private String sqlFormulaSelect;
   private String sqlFormulaJoin;
+  private String formula2Expression;
   /**
    * The jdbc data type this maps to.
    */
@@ -551,6 +552,23 @@ public class DeployBeanProperty {
   public void setSqlFormula(String formulaSelect, String formulaJoin) {
     this.sqlFormulaSelect = formulaSelect;
     this.sqlFormulaJoin = formulaJoin.isEmpty() ? null : formulaJoin;
+    this.dbRead = true;
+    this.dbInsertable = false;
+    this.dbUpdateable = false;
+  }
+
+  /**
+   * Return the raw logical expression set by {@code @Formula2}.
+   */
+  public String getFormula2Expression() {
+    return formula2Expression;
+  }
+
+  /**
+   * Set the raw logical expression for a {@code @Formula2} property.
+   */
+  public void setFormula2Expression(String formula2Expression) {
+    this.formula2Expression = formula2Expression;
     this.dbRead = true;
     this.dbInsertable = false;
     this.dbUpdateable = false;
@@ -1089,6 +1107,22 @@ public class DeployBeanProperty {
           } else if (matchPlatform(platforms, platform)) {
             return formula;
           }
+        }
+      }
+    }
+    return fallback;
+  }
+
+  public Formula2 getMetaAnnotationFormula2(Platform platform) {
+    Formula2 fallback = null;
+    for (Annotation ann : metaAnnotations) {
+      if (ann.annotationType() == Formula2.class) {
+        Formula2 formula2 = (Formula2) ann;
+        final Platform[] platforms = formula2.platforms();
+        if (platforms.length == 0) {
+          fallback = formula2;
+        } else if (matchPlatform(platforms, platform)) {
+          return formula2;
         }
       }
     }

@@ -282,6 +282,14 @@ final class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
+  public void appendFormula2Select(String parseSelect) {
+    // resolve the path based placeholders relative to the current node prefix
+    sb.append(COMMA);
+    sb.append(alias.parseFormula2(parseSelect, currentPrefix));
+    appendColumnAlias();
+  }
+
+  @Override
   public void appendFormulaSelect(String sqlFormulaSelect) {
     String tableAlias = tableAliasStack.peek();
     sb.append(COMMA);

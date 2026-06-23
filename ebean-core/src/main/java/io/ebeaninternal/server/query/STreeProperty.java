@@ -107,4 +107,12 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   default void extraIncludes(Set<String> predicateIncludes) {
     // do nothing
   }
+
+  /**
+   * Return the association join paths required by a {@code @Formula2} property, or null.
+   * These paths are automatically added as joins when this property is selected.
+   */
+  default Set<String> formula2Joins() {
+    return null;
+  }
 }
