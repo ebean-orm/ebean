@@ -1,9 +1,7 @@
 package org.multitenant.partition;
 
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.config.TenantMode;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
@@ -120,7 +118,7 @@ class MultiTenantPartitionTest extends BaseTestCase {
   }
 
   private static Database init() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("h2multitenant");
     config.loadFromProperties();
     config.setDdlGenerate(true);
@@ -135,6 +133,6 @@ class MultiTenantPartitionTest extends BaseTestCase {
     config.addClass(MtContent.class);
     config.addClass(MtNone.class);
 
-    return DatabaseFactory.create(config);
+    return config.build();
   }
 }

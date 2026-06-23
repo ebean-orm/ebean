@@ -13,6 +13,9 @@ ebean-profiling*.xml
 profiling/
 .DS_Store
 
+# Local Redis integration test credentials
+ebean-redis/src/test/resources/redis-local.yml
+
 # Intellij project files
 *.iml
 *.ipr

@@ -1,8 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
 import io.ebean.bean.EntityBean;
 import io.ebeaninternal.api.json.SpiJsonReader;
 
@@ -38,17 +37,17 @@ class BeanPropertyAssocManyJsonHelp {
     if (!this.many.jsonDeserialize) {
       return;
     }
-    JsonParser parser = readJson.parser();
-    JsonToken event = parser.nextToken();
-    if (JsonToken.VALUE_NULL == event) {
+    JsonReader parser = readJson.parser();
+    if (parser.isNullValue()) {
       return;
     }
     if (many.isTransient()) {
       jsonReadTransientUsingObjectMapper(readJson, parentBean);
       return;
     }
-    if (JsonToken.START_ARRAY != event && JsonToken.START_OBJECT != event) {
-      throw new JsonParseException(parser, "Unexpected token " + event + " - expecting start array or object");
+    Token event = parser.currentToken();
+    if (Token.BEGIN_ARRAY != event && Token.BEGIN_OBJECT != event) {
+      throw new IllegalStateException("Unexpected token " + event + " - expecting start array or object");
     }
     if (readJson.update()) {
       many.setValueIntercept(parentBean, many.jsonReadCollection(readJson, parentBean, many.getValue(parentBean)));

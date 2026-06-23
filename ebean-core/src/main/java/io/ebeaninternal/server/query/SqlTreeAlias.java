@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Special Map of the logical property joins to table alias.
@@ -150,6 +152,33 @@ final class SqlTreeAlias {
   public String parse(String clause) {
     clause = parseRootAlias(clause);
     return parseAliasMap(clause, aliasMap);
+  }
+
+  /**
+   * Placeholder pattern for @Formula2 path based formulas e.g. ${} or ${parent}.
+   */
+  private static final Pattern FORMULA2_PLACEHOLDER = Pattern.compile("\\$\\{([^}]*)}");
+
+  /**
+   * Parse a @Formula2 select/predicate replacing the path based placeholders.
+   * <p>
+   * The placeholder paths are relative to the bean the formula is declared on. They are combined
+   * with the current node prefix to give the root descriptor relative path and then mapped to the
+   * appropriate table alias. e.g. with currentPrefix "children.children" the placeholder ${parent}
+   * resolves via the path "children.children.parent".
+   */
+  String parseFormula2(String clause, String currentPrefix) {
+    Matcher matcher = FORMULA2_PLACEHOLDER.matcher(clause);
+    StringBuilder sb = new StringBuilder(clause.length() + 16);
+    while (matcher.find()) {
+      String relativePath = matcher.group(1);
+      String fullPath = relativePath.isEmpty() ? currentPrefix : SplitName.add(currentPrefix, relativePath);
+      String tableAlias = tableAlias(fullPath);
+      String replacement = tableAlias == null ? "" : tableAlias + ".";
+      matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
   }
 
   /**

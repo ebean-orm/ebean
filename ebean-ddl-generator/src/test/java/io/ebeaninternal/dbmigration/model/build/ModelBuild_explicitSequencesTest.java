@@ -1,9 +1,6 @@
 package io.ebeaninternal.dbmigration.model.build;
 
-
-import io.ebean.DatabaseFactory;
-import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
+import io.ebean.Database;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.DdlOptions;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
@@ -20,22 +17,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ModelBuild_explicitSequencesTest extends BaseTestCase {
 
   private SpiEbeanServer createServer(boolean postgres) {
-
-    DatabaseBuilder config = new DatabaseConfig();
-    config.setName("h2");
-    config.loadFromProperties();
-    config.setName("h2other");
-    config.setDdlGenerate(false);
-    config.setDdlRun(false);
-    config.setDdlExtra(false);
-    config.setDefaultServer(false);
-    config.setRegister(false);
-
-    config.setDatabasePlatformName(postgres ? "postgres" : "h2");
-
-    config.addClass(Person.class);
-    config.addClass(Phone.class);
-    return (SpiEbeanServer) DatabaseFactory.create(config);
+    return (SpiEbeanServer) Database.builder()
+      .name("h2")
+      .loadFromProperties()
+      .name("h2other")
+      .ddlGenerate(false)
+      .ddlRun(false)
+      .ddlExtra(false)
+      .defaultDatabase(false)
+      .register(false)
+      .databasePlatformName(postgres ? "postgres" : "h2")
+      .addClass(Person.class)
+      .addClass(Phone.class)
+      .build();
   }
 
   @Test

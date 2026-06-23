@@ -1,7 +1,7 @@
 package io.ebean.config;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import io.avaje.config.Config;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.*;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.PersistBatch;
@@ -31,38 +31,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * The configuration used for creating a Database.
- * <p>
- * Used to programmatically construct an Database and optionally register it
- * with the DB singleton.
- * <p>
- * If you just use DB thout this programmatic configuration Ebean will read
- * the application.properties file and take the configuration from there. This usually
- * includes searching the class path and automatically registering any entity
- * classes and listeners etc.
- * <pre>{@code
- *
- * DatabaseConfig config = new DatabaseConfig();
- *
- * // read the ebean.properties and load
- * // those settings into this DatabaseConfig object
- * config.loadFromProperties();
- *
- * // explicitly register the entity beans to avoid classpath scanning
- * config.addClass(Customer.class);
- * config.addClass(User.class);
- *
- * Database db = DatabaseFactory.create(config);
- *
- * }</pre>
+ * Deprecated migrate to {@link Database#builder()} rather than constructing {@code DatabaseConfig} directly.
  *
  * <p>
- * Note that DatabaseConfigProvider provides a standard Java ServiceLoader mechanism that can
- * be used to apply configuration to the DatabaseConfig.
+ * Note that {@link DatabaseConfigProvider} provides a standard Java ServiceLoader mechanism that can
+ * be used to apply configuration to the {@link DatabaseBuilder}.
  *
  * @author emcgreal
  * @author rbygrave
- * @see DatabaseFactory
+ * @see Database#builder()
  */
 public class DatabaseConfig implements DatabaseBuilder.Settings {
 
@@ -443,7 +420,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    * The default PersistenceContextScope used if one is not explicitly set on a query.
    */
   private PersistenceContextScope persistenceContextScope = PersistenceContextScope.TRANSACTION;
-  private JsonFactory jsonFactory;
+  private JsonStream jsonStream;
   private boolean localTimeWithNanos;
   private boolean durationWithNanos;
   private int maxCallStack = 5;
@@ -539,8 +516,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   private SlowQueryListener slowQueryListener;
 
-  private ProfilingConfig profilingConfig = new ProfilingConfig();
-
   /**
    * The mappingLocations for searching xml mapping.
    */
@@ -560,12 +535,14 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private Function<String, String> metricNaming = MetricNamingMatch.INSTANCE;
 
   /**
-   * Construct a Database Configuration for programmatically creating an Database.
+   * @deprecated migrate to {@link Database#builder()} and configure the returned {@link DatabaseBuilder}.
    */
+  @Deprecated(forRemoval = true)
   public DatabaseConfig() {
   }
 
   @Override
+  @SuppressWarnings("removal")
   public Database build() {
     return DatabaseFactory.create(this);
   }
@@ -654,13 +631,13 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public JsonFactory getJsonFactory() {
-    return jsonFactory;
+  public JsonStream getJsonStream() {
+    return jsonStream;
   }
 
   @Override
-  public DatabaseConfig setJsonFactory(JsonFactory jsonFactory) {
-    this.jsonFactory = jsonFactory;
+  public DatabaseConfig setJsonStream(JsonStream jsonStream) {
+    this.jsonStream = jsonStream;
     return this;
   }
 
@@ -1025,17 +1002,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public DatabaseConfig setReadAuditPrepare(ReadAuditPrepare readAuditPrepare) {
     this.readAuditPrepare = readAuditPrepare;
-    return this;
-  }
-
-  @Override
-  public ProfilingConfig getProfilingConfig() {
-    return profilingConfig;
-  }
-
-  @Override
-  public DatabaseConfig setProfilingConfig(ProfilingConfig profilingConfig) {
-    this.profilingConfig = profilingConfig;
     return this;
   }
 
@@ -2137,7 +2103,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   protected void loadSettings(PropertiesWrapper p) {
     dbSchema = p.get("dbSchema", dbSchema);
-    profilingConfig.loadSettings(p, name);
     platformConfig.loadSettings(p);
     if (platformConfig.isAllQuotedIdentifiers()) {
       adjustNamingConventionForAllQuoted();

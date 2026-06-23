@@ -77,6 +77,7 @@ often the right query shape.
 | Check if at least one row exists | `exists()` | Cheapest choice for boolean existence checks |
 | Load exactly one row by ID or unique key | `findOne()` | Only use when the predicate is truly unique |
 | Load a list of entity beans | `findList()` | Default for list screens and domain logic |
+| Stream rows, usually to map into another type | `findStream()` | For large/unbounded results streamed from the JDBC cursor; close via try-with-resources. For small/bounded results prefer `findList().stream()` |
 | Count matching rows | `findCount()` | Prefer over loading entities just to count |
 | Load a page plus optional total row count | `findPagedList()` | Use when the caller needs pagination metadata |
 | Return DTO/read-model rows | `asDto(...).findList()` | Prefer this over partially loaded entities for API/view models |
@@ -98,6 +99,43 @@ Customer customer = new QCustomer()
 ```
 
 Do **not** use `findOne()` for predicates that can match multiple rows.
+
+### Example - stream and map to another type
+
+Choose based on result size and how you consume it:
+
+- **`findList().stream()`** — executes the query, materialises the rows,
+  **releases the connection**, then streams over an in-memory list. No open
+  database resources and no try-with-resources needed. Prefer this for small or
+  bounded results (e.g. when you apply `setMaxRows`) that you collect anyway.
+- **`findStream()`** — streams rows directly from the JDBC cursor, holding a
+  connection (and an implicit transaction) open for the **whole lifetime of the
+  stream pipeline**. It must be closed with try-with-resources. Prefer it when
+  the result may be large, when you want constant memory, or when you want to
+  short-circuit (`limit`, `findFirst`, `takeWhile`) without loading everything.
+
+```java
+// small, bounded result fully collected -> findList().stream()
+List<PendingPlan> pending = new QCaptureRequest()
+  .collectedAt.isNull()
+  .orderBy().requestedAt.asc()
+  .findList()
+  .stream()
+  .map(r -> new PendingPlan(r.app().getName(), r.hash()))
+  .toList();
+
+// large/unbounded result streamed from the cursor -> findStream() + try-with-resources
+try (Stream<Customer> stream = new QCustomer()
+  .status.equalTo(Status.NEW)
+  .findStream()) {
+  stream
+    .map(...)
+    .forEach(...);
+}
+```
+
+For processing large results one bean at a time, `findEach()` is often the
+simplest choice because it closes the underlying resources automatically.
 
 ---
 
@@ -131,6 +169,49 @@ List<Customer> customers = new QCustomer()
   .findList();
 ```
 
+### Optional predicates - prefer conditional helpers over `if` blocks
+
+When a filter is driven by a nullable/optional parameter, use the built-in
+conditional helpers instead of wrapping predicates in `if` blocks. The query
+stays fluent and reads top-to-bottom, and no predicate is added when the value
+is absent.
+
+| Helper | Adds predicate when | Resulting SQL |
+|--------|---------------------|---------------|
+| `eqIfPresent(v)` | `v != null` | `prop = ?` |
+| `eqIfNotBlank(v)` (String) | `v` non-null and not blank (value is trimmed) | `prop = ?` |
+| `eqOrNull(v)` | always | `(prop = ? or prop is null)` |
+| `inOrEmpty(coll)` | `coll` non-empty | `prop in (...)` (no predicate when empty) |
+| `likeIfPresent` / `ilikeIfPresent` / `startsWithIfPresent` / `istartsWithIfPresent` / `containsIfPresent` / `icontainsIfPresent` (String) | `v != null` | the match expression |
+
+```java
+// Instead of building the query with if blocks:
+QCustomer q = new QCustomer();
+if (name != null && !name.isBlank()) {
+  q.name.eq(name.trim());
+}
+if (status != null) {
+  q.status.eq(status);
+}
+List<Customer> customers = q.findList();
+
+// Prefer the conditional helpers:
+List<Customer> customers = new QCustomer()
+  .name.eqIfNotBlank(name)
+  .status.eqIfPresent(status)
+  .findList();
+```
+
+Use `eqOrNull(v)` when a null column value should also match - for example an
+"any environment" row stored with `env_id is null` should surface under any env
+filter - instead of a hand-rolled `or()/eq()/isNull()/endOr()` block:
+
+```java
+List<CaptureRequest> rows = new QCaptureRequest()
+  .env.name.eqOrNull(envFilter)   // env_name = ? or env_name is null
+  .findList();
+```
+
 ### Agent rule
 
 When adding a new query:
@@ -140,6 +221,10 @@ When adding a new query:
 3. Traverse relationships instead of writing manual join SQL
 4. Keep property references type-safe; avoid string property names unless the API
    specifically requires them
+5. For optional filters, reach for `eqIfPresent` / `eqIfNotBlank` / `inOrEmpty`
+   before writing an `if (param != null)` block, and use `eqOrNull` instead of a
+   manual `or()/eq()/isNull()/endOr()` when the intent is "match this value or a
+   null column"
 
 ---
 
@@ -282,6 +367,9 @@ Do **not** use `setUnmodifiable(true)` when the caller will:
 If you are returning entity beans for read-only use, `setUnmodifiable(true)`
 should be the default recommendation. If the caller needs a mutable model or a
 serialized summary shape, choose mutable entities or DTO projection instead.
+
+If you need cached assoc-one references for unmodifiable graphs, see
+[Immutable bean cache for read-only references](immutable-bean-cache.md).
 
 ---
 
@@ -481,4 +569,5 @@ When asked to add or modify an Ebean query:
 
 - [Add Ebean Postgres Maven POM](add-ebean-postgres-maven-pom.md)
 - [Entity Bean Creation](entity-bean-creation.md)
+- [Immutable bean cache for read-only references](immutable-bean-cache.md)
 - [Ebean query docs](https://ebean.io/docs/query/)

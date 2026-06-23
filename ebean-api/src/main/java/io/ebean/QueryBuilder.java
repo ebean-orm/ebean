@@ -126,6 +126,11 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   SELF usingTransaction(Transaction transaction);
 
   /**
+   * Execute this query using immutable bean cache values for matching bean types.
+   */
+  SELF using(ImmutableBeanCache<?> beanCache);
+
+  /**
    * Execute the query using the given connection.
    */
   SELF usingConnection(Connection connection);

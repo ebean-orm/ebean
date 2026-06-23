@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.query;
 
+import io.ebean.ProfileLocation;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -114,5 +115,66 @@ class CQueryBuilderTest {
     String countSql = simulateCountWrap(innerSql);
 
     assertThat(countSql).isEqualTo("select count(*) from ( select t0.id from ad t0) as c");
+  }
+
+  @Test
+  void inlineSqlCommentLabel_rootExplicitLabel_prefixesBeanType() {
+    String label = CQueryBuilder.inlineSqlCommentLabel("fetchMachineFleets", null, false, "COrganisationMachine");
+    assertThat(label).isEqualTo("COrganisationMachine.fetchMachineFleets");
+  }
+
+  @Test
+  void inlineSqlCommentLabel_rootExplicitLabel_avoidsDuplicatePrefix() {
+    String label = CQueryBuilder.inlineSqlCommentLabel("COrganisationMachine.fetchMachineFleets", null, false, "COrganisationMachine");
+    assertThat(label).isEqualTo("COrganisationMachine.fetchMachineFleets");
+  }
+
+  @Test
+  void inlineSqlCommentLabel_secondaryLabel_usedAsIs() {
+    String label = CQueryBuilder.inlineSqlCommentLabel("COrganisationMachine.fetchMachineFleets.contacts.lazy", null, true, "Contact");
+    assertThat(label).isEqualTo("COrganisationMachine.fetchMachineFleets.contacts.lazy");
+  }
+
+  @Test
+  void inlineSqlCommentLabel_profileLocationFallback() {
+    String label = CQueryBuilder.inlineSqlCommentLabel(null, profileLocation("Finder.byName"), false, "COrganisationMachine");
+    assertThat(label).isEqualTo("Finder.byName");
+  }
+
+  private static ProfileLocation profileLocation(String label) {
+    return new ProfileLocation() {
+      @Override
+      public boolean obtain() {
+        return false;
+      }
+
+      @Override
+      public String location() {
+        return label;
+      }
+
+      @Override
+      public String label() {
+        return label;
+      }
+
+      @Override
+      public String fullLocation() {
+        return label;
+      }
+
+      @Override
+      public void add(long executionTime) {
+      }
+
+      @Override
+      public boolean trace() {
+        return false;
+      }
+
+      @Override
+      public void setTraceCount(int traceCount) {
+      }
+    };
   }
 }

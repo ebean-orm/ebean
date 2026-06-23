@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.changelog;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import io.avaje.json.JsonWriter;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.event.changelog.BeanChange;
 import io.ebean.event.changelog.ChangeSet;
 import io.ebean.event.changelog.ChangeType;
@@ -15,13 +15,13 @@ import java.util.Map;
  */
 final class ChangeJsonBuilder {
 
-  private final JsonFactory jsonFactory = new JsonFactory();
+  private final JsonStream jsonStream = JsonStream.builder().build();
 
   /**
    * Write the bean change as JSON.
    */
   void writeBeanJson(Writer writer, BeanChange bean, ChangeSet changeSet) throws IOException {
-    try (JsonGenerator generator = jsonFactory.createGenerator(writer)) {
+    try (JsonWriter generator = jsonStream.writer(writer)) {
       writeBeanChange(generator, bean, changeSet);
       generator.flush();
     }
@@ -30,58 +30,67 @@ final class ChangeJsonBuilder {
   /**
    * Write the bean change as JSON document containing the transaction header details.
    */
-  private void writeBeanChange(JsonGenerator gen, BeanChange bean, ChangeSet changeSet) throws IOException {
-    gen.writeStartObject();
-    gen.writeNumberField("ts", bean.getEventTime());
-    gen.writeStringField("change", bean.getEvent().getCode());
-    gen.writeStringField("type", bean.getType());
-    gen.writeStringField("id", bean.getId().toString());
+  private void writeBeanChange(JsonWriter gen, BeanChange bean, ChangeSet changeSet) {
+    gen.beginObject();
+    gen.name("ts");
+    gen.value(bean.getEventTime());
+    gen.name("change");
+    gen.value(bean.getEvent().getCode());
+    gen.name("type");
+    gen.value(bean.getType());
+    gen.name("id");
+    gen.value(bean.getId().toString());
     if (bean.getTenantId() != null) {
-      gen.writeStringField("tenantId", bean.getTenantId().toString());
+      gen.name("tenantId");
+      gen.value(bean.getTenantId().toString());
     }
     writeBeanTransactionDetails(gen, changeSet);
     writeBeanValues(gen, bean);
-    gen.writeEndObject();
+    gen.endObject();
   }
 
   /**
    * Denormalise by writing the transaction header details.
    */
-  private void writeBeanTransactionDetails(JsonGenerator gen, ChangeSet changeSet) throws IOException {
+  private void writeBeanTransactionDetails(JsonWriter gen, ChangeSet changeSet) {
     String source = changeSet.getSource();
     if (source != null) {
-      gen.writeStringField("source", source);
+      gen.name("source");
+      gen.value(source);
     }
     String userId = changeSet.getUserId();
     if (userId != null) {
-      gen.writeStringField("userId", userId);
+      gen.name("userId");
+      gen.value(userId);
     }
     String userIpAddress = changeSet.getUserIpAddress();
     if (userIpAddress != null) {
-      gen.writeStringField("userIpAddress", userIpAddress);
+      gen.name("userIpAddress");
+      gen.value(userIpAddress);
     }
     Map<String, String> userContext = changeSet.getUserContext();
     if (userContext != null && !userContext.isEmpty()) {
-      gen.writeObjectFieldStart("userContext");
+      gen.name("userContext");
+      gen.beginObject();
       for (Map.Entry<String, String> entry : userContext.entrySet()) {
-        gen.writeStringField(entry.getKey(), entry.getValue());
+        gen.name(entry.getKey());
+        gen.value(entry.getValue());
       }
-      gen.writeEndObject();
+      gen.endObject();
     }
   }
 
   /**
    * For insert and update write the new/old values.
    */
-  private void writeBeanValues(JsonGenerator gen, BeanChange bean) throws IOException {
+  private void writeBeanValues(JsonWriter gen, BeanChange bean) {
     if (bean.getEvent() != ChangeType.DELETE) {
-      gen.writeFieldName("data");
-      gen.writeRaw(":");
-      gen.writeRaw(bean.getData());
+      gen.name("data");
+      gen.rawValue(bean.getData());
       String oldData = bean.getOldData();
       if (oldData != null) {
-        gen.writeRaw(",\"oldData\":");
-        gen.writeRaw(oldData);
+        gen.name("oldData");
+        gen.rawValue(oldData);
       }
     }
   }

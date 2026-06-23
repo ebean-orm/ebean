@@ -30,7 +30,7 @@ class PlatformArrayTypeJsonList implements PlatformArrayTypeFactory {
       // TODO: keepSource for @DbArray?
       return new ScalarTypeJsonList.VarcharWithConverter(DocPropertyType.UUID, nullable, false, ArrayElementConverter.UUID);
     }
-    return new ScalarTypeJsonList.Varchar(docType(valueType), nullable, false);
+    return new ScalarTypeJsonList(java.sql.Types.VARCHAR, JsonStorage.VARCHAR, docType(valueType), nullable, false);
   }
 
   @Override

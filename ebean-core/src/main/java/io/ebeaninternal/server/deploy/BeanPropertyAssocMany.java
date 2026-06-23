@@ -1,15 +1,14 @@
 package io.ebeaninternal.server.deploy;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.BeanCollection.ModifyListenMode;
 import io.ebean.bean.BeanCollectionAdd;
 import io.ebean.bean.EntityBean;
+import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.plugin.PropertyAssocMany;
 import io.ebean.text.PathProperties;
@@ -1043,9 +1042,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   private Object jsonReadCollection(String json) throws IOException {
     SpiJsonReader ctx = descriptor.createJsonReader(json);
-    JsonParser parser = ctx.parser();
-    JsonToken event = parser.nextToken();
-    if (JsonToken.VALUE_NULL == event) {
+    JsonReader parser = ctx.parser();
+    if (parser.isNullValue()) {
       return null;
     }
     return jsonReadCollection(ctx, null, null);
@@ -1068,20 +1066,18 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     BeanCollection<?> collection = createEmpty(parentBean);
     BeanCollectionAdd add = beanCollectionAdd(collection);
     Map<Object, T> existingBeans = extractBeans(targets);
-    do {
-
+    JsonReader parser = readJson.parser();
+    parser.beginArray();
+    while (parser.hasNextElement()) {
       EntityBean detailBean = getDetailBean(readJson, existingBeans);
-      if (detailBean == null) {
-        // read the entire array
-        break;
+      if (detailBean != null) {
+        add.addEntityBean(detailBean);
+        if (parentBean != null && childMasterProperty != null) {
+          // bind detail bean back to master via mappedBy property
+          childMasterProperty.setValue(detailBean, parentBean);
+        }
       }
-      add.addEntityBean(detailBean);
-
-      if (parentBean != null && childMasterProperty != null) {
-        // bind detail bean back to master via mappedBy property
-        childMasterProperty.setValue(detailBean, parentBean);
-      }
-    } while (true);
+    }
     return collection;
   }
 
@@ -1092,18 +1088,79 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     BeanProperty idProperty = targetDescriptor.idProperty();
     if (targets == null || idProperty == null) {
       return (EntityBean) targetDescriptor.jsonRead(readJson, name, null);
-    } else {
-      JsonToken token = readJson.parser().nextToken();
-      if (JsonToken.VALUE_NULL == token || JsonToken.END_ARRAY == token) {
-        return null;
-      }
-      // extract the id. We have to buffer the JSON;
-      ObjectNode node = readJson.mapper().readTree(readJson.parser());
-      SpiJsonReader jsonReader = readJson.forJson(node.traverse());
-      JsonNode idNode = node.get(idProperty.name());
-      Object id = idNode == null ? null : idProperty.jsonRead(readJson.forJson(idNode.traverse()));
-      return (EntityBean) targetDescriptor.jsonRead(jsonReader, name, targets.get(id));
     }
+    /// ROB Checkme
+    JsonReader parser = readJson.parser();
+    if (parser.isNullValue()) {
+      return null;
+    }
+    EntityBean incomingBean = (EntityBean) targetDescriptor.jsonRead(readJson, name, null);
+    Object id = idProperty.getValue(incomingBean);
+    EntityBean existingBean = (EntityBean) targets.get(id);
+    if (existingBean == null) {
+      return incomingBean;
+    }
+    mergeLoadedBean(targetDescriptor, incomingBean, existingBean);
+    return existingBean;
+  }
+
+  private void mergeLoadedBean(BeanDescriptor<?> descriptor, EntityBean incomingBean, EntityBean existingBean) {
+    EntityBeanIntercept incomingIntercept = incomingBean._ebean_getIntercept();
+    for (BeanProperty property : descriptor.propertiesBaseScalar()) {
+      if (incomingIntercept.isLoadedProperty(property.propertyIndex())) {
+        property.setValueIntercept(existingBean, property.getValue(incomingBean));
+      }
+    }
+    for (BeanPropertyAssocMany<?> property : descriptor.propertiesMany()) {
+      if (incomingIntercept.isLoadedProperty(property.propertyIndex())) {
+        Object mergedValue = mergeLoadedMany(property, property.getValue(incomingBean), property.getValue(existingBean));
+        property.setValueIntercept(existingBean, mergedValue);
+      }
+    }
+  }
+
+  private Object mergeLoadedMany(BeanPropertyAssocMany<?> property, Object incomingValue, Object existingValue) {
+    if (!(incomingValue instanceof Collection<?>)) {
+      return incomingValue;
+    }
+    if (!(existingValue instanceof Collection<?>)) {
+      return incomingValue;
+    }
+    Collection<?> incomingCollection = (Collection<?>) incomingValue;
+    Collection<?> existingCollection = (Collection<?>) existingValue;
+    BeanProperty idProperty = property.targetDescriptor.idProperty();
+    if (idProperty == null) {
+      return incomingValue;
+    }
+
+    Map<Object, EntityBean> existingById = new LinkedHashMap<>();
+    for (Object existingElement : existingCollection) {
+      if (existingElement instanceof EntityBean) {
+        EntityBean existingBean = (EntityBean) existingElement;
+        Object id = idProperty.getValue(existingBean);
+        if (id != null) {
+          existingById.put(id, existingBean);
+        }
+      }
+    }
+
+    BeanCollection<?> mergedCollection = property.createEmpty(null);
+    BeanCollectionAdd add = property.beanCollectionAdd(mergedCollection);
+    for (Object incomingElement : incomingCollection) {
+      if (!(incomingElement instanceof EntityBean)) {
+        continue;
+      }
+      EntityBean incomingBean = (EntityBean) incomingElement;
+      Object id = idProperty.getValue(incomingBean);
+      EntityBean existingBean = id == null ? null : existingById.get(id);
+      if (existingBean == null) {
+        add.addEntityBean(incomingBean);
+      } else {
+        mergeLoadedBean(property.targetDescriptor, incomingBean, existingBean);
+        add.addEntityBean(existingBean);
+      }
+    }
+    return mergedCollection;
   }
 
   /**

@@ -188,7 +188,10 @@ final class DefaultBeanLoader {
     query.setLazyLoadProperty(ebi.lazyLoadProperty());
     if (draft) {
       query.asDraft();
-    } else if (mode == SpiQuery.Mode.LAZYLOAD_BEAN && desc.isSoftDelete()) {
+    } else if (desc.isSoftDelete()
+        && (mode == SpiQuery.Mode.LAZYLOAD_BEAN || mode == SpiQuery.Mode.REFRESH_BEAN)) {
+      // include soft-deleted rows when lazy loading or refreshing so a
+      // refresh() on a soft-deleted bean can reload it (issue #3641)
       query.setIncludeSoftDeletes();
     }
     if (embeddedOwnerIndex > -1) {

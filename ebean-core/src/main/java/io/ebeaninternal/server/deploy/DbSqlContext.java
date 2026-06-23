@@ -64,6 +64,12 @@ public interface DbSqlContext {
   void appendParseSelect(String parseSelect, String alias);
 
   /**
+   * Parse and add a @Formula2 path based formula resolving the path placeholders
+   * (e.g. ${} or ${parent}) relative to the current node prefix.
+   */
+  void appendFormula2Select(String parseSelect);
+
+  /**
    * Append a Sql Formula select. This converts the "${ta}" keyword to the
    * current table alias.
    */

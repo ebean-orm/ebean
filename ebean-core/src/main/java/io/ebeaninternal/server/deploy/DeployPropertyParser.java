@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
+import io.ebean.util.SplitName;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 
 import java.util.HashSet;
@@ -64,6 +65,7 @@ public final class DeployPropertyParser extends DeployParser {
         firstProp = elProp;
       }
       addIncludes(elProp.elPrefix());
+      addFormula2Includes(elProp);
       return elProp.elPlaceholder(encrypted);
     }
   }
@@ -77,6 +79,24 @@ public final class DeployPropertyParser extends DeployParser {
   private void addIncludes(String prefix) {
     if (prefix != null) {
       includes.add(prefix);
+    }
+  }
+
+  /**
+   * Add the join paths required by a @Formula2 property so the joins it
+   * references (e.g. parent, parent.parent) are included to support the
+   * formula when used in where / order by / select clauses.
+   */
+  private void addFormula2Includes(ElPropertyDeploy elProp) {
+    BeanProperty beanProperty = elProp.beanProperty();
+    if (beanProperty != null) {
+      Set<String> formula2Joins = beanProperty.formula2Joins();
+      if (formula2Joins != null) {
+        String prefix = elProp.elPrefix();
+        for (String join : formula2Joins) {
+          includes.add(prefix == null ? join : SplitName.add(prefix, join));
+        }
+      }
     }
   }
 }

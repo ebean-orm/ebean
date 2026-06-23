@@ -1,6 +1,7 @@
 package org.tests.model.family;
 
 import io.ebean.annotation.Formula;
+import io.ebean.annotation.Formula2;
 import org.tests.model.basic.EBasic;
 
 import jakarta.persistence.*;
@@ -41,6 +42,15 @@ public class ParentPerson extends InheritablePerson {
   //@Coalesce({ "familyName", "parent.familyName" })
   @Formula(select = "coalesce(${ta}.family_name, j1.family_name)", join = GRAND_PARENT_PERSON_JOIN)
   private String effectiveFamilyName;
+
+  //@Formula2 equivalent - logical path-based, joins are auto-detected
+  @Formula2("coalesce(familyName, parent.familyName)")
+  private String derivedFamilyName;
+
+  // @Transient makes the @Formula2 property opt-in (excluded from queries by default)
+  @Transient
+  @Formula2("coalesce(familyName, parent.familyName)")
+  private String lazyDerivedFamilyName;
 
   //@Coalesce({ "address", "parent.address" })
   @Formula(select = "coalesce(${ta}.address, j1.address)", join = GRAND_PARENT_PERSON_JOIN)
@@ -88,6 +98,14 @@ public class ParentPerson extends InheritablePerson {
 
   public String getEffectiveFamilyName() {
     return effectiveFamilyName;
+  }
+
+  public String getDerivedFamilyName() {
+    return derivedFamilyName;
+  }
+
+  public String getLazyDerivedFamilyName() {
+    return lazyDerivedFamilyName;
   }
 
   public String getEffectiveAddress() {

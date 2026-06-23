@@ -1,6 +1,6 @@
 package io.ebean.xtest.json;
 
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.bean.PersistenceContext;
@@ -22,7 +22,7 @@ public class JsonBeanReaderTest extends BaseTestCase {
   @Test
   public void read() {
 
-    JsonParser parser = getParser();
+    JsonReader parser = getParser();
     JsonBeanReader<Customer> beanReader = json.createBeanReader(Customer.class, parser, null);
 
     Customer customer = beanReader.read();
@@ -30,7 +30,7 @@ public class JsonBeanReaderTest extends BaseTestCase {
     assertThat(customer.getName()).isEqualTo("dummy");
   }
 
-  private JsonParser getParser() {
+  private JsonReader getParser() {
 
     Customer customer = new Customer();
     customer.setId(42);
@@ -45,11 +45,11 @@ public class JsonBeanReaderTest extends BaseTestCase {
   @Test
   public void forJson() {
 
-    JsonParser parser = getParser();
+    JsonReader parser = getParser();
     JsonBeanReader<Customer> beanReader = json.createBeanReader(Customer.class, parser, null);
     beanReader.read();
 
-    JsonParser more = getParser();
+    JsonReader more = getParser();
     JsonBeanReader<Customer> moreReader = beanReader.forJson(more);
 
     Customer customer = moreReader.read();
@@ -60,7 +60,7 @@ public class JsonBeanReaderTest extends BaseTestCase {
   @Test
   public void persistenceContextPut_when_noPC() throws Exception {
 
-    JsonParser parser = getParser();
+    JsonReader parser = getParser();
     JsonBeanReader<Customer> beanReader = json.createBeanReader(Customer.class, parser, null);
     beanReader.read();
 
@@ -75,7 +75,7 @@ public class JsonBeanReaderTest extends BaseTestCase {
 
     JsonReadOptions options = new JsonReadOptions().setEnableLazyLoading(true);
 
-    JsonParser parser = getParser();
+    JsonReader parser = getParser();
     JsonBeanReader<Customer> beanReader = json.createBeanReader(Customer.class, parser, options);
     Customer customer = beanReader.read();
 

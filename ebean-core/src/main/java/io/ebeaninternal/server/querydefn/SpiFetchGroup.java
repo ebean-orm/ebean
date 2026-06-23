@@ -10,7 +10,7 @@ public interface SpiFetchGroup<T> extends FetchGroup<T> {
   /**
    * Return the detail to use for query execution.
    */
-  OrmQueryDetail detail(OrmQueryDetail existing);
+  OrmQueryDetail detail(OrmQueryDetail priorState);
 
   /**
    * Return the underlying detail for copy purposes.

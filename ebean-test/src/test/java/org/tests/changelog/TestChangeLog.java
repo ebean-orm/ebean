@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.ebean.DatabaseBuilder;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.annotation.ChangeLog;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanPersistRequest;
 import io.ebean.event.changelog.*;
 import io.ebean.test.LoggedSql;
@@ -172,7 +170,7 @@ public class TestChangeLog extends BaseTestCase {
 
   private Database createServer() {
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("h2other");
     config.loadFromProperties();
     config.setDdlGenerate(true);
@@ -187,7 +185,7 @@ public class TestChangeLog extends BaseTestCase {
     config.setChangeLogListener(changeLogListener);
     config.setChangeLogRegister(changeLogRegister);
 
-    return DatabaseFactory.create(config);
+    return config.build();
   }
 
   static class TDChangeLogPrepare implements ChangeLogPrepare {

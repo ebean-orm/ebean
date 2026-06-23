@@ -79,6 +79,21 @@ final class DLoadBeanContext extends DLoadBaseContext implements LoadBeanContext
     currentBuffer.add(ebi);
   }
 
+  BeanDescriptor<?> descriptor() {
+    return desc;
+  }
+
+  Set<EntityBeanIntercept> bufferedBeans() {
+    if (bufferList != null) {
+      Set<EntityBeanIntercept> beans = new HashSet<>();
+      for (LoadBuffer loadBuffer : bufferList) {
+        beans.addAll(loadBuffer.batch);
+      }
+      return beans;
+    }
+    return new HashSet<>(currentBuffer.batch);
+  }
+
   private LoadBuffer createBuffer(int size) {
     LoadBuffer buffer = new LoadBuffer(this, size);
     if (bufferList != null) {

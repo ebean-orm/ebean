@@ -3,11 +3,9 @@ package org.tests.readaudit;
 import io.ebean.DatabaseBuilder;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.FutureList;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadAuditQueryPlan;
@@ -303,7 +301,7 @@ public class TestReadAudit extends BaseTestCase {
 
   private Database createServer() {
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("h2other");
     config.loadFromProperties();
 
@@ -320,7 +318,7 @@ public class TestReadAudit extends BaseTestCase {
     config.setReadAuditLogger(readAuditLogger);
     config.setReadAuditPrepare(readAuditPrepare);
 
-    return DatabaseFactory.create(config);
+    return config.build();
   }
 
   private void resetCounters() {

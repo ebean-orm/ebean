@@ -1,6 +1,7 @@
 package org.tests.model.family;
 
 import io.ebean.annotation.Formula;
+import io.ebean.annotation.Formula2;
 import org.tests.model.basic.EBasic;
 
 import jakarta.persistence.CascadeType;
@@ -21,9 +22,12 @@ public class ChildPerson extends InheritablePerson {
 
   private String address;
 
-  //@Coalesce({ "familyName", "parent.familyName", "parent.parent.familyName" })
+ //@Formula2("coalesce(familyName, parent.familyName, parent.parent.familyName)")
   @Formula(select = "coalesce(${ta}.family_name, j1.family_name, j2.family_name)", join = PARENTS_JOIN)
   private String effectiveFamilyName;
+
+  @Formula2("coalesce(familyName, parent.familyName, parent.parent.familyName)")
+  private String derivedFamilyName;
 
   //@Coalesce({ "address", "parent.address", "parent.parent.address"  })
   @Formula(select = "coalesce(${ta}.address, j1.address, j2.address)", join = PARENTS_JOIN)
@@ -59,6 +63,10 @@ public class ChildPerson extends InheritablePerson {
 
   public String getEffectiveFamilyName() {
     return effectiveFamilyName;
+  }
+
+  public String getDerivedFamilyName() {
+    return derivedFamilyName;
   }
 
   public String getEffectiveAddress() {

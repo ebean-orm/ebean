@@ -42,6 +42,12 @@ public interface SpiDtoQuery<T> extends DtoQuery<T>, SpiSqlBinding {
   String planLabel();
 
   /**
+   * Return the explicit label (from {@code setLabel}) or null. Unlike
+   * {@link #planLabel()} this does not fall back to the profile location.
+   */
+  String explicitLabel();
+
+  /**
    * Obtain the location if necessary.
    */
   void obtainLocation();

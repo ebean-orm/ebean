@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
 import io.ebean.bean.EntityBean;
 import io.ebean.core.type.ScalarType;
 import io.ebeaninternal.api.json.SpiJsonReader;
@@ -49,25 +49,25 @@ class BeanDescriptorElementEmbeddedMap<T> extends BeanDescriptorElementEmbedded<
 
   @Override
   public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
-    JsonParser parser = readJson.parser();
+    JsonReader parser = readJson.parser();
     ElementCollector add = elementHelp.createCollector();
-    do {
-      String fieldName = parser.nextFieldName();
-      if (fieldName == null) {
-        break;
-      }
+    parser.beginObject();
+    while (parser.hasNextField()) {
+      String fieldName = parser.nextField();
       if (stringKey) {
-        parser.nextToken();
         Object val = readJsonElement(readJson, null, null); // CHECKME: Update existing map entry here?
         add.addKeyValue(fieldName, val);
       } else {
-        parser.nextFieldName();
+        parser.beginObject();
+        parser.nextField();
         Object key = scalarTypeKey.jsonRead(parser);
-        parser.nextFieldName();
+        parser.nextField();
         Object val = readJsonElement(readJson, null, null); // CHECKME: Update existing map entry here?
+        parser.endObject();
         add.addKeyValue(key, val);
       }
-    } while (true);
+    }
+    parser.endObject();
     return add.collection();
   }
 

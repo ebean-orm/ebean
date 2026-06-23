@@ -156,6 +156,33 @@ public class TestSoftDeleteBasic extends BaseTestCase {
   }
 
   @Test
+  public void testRefreshSoftDeleted() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("refreshSoftDeleted");
+    DB.save(bean);
+
+    DB.delete(bean);
+
+    // obtain a handle to the soft-deleted bean
+    EBasicSoftDelete softDeleted = DB.find(EBasicSoftDelete.class)
+      .setId(bean.getId())
+      .setIncludeSoftDeletes()
+      .findOne();
+
+    assertThat(softDeleted).isNotNull();
+
+    // refresh() must not throw EntityNotFoundException for a soft-deleted bean (issue #3641)
+    DB.refresh(softDeleted);
+
+    assertThat(softDeleted.getName()).isEqualTo("refreshSoftDeleted");
+    assertThat(softDeleted.isDeleted()).isTrue();
+
+    // Cleanup created entity
+    DB.deletePermanent(softDeleted);
+  }
+
+  @Test
   public void testFindSoftDeleted() {
 
     EBasicSoftDelete bean = new EBasicSoftDelete();

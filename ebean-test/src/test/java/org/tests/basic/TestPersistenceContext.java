@@ -1,11 +1,10 @@
 package org.tests.basic;
 
 import io.ebean.DB;
-import io.ebean.DatabaseFactory;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
+import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiPersistenceContext;
 import io.ebeaninternal.api.SpiTransaction;
@@ -250,16 +249,16 @@ public class TestPersistenceContext extends BaseTestCase {
   @Test
   @Disabled
   void initDb() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("h2-batch");
     config.loadFromProperties();
     config.setDdlExtra(false);
-    config.getDataSourceConfig().setUsername("sa");
-    config.getDataSourceConfig().setPassword("sa");
-    config.getDataSourceConfig().setUrl("jdbc:h2:file:./testsFile3;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=KEY,VALUE");
+    config.settings().getDataSourceConfig().setUsername("sa");
+    config.settings().getDataSourceConfig().setPassword("sa");
+    config.settings().getDataSourceConfig().setUrl("jdbc:h2:file:./testsFile3;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=KEY,VALUE");
     config.addClass(TestModel2.class);
     config.addClass(TmId.class);
-    DatabaseFactory.create(config);
+    config.build();
 
     String base = "x".repeat(240);
     // 10 mio TestModel - each needs about 1/4 kbytes -> 2,5 GB in total
@@ -284,16 +283,16 @@ public class TestPersistenceContext extends BaseTestCase {
   @Test
   @Disabled
   void testFindEachFindList() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("h2-batch");
     config.loadFromProperties();
     config.setDdlRun(false);
-    config.getDataSourceConfig().setUsername("sa");
-    config.getDataSourceConfig().setPassword("sa");
-    config.getDataSourceConfig().setUrl("jdbc:h2:file:./testsFile3;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=KEY,VALUE");
+    config.settings().getDataSourceConfig().setUsername("sa");
+    config.settings().getDataSourceConfig().setPassword("sa");
+    config.settings().getDataSourceConfig().setUrl("jdbc:h2:file:./testsFile3;DB_CLOSE_ON_EXIT=FALSE;NON_KEYWORDS=KEY,VALUE");
     config.addClass(TestModel2.class);
     config.addClass(TmId.class);
-    DatabaseFactory.create(config);
+    config.build();
 
     AtomicInteger i = new AtomicInteger();
     System.out.println("Doing findEach");

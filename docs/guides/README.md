@@ -18,18 +18,36 @@ existing Maven project. Complete the steps in order.
 | 2 | [Test container setup](add-ebean-postgres-test-container.md) | Start a PostgreSQL (or PostGIS) Docker container for tests using `@TestScope @Factory` with Avaje Inject; verify the test database works with `mvn verify` before adding production configuration |
 | 3 | [Database configuration](add-ebean-postgres-database-config.md) | Configure the production Ebean `Database` bean using `DataSourceBuilder` and `DatabaseBuilder` with Avaje Inject |
 
+## Migration & upgrades
+
+| Guide | Description |
+|-------|-------------|
+| [Migrate to `Database.builder()`](migrating-to-database-builder.md) | Replace legacy `new DatabaseConfig()` and `DatabaseFactory.create(...)` code with `Database.builder()` and `DatabaseBuilder.build()`. Includes common rewrites, fluent builder equivalents, and manual-review cases for semi-automated upgrades |
+| [Migrate JSON APIs from Jackson core to avaje-json-core](migrating-json-jackson-core-to-avaje-json-core.md) | Cut over `JsonParser`/`JsonGenerator`/`JsonFactory` usage to `JsonReader`/`JsonWriter`/`JsonStream`, including `DatabaseBuilder`/`DatabaseConfig` JSON config changes and validation checklist |
+
+## Observability
+
+| Guide | Description |
+|-------|-------------|
+| [Ebean OpenTelemetry tracing](add-ebean-opentelemetry.md) | Add `ebean-opentelemetry`, register `GlobalOpenTelemetry` once before Ebean databases are built, and troubleshoot missing spans or double-registration errors |
+| [Ebean query metrics and naming](ebean-query-metrics.md) | How Ebean query metric names are derived from `setLabel(..)` and profile locations; secondary (lazy/query) load naming; inline SQL comments; collecting metrics at runtime; mapping to avaje-metrics tags |
+| [Ebean query plan capture](ebean-query-plan-capture.md) | Enable and configure database query plan (`EXPLAIN`) capture for slow queries; bind capture vs plan capture; periodic and on-demand collection; thresholds, load limits, EXPLAIN dialect, and listeners |
+
 ## Entity beans
 
 | Guide | Description |
 |-------|-------------|
 | [Entity Bean Creation](entity-bean-creation.md) | How to generate clean, idiomatic Ebean entity beans for AI agents; patterns and anti-patterns; field visibility and accessor guidance; minimal boilerplate |
 | [Lombok with Ebean entity beans](lombok-with-ebean-entity-beans.md) | Which Lombok annotations to use and avoid on entity beans; why `@Data` is incompatible with Ebean; how to use `@Getter` + `@Setter` + `@Accessors(chain = true)` |
+| [`@DbJson` mapping support (built-in vs Jackson)](dbjson-mapping-support.md) | Which `@DbJson` / `@DbJsonB` property types are handled by the built-in avaje-json-core support versus which require `ebean-jackson-mapper` (Jackson `ObjectMapper`); supported `String`/`List`/`Set`/`Map` matrix; enum-key and `@DbArray` notes |
+| [Derived / formula properties (`@Formula`, `@Formula2`)](derived-formula-properties.md) | Read-only computed properties: physical-SQL `@Formula` (with `${ta}` and hand-written joins) versus logical path-based `@Formula2` (auto-resolved joins); use in `select`/`where`/`orderBy`; default inclusion and the `@Transient` opt-out |
 
 ## Querying
 
 | Guide | Description |
 |-------|-------------|
 | [Write Ebean queries with query beans](writing-ebean-query-beans.md) | Step-by-step guidance for AI agents to write type-safe Ebean queries; choose the right terminal method; tune `select()` / `fetch()` / `fetchQuery()`; and project to DTOs when entity beans are not the right output |
+| [Immutable bean cache for read-only references](immutable-bean-cache.md) | Use `ImmutableBeanCache` and `ImmutableBeanCaches.loading(...)` to resolve assoc-one references in read-only/unmodifiable queries, including secondary `fetchQuery`/`fetchLazy` loads |
 
 ## Persisting & transactions
 
@@ -132,7 +150,12 @@ tasks are at: https://github.com/ebean-orm/ebean/tree/HEAD/docs/guides/
 Key guides (fetch and follow these when performing the relevant task):
 - Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md
 - Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
+- Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
+- Immutable bean cache for read-only references: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/immutable-bean-cache.md
+- Ebean OpenTelemetry tracing: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-opentelemetry.md
+- Query metrics and naming: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/ebean-query-metrics.md
+- Query plan capture: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/ebean-query-plan-capture.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md
 - DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md
@@ -156,6 +179,7 @@ tasks are at: https://github.com/ebean-orm/ebean/tree/HEAD/docs/guides/
 Key guides (fetch and follow these when performing the relevant task):
 - Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md
 - Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
+- Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md

@@ -3,7 +3,6 @@ package org.tests.unitinternal;
 import io.ebean.Database;
 import io.ebean.DatabaseFactory;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.datasource.DataSourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +16,7 @@ public class HelloMain {
 
   public static void main(String[] args) {
     // ### Configuration Objects ###
-    DatabaseBuilder serverConfig = new DatabaseConfig();
+    DatabaseBuilder serverConfig = Database.builder();
     DataSourceConfig dataSourceConfig = new DataSourceConfig();
 
     // ### Configuration Settings ###

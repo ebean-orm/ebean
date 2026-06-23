@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.annotation.Aggregation;
 import io.ebean.annotation.Formula;
+import io.ebean.annotation.Formula2;
 import io.ebean.annotation.Where;
 import io.ebean.config.ClassLoadConfig;
 import io.ebean.DatabaseBuilder;
@@ -46,6 +47,7 @@ final class ReadAnnotationConfig {
     this.metaAnnotations.add(Column.class);
     this.metaAnnotations.add(Formula.class);
     this.metaAnnotations.add(Formula.List.class);
+    this.metaAnnotations.add(Formula2.class);
     this.metaAnnotations.add(Where.class);
     this.metaAnnotations.add(Where.List.class);
     this.metaAnnotations.add(Aggregation.class);

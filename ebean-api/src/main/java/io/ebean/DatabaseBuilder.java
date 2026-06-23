@@ -1,6 +1,6 @@
 package io.ebean;
 
-import com.fasterxml.jackson.core.JsonFactory;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.annotation.*;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.*;
@@ -360,18 +360,18 @@ public interface DatabaseBuilder {
   DatabaseBuilder putServiceObject(Object configObject);
 
   /**
-   * Set the Jackson JsonFactory to use.
+   * Set the JsonStream to use.
    * <p>
    * If not set a default implementation will be used.
    */
-  default DatabaseBuilder jsonFactory(JsonFactory jsonFactory) {
-    return setJsonFactory(jsonFactory);
+  default DatabaseBuilder jsonStream(JsonStream jsonStream) {
+    return setJsonStream(jsonStream);
   }
 
   /**
-   * @deprecated migrate to {@link #jsonFactory(JsonFactory)}.
+   * @deprecated migrate to {@link #jsonStream(JsonStream)}.
    */
-  DatabaseBuilder setJsonFactory(JsonFactory jsonFactory);
+  DatabaseBuilder setJsonStream(JsonStream jsonStream);
 
   /**
    * Set the JSON format to use for DateTime types.
@@ -724,19 +724,6 @@ public interface DatabaseBuilder {
   DatabaseBuilder setReadAuditPrepare(ReadAuditPrepare readAuditPrepare);
 
   /**
-   * Set the configuration for profiling.
-   */
-  default DatabaseBuilder profilingConfig(ProfilingConfig profilingConfig) {
-    return setProfilingConfig(profilingConfig);
-  }
-
-  /**
-   * @deprecated migrate to {@link #profilingConfig(ProfilingConfig)}.
-   */
-  @Deprecated
-  DatabaseBuilder setProfilingConfig(ProfilingConfig profilingConfig);
-
-  /**
    * Set the suffix appended to the base table to derive the view that contains the union
    * of the base table and the history table in order to support asOf queries.
    */
@@ -995,7 +982,7 @@ public interface DatabaseBuilder {
    * <p>
    * Use this to override the default known aggregation functions.
    */
-  DatabaseConfig aggregateFormulaContext(AggregateFormulaContext aggregateFormulaContext);
+  DatabaseBuilder aggregateFormulaContext(AggregateFormulaContext aggregateFormulaContext);
 
   /**
    * Set to true if all DB column and table names should use quoted identifiers.
@@ -2234,7 +2221,7 @@ public interface DatabaseBuilder {
    *
    * @param includeLabelInSql When true include a SQL inline comment in generated SELECT queries.
    */
-  DatabaseConfig includeLabelInSql(boolean includeLabelInSql);
+  DatabaseBuilder includeLabelInSql(boolean includeLabelInSql);
 
   /**
    * Set the naming convention to apply to metrics names.
@@ -2252,7 +2239,7 @@ public interface DatabaseBuilder {
   /**
    * Sets the length check mode.
    */
-  DatabaseConfig lengthCheck(LengthCheck lengthCheck);
+  DatabaseBuilder lengthCheck(LengthCheck lengthCheck);
 
   /**
    * Provides read access (getters) for the DatabaseBuilder configuration
@@ -2267,11 +2254,11 @@ public interface DatabaseBuilder {
     boolean isAutoLoadModuleInfo();
 
     /**
-     * Return the Jackson JsonFactory to use.
+     * Return the JsonStream to use.
      * <p>
      * If not set a default implementation will be used.
      */
-    JsonFactory getJsonFactory();
+    JsonStream getJsonStream();
 
     /**
      * Get the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
@@ -2489,11 +2476,6 @@ public interface DatabaseBuilder {
      * Return the tenancy catalog provider.
      */
     TenantCatalogProvider getTenantCatalogProvider();
-
-    /**
-     * Return the configuration for profiling.
-     */
-    ProfilingConfig getProfilingConfig();
 
     /**
      * Return the DB schema to use.

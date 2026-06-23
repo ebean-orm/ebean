@@ -1,6 +1,6 @@
 package io.ebean.xtest.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import io.avaje.json.JsonWriter;
 import io.ebean.DB;
 import io.ebean.text.PathProperties;
 import io.ebean.text.json.JsonContext;
@@ -90,8 +90,8 @@ public class JsonContextTest {
       .findList();
 
     String json = DB.json().toJsonPretty(orders);
-    assertThat(json).contains("[ {");
-    assertThat(json).contains("\"customer\": {");
+    assertThat(json).contains("[");
+    assertThat(json).contains("\"customer\":");
   }
 
   @Test
@@ -185,7 +185,7 @@ public class JsonContextTest {
 
     StringWriter writer = new StringWriter();
     JsonContext json = DB.json();
-    JsonGenerator generator = json.createGenerator(writer);
+    JsonWriter generator = json.createGenerator(writer);
 
     Customer customer = new Customer();
     customer.setId(1);
@@ -194,10 +194,10 @@ public class JsonContextTest {
 
     // we can use the generator before and after our json.toJson() call
     // ... confirming we are not closing the generator
-    generator.writeStartArray();
+    generator.beginArray();
     json.toJson(customer, generator, PathProperties.parse("id,name"));
-    generator.writeEndArray();
-    generator.close();
+    generator.endArray();
+    generator.flush();
 
     String jsonString = writer.toString();
     assertThat(jsonString).startsWith("[");
@@ -210,17 +210,18 @@ public class JsonContextTest {
 
     StringWriter writer = new StringWriter();
     JsonContext json = DB.json();
-    JsonGenerator generator = json.createGenerator(writer);
+    JsonWriter generator = json.createGenerator(writer);
 
     // test that we can write anything via writeRaw()
-    generator.writeRaw("START");
-    generator.writeStartArray();
-    generator.writeStartObject();
-    generator.writeNumberField("count", 12);
-    generator.writeEndObject();
-    generator.writeEndArray();
-    generator.writeRaw("END");
-    generator.close();
+    generator.rawChunk("START");
+    generator.beginArray();
+    generator.beginObject();
+    generator.name("count");
+    generator.value(12);
+    generator.endObject();
+    generator.endArray();
+    generator.rawChunk("END");
+    generator.flush();
 
     assertEquals("START[{\"count\":12}]END", writer.toString());
   }

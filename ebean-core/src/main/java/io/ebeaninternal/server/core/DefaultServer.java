@@ -206,6 +206,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
+  public void registerImmutableCache(ImmutableBeanCache<?> beanCache) {
+    BeanDescriptor<?> descriptor = descriptorManager.descriptor(beanCache.type());
+    if (descriptor != null) {
+      descriptor.registerImmutableCache(beanCache);
+    }
+  }
+
+  @Override
   public SpiLogManager log() {
     return logManager;
   }
@@ -2268,7 +2276,10 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (initRequest.isAll()) {
       queryPlanManager.setDefaultThreshold(initRequest.thresholdMicros());
     }
-    return descriptorManager.queryPlanInit(initRequest);
+    List<MetaQueryPlan> list = descriptorManager.queryPlanInit(initRequest);
+    dtoBeanManager.queryPlanInit(initRequest, list);
+    relationalQueryEngine.queryPlanInit(initRequest, list);
+    return list;
   }
 
   List<MetaQueryPlan> queryPlanCollectNow(QueryPlanRequest request) {

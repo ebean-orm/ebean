@@ -1,10 +1,8 @@
 package io.ebean.xtest.dbmigration;
 
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.dbmigration.DbMigration;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -89,15 +87,15 @@ public class DbMigrationGenerateTest {
     migration.addPlatform(Platform.YUGABYTE);
 
 
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("migrationtest");
     config.loadFromProperties();
     config.setRegister(false);
     config.setDefaultServer(false);
-    config.getProperties().put("ebean.hana.generateUniqueDdl", "true"); // need to generate unique statements to prevent them from being filtered out as duplicates by the DdlRunner
+    config.settings().getProperties().put("ebean.hana.generateUniqueDdl", "true"); // need to generate unique statements to prevent them from being filtered out as duplicates by the DdlRunner
 
     config.setPackages(Arrays.asList("misc.migration.v1_0"));
-    Database server = DatabaseFactory.create(config);
+    Database server = config.build();
     migration.setServer(server);
 
     // then we generate migration scripts for v1_0
@@ -108,7 +106,7 @@ public class DbMigrationGenerateTest {
     // and now for v1_1
     config.setPackages(Arrays.asList("misc.migration.v1_1"));
     server.shutdown();
-    server = DatabaseFactory.create(config);
+    server = config.build();
     migration.setServer(server);
     assertThat(migration.generateMigration()).isEqualTo("1.1");
     assertThat(migration.generateMigration()).isNull(); // subsequent call
@@ -128,7 +126,7 @@ public class DbMigrationGenerateTest {
     // and now for v1_2 with
     config.setPackages(Arrays.asList("misc.migration.v1_2"));
     server.shutdown();
-    server = DatabaseFactory.create(config);
+    server = config.build();
     migration.setServer(server);
     assertThat(migration.generateMigration()).isEqualTo("1.3");
     assertThat(migration.generateMigration()).isNull(); // subsequent call

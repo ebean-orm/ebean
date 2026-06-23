@@ -163,6 +163,7 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   private String nativeSql;
   private boolean orderById;
   private ProfileLocation profileLocation;
+  private Map<Class<?>, ImmutableBeanCache<?>> immutableBeanCaches;
 
   public DefaultOrmQuery(BeanDescriptor<T> desc, SpiEbeanServer server, ExpressionFactory expressionFactory) {
     this.beanDescriptor = desc;
@@ -254,9 +255,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
-  public final void setProfilePath(String label, String relativePath, @Nullable ProfileLocation profileLocation) {
+  public final void setProfilePath(String parentName, String relativePath, @Nullable ProfileLocation profileLocation) {
     this.profileLocation = profileLocation;
-    this.label = (profileLocation == null ? label : profileLocation.label()) + '_' + relativePath;
+    // 'parentName' is the parent query's full plan name (bean type + label, or
+    // the full name of a parent secondary query) so extend it directly.
+    this.label = parentName + '.' + relativePath;
   }
 
   @Override
@@ -776,6 +779,9 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
     copy.useBeanCache = useBeanCache;
     copy.useQueryCache = useQueryCache;
     copy.unmodifiable = unmodifiable;
+    if (immutableBeanCaches != null) {
+      copy.immutableBeanCaches = new LinkedHashMap<>(immutableBeanCaches);
+    }
     if (detail != null) {
       copy.detail = detail.copy(null);
     }
@@ -1471,6 +1477,12 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public Query<T> using(ImmutableBeanCache<?> beanCache) {
+    putImmutableBeanCache(beanCache);
+    return this;
+  }
+
+  @Override
   public final Query<T> usingConnection(Connection connection) {
     this.transaction = new ExternalJdbcTransaction(connection);
     return this;
@@ -1486,6 +1498,19 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public Query<T> usingMaster(boolean useMaster) {
     this.useMaster = useMaster;
     return this;
+  }
+
+  @Override
+  public void putImmutableBeanCache(ImmutableBeanCache<?> beanCache) {
+    if (immutableBeanCaches == null) {
+      immutableBeanCaches = new LinkedHashMap<>();
+    }
+    immutableBeanCaches.put(beanCache.type(), beanCache);
+  }
+
+  @Override
+  public Map<Class<?>, ImmutableBeanCache<?>> immutableBeanCaches() {
+    return immutableBeanCaches == null ? Collections.emptyMap() : Collections.unmodifiableMap(immutableBeanCaches);
   }
 
   @Override

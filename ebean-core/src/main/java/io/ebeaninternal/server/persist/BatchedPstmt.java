@@ -116,9 +116,12 @@ public final class BatchedPstmt implements SpiProfileTransactionEvent {
       getGeneratedKeys();
     }
     postExecute();
-    addTimingMetrics();
-    list.clear();
-    transaction.profileEvent(this);
+    try {
+      addTimingMetrics();
+      transaction.profileEvent(this);
+    } finally {
+      list.clear();
+    }
   }
 
   private void addTimingMetrics() {
