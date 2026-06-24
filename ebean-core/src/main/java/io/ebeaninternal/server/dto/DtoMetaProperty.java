@@ -34,21 +34,19 @@ final class DtoMetaProperty implements DtoReadSet {
     this.name = name;
     if (writeMethod != null) {
       this.setter = lookupMethodHandle(dtoType, writeMethod);
-      DeployProperty deployProp = new DtoMetaDeployProperty(name,
+      var deployProp = new DtoMetaDeployProperty(name,
         dtoType,
         propertyType(writeMethod),
         propertyClass(writeMethod),
         findMetaAnnotations(dtoType, writeMethod, name, annotationFilter));
-      scalarType = getScalarType(typeManager, deployProp);
+      scalarType = scalarType(typeManager, deployProp);
     } else {
       this.scalarType = null;
       this.setter = null;
     }
   }
 
-  private ScalarType<?> getScalarType(TypeManager typeManager, DeployProperty deployProp) {
-    final ScalarType<?> scalarType;
-
+  private ScalarType<?> scalarType(TypeManager typeManager, DeployProperty deployProp) {
     List<DbJson> json = deployProp.getMetaAnnotations(DbJson.class);
     if (!json.isEmpty()) {
       return typeManager.dbJsonType(deployProp, DeployUtil.dbJsonStorage(json.get(0).storage()), json.get(0).length());
@@ -62,8 +60,6 @@ final class DtoMetaProperty implements DtoReadSet {
       return typeManager.dbJsonType(deployProp, DbPlatformType.JSON, 0);
     }
     return typeManager.type(deployProp);
-
-
   }
 
   /**
