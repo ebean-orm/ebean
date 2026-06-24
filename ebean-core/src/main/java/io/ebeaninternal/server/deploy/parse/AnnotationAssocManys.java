@@ -187,7 +187,7 @@ final class AnnotationAssocManys extends AnnotationAssoc {
     CollectionTable collectionTable = get(prop, CollectionTable.class);
     String fullTableName = getFullTableName(collectionTable);
     if (fullTableName == null) {
-      fullTableName = descriptor.getBaseTable()+"_"+ CamelCaseHelper.toUnderscoreFromCamel(prop.getName());
+      fullTableName = descriptor.getBaseTable()+"_"+ CamelCaseHelper.toUnderscoreFromCamel(prop.name());
     }
 
     BeanTable localTable = factory.beanTable(descriptor.getBeanType());

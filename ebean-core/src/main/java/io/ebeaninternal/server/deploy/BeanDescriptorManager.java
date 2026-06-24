@@ -657,7 +657,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
           throw new RuntimeException(msg);
         }
         DeployTableJoin tableJoin = assocOne.getTableJoin();
-        prop.setSecondaryTableJoin(tableJoin, assocOne.getName());
+        prop.setSecondaryTableJoin(tableJoin, assocOne.name());
       }
     }
   }
@@ -715,8 +715,8 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     for (DeployBeanPropertyAssocOne<?> possibleMappedBy : ones) {
       Class<?> possibleMappedByType = possibleMappedBy.getTargetType();
       if (possibleMappedByType.equals(owningType)) {
-        prop.setMappedBy(possibleMappedBy.getName());
-        matchSet.add(possibleMappedBy.getName());
+        prop.setMappedBy(possibleMappedBy.name());
+        matchSet.add(possibleMappedBy.name());
       }
     }
 
@@ -733,7 +733,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     if (matchSet.size() == 2) {
       // try to find a match implicitly using a common naming convention
       // e.g. List<Bug> loggedBugs; ... search for "logged" in matchSet
-      String name = prop.getName();
+      String name = prop.name();
 
       // get the target type short name
       String targetType = prop.getTargetType().getName();
@@ -1151,7 +1151,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     // abstract classes as well.
     BeanPropertiesReader reflectProps = new BeanPropertiesReader(desc.propertyNames());
     for (DeployBeanProperty prop : desc.propertiesAll()) {
-      String propName = prop.getName();
+      String propName = prop.name();
       Integer pos = reflectProps.propertyIndex(propName);
       if (pos == null) {
         if (isPersistentField(prop)) {

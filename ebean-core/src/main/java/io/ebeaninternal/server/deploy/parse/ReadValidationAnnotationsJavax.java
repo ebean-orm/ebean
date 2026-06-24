@@ -41,8 +41,8 @@ final class ReadValidationAnnotationsJavax implements ReadValidationAnnotations 
   }
 
   private List<Size> getMetaAnnotationJavaxSize(DeployBeanProperty prop) {
-    final List<Size> size = prop.getMetaAnnotations(Size.class);
-    final List<Size.List> lists = prop.getMetaAnnotations(Size.List.class);
+    final List<Size> size = prop.metaAnnotations(Size.class);
+    final List<Size.List> lists = prop.metaAnnotations(Size.List.class);
     for (Size.List list : lists) {
       Collections.addAll(size, list.value());
     }

@@ -138,7 +138,7 @@ final class AnnotationAssocOnes extends AnnotationAssoc {
 
         String fkeyPrefix = null;
         if (nc.isUseForeignKeyPrefix()) {
-          fkeyPrefix = nc.getColumnFromProperty(beanType, prop.getName());
+          fkeyPrefix = nc.getColumnFromProperty(beanType, prop.name());
         }
 
         beanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), true, prop.getSqlFormulaSelect());

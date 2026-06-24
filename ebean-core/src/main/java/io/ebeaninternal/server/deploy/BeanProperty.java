@@ -181,7 +181,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   public BeanProperty(BeanDescriptor<?> descriptor, DeployBeanProperty deploy) {
     this.descriptor = descriptor;
-    this.name = InternString.intern(deploy.getName());
+    this.name = InternString.intern(deploy.name());
     this.propertyIndex = deploy.getPropertyIndex();
     this.unidirectionalShadow = deploy.isUndirectionalShadow();
     this.importedPrimaryKey = deploy.isImportedPrimaryKey();
@@ -234,7 +234,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.dbType = deploy.getDbType();
     this.scalarType = deploy.getScalarType();
     this.lob = isLobType(dbType);
-    this.propertyType = deploy.getPropertyType();
+    this.propertyType = deploy.propertyType();
     this.field = deploy.getField();
     this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), false, null);
     this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), dbEncrypted, dbColumn);

@@ -90,7 +90,7 @@ public final class DeployUtil {
 
   @SuppressWarnings("unchecked")
   void setEnumScalarType(Enumerated enumerated, DeployBeanProperty prop) {
-    Class<?> enumType = prop.getPropertyType();
+    Class<?> enumType = prop.propertyType();
     if (!enumType.isEnum()) {
       throw new IllegalArgumentException("Class [" + enumType + "] is Not a Enum?");
     }
@@ -130,7 +130,7 @@ public final class DeployUtil {
   private ScalarType<?> scalarType(DeployBeanProperty property) {
     // Note that Temporal types already have dbType
     // set via annotations
-    Class<?> propType = property.getPropertyType();
+    Class<?> propType = property.propertyType();
     try {
       ScalarType<?> scalarType = typeManager.type(propType, property.getDbType());
       if (scalarType != null || property.isTransient()) {
@@ -171,8 +171,8 @@ public final class DeployUtil {
       // set nullable(false) before the ScalarTypeArray is determined and assigned
       prop.setNullable(false);
     }
-    Class<?> type = prop.getPropertyType();
-    ScalarType<?> scalarType = typeManager.dbArrayType(type, prop.getGenericType(), prop.isNullable());
+    Class<?> type = prop.propertyType();
+    ScalarType<?> scalarType = typeManager.dbArrayType(type, prop.genericType(), prop.isNullable());
     if (scalarType == null) {
       throw new RuntimeException("No ScalarType for @DbArray type for " + prop);
     }
@@ -244,7 +244,7 @@ public final class DeployUtil {
       prop.setDbType(lobType);
     } else {
       // is String or byte[] ? used to determine if its a CLOB or BLOB
-      Class<?> type = prop.getPropertyType();
+      Class<?> type = prop.propertyType();
       // this also sets the lob flag on DeployBeanProperty
       int lobType = isClobType(type) ? dbCLOBType : dbBLOBType;
 

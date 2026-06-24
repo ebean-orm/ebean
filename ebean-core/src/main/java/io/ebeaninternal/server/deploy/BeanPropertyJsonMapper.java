@@ -25,7 +25,7 @@ public final class BeanPropertyJsonMapper extends BeanPropertyJsonBasic {
 
   public BeanPropertyJsonMapper(BeanDescriptor<?> desc, DeployBeanProperty deployProp) {
     super(desc, deployProp);
-    this.sourceDetection = deployProp.getMutationDetection() == MutationDetection.SOURCE;
+    this.sourceDetection = deployProp.mutationDetection() == MutationDetection.SOURCE;
   }
 
   private BeanPropertyJsonMapper(BeanPropertyJsonMapper source, BeanPropertyOverride override) {
