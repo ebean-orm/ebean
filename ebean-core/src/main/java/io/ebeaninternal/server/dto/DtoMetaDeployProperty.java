@@ -14,7 +14,8 @@ import java.util.Set;
  *
  * @author Roland Praml, FOCONIS AG
  */
-class DtoMetaDeployProperty implements DeployProperty {
+final class DtoMetaDeployProperty implements DeployProperty {
+
   private final String name;
   private final Class<?> ownerType;
   private final Type genericType;
