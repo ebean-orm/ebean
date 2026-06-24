@@ -34,27 +34,27 @@ final class DtoMetaDeployProperty implements DeployProperty {
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 
   @Override
-  public Type getGenericType() {
+  public Type genericType() {
     return genericType;
   }
 
   @Override
-  public Class<?> getPropertyType() {
+  public Class<?> propertyType() {
     return propertyType;
   }
 
   @Override
-  public Class<?> getOwnerType() {
+  public Class<?> ownerType() {
     return ownerType;
   }
 
   @Override
-  public <A extends Annotation> List<A> getMetaAnnotations(Class<A> annotationType) {
+  public <A extends Annotation> List<A> metaAnnotations(Class<A> annotationType) {
     List<A> result = new ArrayList<>();
     for (Annotation ann : metaAnnotations) {
       if (ann.annotationType() == annotationType) {
@@ -65,7 +65,7 @@ final class DtoMetaDeployProperty implements DeployProperty {
   }
 
   @Override
-  public MutationDetection getMutationDetection() {
+  public MutationDetection mutationDetection() {
     return mutationDetection;
   }
 

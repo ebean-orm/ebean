@@ -14,32 +14,32 @@ public interface DeployProperty {
   /**
    * Return the name of the property.
    */
-  String getName();
+  String name();
 
   /**
    * Return the generic type for this property.
    */
-  Type getGenericType();
+  Type genericType();
 
   /**
    * Return the property type.
    */
-  Class<?> getPropertyType();
+  Class<?> propertyType();
 
   /**
    * Returns the owner class of this property.
    */
-  Class<?> getOwnerType();
+  Class<?> ownerType();
 
   /**
    * Returns the annotations on this property.
    */
-  <A extends Annotation> List<A> getMetaAnnotations(Class<A> annotationType);
+  <A extends Annotation> List<A> metaAnnotations(Class<A> annotationType);
 
   /**
    * Returns the mutation detection setting of this property.
    */
-  MutationDetection getMutationDetection();
+  MutationDetection mutationDetection();
 
   /**
    * Sets the mutation detection setting of this property.

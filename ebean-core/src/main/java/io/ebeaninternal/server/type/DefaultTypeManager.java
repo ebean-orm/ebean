@@ -194,7 +194,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   @Override
   public ScalarType<?> type(DeployProperty prop) {
-    Type propertyType = prop.getGenericType();
+    Type propertyType = prop.genericType();
     if (propertyType instanceof ParameterizedType) {
       ParameterizedType pt = (ParameterizedType) propertyType;
       Type rawType = pt.getRawType();
@@ -202,7 +202,7 @@ public final class DefaultTypeManager implements TypeManager {
         return dbArrayType((Class<?>) rawType, propertyType, true);
       }
     }
-    return type(prop.getPropertyType());
+    return type(prop.propertyType());
   }
 
   /**
@@ -311,17 +311,17 @@ public final class DefaultTypeManager implements TypeManager {
 
   @Override
   public ScalarType<?> dbJsonType(DeployProperty prop, int dbType, int dbLength) {
-    Class<?> type = prop.getPropertyType();
+    Class<?> type = prop.propertyType();
     if (type.equals(String.class)) {
       return ScalarTypeJsonString.typeFor(postgres, dbType);
     }
     if (jsonMapper != null) {
       var markerAnnotation = jsonMapper.markerAnnotation();
-      if (markerAnnotation != null && !prop.getMetaAnnotations(markerAnnotation).isEmpty()) {
+      if (markerAnnotation != null && !prop.metaAnnotations(markerAnnotation).isEmpty()) {
         return createJsonObjectMapperType(prop, dbType, docPropertyType(prop, type));
       }
     }
-    Type genericType = prop.getGenericType();
+    Type genericType = prop.genericType();
     if (type.equals(List.class) && isValueTypeSimple(genericType)) {
       return ScalarTypeJsonList.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), keepSource(prop));
     }
@@ -335,7 +335,7 @@ public final class DefaultTypeManager implements TypeManager {
       }
       return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource(prop));
     }
-    if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
+    if (objectMapperPresent && prop.mutationDetection() == MutationDetection.DEFAULT) {
       ScalarTypeSet<?> typeSet = typeSets.get(type);
       if (typeSet != null) {
         return typeSet.forType(dbType);
@@ -345,10 +345,10 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private boolean keepSource(DeployProperty prop) {
-    if (prop.getMutationDetection() == MutationDetection.DEFAULT) {
+    if (prop.mutationDetection() == MutationDetection.DEFAULT) {
       prop.setMutationDetection(jsonManager.mutationDetection());
     }
-    return prop.getMutationDetection() == MutationDetection.SOURCE;
+    return prop.mutationDetection() == MutationDetection.SOURCE;
   }
 
   @SuppressWarnings("unchecked")
@@ -359,7 +359,7 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   private DocPropertyType docPropertyType(DeployProperty prop, Class<?> type) {
-    return type.equals(List.class) || type.equals(Set.class) ? docType(prop.getGenericType()) : DocPropertyType.OBJECT;
+    return type.equals(List.class) || type.equals(Set.class) ? docType(prop.genericType()) : DocPropertyType.OBJECT;
   }
 
   private DocPropertyType docType(Type genericType) {
@@ -409,14 +409,14 @@ public final class DefaultTypeManager implements TypeManager {
     if (jsonMapper == null) {
       throw new IllegalArgumentException("Unsupported @DbJson mapping - Missing dependency ebean-jackson-mapper? Jackson ObjectMapper not present for " + prop);
     }
-    if (MutationDetection.DEFAULT == prop.getMutationDetection()) {
+    if (MutationDetection.DEFAULT == prop.mutationDetection()) {
       prop.setMutationDetection(jsonManager.mutationDetection());
     }
-    Class<?> type = prop.getOwnerType();
+    Class<?> type = prop.ownerType();
     if (prop instanceof DeployBeanProperty) {
       type = ((DeployBeanProperty) prop).getField().getDeclaringClass();
     }
-    var req = new ScalarJsonRequest(jsonManager, dbType, docType, type, prop.getMutationDetection(), prop.getName());
+    var req = new ScalarJsonRequest(jsonManager, dbType, docType, type, prop.mutationDetection(), prop.name());
     return jsonMapper.createType(req);
   }
 

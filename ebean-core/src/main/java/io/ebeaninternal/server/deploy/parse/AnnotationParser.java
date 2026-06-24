@@ -61,7 +61,7 @@ public abstract class AnnotationParser extends AnnotationBase {
       prop.setImportedPrimaryKey();
     } else {
       prop.setId();
-      if (prop.getPropertyType().equals(UUID.class) && readConfig.isIdGeneratorAutomatic()) {
+      if (prop.propertyType().equals(UUID.class) && readConfig.isIdGeneratorAutomatic()) {
         descriptor.setUuidGenerator();
       }
     }

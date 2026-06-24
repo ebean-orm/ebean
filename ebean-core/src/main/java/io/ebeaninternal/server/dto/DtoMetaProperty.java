@@ -47,16 +47,16 @@ final class DtoMetaProperty implements DtoReadSet {
   }
 
   private ScalarType<?> scalarType(TypeManager typeManager, DeployProperty deployProp) {
-    List<DbJson> json = deployProp.getMetaAnnotations(DbJson.class);
+    List<DbJson> json = deployProp.metaAnnotations(DbJson.class);
     if (!json.isEmpty()) {
       return typeManager.dbJsonType(deployProp, DeployUtil.dbJsonStorage(json.get(0).storage()), json.get(0).length());
     }
-    List<DbJsonB> jsonB = deployProp.getMetaAnnotations(DbJsonB.class);
+    List<DbJsonB> jsonB = deployProp.metaAnnotations(DbJsonB.class);
     if (!jsonB.isEmpty()) {
       return typeManager.dbJsonType(deployProp, DbPlatformType.JSONB, jsonB.get(0).length());
     }
     if (typeManager.jsonMarkerAnnotation() != null
-      && !deployProp.getMetaAnnotations(typeManager.jsonMarkerAnnotation()).isEmpty()) {
+      && !deployProp.metaAnnotations(typeManager.jsonMarkerAnnotation()).isEmpty()) {
       return typeManager.dbJsonType(deployProp, DbPlatformType.JSON, 0);
     }
     return typeManager.type(deployProp);

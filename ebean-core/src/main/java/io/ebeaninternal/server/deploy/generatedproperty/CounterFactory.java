@@ -26,7 +26,7 @@ final class CounterFactory {
    * Create the GeneratedProperty based on the property type.
    */
   private GeneratedProperty createCounter(DeployBeanProperty property) {
-    Class<?> propType = property.getPropertyType();
+    Class<?> propType = property.propertyType();
     if (propType.equals(Integer.class) || propType.equals(int.class)) {
       return integerCounter;
     }
