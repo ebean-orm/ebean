@@ -439,6 +439,7 @@ public class DeployBeanProperty implements DeployProperty {
   /**
    * Return the name of the property.
    */
+  @Override
   public String getName() {
     return name;
   }
@@ -872,6 +873,7 @@ public class DeployBeanProperty implements DeployProperty {
   /**
    * Return the property type.
    */
+  @Override
   public Class<?> getPropertyType() {
     return propertyType;
   }
