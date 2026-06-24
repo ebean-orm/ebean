@@ -343,6 +343,10 @@ final class SaveManyBeans extends SaveManyBase {
       if (insertedParent) {
         // after insert set the modify listening mode for private owned etc
         c.setModifyListening(many.modifyListenMode());
+      } else {
+        // a lazily initialized collection (e.g. first save had null value) has no
+        // listen mode yet - set it now so that subsequent modifications are tracked
+        setListenMode(c, many);
       }
       // We must not reset when we still have to update other entities in the collection and set their new orderColumn value
       if (!hasOrderColumn) {
