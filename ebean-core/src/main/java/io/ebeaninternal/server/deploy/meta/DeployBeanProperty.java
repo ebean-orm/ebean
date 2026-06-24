@@ -231,7 +231,7 @@ public class DeployBeanProperty implements DeployProperty {
   }
 
   @Override
-  public Class<?> getOwnerType() {
+  public Class<?> ownerType() {
     return desc.getBeanType();
   }
 
@@ -268,7 +268,7 @@ public class DeployBeanProperty implements DeployProperty {
   }
 
   @Override
-  public MutationDetection getMutationDetection() {
+  public MutationDetection mutationDetection() {
     return mutationDetection;
   }
 
@@ -436,11 +436,8 @@ public class DeployBeanProperty implements DeployProperty {
     this.setter = setter;
   }
 
-  /**
-   * Return the name of the property.
-   */
   @Override
-  public String getName() {
+  public String name() {
     return name;
   }
 
@@ -487,9 +484,6 @@ public class DeployBeanProperty implements DeployProperty {
     this.generatedProperty = generatedValue;
   }
 
-  /**
-   * Return true if this property is not mandatory.
-   */
   @Override
   public boolean isNullable() {
     return nullable;
@@ -870,19 +864,13 @@ public class DeployBeanProperty implements DeployProperty {
     this.isTransient = true;
   }
 
-  /**
-   * Return the property type.
-   */
   @Override
-  public Class<?> getPropertyType() {
+  public Class<?> propertyType() {
     return propertyType;
   }
 
-  /**
-   * Return the generic type for this property.
-   */
   @Override
-  public Type getGenericType() {
+  public Type genericType() {
     return genericType;
   }
 
@@ -1088,7 +1076,7 @@ public class DeployBeanProperty implements DeployProperty {
 
   @Override
   @SuppressWarnings("unchecked")
-  public <A extends Annotation> List<A> getMetaAnnotations(Class<A> annotationType) {
+  public <A extends Annotation> List<A> metaAnnotations(Class<A> annotationType) {
     List<A> result = new ArrayList<>();
     for (Annotation ann : metaAnnotations) {
       if (ann.annotationType() == annotationType) {

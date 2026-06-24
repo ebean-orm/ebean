@@ -43,7 +43,7 @@ final class UpdateTimestampFactory {
    * Create the update GeneratedProperty depending on the property type.
    */
   GeneratedProperty createUpdateTimestamp(DeployBeanProperty property) {
-    Class<?> propType = property.getPropertyType();
+    Class<?> propType = property.propertyType();
     GeneratedProperty generatedProperty = map.get(propType);
     if (generatedProperty != null) {
       return generatedProperty;
