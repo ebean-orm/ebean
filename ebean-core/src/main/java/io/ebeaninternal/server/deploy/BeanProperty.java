@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
 import io.avaje.json.JsonReader;
-import io.avaje.json.JsonReader.Token;
 import io.ebean.DataIntegrityException;
 import io.ebean.ModifyAwareType;
 import io.ebean.ValuePair;
