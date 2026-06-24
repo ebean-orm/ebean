@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>16.5.0</version>
+    <version>18.0.0</version>
   </parent>
 
   <name>ebean api</name>
@@ -70,15 +70,13 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- Jackson core used internally by Ebean -->
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-      <optional>true</optional>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-json-core</artifactId>
+      <version>${avaje-json-core.version}</version>
     </dependency>
 
-    <!-- provided scope for JsonNode support -->
+    <!-- Jackson databind remains for ObjectMapper compatibility paths -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
@@ -105,6 +103,53 @@
         </excludes>
       </resource>
     </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <release>11</release>
+            </configuration>
+          </execution>
+          <execution>
+            <id>compile-21</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <release>21</release>
+              <compileSourceRoots>
+                <compileSourceRoot>${project.basedir}/src/main/java21</compileSourceRoot>
+              </compileSourceRoots>
+              <multiReleaseOutput>true</multiReleaseOutput>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+            <manifestEntries>
+              <Multi-Release>true</Multi-Release>
+            </manifestEntries>
+          </archive>
+        </configuration>
+<!--          <manifest>-->
+<!--            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
+<!--          </manifest>-->
+
+      </plugin>
+    </plugins>
   </build>
 
 </project>

@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
 import io.avaje.applog.AppLog;
+import io.ebean.ImmutableBeanCache;
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -17,6 +18,7 @@ import io.ebeaninternal.server.transaction.DefaultPersistenceContext;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.lang.System.Logger.Level.*;
 
@@ -52,6 +54,7 @@ final class BeanDescriptorCacheHelp<T> {
   private final boolean noCaching;
   private final SpiCacheControl cacheControl;
   private final SpiCacheRegion cacheRegion;
+  private final Set<ImmutableCacheInvalidator> immutableCaches = ConcurrentHashMap.newKeySet();
   /**
    * Set to true if all persist changes need to notify the cache.
    */
@@ -131,6 +134,9 @@ final class BeanDescriptorCacheHelp<T> {
    * Return true if the persist request needs to notify the cache.
    */
   boolean isCacheNotify(PersistRequest.Type type) {
+    if (hasImmutableCaches()) {
+      return true;
+    }
     return cacheRegion.isEnabled()
       && (cacheNotifyOnAll || cacheNotifyOnDelete && (type == PersistRequest.Type.DELETE || type == PersistRequest.Type.DELETE_PERMANENT));
   }
@@ -759,6 +765,9 @@ final class BeanDescriptorCacheHelp<T> {
    * Add appropriate cache changes to support delete by id.
    */
   void persistDeleteIds(Collection<Object> ids, CacheChangeSet changeSet) {
+    if (hasImmutableCaches()) {
+      changeSet.addImmutableRemoveMany(desc, ids);
+    }
     if (invalidateQueryCache) {
       changeSet.addInvalidate(desc);
     } else {
@@ -774,6 +783,9 @@ final class BeanDescriptorCacheHelp<T> {
    * Add appropriate cache changes to support delete bean.
    */
   void persistDelete(Object id, PersistRequestBean<T> deleteRequest, CacheChangeSet changeSet) {
+    if (hasImmutableCaches()) {
+      changeSet.addImmutableRemove(desc, id);
+    }
     if (invalidateQueryCache) {
       changeSet.addInvalidate(desc);
     } else {
@@ -808,6 +820,9 @@ final class BeanDescriptorCacheHelp<T> {
    * Add appropriate changes to support update.
    */
   void persistUpdate(Object id, PersistRequestBean<T> updateRequest, CacheChangeSet changeSet) {
+    if (hasImmutableCaches()) {
+      changeSet.addImmutableRemove(desc, id);
+    }
     if (invalidateQueryCache) {
       changeSet.addInvalidate(desc);
 
@@ -836,6 +851,9 @@ final class BeanDescriptorCacheHelp<T> {
    * Invalidate parts of cache due to SqlUpdate or external modification etc.
    */
   void persistTableIUD(TableIUD tableIUD, CacheChangeSet changeSet) {
+    if (hasImmutableCaches() && tableIUD.isUpdateOrDelete()) {
+      changeSet.addImmutableClear(desc);
+    }
     if (invalidateQueryCache) {
       changeSet.addInvalidate(desc);
       return;
@@ -892,6 +910,31 @@ final class BeanDescriptorCacheHelp<T> {
           naturalKeyCache.remove(oldKey);
         }
       }
+    }
+  }
+
+  void registerImmutableCache(ImmutableBeanCache<?> beanCache) {
+    if (beanCache instanceof ImmutableCacheInvalidator) {
+      immutableCaches.add((ImmutableCacheInvalidator) beanCache);
+    }
+  }
+
+  boolean hasImmutableCaches() {
+    return !immutableCaches.isEmpty();
+  }
+
+  void clearImmutableCaches() {
+    for (ImmutableCacheInvalidator immutableCache : immutableCaches) {
+      immutableCache.clear();
+    }
+  }
+
+  void removeImmutableCacheByIds(Collection<Object> ids) {
+    if (ids == null || ids.isEmpty()) {
+      return;
+    }
+    for (ImmutableCacheInvalidator immutableCache : immutableCaches) {
+      immutableCache.removeAll(ids);
     }
   }
 

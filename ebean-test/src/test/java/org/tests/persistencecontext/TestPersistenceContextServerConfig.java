@@ -2,8 +2,8 @@ package org.tests.persistencecontext;
 
 import io.ebean.*;
 import io.ebean.config.ContainerConfig;
+import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.xtest.BaseTestCase;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
@@ -31,7 +31,7 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
 
   static Database create() {
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("withPCQuery");
     config.setDdlExtra(false);
 
@@ -48,6 +48,6 @@ public class TestPersistenceContextServerConfig extends BaseTestCase {
     config.setRegister(false);
 
     config.addClass(EBasicVer.class);
-    return DatabaseFactory.create(config);
+    return config.build();
   }
 }

@@ -78,7 +78,7 @@ public class QCustomerAndOrTest {
     query.findList();
 
     assertThat(query.getGeneratedSql()).isEqualTo(
-      "select /* hiLabel */ _cust.id from be_customer _cust where (" +
+      "select /* Customer.hiLabel */ _cust.id from be_customer _cust where (" +
         "_cust.name = ? or exists (select 1 from be_contact contact where " +
         "contact.first_name = ? and contact.customer_id = _cust.id))"
     );

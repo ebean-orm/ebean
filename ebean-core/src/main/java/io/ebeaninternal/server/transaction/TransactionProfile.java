@@ -28,7 +28,7 @@ public final class TransactionProfile {
    */
   public TransactionProfile(long startTime, ProfileLocation location) {
     this.location = location;
-    this.label = location.label();
+    this.label = (location != null) ? location.label() : null;
     this.startTime = startTime;
     this.summary = new Summary();
   }

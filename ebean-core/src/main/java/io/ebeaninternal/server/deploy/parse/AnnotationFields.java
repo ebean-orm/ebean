@@ -270,6 +270,10 @@ final class AnnotationFields extends AnnotationParser {
     if (formula != null) {
       prop.setSqlFormula(processFormula(formula.select()), processFormula(formula.join()));
     }
+    Formula2 formula2 = prop.getMetaAnnotationFormula2(platform);
+    if (formula2 != null) {
+      prop.setFormula2Expression(formula2.value());
+    }
     final Aggregation aggregation = prop.getMetaAnnotation(Aggregation.class);
     if (aggregation != null) {
       prop.setAggregation(aggregation.value().replace("$1", prop.getName()));

@@ -40,17 +40,17 @@ If the project is not yet configured, first follow:
 
 ## Step 1 - Choose the correct persistence operation before editing code
 
-Do not start with `DB.save(...)` by habit. First decide what kind of change the
+Do not start with `database.save(...)` by habit. First decide what kind of change the
 caller is making.
 
 | Need | Preferred API | Use when |
 |------|---------------|----------|
-| Insert a bean that is definitely new | `DB.insert(bean)` | New-create flow, seed data, fixture setup |
-| Save a bean that may be new or existing | `DB.save(bean)` | Common default when bean state determines insert vs update |
-| Update a bean that is definitely existing | `DB.update(bean)` | Existing row should be updated only |
-| Delete one bean | `DB.delete(bean)` | Remove a loaded entity bean |
-| Update many rows without loading beans | `DB.update(...)` or `query.asUpdate()` | Set-based write, not per-row business logic |
-| Delete many rows without loading beans | bulk update/delete API or `DB.sqlUpdate(...)` | Set-based deletion |
+| Insert a bean that is definitely new | `database.insert(bean)` | New-create flow, seed data, fixture setup |
+| Save a bean that may be new or existing | `database.save(bean)` | Common default when bean state determines insert vs update |
+| Update a bean that is definitely existing | `database.update(bean)` | Existing row should be updated only |
+| Delete one bean | `database.delete(bean)` | Remove a loaded entity bean |
+| Update many rows without loading beans | `database.update(...)` or `query.asUpdate()` | Set-based write, not per-row business logic |
+| Delete many rows without loading beans | bulk update/delete API or `database.sqlUpdate(...)` | Set-based deletion |
 
 ### Agent rule
 
@@ -63,10 +63,10 @@ Choose the operation that matches intent:
 
 ### Style note
 
-Some codebases use `DB.save(bean)` and others use model instance methods such as
-`bean.save()`. Unless the project already standardizes on model instance methods,
-default to `DB.*(...)` style because it works regardless of whether entities
-extend `Model`.
+Use a `Database` instance for all persistence operations: `database.save(bean)`,
+`database.insert(bean)`, `database.update(bean)`, `database.delete(bean)`.
+Inject the `Database` bean or obtain it via `DB.getDefault()`. Avoid using the
+static `DB.*` convenience methods.
 
 ---
 
@@ -79,7 +79,7 @@ Customer customer = new Customer();
 customer.setName("Rob");
 customer.setEmail("rob@example.com");
 
-DB.insert(customer);
+database.insert(customer);
 ```
 
 ### Example - update an existing bean
@@ -91,7 +91,7 @@ Customer customer = new QCustomer()
 
 customer.setStatus(Customer.Status.ACTIVE);
 
-DB.update(customer);
+database.update(customer);
 ```
 
 ### When to prefer `insert()` over `save()`
@@ -128,7 +128,7 @@ public class Order {
 ```
 
 ```java
-DB.save(order);
+database.save(order);
 ```
 
 With the mapping above:
@@ -159,7 +159,7 @@ Customer customer = new QCustomer()
   .findOne();
 
 customer.setStatus(Customer.Status.INACTIVE);
-DB.save(customer);
+database.save(customer);
 ```
 
 ### Good fit
@@ -200,10 +200,10 @@ public void shipOrder(long orderId) {
     .findOne();
 
   order.setStatus(Order.Status.SHIPPED);
-  DB.save(order);
+  database.save(order);
 
   Shipment shipment = new Shipment(order, Instant.now());
-  DB.insert(shipment);
+  database.insert(shipment);
 }
 ```
 
@@ -245,17 +245,17 @@ flush, savepoints, or other low-level transaction control.
 ### Example - explicit transaction with try-with-resources
 
 ```java
-try (Transaction txn = DB.beginTransaction()) {
+try (Transaction txn = database.beginTransaction()) {
 
   Order order = new QOrder()
     .id.equalTo(orderId)
     .findOne();
 
   order.cancel();
-  DB.save(order);
+  database.save(order);
 
   AuditLog auditLog = new AuditLog("order-cancelled", orderId);
-  DB.insert(auditLog);
+  database.insert(auditLog);
 
   txn.commit();
 }
@@ -315,7 +315,7 @@ use `createTransaction()`. Most service code should use `@Transactional` or
 
 ## Step 8 - Use bulk update/delete or JDBC batch for many-row writes
 
-Loops of `DB.save(...)` are often the wrong tool for large write sets.
+Loops of `database.save(...)` are often the wrong tool for large write sets.
 
 ### Prefer bulk update for set-based changes
 
@@ -334,10 +334,10 @@ int rows = new QCustomer()
   .update();
 ```
 
-### Example - bulk update with `DB.update(...)`
+### Example - bulk update with `database.update(...)`
 
 ```java
-int rows = DB.update(Customer.class)
+int rows = database.update(Customer.class)
   .set("status", Customer.Status.ACTIVE)
   .where()
   .eq("status", Customer.Status.NEW)
@@ -371,7 +371,7 @@ try (Transaction txn = database.beginTransaction()) {
 @Transactional(batchSize = 50)
 public void importCustomers(List<Customer> customers) {
   for (Customer customer : customers) {
-    DB.insert(customer);
+    database.insert(customer);
   }
 }
 ```

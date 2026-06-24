@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.profile;
 
 import io.ebean.ProfileLocation;
-import io.ebeaninternal.server.util.Md5;
 
 final class DQueryPlanMeta {
 
@@ -12,18 +11,13 @@ final class DQueryPlanMeta {
   private final String sql;
   private final String hash;
 
-  DQueryPlanMeta(Class<?> type, String label, ProfileLocation profileLocation, String sql) {
+  DQueryPlanMeta(Class<?> type, String name, String label, ProfileLocation profileLocation, String sql, String hash) {
     this.type = type;
+    this.name = name;
     this.label = label;
     this.profileLocation = profileLocation;
     this.sql = sql;
-    String name = "dto." + type.getSimpleName();
-    if (label != null) {
-      name += "_" + label;
-    }
-    this.name = name;
-    String loc = profileLocation == null ? null : profileLocation.location();
-    this.hash = Md5.hash(sql, name, loc);
+    this.hash = hash;
   }
 
   public Class<?> getType() {

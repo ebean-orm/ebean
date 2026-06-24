@@ -20,16 +20,16 @@ public class BeanMapTest {
   private final Product object4 = new Product(4);
   private final Product object5 = new Product(5);
 
-  private Map<String, Object> all() {
-    Map<String, Object> all = new LinkedHashMap<>();
+  private LinkedHashMap<String, Object> all() {
+    LinkedHashMap<String, Object> all = new LinkedHashMap<>();
     all.put("1", new Product(1));
     all.put("2", new Product(2));
     all.put("3", new Product(3));
     return all;
   }
 
-  private Map<String, Object> some() {
-    Map<String, Object> all = new LinkedHashMap<>();
+  private LinkedHashMap<String, Object> some() {
+    LinkedHashMap<String, Object> all = new LinkedHashMap<>();
     all.put("2", new Product(2));
     all.put("3", new Product(3));
     return all;
@@ -73,7 +73,7 @@ public class BeanMapTest {
 
   @Test
   public void testAdd_given_someAlreadyIn() {
-    Map<String, Object> some = new LinkedHashMap<>(Map.of("2", object2, "3", object3));
+    LinkedHashMap<String, Object> some = new LinkedHashMap<>(Map.of("2", object2, "3", object3));
     BeanMap<String, Object> map = new BeanMap<>(some);
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 
@@ -90,7 +90,7 @@ public class BeanMapTest {
   @Test
   public void testAddSome_given_someAlreadyIn() {
 
-    Map<String, Object> some = new LinkedHashMap<>(Map.of("2", object2, "3", object3));
+    LinkedHashMap<String, Object> some = new LinkedHashMap<>(Map.of("2", object2, "3", object3));
     BeanMap<String, Object> map = new BeanMap<>(some);
     map.setModifyListening(BeanCollection.ModifyListenMode.ALL);
 

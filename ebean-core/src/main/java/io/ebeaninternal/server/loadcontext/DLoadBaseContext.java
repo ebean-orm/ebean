@@ -21,6 +21,8 @@ abstract class DLoadBaseContext {
 
   protected final String fullPath;
 
+  protected final String path;
+
   protected final String serverName;
 
   final OrmQueryProperties queryProps;
@@ -38,6 +40,7 @@ abstract class DLoadBaseContext {
     this.serverName = parent.server().name();
     this.desc = desc;
     this.queryProps = queryProps;
+    this.path = path;
     this.fullPath = parent.fullPath(path);
     this.hitCache = parent.isBeanCacheGet() && desc.isBeanCaching();
     this.objectGraphNode = parent.objectGraphNode(path);
@@ -50,15 +53,21 @@ abstract class DLoadBaseContext {
    * set onto the secondary query.
    */
   void setLabel(SpiQuery<?> query) {
-    String label = parent.planLabel();
-    if (label != null) {
-      query.setProfilePath(label, pathMode(query), parent.profileLocation());
+    String prefix = parent.namePrefix();
+    if (prefix != null) {
+      query.setProfilePath(prefix, pathMode(query), parent.profileLocation());
     }
   }
 
+  /**
+   * Extend the parent query's full name with this load's immediate path segment
+   * and load mode. The parent name already carries everything up to this point,
+   * so only the immediate path (not the root relative fullPath) is appended to
+   * avoid duplicating intermediate path segments on nested secondary loads.
+   */
   private String pathMode(SpiQuery<?> query) {
     final var loadMode = query.loadMode();
-    return fullPath == null ? '_' + loadMode : fullPath + "__" + loadMode;
+    return path == null ? loadMode : path + '.' + loadMode;
   }
 
   PersistenceContext persistenceContext() {

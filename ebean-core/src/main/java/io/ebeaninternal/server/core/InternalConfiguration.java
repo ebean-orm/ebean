@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import com.fasterxml.jackson.core.JsonFactory;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.DatabaseBuilder;
 import io.ebean.ExpressionFactory;
 import io.ebean.annotation.Platform;
@@ -89,7 +89,7 @@ public final class InternalConfiguration {
   private final boolean jacksonCorePresent;
   private final ExpressionFactory expressionFactory;
   private final SpiBackgroundExecutor backgroundExecutor;
-  private final JsonFactory jsonFactory;
+  private final JsonStream jsonStream;
   private final DocStoreFactory docStoreFactory;
   private final List<Plugin> plugins = new ArrayList<>();
   private final MultiValueBind multiValueBind;
@@ -108,7 +108,7 @@ public final class InternalConfiguration {
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(service(DocStoreFactory.class));
-    this.jsonFactory = config.getJsonFactory();
+    this.jsonStream = config.getJsonStream();
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
     this.bootupClasses = bootupClasses;
@@ -292,7 +292,7 @@ public final class InternalConfiguration {
   }
 
   SpiJsonContext createJsonContext(SpiEbeanServer server) {
-    return jacksonCorePresent ? new DJsonContext(server, jsonFactory, typeManager) : null;
+    return jacksonCorePresent ? new DJsonContext(server, jsonStream, typeManager) : null;
   }
 
   AutoTuneService createAutoTuneService(SpiEbeanServer server) {
@@ -306,7 +306,7 @@ public final class InternalConfiguration {
 
   RelationalQueryEngine createRelationalQueryEngine() {
     return new DefaultRelationalQueryEngine(binder, config.getDatabaseBooleanTrue(), config.getPlatformConfig().getDbUuid().useBinaryOptimized(),
-      config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList(), databasePlatform.autoCommitFalseOnFindIterate());
+      config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList(), databasePlatform.autoCommitFalseOnFindIterate(), config.isQueryPlanEnable());
   }
 
   OrmQueryEngine createOrmQueryEngine() {
@@ -401,16 +401,11 @@ public final class InternalConfiguration {
   }
 
   private SpiProfileHandler profileHandler() {
-
-    ProfilingConfig profilingConfig = config.getProfilingConfig();
-    if (!profilingConfig.isEnabled()) {
-      return new NoopProfileHandler();
-    }
     SpiProfileHandler handler = service(SpiProfileHandler.class);
-    if (handler == null) {
-      handler = new DefaultProfileHandler(profilingConfig);
+    if (handler != null) {
+      return plugin(handler);
     }
-    return plugin(handler);
+    return new NoopProfileHandler();
   }
 
   /**

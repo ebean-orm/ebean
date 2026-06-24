@@ -15,8 +15,23 @@ existing Maven project. Complete the steps in order.
 | Step | Guide | Description |
 |------|-------|-------------|
 | 1 | [Maven POM setup](add-ebean-postgres-maven-pom.md) | Add Ebean dependencies, the enhancement plugin, and the querybean-generator annotation processor to `pom.xml` |
-| 2 | [Database configuration](add-ebean-postgres-database-config.md) | Configure the Ebean `Database` bean using `DataSourceBuilder` and `DatabaseBuilder` with Avaje Inject |
-| 3 | [Test container setup](add-ebean-postgres-test-container.md) | Start a PostgreSQL (or PostGIS) Docker container for tests using `@TestScope @Factory` with Avaje Inject; covers image mirror, read-only datasource, and PostGIS variant |
+| 2 | [Test container setup](add-ebean-postgres-test-container.md) | Start a PostgreSQL (or PostGIS) Docker container for tests using `@TestScope @Factory` with Avaje Inject; verify the test database works with `mvn verify` before adding production configuration |
+| 3 | [Database configuration](add-ebean-postgres-database-config.md) | Configure the production Ebean `Database` bean using `DataSourceBuilder` and `DatabaseBuilder` with Avaje Inject |
+
+## Migration & upgrades
+
+| Guide | Description |
+|-------|-------------|
+| [Migrate to `Database.builder()`](migrating-to-database-builder.md) | Replace legacy `new DatabaseConfig()` and `DatabaseFactory.create(...)` code with `Database.builder()` and `DatabaseBuilder.build()`. Includes common rewrites, fluent builder equivalents, and manual-review cases for semi-automated upgrades |
+| [Migrate JSON APIs from Jackson core to avaje-json-core](migrating-json-jackson-core-to-avaje-json-core.md) | Cut over `JsonParser`/`JsonGenerator`/`JsonFactory` usage to `JsonReader`/`JsonWriter`/`JsonStream`, including `DatabaseBuilder`/`DatabaseConfig` JSON config changes and validation checklist |
+
+## Observability
+
+| Guide | Description |
+|-------|-------------|
+| [Ebean OpenTelemetry tracing](add-ebean-opentelemetry.md) | Add `ebean-opentelemetry`, register `GlobalOpenTelemetry` once before Ebean databases are built, and troubleshoot missing spans or double-registration errors |
+| [Ebean query metrics and naming](ebean-query-metrics.md) | How Ebean query metric names are derived from `setLabel(..)` and profile locations; secondary (lazy/query) load naming; inline SQL comments; collecting metrics at runtime; mapping to avaje-metrics tags |
+| [Ebean query plan capture](ebean-query-plan-capture.md) | Enable and configure database query plan (`EXPLAIN`) capture for slow queries; bind capture vs plan capture; periodic and on-demand collection; thresholds, load limits, EXPLAIN dialect, and listeners |
 
 ## Entity beans
 
@@ -24,12 +39,15 @@ existing Maven project. Complete the steps in order.
 |-------|-------------|
 | [Entity Bean Creation](entity-bean-creation.md) | How to generate clean, idiomatic Ebean entity beans for AI agents; patterns and anti-patterns; field visibility and accessor guidance; minimal boilerplate |
 | [Lombok with Ebean entity beans](lombok-with-ebean-entity-beans.md) | Which Lombok annotations to use and avoid on entity beans; why `@Data` is incompatible with Ebean; how to use `@Getter` + `@Setter` + `@Accessors(chain = true)` |
+| [`@DbJson` mapping support (built-in vs Jackson)](dbjson-mapping-support.md) | Which `@DbJson` / `@DbJsonB` property types are handled by the built-in avaje-json-core support versus which require `ebean-jackson-mapper` (Jackson `ObjectMapper`); supported `String`/`List`/`Set`/`Map` matrix; enum-key and `@DbArray` notes |
+| [Derived / formula properties (`@Formula`, `@Formula2`)](derived-formula-properties.md) | Read-only computed properties: physical-SQL `@Formula` (with `${ta}` and hand-written joins) versus logical path-based `@Formula2` (auto-resolved joins); use in `select`/`where`/`orderBy`; default inclusion and the `@Transient` opt-out |
 
 ## Querying
 
 | Guide | Description |
 |-------|-------------|
 | [Write Ebean queries with query beans](writing-ebean-query-beans.md) | Step-by-step guidance for AI agents to write type-safe Ebean queries; choose the right terminal method; tune `select()` / `fetch()` / `fetchQuery()`; and project to DTOs when entity beans are not the right output |
+| [Immutable bean cache for read-only references](immutable-bean-cache.md) | Use `ImmutableBeanCache` and `ImmutableBeanCaches.loading(...)` to resolve assoc-one references in read-only/unmodifiable queries, including secondary `fetchQuery`/`fetchLazy` loads |
 
 ## Persisting & transactions
 
@@ -64,6 +82,24 @@ useful for production deployments, especially in Kubernetes or AWS environments:
 ---
 
 ## Helping AI agents find these guides
+
+### Agent Skills (recommended)
+
+The **ebean-orm skill** packages these guides into a structured format that AI agents
+load on-demand. See the [ebean-orm/skills](https://github.com/ebean-orm/skills) repo
+for installation instructions. Quick start:
+
+```bash
+git clone git@github.com:ebean-orm/skills.git ~/.agents/ebean-skills
+mkdir -p ~/.agents/skills
+ln -sf ~/.agents/ebean-skills/ebean-orm ~/.agents/skills/ebean-orm
+```
+
+This works with [pi](https://github.com/mariozechner/pi-coding-agent),
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code), and any harness
+that supports the [Agent Skills standard](https://agentskills.io/specification).
+
+### Other approaches
 
 AI coding agents can only follow these guides if they know they exist. Below are
 copy-paste snippets for the most common AI tooling configurations. Add whichever
@@ -114,7 +150,12 @@ tasks are at: https://github.com/ebean-orm/ebean/tree/HEAD/docs/guides/
 Key guides (fetch and follow these when performing the relevant task):
 - Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md
 - Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
+- Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
+- Immutable bean cache for read-only references: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/immutable-bean-cache.md
+- Ebean OpenTelemetry tracing: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-opentelemetry.md
+- Query metrics and naming: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/ebean-query-metrics.md
+- Query plan capture: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/ebean-query-plan-capture.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md
 - DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md
@@ -138,6 +179,7 @@ tasks are at: https://github.com/ebean-orm/ebean/tree/HEAD/docs/guides/
 Key guides (fetch and follow these when performing the relevant task):
 - Maven POM setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-maven-pom.md
 - Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
+- Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md

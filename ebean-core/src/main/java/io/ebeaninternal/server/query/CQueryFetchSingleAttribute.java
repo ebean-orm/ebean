@@ -16,7 +16,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Collection;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static java.lang.System.Logger.Level.ERROR;
@@ -165,11 +164,7 @@ final class CQueryFetchSingleAttribute implements SpiProfileTransactionEvent, Ca
   public void profile() {
     transaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId());
-  }
-
-  Set<String> dependentTables() {
-    return queryPlan.dependentTables();
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), rowCount, query.profileId(), queryPlan.hash(), query.getGeneratedSql());
   }
 
   @Override

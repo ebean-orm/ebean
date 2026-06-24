@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -120,12 +120,12 @@ public final class ScalarTypeEncryptedWrapper<T> implements ScalarType<T>, Local
   }
 
   @Override
-  public T jsonRead(JsonParser parser) throws IOException {
+  public T jsonRead(JsonReader parser) throws IOException {
     return wrapped.jsonRead(parser);
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, T value) throws IOException {
+  public void jsonWrite(JsonWriter writer, T value) throws IOException {
     wrapped.jsonWrite(writer, value);
   }
 

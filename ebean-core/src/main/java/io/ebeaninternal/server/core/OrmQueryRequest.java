@@ -42,7 +42,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   private SpiQuerySecondary secondaryQueries;
   private List<T> cacheBeans;
   private boolean inlineCountDistinct;
-  private Set<String> dependentTables;
   private SpiQueryManyJoin manyJoin;
 
   public OrmQueryRequest(SpiEbeanServer server, OrmQueryEngine queryEngine, SpiQuery<T> query, SpiTransaction t) {
@@ -119,6 +118,12 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
     // disable lazy loading leaves loadContext null
     if (loadContext != null) {
       loadContext.executeSecondaryQueries(this, forEach);
+    }
+  }
+
+  public void populateFromImmutableCache() {
+    if (loadContext != null) {
+      loadContext.populateFromImmutableCache();
     }
   }
 
@@ -661,7 +666,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   public void putToQueryCache(Object result) {
-    beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, dependentTables, transaction.startTime()));
+    CQueryPlan plan = queryPlan();
+    if (plan != null) {
+      // only cache when we have the plan's dependent tables
+      beanDescriptor.queryCachePut(cacheKey, new QueryCacheEntry(result, plan.dependentTables(), transaction.startTime()));
+    }
   }
 
   /**
@@ -729,15 +738,6 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
 
   public boolean isInlineCountDistinct() {
     return inlineCountDistinct;
-  }
-
-  public void addDependentTables(Set<String> tables) {
-    if (tables != null && !tables.isEmpty()) {
-      if (dependentTables == null) {
-        dependentTables = new LinkedHashSet<>();
-      }
-      dependentTables.addAll(tables);
-    }
   }
 
   /**

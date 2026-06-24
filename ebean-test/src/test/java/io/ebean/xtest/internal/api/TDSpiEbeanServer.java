@@ -216,6 +216,11 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
+  public void registerImmutableCache(ImmutableBeanCache<?> beanCache) {
+
+  }
+
+  @Override
   public <T> CQuery<T> compileQuery(Type type, SpiQuery<T> query, Transaction t) {
     return null;
   }

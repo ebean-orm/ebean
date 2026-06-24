@@ -41,9 +41,9 @@ Ebean is an ORM library for Java and Kotlin focused on relational data access, t
 |------|------|------|
 | `DB.getDefault()` | Access default `Database` | `Database db = DB.getDefault();` |
 | `DB.byName("...")` | Access named `Database` | `Database reporting = DB.byName("reporting");` |
-| `DB.find(...)` | Query entities from default database | `Customer c = DB.find(Customer.class, id);` |
-| `DB.insert/save/update/delete` | Persist entity changes | `DB.save(customer);` |
-| `DB.beginTransaction()` | Manual transaction boundary | `try (Transaction txn = DB.beginTransaction()) { ... }` |
+| `database.find(...)` | Query entities | `Customer c = database.find(Customer.class, id);` |
+| `database.insert/save/update/delete` | Persist entity changes | `database.save(customer);` |
+| `database.beginTransaction()` | Manual transaction boundary | `try (Transaction txn = database.beginTransaction()) { ... }` |
 | `Database.builder()` | Programmatic `Database` setup | `Database.builder().loadFromProperties().build();` |
 
 ### Query APIs
@@ -168,9 +168,11 @@ class Customer {
   }
 }
 
-Customer customer = DB.find(Customer.class, 42);
+Database database = DB.getDefault(); // or injected
+
+Customer customer = database.find(Customer.class, 42);
 customer.setName("Updated");
-DB.save(customer);
+database.save(customer);
 ```
 
 ## Common Tasks & Guides
@@ -181,6 +183,8 @@ DB.save(customer);
 | Configure database and `Database` bean | [add-ebean-postgres-database-config.md](guides/add-ebean-postgres-database-config.md) |
 | Add PostgreSQL test container support | [add-ebean-postgres-test-container.md](guides/add-ebean-postgres-test-container.md) |
 | Generate DB migrations | [add-ebean-db-migration-generation.md](guides/add-ebean-db-migration-generation.md) |
+| Migrate JSON APIs from Jackson core to avaje-json-core | [migrating-json-jackson-core-to-avaje-json-core.md](guides/migrating-json-jackson-core-to-avaje-json-core.md) |
+| Know which `@DbJson` types need Jackson vs built-in | [dbjson-mapping-support.md](guides/dbjson-mapping-support.md) |
 | Model entity beans correctly | [entity-bean-creation.md](guides/entity-bean-creation.md) |
 | Use Lombok safely with entities | [lombok-with-ebean-entity-beans.md](guides/lombok-with-ebean-entity-beans.md) |
 | Write type-safe query bean queries | [writing-ebean-query-beans.md](guides/writing-ebean-query-beans.md) |

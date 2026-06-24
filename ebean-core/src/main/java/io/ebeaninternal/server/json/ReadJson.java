@@ -1,8 +1,10 @@
 package io.ebeaninternal.server.json;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
+import io.avaje.json.stream.BufferRecycleStrategy;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.bean.PersistenceContext;
@@ -22,8 +24,9 @@ import java.util.Map;
  */
 public final class ReadJson implements SpiJsonReader {
 
+  private final JsonStream jsonStream;
   private final BeanDescriptor<?> rootDesc;
-  private final JsonParser parser;
+  private final JsonReader parser;
   private final PathStack pathStack;
   /**
    * Map of the JsonReadBeanVisitor keyed by path.
@@ -38,9 +41,10 @@ public final class ReadJson implements SpiJsonReader {
   /**
    * Construct with parser and readOptions.
    */
-  public ReadJson(BeanDescriptor<?> desc, JsonParser parser, JsonReadOptions readOptions, Object objectMapper, boolean update) {
+  public ReadJson(BeanDescriptor<?> desc, JsonReader parser, JsonReadOptions readOptions, Object objectMapper, boolean update, JsonStream jsonStream) {
     this.rootDesc = desc;
     this.parser = parser;
+    this.jsonStream = jsonStream;
     this.objectMapper = objectMapper;
     this.persistenceContext = initPersistenceContext(readOptions);
     this.loadContext = initLoadContext(desc, readOptions);
@@ -54,7 +58,8 @@ public final class ReadJson implements SpiJsonReader {
   /**
    * Construct when transferring load context, persistence context, object mapper etc to a new ReadJson instance.
    */
-  private ReadJson(JsonParser moreJson, ReadJson source) {
+  private ReadJson(JsonReader moreJson, ReadJson source) {
+    this.jsonStream = source.jsonStream;
     this.parser = moreJson;
     this.rootDesc = source.rootDesc;
     this.pathStack = source.pathStack;
@@ -91,11 +96,20 @@ public final class ReadJson implements SpiJsonReader {
   }
 
   /**
-   * Return a new instance of ReadJson using the existing context but with a new JsonParser.
+   * Return a new instance of ReadJson using the existing context but with a new JsonReader.
    */
   @Override
-  public SpiJsonReader forJson(JsonParser moreJson) {
+  public SpiJsonReader forJson(JsonReader moreJson) {
     return new ReadJson(moreJson, this);
+  }
+
+  @Override
+  public SpiJsonReader forJson(String moreJson) {
+    JsonReader nestedReader = JsonStream.builder()
+      .bufferRecycling(BufferRecycleStrategy.NO_RECYCLING)
+      .build()
+      .reader(moreJson);
+    return new ReadJson(nestedReader, this);
   }
 
   /**
@@ -152,19 +166,19 @@ public final class ReadJson implements SpiJsonReader {
   }
 
   /**
-   * Return the JsonParser.
+   * Return the JsonReader.
    */
   @Override
-  public JsonParser parser() {
+  public JsonReader parser() {
     return parser;
   }
 
   /**
-   * Return the next JsonToken from the underlying parser.
+   * Return the current token from the underlying parser.
    */
   @Override
-  public JsonToken nextToken() throws IOException {
-    return parser.nextToken();
+  public Token nextToken() throws IOException {
+    return parser.currentToken();
   }
 
   /**
@@ -209,7 +223,7 @@ public final class ReadJson implements SpiJsonReader {
    */
   @Override
   public Object readValueUsingObjectMapper(Class<?> propertyType) throws IOException {
-    return mapper().readValue(parser, propertyType);
+    return mapper().readValue(parser.readRaw(), propertyType);
   }
 
   /**

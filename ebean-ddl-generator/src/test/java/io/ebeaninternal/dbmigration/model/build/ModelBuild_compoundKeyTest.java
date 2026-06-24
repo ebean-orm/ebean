@@ -1,10 +1,7 @@
 package io.ebeaninternal.dbmigration.model.build;
 
-
-import io.ebean.DatabaseBuilder;
+import io.ebean.Database;
 import io.localtest.BaseTestCase;
-import io.ebean.DatabaseFactory;
-import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
 import io.ebeaninternal.dbmigration.migration.Migration;
@@ -25,23 +22,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModelBuild_compoundKeyTest extends BaseTestCase {
 
   private SpiEbeanServer createServer() {
-
-    DatabaseBuilder config = new DatabaseConfig();
-    config.setName("h2");
-    config.loadFromProperties();
-    config.setName("h2other");
-    config.setDdlGenerate(false);
-    config.setDdlRun(false);
-    config.setDdlExtra(false);
-    config.setDefaultServer(false);
-    config.setRegister(false);
-
-    config.addClass(CKeyDetail.class);
-    config.addClass(CKeyParent.class);
-    config.addClass(CKeyAssoc.class);
-    config.addClass(CKeyParentId.class);
-
-    return (SpiEbeanServer) DatabaseFactory.create(config);
+    return (SpiEbeanServer) Database.builder()
+      .name("h2")
+      .loadFromProperties()
+      .name("h2other")
+      .ddlGenerate(false)
+      .ddlRun(false)
+      .ddlExtra(false)
+      .defaultDatabase(false)
+      .register(false)
+      .addClass(CKeyDetail.class)
+      .addClass(CKeyParent.class)
+      .addClass(CKeyAssoc.class)
+      .addClass(CKeyParentId.class)
+      .build();
   }
 
   @Test

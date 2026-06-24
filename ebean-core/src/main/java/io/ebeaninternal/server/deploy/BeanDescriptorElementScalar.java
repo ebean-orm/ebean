@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import io.avaje.json.JsonReader;
 import io.ebean.PersistenceIOException;
 import io.ebean.SqlUpdate;
 import io.ebean.bean.EntityBean;
@@ -40,15 +39,13 @@ class BeanDescriptorElementScalar<T> extends BeanDescriptorElement<T> {
 
   @Override
   public Object jsonReadCollection(SpiJsonReader readJson, EntityBean parentBean) throws IOException {
-    JsonParser parser = readJson.parser();
+    JsonReader parser = readJson.parser();
     ElementCollector add = elementHelp.createCollector();
-    do {
-      JsonToken token = parser.nextToken();
-      if (JsonToken.VALUE_NULL == token || JsonToken.END_ARRAY == token) {
-        break;
-      }
+    parser.beginArray();
+    while (parser.hasNextElement()) {
       add.addElement(scalarType.jsonRead(parser));
-    } while (true);
+    }
+    parser.endArray();
     return add.collection();
   }
 

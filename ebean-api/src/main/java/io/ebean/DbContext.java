@@ -99,6 +99,7 @@ final class DbContext {
   /**
    * Read, create and put of Databases.
    */
+  @SuppressWarnings("deprecation")
   private Database getWithCreate(String name) {
     lock.lock();
     try {

@@ -15,12 +15,12 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
   /**
    * The underlying Set implementation.
    */
-  private Set<E> set;
+  private LinkedHashSet<E> set;
 
   /**
    * Create with a specific Set implementation.
    */
-  public BeanSet(Set<E> set) {
+  public BeanSet(LinkedHashSet<E> set) {
     this.set = set;
   }
 
@@ -146,18 +146,22 @@ public final class BeanSet<E> extends AbstractBeanCollection<E> implements Set<E
     }
   }
 
-  /**
-   * Set the underlying set (used for lazy fetch).
-   */
-  @SuppressWarnings("unchecked")
-  public void setActualSet(Set<?> set) {
-    this.set = (Set<E>) set;
+  public BeanCollectionAdd collectionAdd() {
+    if (set == null) {
+      set = new LinkedHashSet<>();
+    }
+    return this;
+  }
+
+  public void refresh(ModifyListenMode modifyListenMode, BeanSet<E> newSet) {
+    setModifyListening(modifyListenMode);
+    this.set = newSet.actualSet();
   }
 
   /**
    * Return the actual underlying set.
    */
-  public Set<E> actualSet() {
+  public LinkedHashSet<E> actualSet() {
     return set;
   }
 

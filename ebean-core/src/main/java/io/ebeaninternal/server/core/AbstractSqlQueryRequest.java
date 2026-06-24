@@ -27,6 +27,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
   protected String bindLog = "";
   protected PreparedStatement pstmt;
   protected long startNano;
+  protected Binder binder;
   private final ReentrantLock lock = new ReentrantLock();
 
   /**
@@ -144,6 +145,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
   }
 
   protected void executeAsSql(Binder binder) throws SQLException {
+    this.binder = binder;
     lock.lock();
     try {
       query.checkCancelled();

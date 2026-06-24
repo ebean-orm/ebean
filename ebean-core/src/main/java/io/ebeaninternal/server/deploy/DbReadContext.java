@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -58,6 +60,17 @@ public interface DbReadContext {
    * Register a collection for lazy loading.
    */
   void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc);
+
+  /**
+   * Register a bean as a candidate for immutable cache population.
+   */
+  void registerForImmutable(EntityBeanIntercept ebi);
+
+  /**
+   * Return an immutable cached bean for the given descriptor and id if already present.
+   */
+  @Nullable
+  EntityBean immutableBeanHit(BeanDescriptor<?> descriptor, Object id);
 
   /**
    * Set back the bean that has just been loaded with its id.

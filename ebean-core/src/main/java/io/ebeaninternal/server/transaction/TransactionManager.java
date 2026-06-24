@@ -23,6 +23,7 @@ import io.ebeaninternal.api.*;
 import io.ebeaninternal.api.TransactionEventTable.TableIUD;
 import io.ebeaninternal.server.cache.CacheChangeSet;
 import io.ebeaninternal.server.cluster.ClusterManager;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanDescriptorManager;
 import io.ebeaninternal.server.profile.TimedProfileLocation;
 import io.ebeaninternal.server.profile.TimedProfileLocationRegistry;
@@ -301,7 +302,12 @@ public class TransactionManager implements SpiTransactionManager {
    * Create a new Transaction for query only purposes (can use read only datasource).
    */
   public SpiTransaction createReadOnlyTransaction(Object tenantId, boolean useMaster) {
-    return transactionFactory.createReadOnlyTransaction(tenantId, useMaster);
+    SpiTransaction t = transactionFactory.createReadOnlyTransaction(tenantId, useMaster);
+    ProfileStream stream = profileHandler.createProfileStream(null, "readOnly");
+    if (stream != null) {
+      t.setProfileStream(stream);
+    }
+    return t;
   }
 
   /**
@@ -364,6 +370,13 @@ public class TransactionManager implements SpiTransactionManager {
     RemoteTableMod tableMod = remoteEvent.getRemoteTableMod();
     if (tableMod != null) {
       changeSet.addInvalidate(tableMod.getTables());
+      for (String table : tableMod.getTables()) {
+        for (BeanDescriptor<?> descriptor : beanDescriptorManager.descriptors(table)) {
+          if (descriptor.hasImmutableCaches()) {
+            changeSet.addImmutableClear(descriptor);
+          }
+        }
+      }
     }
     List<TableIUD> tableIUDList = remoteEvent.getTableIUDList();
     if (tableIUDList != null) {
@@ -416,13 +429,6 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   /**
-   * Process the collected transaction profiling information.
-   */
-  final void profileCollect(TransactionProfile transactionProfile) {
-    profileHandler.collectTransactionProfile(transactionProfile);
-  }
-
-  /**
    * Collect execution time for an explicit transaction.
    */
   final void collectMetric(long exeMicros) {
@@ -464,6 +470,10 @@ public class TransactionManager implements SpiTransactionManager {
    */
   public final SpiTransaction beginServerTransaction() {
     SpiTransaction t = createTransaction(false, -1);
+    ProfileStream stream = profileHandler.createProfileStream(null, null);
+    if (stream != null) {
+      t.setProfileStream(stream);
+    }
     scopeManager.set(t);
     return t;
   }
@@ -569,9 +579,10 @@ public class TransactionManager implements SpiTransactionManager {
         registerProfileLocation(profileLocation);
       }
       transaction.setProfileLocation(profileLocation);
-      if (profileLocation.trace()) {
-        transaction.setProfileStream(profileHandler.createProfileStream(profileLocation));
-      }
+    }
+    ProfileStream stream = profileHandler.createProfileStream(profileLocation, label);
+    if (stream != null) {
+      transaction.setProfileStream(stream);
     }
   }
 

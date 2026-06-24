@@ -1,8 +1,11 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.*;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiSqlQuery;
+import io.ebeaninternal.server.bind.DataBindCapture;
+import io.ebeaninternal.server.query.SqlQueryPlan;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -11,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Wraps the objects involved in executing a SqlQuery.
@@ -39,9 +44,28 @@ public final class RelationalQueryRequest extends AbstractSqlQueryRequest {
   @Override
   protected void requestComplete() {
     String label = query.getLabel();
-    if (label != null) {
-      long exeMicros = (System.nanoTime() - startNano) / 1000L;
-      queryEngine.collect(label, exeMicros);
+    if (label == null) {
+      return;
+    }
+    long exeMicros = (System.nanoTime() - startNano) / 1000L;
+    queryEngine.collect(label, exeMicros);
+    // capture bind values to later collect the database query plan
+    if (binder != null && queryEngine.captureActive()) {
+      SqlQueryPlan plan = queryEngine.obtainPlan(label, sql, server);
+      if (plan.collectFor(exeMicros)) {
+        captureBindForQueryPlan(plan, exeMicros);
+      }
+    }
+  }
+
+  private void captureBindForQueryPlan(SqlQueryPlan plan, long exeMicros) {
+    final long startNanos = System.nanoTime();
+    try {
+      DataBindCapture capture = DataBindCapture.of(server.dataTimeZone());
+      binder.bind(query.getBindParams(), capture, new StringBuilder());
+      plan.setBind(capture.bindCapture(), exeMicros, startNanos);
+    } catch (SQLException e) {
+      CoreLog.log.log(ERROR, "Error capturing SqlQuery bind values", e);
     }
   }
 

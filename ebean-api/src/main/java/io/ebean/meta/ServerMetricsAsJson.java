@@ -42,6 +42,17 @@ public interface ServerMetricsAsJson {
   void write(Appendable buffer);
 
   /**
+   * Collect and write metrics as "v2" JSON to the given buffer.
+   * <p>
+   * The v2 form uses the canonical label-tag convention: each metric is written with
+   * a family {@code name} (e.g. {@code ebean.query}, {@code ebean.dml}) plus a
+   * {@code tags} string of sorted {@code key:value} pairs (e.g.
+   * {@code "kind:orm,label:Customer.findList,type:Customer"}) rather than the flat
+   * prefixed name. Timing, hash, location and sql attributes are unchanged.
+   */
+  void writeV2(Appendable buffer);
+
+  /**
    * Return the metrics in raw JSON.
    */
   String json();

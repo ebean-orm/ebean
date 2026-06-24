@@ -1,8 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -348,13 +347,39 @@ public final class ScalarTypeBoolean {
     }
 
     @Override
-    public Boolean jsonRead(JsonParser parser) {
-      return JsonToken.VALUE_TRUE == parser.getCurrentToken() ? Boolean.TRUE : Boolean.FALSE;
+    public Boolean jsonRead(JsonReader parser) {
+      if (parser.isNullValue()) {
+        return null;
+      }
+      var token = parser.currentToken();
+      if (token == JsonReader.Token.BOOLEAN) {
+        return parser.readBoolean();
+      }
+      if (token == JsonReader.Token.NUMBER) {
+        return parser.readDecimal().intValue() == 1;
+      }
+      if (token == JsonReader.Token.STRING) {
+        return parse(parser.readString());
+      }
+      String raw = parser.readRaw();
+      if (raw == null || "null".equals(raw)) {
+        return null;
+      }
+      if ("true".equals(raw) || "1".equals(raw)) {
+        return Boolean.TRUE;
+      }
+      if ("false".equals(raw) || "0".equals(raw)) {
+        return Boolean.FALSE;
+      }
+      if (raw.length() > 1 && raw.charAt(0) == '"' && raw.charAt(raw.length() - 1) == '"') {
+        return parse(raw.substring(1, raw.length() - 1));
+      }
+      return parse(raw);
     }
 
     @Override
-    public void jsonWrite(JsonGenerator writer, Boolean value) throws IOException {
-      writer.writeBoolean(value);
+    public void jsonWrite(JsonWriter writer, Boolean value) throws IOException {
+      writer.value(value);
     }
 
     @Override

@@ -1,7 +1,8 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonReader.Token;
+import io.avaje.json.JsonWriter;
 import io.ebean.config.JsonConfig;
 import io.ebean.config.dbplatform.ExtraDbTypes;
 import io.ebean.core.type.ScalarTypeBaseDateTime;
@@ -48,13 +49,19 @@ final class ScalarTypeLocalDateTime extends ScalarTypeBaseDateTime<LocalDateTime
   }
 
   @Override
-  public LocalDateTime jsonRead(JsonParser parser) throws IOException {
-    return parse(parser.getText());
+  public LocalDateTime jsonRead(JsonReader parser) throws IOException {
+    if (parser.isNullValue()) {
+      return null;
+    }
+    if (parser.currentToken() == Token.NUMBER) {
+      return parse(parser.readDecimal().toPlainString());
+    }
+    return parse(parser.readString());
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, LocalDateTime value) throws IOException {
-    writer.writeString(value.toString());
+  public void jsonWrite(JsonWriter writer, LocalDateTime value) throws IOException {
+    writer.value(value.toString());
   }
 
   @Override

@@ -14,6 +14,7 @@ public final class XBootstrapService {
   private static final SpiRawSqlService rawSqlService;
   private static final SpiProfileLocationFactory profileLocationFactory;
   private static final SpiFetchGroupService fetchGroupService;
+  private static final SpiImmutableCacheFactory immutableCacheFactory;
   private static final MetricFactory metricFactory;
   private static final SpiJsonService jsonService;
   static {
@@ -21,6 +22,7 @@ public final class XBootstrapService {
     SpiRawSqlService _raw = null;
     SpiProfileLocationFactory _profile = null;
     SpiFetchGroupService _fetch = null;
+    SpiImmutableCacheFactory _immutable = null;
     MetricFactory _metric = null;
     SpiJsonService _json = null;
     for (BootstrapService extension : ServiceLoader.load(BootstrapService.class)) {
@@ -32,6 +34,8 @@ public final class XBootstrapService {
         _profile = (SpiProfileLocationFactory)extension;
       } else if (extension instanceof SpiFetchGroupService) {
         _fetch = (SpiFetchGroupService)extension;
+      } else if (extension instanceof SpiImmutableCacheFactory) {
+        _immutable = (SpiImmutableCacheFactory) extension;
       } else if (extension instanceof MetricFactory) {
         _metric = (MetricFactory)extension;
       } else if (extension instanceof SpiJsonService) {
@@ -42,6 +46,7 @@ public final class XBootstrapService {
     rawSqlService = _raw;
     profileLocationFactory = _profile;
     fetchGroupService = _fetch;
+    immutableCacheFactory = _immutable;
     metricFactory = _metric;
     jsonService = _json;
   }
@@ -70,6 +75,10 @@ public final class XBootstrapService {
 
   static SpiProfileLocationFactory profileLocationFactory() {
     return profileLocationFactory;
+  }
+
+  static SpiImmutableCacheFactory immutableCacheFactory() {
+    return immutableCacheFactory;
   }
 
   /**

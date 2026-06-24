@@ -1,7 +1,7 @@
 package io.ebean.xtest.internal.server.text.json;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
+import io.avaje.json.JsonWriter;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.DatabaseBuilder;
 import io.ebean.config.DatabaseConfig;
 import io.ebean.platform.h2.H2Platform;
@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DJsonScalarTest {
 
   private final DJsonScalar jsonScalar;
+  private final JsonStream jsonStream = JsonStream.builder().build();
 
   public DJsonScalarTest() {
     var serverConfig = new DatabaseConfig();
@@ -33,37 +34,35 @@ public class DJsonScalarTest {
   @Test
   public void writeBasicTypes() throws IOException {
     StringWriter writer = new StringWriter();
-    JsonGenerator generator = createGenerator(writer);
+    JsonWriter generator = createGenerator(writer);
 
     UUID uuid = UUID.randomUUID();
     LocalDate today = LocalDate.now();
 
-    generator.writeRaw("[");
+    generator.rawChunk('[');
     jsonScalar.write(generator, "hello");
-    generator.writeRaw(",");
+    generator.rawChunk(',');
     jsonScalar.write(generator, uuid);
-    generator.writeRaw(",");
+    generator.rawChunk(',');
     jsonScalar.write(generator, today);
-    generator.writeRaw("]");
+    generator.rawChunk(']');
 
     generator.flush();
-    generator.close();
 
     String json = writer.toString();
     assertThat(json).contains("hello");
     assertThat(json).contains(uuid.toString());
   }
 
-  private JsonGenerator createGenerator(StringWriter writer) throws IOException {
-    JsonFactory factory = new JsonFactory();
-    return factory.createGenerator(writer);
+  private JsonWriter createGenerator(StringWriter writer) {
+    return jsonStream.writer(writer);
   }
 
   @Test
   public void writeDbArrayTypes() throws IOException {
 
     StringWriter writer = new StringWriter();
-    JsonGenerator generator = createGenerator(writer);
+    JsonWriter generator = createGenerator(writer);
 
     List<UUID> list = new ArrayList<>();
     list.add(UUID.randomUUID());
@@ -72,10 +71,9 @@ public class DJsonScalarTest {
     jsonScalar.write(generator, list);
 
     generator.flush();
-    generator.close();
 
     String json = writer.toString();
-    assertThat(json).isEqualTo("[\""+list.get(0)+"\", \""+list.get(1)+"\"]");
+    assertThat(json).isEqualTo("[\"" + list.get(0) + "\",\"" + list.get(1) + "\"]");
   }
 
 }

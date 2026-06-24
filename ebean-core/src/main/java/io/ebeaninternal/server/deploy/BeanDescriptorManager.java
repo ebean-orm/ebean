@@ -438,6 +438,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       if (list != null) {
         for (BeanDescriptor<?> desc : list) {
           desc.clearQueryCache();
+          desc.clearImmutableCaches();
         }
       }
     }

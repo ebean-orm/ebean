@@ -105,7 +105,6 @@ public final class CQueryEngine {
         request.transaction().logSummary(rcQuery.summary());
       }
       if (request.isQueryCachePut()) {
-        request.addDependentTables(rcQuery.dependentTables());
         if (collection instanceof List) {
           collection = (A) Collections.unmodifiableList((List<?>) collection);
           request.putToQueryCache(collection);
@@ -163,7 +162,6 @@ public final class CQueryEngine {
         request.transaction().logSummary(rcQuery.summary());
       }
       if (request.isQueryCachePut()) {
-        request.addDependentTables(rcQuery.dependentTables());
         request.putToQueryCache(count);
       }
       return count;
@@ -354,9 +352,7 @@ public final class CQueryEngine {
         cquery.auditFindMany();
       }
       request.executeSecondaryQueries(false);
-      if (request.isQueryCachePut()) {
-        request.addDependentTables(cquery.dependentTables());
-      }
+      request.populateFromImmutableCache();
       request.unmodifiableFreeze(beanCollection);
       return beanCollection;
 
@@ -390,6 +386,7 @@ public final class CQueryEngine {
         cquery.auditFind(bean);
       }
       request.executeSecondaryQueries(false);
+      request.populateFromImmutableCache();
       request.unmodifiableFreeze(bean);
       return (T) bean;
     } catch (SQLException e) {

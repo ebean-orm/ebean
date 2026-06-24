@@ -1,0 +1,419 @@
+package io.ebean.common;
+
+import io.ebean.bean.*;
+
+import java.util.*;
+
+/**
+ * Set capable of lazy loading and modification aware.
+ */
+public final class BeanSet<E> extends AbstractBeanCollection<E> implements SequencedSet<E>, BeanCollectionAdd {
+
+  private static final long serialVersionUID = 1L;
+
+  /**
+   * The underlying Set implementation.
+   */
+  private LinkedHashSet<E> set;
+
+  /**
+   * Create with a specific Set implementation.
+   */
+  public BeanSet(LinkedHashSet<E> set) {
+    this.set = set;
+  }
+
+  /**
+   * Create using an underlying LinkedHashSet.
+   */
+  public BeanSet() {
+    this(new LinkedHashSet<>());
+  }
+
+  public BeanSet(BeanCollectionLoader loader, EntityBean ownerBean, String propertyName) {
+    super(loader, ownerBean, propertyName);
+  }
+
+  @Override
+  public Set<E> freeze() {
+    return set == null ? null : Collections.unmodifiableSet(set);
+  }
+
+  @Override
+  public void toString(ToStringBuilder builder) {
+    builder.addCollection(set);
+  }
+
+  @Override
+  public void reset(EntityBean ownerBean, String propertyName) {
+    this.ownerBean = ownerBean;
+    this.propertyName = propertyName;
+    this.set = null;
+  }
+
+  @Override
+  public boolean isSkipSave() {
+    return set == null || (set.isEmpty() && !holdsModifications());
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void addEntityBean(EntityBean bean) {
+    set.add((E) bean);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void loadFrom(BeanCollection<?> other) {
+    if (set == null) {
+      set = new LinkedHashSet<>();
+    }
+    set.addAll((Collection<? extends E>) other.actualDetails());
+  }
+
+  @Override
+  public void internalAddWithCheck(Object bean) {
+    // set add() already de-dups so just add it
+    internalAdd(bean);
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public void internalAdd(Object bean) {
+    if (set == null) {
+      set = new LinkedHashSet<>();
+    }
+    if (bean != null) {
+      set.add((E) bean);
+    }
+  }
+
+  /**
+   * Returns true if the underlying set has its data.
+   */
+  @Override
+  public boolean isPopulated() {
+    return set != null;
+  }
+
+  /**
+   * Return true if this is a reference (lazy loading) bean collection. This is
+   * the same as !isPopulated();
+   */
+  @Override
+  public boolean isReference() {
+    return set == null;
+  }
+
+  @Override
+  public boolean checkEmptyLazyLoad() {
+    if (set == null) {
+      set = new LinkedHashSet<>();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  private void initClear() {
+    lock.lock();
+    try {
+      if (set == null) {
+        if (!disableLazyLoad && modifyListening) {
+          lazyLoadCollection(false);
+        } else {
+          set = new LinkedHashSet<>();
+        }
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  private void init() {
+    lock.lock();
+    try {
+      if (set == null) {
+        if (disableLazyLoad) {
+          set = new LinkedHashSet<>();
+        } else {
+          lazyLoadCollection(false);
+        }
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  public BeanCollectionAdd collectionAdd() {
+    if (set == null) {
+      set = new LinkedHashSet<>();
+    }
+    return this;
+  }
+
+  public void refresh(ModifyListenMode modifyListenMode, BeanSet<E> newSet) {
+    setModifyListening(modifyListenMode);
+    this.set = newSet.actualSet();
+  }
+
+  /**
+   * Return the actual underlying set.
+   */
+  public LinkedHashSet<E> actualSet() {
+    return set;
+  }
+
+  @Override
+  public Collection<E> actualDetails() {
+    return set;
+  }
+
+  @Override
+  public Collection<?> actualEntries() {
+    return set;
+  }
+
+  @Override
+  public String toString() {
+    if (set == null) {
+      return "BeanSet<deferred>";
+    } else {
+      return set.toString();
+    }
+  }
+
+  /**
+   * Equal if obj is a Set and equal in a Set sense.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    init();
+    return set.equals(obj);
+  }
+
+  @Override
+  public int hashCode() {
+    init();
+    return set.hashCode();
+  }
+
+  @Override
+  public void addBean(E bean) {
+    add(bean);
+  }
+
+  @Override
+  public void removeBean(E bean) {
+    if (set.remove(bean)) {
+      getModifyHolder().modifyRemoval(bean);
+    }
+  }
+
+  // -----------------------------------------------------//
+  // proxy method for map
+  // -----------------------------------------------------//
+
+  @Override
+  public boolean add(E bean) {
+    init();
+    if (modifyListening) {
+      if (set.add(bean)) {
+        modifyAddition(bean);
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return set.add(bean);
+  }
+
+  @Override
+  public boolean addAll(Collection<? extends E> beans) {
+    init();
+    if (modifyListening) {
+      boolean changed = false;
+      for (E bean : beans) {
+        if (set.add(bean)) {
+          // register the addition of the bean
+          modifyAddition(bean);
+          changed = true;
+        }
+      }
+      return changed;
+    }
+    return set.addAll(beans);
+  }
+
+  @Override
+  public void clear() {
+    initClear();
+    if (modifyListening) {
+      for (E bean : set) {
+        modifyRemoval(bean);
+      }
+    }
+    set.clear();
+  }
+
+  @Override
+  public boolean contains(Object bean) {
+    init();
+    return set.contains(bean);
+  }
+
+  @Override
+  public boolean containsAll(Collection<?> beans) {
+    init();
+    return set.containsAll(beans);
+  }
+
+  @Override
+  public boolean isEmpty() {
+    init();
+    return set.isEmpty();
+  }
+
+  @Override
+  public Iterator<E> iterator() {
+    init();
+    if (modifyListening) {
+      return new ModifyIterator<>(this, set.iterator());
+    }
+    return set.iterator();
+  }
+
+  @Override
+  public boolean remove(Object bean) {
+    init();
+    if (modifyListening) {
+      if (set.remove(bean)) {
+        modifyRemoval(bean);
+        return true;
+      }
+      return false;
+    }
+    return set.remove(bean);
+  }
+
+  @Override
+  public boolean removeAll(Collection<?> beans) {
+    init();
+    if (modifyListening) {
+      boolean changed = false;
+      for (Object bean : beans) {
+        if (set.remove(bean)) {
+          modifyRemoval(bean);
+          changed = true;
+        }
+      }
+      return changed;
+    }
+    return set.removeAll(beans);
+  }
+
+  @Override
+  public boolean retainAll(Collection<?> beans) {
+    init();
+    if (modifyListening) {
+      boolean changed = false;
+      Iterator<?> it = set.iterator();
+      while (it.hasNext()) {
+        Object bean = it.next();
+        if (!beans.contains(bean)) {
+          // not retaining this bean so add it to the removal list
+          it.remove();
+          modifyRemoval(bean);
+          changed = true;
+        }
+      }
+      return changed;
+    }
+    return set.retainAll(beans);
+  }
+
+  @Override
+  public int size() {
+    init();
+    return set.size();
+  }
+
+  @Override
+  public Object[] toArray() {
+    init();
+    return set.toArray();
+  }
+
+  @Override
+  public <T> T[] toArray(T[] array) {
+    init();
+    //noinspection SuspiciousToArrayCall
+    return set.toArray(array);
+  }
+
+  // -----------------------------------------------------//
+  // SequencedSet (Java 21+)
+  // -----------------------------------------------------//
+
+  @Override
+  public SequencedSet<E> reversed() {
+    init();
+    if (modifyListening) {
+      throw new UnsupportedOperationException("Not supported on modify listening set");
+    }
+    return set.reversed();
+  }
+
+  @Override
+  public void addFirst(E bean) {
+    init();
+    if (modifyListening) {
+      modifyAddition(bean);
+    }
+    set.addFirst(bean);
+  }
+
+  @Override
+  public void addLast(E bean) {
+    init();
+    if (modifyListening) {
+      modifyAddition(bean);
+    }
+    set.addLast(bean);
+  }
+
+  @Override
+  public E getFirst() {
+    init();
+    return set.getFirst();
+  }
+
+  @Override
+  public E getLast() {
+    init();
+    return set.getLast();
+  }
+
+  @Override
+  public E removeFirst() {
+    init();
+    if (modifyListening) {
+      E bean = set.removeFirst();
+      modifyRemoval(bean);
+      return bean;
+    }
+    return set.removeFirst();
+  }
+
+  @Override
+  public E removeLast() {
+    init();
+    if (modifyListening) {
+      E bean = set.removeLast();
+      modifyRemoval(bean);
+      return bean;
+    }
+    return set.removeLast();
+  }
+
+}

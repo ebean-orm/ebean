@@ -1,7 +1,7 @@
 package io.ebean.core.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -104,13 +104,16 @@ public abstract class ScalarTypeBaseVarchar<T> extends ScalarTypeBase<T> {
   }
 
   @Override
-  public T jsonRead(JsonParser parser) throws IOException {
-    return parse(parser.getValueAsString());
+  public T jsonRead(JsonReader parser) throws IOException {
+    if (parser.isNullValue()) {
+      return null;
+    }
+    return parse(parser.readString());
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, T value) throws IOException {
-    writer.writeString(format(value));
+  public void jsonWrite(JsonWriter writer, T value) throws IOException {
+    writer.value(format(value));
   }
 
   @Override

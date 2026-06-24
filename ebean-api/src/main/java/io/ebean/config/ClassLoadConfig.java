@@ -60,7 +60,8 @@ public class ClassLoadConfig {
   }
 
   public boolean isJacksonCorePresent() {
-    return isPresent("com.fasterxml.jackson.core.JsonParser");
+    // Legacy method name retained for compatibility; now checks avaje JSON core.
+    return isPresent("io.avaje.json.JsonReader");
   }
 
   /**
@@ -158,4 +159,3 @@ public class ClassLoadConfig {
     }
   }
 }
-

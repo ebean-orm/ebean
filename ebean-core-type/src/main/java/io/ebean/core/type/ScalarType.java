@@ -1,7 +1,7 @@
 package io.ebean.core.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.text.StringFormatter;
 import io.ebean.text.StringParser;
 
@@ -177,13 +177,44 @@ public interface ScalarType<T> extends StringParser, StringFormatter, ScalarData
   void writeData(DataOutput dataOutput, T value) throws IOException;
 
   /**
-   * Read the value from JsonParser.
+   * Read the value from JsonReader.
    */
-  T jsonRead(JsonParser parser) throws IOException;
+  default T jsonRead(JsonReader parser) throws IOException {
+    JsonReader.Token token = parser.currentToken();
+    if (token == JsonReader.Token.NULL) {
+      parser.isNullValue();
+      return null;
+    }
+    if (token == JsonReader.Token.STRING) {
+      return parse(parser.readString());
+    }
+    return parse(parser.readRaw());
+  }
 
   /**
-   * Write the value to the JsonGenerator.
+   * Write the value to the JsonWriter.
    */
-  void jsonWrite(JsonGenerator writer, T value) throws IOException;
+  default void jsonWrite(JsonWriter writer, T value) throws IOException {
+    if (value == null) {
+      writer.nullValue();
+      return;
+    }
+    String formatted = formatValue(value);
+    if (formatted == null) {
+      writer.nullValue();
+      return;
+    }
+    DocPropertyType docType = docType();
+    if (docType == DocPropertyType.OBJECT || docType == DocPropertyType.LIST || docType == DocPropertyType.ROOT || likelyRawJson(formatted)) {
+      writer.rawValue(formatted);
+    } else {
+      writer.value(formatted);
+    }
+  }
+
+  private static boolean likelyRawJson(String formatted) {
+    String trimmed = formatted.trim();
+    return !trimmed.isEmpty() && (trimmed.charAt(0) == '{' || trimmed.charAt(0) == '[');
+  }
 
 }

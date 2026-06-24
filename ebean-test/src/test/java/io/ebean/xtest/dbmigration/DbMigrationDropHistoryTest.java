@@ -1,9 +1,7 @@
 package io.ebean.xtest.dbmigration;
 
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.dbmigration.DbMigration;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -47,7 +45,7 @@ class DbMigrationDropHistoryTest {
 
     migration.setPathToResources("src/test/resources");
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("migrationtest-history");
     config.loadFromProperties();
     config.setRegister(false);
@@ -55,7 +53,7 @@ class DbMigrationDropHistoryTest {
 
 
     config.setPackages(Arrays.asList("misc.migration.history.v1_0"));
-    Database server = DatabaseFactory.create(config);
+    Database server = config.build();
     migration.setServer(server);
 
     // First, we clean up the output-directory
@@ -71,7 +69,7 @@ class DbMigrationDropHistoryTest {
     // and now for v1_1
     config.setPackages(Arrays.asList("misc.migration.history.v1_1"));
     server.shutdown();
-    server = DatabaseFactory.create(config);
+    server = config.build();
     migration.setServer(server);
     assertThat(migration.generateMigration()).isEqualTo("1.1");
     assertThat(migration.generateMigration()).isNull(); // subsequent call

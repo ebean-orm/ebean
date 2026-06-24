@@ -2,8 +2,8 @@ package io.ebean.redis.topic;
 
 import io.avaje.applog.AppLog;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.exceptions.JedisException;
+import redis.clients.jedis.util.Pool;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,10 +23,10 @@ public final class DaemonTopicRunner {
 
   private static final long reconnectWaitMillis = 1000;
 
-  private final JedisPool jedisPool;
+  private final Pool<Jedis> jedisPool;
   private final DaemonTopic daemonTopic;
 
-  public DaemonTopicRunner(JedisPool jedisPool, DaemonTopic daemonTopic) {
+  public DaemonTopicRunner(Pool<Jedis> jedisPool, DaemonTopic daemonTopic) {
     this.jedisPool = jedisPool;
     this.daemonTopic = daemonTopic;
   }
