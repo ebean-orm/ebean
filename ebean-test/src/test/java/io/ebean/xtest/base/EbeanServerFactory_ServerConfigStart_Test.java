@@ -2,6 +2,8 @@ package io.ebean.xtest.base;
 
 import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
+import io.ebean.DatabaseFactory;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.event.ServerConfigStartup;
 import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;

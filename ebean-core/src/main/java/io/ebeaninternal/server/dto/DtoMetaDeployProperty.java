@@ -4,7 +4,6 @@ import io.ebean.annotation.MutationDetection;
 import io.ebeaninternal.server.deploy.meta.DeployProperty;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +23,7 @@ class DtoMetaDeployProperty implements DeployProperty {
   private final boolean nullable;
   private MutationDetection mutationDetection = MutationDetection.DEFAULT;
 
-  DtoMetaDeployProperty(String name, Class<?> ownerType, Type genericType, Class<?> propertyType, Set<Annotation> metaAnnotations, Method method) {
+  DtoMetaDeployProperty(String name, Class<?> ownerType, Type genericType, Class<?> propertyType, Set<Annotation> metaAnnotations) {
     this.name = name;
     this.ownerType = ownerType;
     this.genericType = genericType;
