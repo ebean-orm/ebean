@@ -11,7 +11,7 @@ public final class DynamicPropertyAggregationFormulaMTO extends DynamicPropertyA
   private final Set<String> includes;
 
   DynamicPropertyAggregationFormulaMTO(BeanPropertyAssocOne prop, String name, String parsedFormula, boolean aggregate, BeanProperty asTarget, String alias, Set<String> includes) {
-    super(name, prop.idScalarType(), parsedFormula, aggregate, asTarget, alias);
+    super(name, prop.idScalarType(), parsedFormula, aggregate, asTarget, alias, Set.of());
     this.prop = prop;
     this.includes = includes;
   }
