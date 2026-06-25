@@ -2,6 +2,7 @@ package io.ebeaninternal.server.deploy.parse;
 
 import io.ebean.annotation.DbForeignKey;
 import io.ebean.annotation.FetchPreference;
+import io.ebean.annotation.Formula2;
 import io.ebean.annotation.TenantId;
 import io.ebean.annotation.Where;
 import io.ebean.config.NamingConvention;
@@ -88,6 +89,11 @@ final class AnnotationAssocOnes extends AnnotationAssoc {
       prop.setExtraWhere(processFormula(where.clause()));
     }
 
+    Formula2 formula2 = prop.getMetaAnnotationFormula2(platform);
+    if (formula2 != null) {
+      prop.setFormula2Expression(formula2.value());
+    }
+
     PrimaryKeyJoinColumn primaryKeyJoin = get(prop, PrimaryKeyJoinColumn.class);
     if (primaryKeyJoin != null) {
       readPrimaryKeyJoin(primaryKeyJoin, prop);
@@ -141,7 +147,8 @@ final class AnnotationAssocOnes extends AnnotationAssoc {
           fkeyPrefix = nc.getColumnFromProperty(beanType, prop.name());
         }
 
-        beanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), true, prop.getSqlFormulaSelect());
+        String formulaSelect = prop.getSqlFormulaSelect() != null ? prop.getSqlFormulaSelect() : prop.getFormula2Expression();
+        beanTable.createJoinColumn(fkeyPrefix, prop.getTableJoin(), true, formulaSelect);
       }
     }
   }

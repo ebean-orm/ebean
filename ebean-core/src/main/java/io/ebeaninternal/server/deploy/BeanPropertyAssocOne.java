@@ -594,9 +594,17 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
+  public boolean isFormula() {
+    return super.isFormula() || formula2Select != null;
+  }
+
+  @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
     if (!isTransient) {
-      if (primaryKeyExport) {
+      if (formula2Select != null) {
+        // @Formula2 on @ManyToOne: use formula2 expression as FK selector
+        ctx.appendFormula2Select(formula2Select);
+      } else if (primaryKeyExport) {
         descriptor.idProperty().appendSelect(ctx, subQuery);
       } else {
         localHelp.appendSelect(ctx, subQuery);
@@ -615,9 +623,32 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return super.addJoin(joinType, a1, a2, ctx);
   }
 
+  /**
+   * Add table join using a prefix to resolve table aliases.
+   */
+  @Override
+  public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
+    if (formula2Select != null) {
+      // @Formula2 on @ManyToOne: join target table with formula2 FK expression as ON clause
+      String parentPrefix = SplitName.split(prefix)[0]; // null for root-level
+      String a2 = ctx.tableAlias(prefix);
+      String resolvedFk = ctx.parseFormula2(formula2Select, parentPrefix);
+      String joinLiteral = joinType.literal(SqlJoinType.OUTER);
+      String foreignIdCol = tableJoin.columns()[0].getForeignDbColumn();
+      ctx.addFormula2Join(joinLiteral, tableJoin.getTable(), a2, foreignIdCol, resolvedFk);
+      return SqlJoinType.OUTER;
+    }
+    return super.addJoin(joinType, prefix, ctx);
+  }
+
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (!isTransient && !primaryKeyExport) {
+      if (formula2Select != null) {
+        // @Formula2 on @ManyToOne: auto-joins for the formula are handled via formula2JoinIncludes;
+        // no additional join SQL is emitted here (the FK value comes from the formula2 SELECT expression)
+        return;
+      }
       localHelp.appendFrom(ctx, joinType);
       if (sqlFormulaJoin != null) {
         String alias = ctx.tableAliasManyWhere(manyWhere);

@@ -519,6 +519,14 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       d.initialiseDocMapping();
     }
 
+    // PASS 5:
+    // parse @Formula2 expressions — runs after all descriptors are fully
+    // initialised so cross-descriptor property paths (e.g. parent.parent.someBean.id)
+    // can be resolved safely without hitting null targetDescriptors
+    for (BeanDescriptor<?> d : descMap.values()) {
+      d.initFormula2Properties();
+    }
+
     // create BeanManager for each non-embedded entity bean
     for (BeanDescriptor<?> d : descMap.values()) {
       d.initLast();

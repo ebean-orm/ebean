@@ -92,4 +92,12 @@ interface SqlTreeNode {
   default void addChild(SqlTreeNode extraJoin) {
     throw new UnsupportedOperationException();
   }
+
+  /**
+   * Add a child node at the beginning of the children list.
+   * Used to ensure formula2 dependency joins appear before the tree nodes that reference them.
+   */
+  default void addChildFirst(SqlTreeNode extraJoin) {
+    addChild(extraJoin);
+  }
 }

@@ -103,6 +103,17 @@ final class SqlTreeNodeExtraJoin implements SqlTreeNode {
   }
 
   @Override
+  public void addChildFirst(SqlTreeNode child) {
+    if (children == null) {
+      children = new ArrayList<>();
+    }
+    if (child.hasMany()) {
+      manyJoin = true;
+    }
+    children.add(0, child);
+  }
+
+  @Override
   public void dependentTables(Set<String> tables) {
     tables.add(assocBeanProperty.target().baseTable(SpiQuery.TemporalMode.CURRENT));
     if (children != null) {
