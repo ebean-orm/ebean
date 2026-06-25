@@ -119,7 +119,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   final String elPlaceHolderEncrypted;
   private final String sqlFormulaSelect;
   final String sqlFormulaJoin;
-  private String formula2Select;
+  protected String formula2Select;
   private Set<String> formula2Includes;
   private final String formula2RawExpression;
   private final String aggregation;

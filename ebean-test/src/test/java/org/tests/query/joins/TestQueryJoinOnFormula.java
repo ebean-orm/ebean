@@ -383,12 +383,12 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     assertEquals(1, sql.size());
 
     String querySql = sql.get(0);
-    // only one coalesce(family_name,...) -> the non-transient derivedFamilyName.
-    // If the transient property leaked into the default select there would be two.
+    // two non-transient @Formula2 properties with same expression (effectiveFamilyName + derivedFamilyName).
+    // If the transient lazyDerivedFamilyName also leaked in there would be three.
     int occurrences = querySql.split("coalesce\\(t0.family_name, t1.family_name\\)", -1).length - 1;
     assertThat(occurrences)
       .as("transient @Formula2 must not be selected by default")
-      .isEqualTo(1);
+      .isEqualTo(2);
   }
 
   @Test
@@ -407,6 +407,91 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     String querySql = sql.get(0);
     assertThat(querySql).contains("coalesce(t0.family_name, t1.family_name)");
     assertThat(querySql).contains("left join grand_parent_person t1 on t1.identifier = t0.parent_identifier");
+  }
+
+  /**
+   * Tests covering the scenario from PR #2773:
+   * fetch and/or where on a @Formula2 @ManyToOne via path should produce correct SQL joins.
+   * Previously (with old @Formula + physical join SQL), the join was incorrectly added to the
+   * root bean instead of the already-existing child node when fetch and where were combined.
+   * With @Formula2, the join ordering is always correct regardless of fetch/where combination.
+   */
+  @Test
+  void formula2_manyToOne_fetchOnly() {
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class)
+      .select("name")
+      .fetch("parent.effectiveBean")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+    String q = sql.get(0);
+    // parent join must appear, grand_parent join for formula2 dependency, then effectiveBean join
+    assertThat(q).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(q).containsPattern("left join grand_parent_person t\\d+ on t\\d+\\.identifier = t1\\.parent_identifier");
+    // effectiveBean join uses formula2: resolves through join aliases (someBean.id, parent.someBean.id)
+    assertThat(q).containsPattern("left join e_basic t\\d+ on t\\d+\\.id = coalesce\\(t\\d+\\.id, t\\d+\\.id\\)");
+  }
+
+  @Test
+  void formula2_manyToOne_whereOnly() {
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class)
+      .select("name")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+    String q = sql.get(0);
+    assertThat(q).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(q).containsPattern("left join grand_parent_person t\\d+ on t\\d+\\.identifier = t1\\.parent_identifier");
+    assertThat(q).containsPattern("left join e_basic t\\d+ on t\\d+\\.id = coalesce\\(t\\d+\\.id, t\\d+\\.id\\)");
+    assertThat(q).contains("where t");
+    assertThat(q).contains(".name = ?");
+  }
+
+  @Test
+  void formula2_manyToOne_fetchPartialWithWhere() {
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class)
+      .select("name")
+      .fetch("parent", "name")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+    String q = sql.get(0);
+    assertThat(q).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(q).containsPattern("left join grand_parent_person t\\d+ on t\\d+\\.identifier = t1\\.parent_identifier");
+    assertThat(q).containsPattern("left join e_basic t\\d+ on t\\d+\\.id = coalesce\\(t\\d+\\.id, t\\d+\\.id\\)");
+    assertThat(q).contains("where t");
+    assertThat(q).contains(".name = ?");
+  }
+
+  @Test
+  void formula2_manyToOne_fetchCompleteWithWhere() {
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class)
+      .select("name")
+      .fetch("parent")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+    String q = sql.get(0);
+    assertThat(q).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(q).containsPattern("left join grand_parent_person t\\d+ on t\\d+\\.identifier = t1\\.parent_identifier");
+    assertThat(q).containsPattern("left join e_basic t\\d+ on t\\d+\\.id = coalesce\\(t\\d+\\.id, t\\d+\\.id\\)");
+    assertThat(q).contains("where t");
+    assertThat(q).contains(".name = ?");
   }
 
   @Test

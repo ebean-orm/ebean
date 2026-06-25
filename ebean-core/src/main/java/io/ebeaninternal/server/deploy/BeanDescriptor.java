@@ -472,7 +472,6 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     if (unidirectional != null) {
       unidirectional.initialise(initContext);
     }
-    initFormula2Properties();
     idBinder.initialise();
     idBinderInLHSSql = idBinder.bindInSql(baseTableAlias);
     idBinderIdSql = idBinder.bindEqSql(baseTableAlias);
@@ -505,8 +504,10 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   /**
    * Parse @Formula2 logical expressions into placeholder-form SQL after all
    * relationships have been wired up and elPropertyDeploy() is fully functional.
+   * Called from BeanDescriptorManager in a dedicated pass after all descriptors
+   * have been fully initialised, so cross-descriptor paths are safe to navigate.
    */
-  private void initFormula2Properties() {
+  void initFormula2Properties() {
     for (BeanProperty prop : propertiesAll()) {
       String rawExpr = prop.formula2RawExpression();
       if (rawExpr != null) {
