@@ -82,6 +82,22 @@ public interface DbSqlContext {
   void appendFormulaJoin(String sqlFormulaJoin, SqlJoinType joinType, String tableAlias);
 
   /**
+   * Parse a @Formula2 expression, resolving path placeholders (e.g. ${} or ${parent})
+   * relative to the given parent prefix.
+   */
+  default String parseFormula2(String formula, String prefix) {
+    return formula;
+  }
+
+  /**
+   * Append a join where the ON clause FK side is a pre-resolved @Formula2 expression.
+   * Used for @Formula2 on @ManyToOne properties where the FK value is a formula.
+   */
+  default void addFormula2Join(String joinLiteral, String table, String a2, String foreignIdCol, String resolvedFkExpr) {
+    // default no-op for non-default implementations
+  }
+
+  /**
    * Return the current content length.
    */
   int length();

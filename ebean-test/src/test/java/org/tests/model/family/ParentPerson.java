@@ -18,8 +18,6 @@ public class ParentPerson extends InheritablePerson {
     + "(select i2.parent_identifier, count(*) as child_count, sum(i2.age) as child_age from child_person i2 group by i2.parent_identifier) "
     + "f2 on f2.parent_identifier = ${ta}.identifier";
 
-  private static final String GRAND_PARENT_PERSON_JOIN = "join grand_parent_person j1 on j1.identifier = ${ta}.parent_identifier";
-
   @ManyToOne(cascade = CascadeType.ALL)
   private GrandParentPerson parent;
 
@@ -40,7 +38,7 @@ public class ParentPerson extends InheritablePerson {
   private String address;
 
   //@Coalesce({ "familyName", "parent.familyName" })
-  @Formula(select = "coalesce(${ta}.family_name, j1.family_name)", join = GRAND_PARENT_PERSON_JOIN)
+  @Formula2("coalesce(familyName, parent.familyName)")
   private String effectiveFamilyName;
 
   //@Formula2 equivalent - logical path-based, joins are auto-detected
@@ -53,10 +51,10 @@ public class ParentPerson extends InheritablePerson {
   private String lazyDerivedFamilyName;
 
   //@Coalesce({ "address", "parent.address" })
-  @Formula(select = "coalesce(${ta}.address, j1.address)", join = GRAND_PARENT_PERSON_JOIN)
+  @Formula2("coalesce(address, parent.address)")
   private String effectiveAddress;
 
-  @Formula(select = "coalesce(${ta}.some_bean_id, j1.some_bean_id)", join = GRAND_PARENT_PERSON_JOIN)
+  @Formula2("coalesce(someBean.id, parent.someBean.id)")
   @ManyToOne
   private EBasic effectiveBean;
 
