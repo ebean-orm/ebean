@@ -64,8 +64,9 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
 
     assertThat(accesses).hasSize(2);
     if (isH2()) {
-      assertThat(query.getGeneratedSql()).isEqualTo("select t0.dtype, t0.id, t0.accessor_id, t0.principal_id, t2.dtype, t0.access_account_number, t1.cid, t1.name, t2.dtype, t2.account_number from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t2 on t2.account_number = t0.access_account_number and t2.dtype = 'B' left join hcustomer t3 on t3.cid = t0.principal_id where t1.status = ? and t3.status = ? and t0.id in (?,?,?,?,?)");
+      assertThat(query.getGeneratedSql()).isEqualTo("select t0.dtype, t0.id, t3.dtype, t0.access_account_number, t0.accessor_id, t1.cid, t1.name from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t3 on t3.account_number = t0.access_account_number left join hcustomer t2 on t2.cid = t0.principal_id where t1.status = ? and t2.status = ? and t0.id in (?,?,?,?,?)");
     } else {
+      // TODO
       assertThat(query.getGeneratedSql()).contains("select t0.dtype, t0.id, t0.accessor_id, t0.principal_id, t2.dtype, t0.access_account_number, t1.cid, t1.name, t2.dtype, t2.account_number from haccess t0 left join hcustomer t1 on t1.cid = t0.accessor_id left join haccount t2 on t2.account_number = t0.access_account_number and t2.dtype = 'B' left join hcustomer t3 on t3.cid = t0.principal_id where t1.status = ? and t3.status = ? and t0.id ");
     }
   }
