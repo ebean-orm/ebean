@@ -211,6 +211,15 @@ final class NoTransaction implements SpiTransaction {
   }
 
   @Override
+  public void setGeneratedPropertiesEnabled(boolean enable) {
+  }
+
+  @Override
+  public boolean isGeneratedPropertiesEnabled() {
+    return true;
+  }
+
+  @Override
   public void setSkipCache(boolean skipCache) {
   }
 

@@ -256,6 +256,15 @@ final class ImplicitReadOnlyTransaction implements SpiTransaction, TxnProfileEve
   }
 
   @Override
+  public void setGeneratedPropertiesEnabled(boolean enable) {
+  }
+
+  @Override
+  public boolean isGeneratedPropertiesEnabled() {
+    return true;
+  }
+
+  @Override
   public void setBatchMode(boolean batchMode) {
   }
 
