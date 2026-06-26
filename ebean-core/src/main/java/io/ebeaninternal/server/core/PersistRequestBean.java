@@ -262,13 +262,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       GeneratedProperty generatedProperty = prop.generatedProperty();
       if (prop.isVersion()) {
         if (isLoadedProperty(prop)) {
-          // @Version property must be loaded to be involved
+          // @Version property must be loaded to be involved — always auto-incremented
           Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
           Object oldVal = prop.getValue(entityBean);
           setVersionValue(value);
           intercept.setOldValue(prop.propertyIndex(), oldVal);
         }
-      } else {
+      } else if (transaction == null || transaction.isGeneratedPropertiesEnabled()) {
         // @WhenModified set without invoking interception
         Object oldVal = prop.getValue(entityBean);
         Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
@@ -280,17 +280,22 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void onFailedUpdateUndoGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
-      Object oldVal = intercept.origValue(prop.propertyIndex());
-      if (oldVal != null) {
-        prop.setValue(entityBean, oldVal);
+      if (prop.isVersion() || transaction == null || transaction.isGeneratedPropertiesEnabled()) {
+        // undo version always (it was always set); undo others only if they were set
+        Object oldVal = intercept.origValue(prop.propertyIndex());
+        if (oldVal != null) {
+          prop.setValue(entityBean, oldVal);
+        }
       }
     }
   }
 
   private void onInsertGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenInsert()) {
-      Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
-      prop.setValueChanged(entityBean, value);
+      if (prop.isVersion() || transaction == null || transaction.isGeneratedPropertiesEnabled() || prop.getValue(entityBean) == null) {
+        Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
+        prop.setValueChanged(entityBean, value);
+      }
     }
   }
 

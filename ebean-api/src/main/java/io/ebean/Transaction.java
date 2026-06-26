@@ -261,6 +261,27 @@ public interface Transaction extends AutoCloseable {
   void setUpdateAllLoadedProperties(boolean updateAllLoadedProperties);
 
   /**
+   * Set to false to disable auto-generation of {@code @WhenCreated}, {@code @WhenModified},
+   * {@code @WhoCreated} and {@code @WhoModified} values for this transaction.
+   * <p>
+   * When disabled, Ebean will only set a generated property value if the property currently
+   * has a null value (for inserts) or is a {@code @Version} property. Any value already set
+   * on the bean is preserved.
+   * <p>
+   * This is useful in backup and restore scenarios where you need to retain the original
+   * audit timestamps and user values rather than have them overwritten.
+   * <pre>{@code
+   *   try (Transaction txn = DB.beginTransaction()) {
+   *     txn.setGeneratedPropertiesEnabled(false);
+   *     bean.setWhenCreated(originalTimestamp);
+   *     DB.save(bean);
+   *     txn.commit();
+   *   }
+   * }</pre>
+   */
+  void setGeneratedPropertiesEnabled(boolean enable);
+
+  /**
    * Set if the L2 cache should be skipped for "find by id" and "find by natural key" queries.
    * <p>
    * By default {@link DatabaseConfig#isSkipCacheAfterWrite()} is true and that means that for

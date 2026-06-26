@@ -245,6 +245,16 @@ public abstract class SpiTransactionProxy implements SpiTransaction {
   }
 
   @Override
+  public void setGeneratedPropertiesEnabled(boolean enable) {
+    transaction.setGeneratedPropertiesEnabled(enable);
+  }
+
+  @Override
+  public boolean isGeneratedPropertiesEnabled() {
+    return transaction.isGeneratedPropertiesEnabled();
+  }
+
+  @Override
   public Boolean isUpdateAllLoadedProperties() {
     return transaction.isUpdateAllLoadedProperties();
   }
