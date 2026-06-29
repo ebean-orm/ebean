@@ -346,7 +346,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private boolean keepSource(DeployProperty prop) {
     if (prop.mutationDetection() == MutationDetection.DEFAULT) {
-      prop.setMutationDetection(jsonManager.mutationDetection());
+      prop.setMutationDetection(jsonManager != null ? jsonManager.mutationDetection() : MutationDetection.NONE);
     }
     return prop.mutationDetection() == MutationDetection.SOURCE;
   }
