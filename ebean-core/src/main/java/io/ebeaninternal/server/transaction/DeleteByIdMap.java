@@ -91,4 +91,16 @@ public final class DeleteByIdMap {
       }
     }
   }
+
+  public void merge(DeleteByIdMap other) {
+    if (other == null || other.beanMap.isEmpty()) {
+      return;
+    }
+    other.beanMap.forEach((key, value) ->
+      beanMap.merge(key, value, (a, b) -> {
+        b.getIds().forEach(id -> a.addId(PersistRequest.Type.UPDATE, id));
+        return a;
+      })
+    );
+  }
 }
