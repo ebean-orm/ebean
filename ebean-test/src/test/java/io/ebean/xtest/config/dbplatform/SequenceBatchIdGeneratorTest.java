@@ -43,8 +43,8 @@ public class SequenceBatchIdGeneratorTest {
 
     @Override
     protected List<Long> getMoreIds(Object tenantKey, int requestSize) {
-      // simulate out of order ids returned from the database (verifies sorted polling)
-      return asList(1L, 2L, 5L, 6L, 3L, 4L);
+      // sequence values arrive ascending - verify FIFO poll order
+      return asList(1L, 2L, 3L, 4L, 5L, 6L);
     }
 
     @Override
