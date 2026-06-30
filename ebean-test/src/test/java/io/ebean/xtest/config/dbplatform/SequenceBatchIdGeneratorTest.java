@@ -16,11 +16,6 @@ public class SequenceBatchIdGeneratorTest {
 
     TD generator = new TD();
 
-    // simulate out of order adding of sequence ids
-    generator.add(asList(1L, 2L));
-    generator.add(asList(5L, 6L));
-    generator.add(asList(3L, 4L));
-
     Assertions.assertThat(generator.nextId(null)).isEqualTo(1L);
     Assertions.assertThat(generator.nextId(null)).isEqualTo(2L);
     Assertions.assertThat(generator.nextId(null)).isEqualTo(3L);
@@ -35,10 +30,6 @@ public class SequenceBatchIdGeneratorTest {
       super(null, null, null, 10);
     }
 
-    void add(List<Long> ids) {
-      idList.addAll(ids);
-    }
-
     @Override
     public String getSql(int batchSize) {
       return "not used";
@@ -51,13 +42,14 @@ public class SequenceBatchIdGeneratorTest {
     }
 
     @Override
-    protected List<Long> getMoreIds(int requestSize) {
-      return null;
+    protected List<Long> getMoreIds(Object tenantKey, int requestSize) {
+      // simulate out of order ids returned from the database (verifies sorted polling)
+      return asList(1L, 2L, 5L, 6L, 3L, 4L);
     }
 
     @Override
     protected void loadInBackground(int requestSize) {
-      // do nothing
+      // do nothing - avoid background reload re-introducing already polled ids
     }
   }
 }

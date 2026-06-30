@@ -46,6 +46,8 @@ import io.ebeanservice.docstore.api.DocStoreFactory;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.Transient;
+import io.ebeaninternal.server.transaction.DataSourceSupplier;
+import io.ebeaninternal.server.transaction.SequenceDataSource;
 import javax.sql.DataSource;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -96,7 +98,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final Map<String, List<BeanDescriptor<?>>> tableToDescMap = new HashMap<>();
   private final Map<String, List<BeanDescriptor<?>>> tableToViewDescMap = new HashMap<>();
   private final DbIdentity dbIdentity;
-  private final DataSource dataSource;
+  private final DataSourceSupplier dataSourceSupplier;
   private final DatabasePlatform databasePlatform;
   private final SpiCacheManager cacheManager;
   private final BackgroundExecutor backgroundExecutor;
@@ -132,7 +134,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.cacheManager = config.getCacheManager();
     this.docStoreFactory = config.getDocStoreFactory();
     this.backgroundExecutor = config.getBackgroundExecutor();
-    this.dataSource = this.config.getDataSource();
+    this.dataSourceSupplier = config.getDataSourceSupplier();
     this.encryptKeyManager = this.config.getEncryptKeyManager();
     this.databasePlatform = this.config.getDatabasePlatform();
     this.multiValueBind = config.getMultiValueBind();
@@ -1272,7 +1274,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {
-    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, stepSize, seqName);
+    DataSource ds = config.getTenantMode().isDynamicDataSource()
+      ? new SequenceDataSource(dataSourceSupplier)
+      : dataSourceSupplier.dataSource();
+    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, ds, stepSize, seqName);
   }
 
   private void setAccessors(DeployBeanDescriptor<?> deploy) {
