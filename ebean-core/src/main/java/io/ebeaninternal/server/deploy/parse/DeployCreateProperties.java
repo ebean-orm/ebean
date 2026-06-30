@@ -71,12 +71,7 @@ public final class DeployCreateProperties {
   /**
    * Create the bean properties from Class. Some of these properties may not map to database columns.
    */
-  private void createProperties(
-    DeployBeanDescriptor<?> desc,
-    Class<?> beanType,
-    int level,
-    Map<TypeVariable<?>, Type> typeMap
-  ) {
+  private void createProperties(DeployBeanDescriptor<?> desc, Class<?> beanType, int level, Map<TypeVariable<?>, Type> typeMap) {
     if (beanType.equals(Model.class)) {
       // ignore all fields on model (_$dbName)
       return;
@@ -129,11 +124,7 @@ public final class DeployCreateProperties {
     return new DeployBeanPropertyAssocMany<>(desc, targetType, manyType);
   }
 
-  private DeployBeanProperty createProp(
-    DeployBeanDescriptor<?> desc,
-    Field field,
-    Map<TypeVariable<?>, Type> typeMap
-  ) {
+  private DeployBeanProperty createProp(DeployBeanDescriptor<?> desc, Field field, Map<TypeVariable<?>, Type> typeMap) {
     // Resolve the field's generic type through the accumulated type-variable map.
     // This handles TypeVariables from generic superclasses at any depth in the hierarchy.
     Type resolvedGenericType = TypeReflectHelper.resolveType(field.getGenericType(), typeMap);
