@@ -11,10 +11,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.List;
-import java.util.NavigableSet;
-import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -52,7 +52,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
    */
   private static final class TenantBuffer {
     final ReentrantLock lock = new ReentrantLock();
-    final NavigableSet<Long> idList = new TreeSet<>();
+    final Deque<Long> idList = new ArrayDeque<>();
     final AtomicBoolean currentlyBackgroundLoading = new AtomicBoolean(false);
   }
 
@@ -130,7 +130,7 @@ public abstract class SequenceIdGenerator implements PlatformIdGenerator {
       } else {
         loadMore(tenantKey, buffer, allocationSize);
       }
-      return buffer.idList.pollFirst();
+      return buffer.idList.poll();
     } finally {
       buffer.lock.unlock();
     }
