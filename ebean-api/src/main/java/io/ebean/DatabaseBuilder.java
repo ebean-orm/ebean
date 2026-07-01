@@ -888,6 +888,13 @@ public interface DatabaseBuilder {
   DatabaseBuilder setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper);
 
   /**
+   * Enable tenant-partitioned caches. When enabled each tenant gets its own cache namespace,
+   * improving cache-hit ratio by preventing cross-tenant key collisions.
+   * Use {@link SpiCacheManager#clearTenant(Object)} when a tenant is deactivated.
+   */
+  DatabaseBuilder tenantPartitionedCache(boolean tenantPartitionedCache);
+
+  /**
    * Set the L2 cache default max size.
    */
   default DatabaseBuilder cacheMaxSize(int cacheMaxSize) {
@@ -2566,6 +2573,11 @@ public interface DatabaseBuilder {
      * Return true if dirty beans are automatically persisted.
      */
     boolean isAutoPersistUpdates();
+
+    /**
+     * Return true if caches are partitioned by tenant.
+     */
+    boolean isTenantPartitionedCache();
 
     /**
      * Return the L2 cache default max size.
