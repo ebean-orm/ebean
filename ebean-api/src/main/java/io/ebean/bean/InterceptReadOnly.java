@@ -175,7 +175,7 @@ public final class InterceptReadOnly extends InterceptBase {
 
   @Override
   public boolean isUpdate() {
-    return false;
+    return true;
   }
 
   @Override

@@ -5,6 +5,7 @@ import io.ebean.annotation.CacheBeanTuning;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +24,20 @@ public class Article extends BasicDomain {
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   List<Section> sections;
 
+  @ManyToOne(cascade = CascadeType.ALL)
+  ArticleAuthor articleAuthor;
+
   public Article(String name, String author) {
     this.name = name;
     this.author = author;
+  }
+
+  public ArticleAuthor getArticleAuthor() {
+    return articleAuthor;
+  }
+
+  public void setArticleAuthor(ArticleAuthor articleAuthor) {
+    this.articleAuthor = articleAuthor;
   }
 
   public String getName() {
