@@ -110,7 +110,8 @@ public final class DLoadContext implements LoadContext {
     this.unmodifiable = query.isUnmodifiable();
     this.disableReadAudit = query.isDisableReadAudit();
     this.disableLazyLoading = query.isDisableLazyLoading();
-    this.useBeanCache = query.beanCacheMode();
+    // asOf queries must not read from or write to the bean cache
+    this.useBeanCache = asOf != null ? CacheMode.OFF : query.beanCacheMode();
     this.profilingListener = query.profilingListener();
     this.namePrefix = deriveNamePrefix(query);
     this.profileLocation = query.profileLocation();
@@ -457,6 +458,10 @@ public final class DLoadContext implements LoadContext {
     query.setUnmodifiable(unmodifiable);
     query.setDisableLazyLoading(disableLazyLoading);
     query.asOf(asOf);
+    if (asOf != null) {
+      // secondary queries spawned by an asOf parent must not touch the bean cache
+      query.setBeanCacheMode(CacheMode.OFF);
+    }
     if (asDraft) {
       query.asDraft();
     }
