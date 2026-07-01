@@ -127,6 +127,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private List<SaveMany> saveMany;
   private InsertOptions insertOptions;
+  /**
+   * Set true when an ON CONFLICT NOTHING insert is skipped (0 rows affected).
+   * Cascade to children must be suppressed to avoid FK violations.
+   */
+  private boolean insertConflictSkipped;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, int flags) {
@@ -810,6 +815,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         throw new OptimisticLockException("Data has changed. updated row count " + rowCount, null, bean);
       } else if (rowCount == 0 && type == Type.UPDATE) {
         throw new EntityNotFoundException("No rows updated");
+      } else if (rowCount == 0 && type == Type.INSERT && isConflictNothingInsert()) {
+        insertConflictSkipped = true;
+        return;
       }
     }
     switch (type) {
@@ -822,6 +830,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         break;
       default: // do nothing
     }
+  }
+
+  private boolean isConflictNothingInsert() {
+    return insertOptions != null && insertOptions.key().charAt(0) == 'N';
+  }
+
+  public boolean isInsertConflictSkipped() {
+    return insertConflictSkipped;
   }
 
   /**
@@ -1433,7 +1449,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   public void setInsertOptions(InsertOptions insertOptions) {
-    this.insertOptions  = insertOptions;
+    this.insertOptions = insertOptions;
+    if (insertOptions != null && insertOptions.key().charAt(0) == 'N' && beanDescriptor.hasCascadeChildren()) {
+      // force immediate (non-batch) execution of this insert so we know whether it
+      // was actually inserted before attempting cascade saves on children.
+      skipBatchForTopLevel = true;
+    }
   }
 
   public InsertOptions insertOptions() {

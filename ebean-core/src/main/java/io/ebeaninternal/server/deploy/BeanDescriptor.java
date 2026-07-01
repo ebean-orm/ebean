@@ -3338,6 +3338,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   }
 
   /**
+   * Return true if this bean has cascade-save children (OneToMany or exported OneToOne)
+   * that hold a FK back to this bean. Used to decide whether an ON CONFLICT NOTHING
+   * insert must be executed immediately so the row-count is known before cascading.
+   */
+  public boolean hasCascadeChildren() {
+    return propertiesManySave.length > 0 || propertiesOneExportedSave.length > 0;
+  }
+
+  /**
    * Assoc Many's with delete cascade.
    */
   public BeanPropertyAssocMany<?>[] propertiesManyDelete() {
