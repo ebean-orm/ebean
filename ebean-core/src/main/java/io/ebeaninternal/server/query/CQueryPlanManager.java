@@ -61,7 +61,6 @@ public final class CQueryPlanManager implements QueryPlanManager {
   }
 
   private List<MetaQueryPlan> collectPlans(QueryPlanRequest request) {
-
     CQueryPlanRequest req = new CQueryPlanRequest(transactionManager, request, plans.keySet().iterator());
       while (req.hasNext()) {
         req.nextCapture();

@@ -14,13 +14,11 @@ import java.util.List;
 final class CQueryPlanRequest {
 
   private final List<MetaQueryPlan> plans = new ArrayList<>();
-
   private final SpiTransactionManager transactionManager;
   private final long since;
   private final int maxCount;
   private final long maxTime;
   private final Iterator<CQueryBindCapture> iterator;
-
 
   CQueryPlanRequest(SpiTransactionManager transactionManager, QueryPlanRequest req, Iterator<CQueryBindCapture> iterator) {
     this.transactionManager = transactionManager;

@@ -26,7 +26,6 @@ final class CQueryBindCapture implements SpiQueryBindCapture {
   private long thresholdMicros;
   private long captureCount;
   private Object tenantId;
-
   private long lastBindCapture;
 
   CQueryBindCapture(CQueryPlanManager manager, SpiQueryPlan queryPlan, long thresholdMicros, CurrentTenantProvider tenantProvider) {
@@ -36,9 +35,6 @@ final class CQueryBindCapture implements SpiQueryBindCapture {
     this.tenantProvider = tenantProvider;
   }
 
-  /**
-   * Return true if we should capture the bind values for this query.
-   */
   @Override
   public boolean collectFor(long timeMicros) {
     return timeMicros > thresholdMicros && captureCount < 10;
@@ -75,17 +71,17 @@ final class CQueryBindCapture implements SpiQueryBindCapture {
   /**
    * Collect the query plan using already captured bind values.
    */
-  public boolean collectQueryPlan(CQueryPlanRequest request, SpiTransactionManager transactionManager) {
+  boolean collectQueryPlan(CQueryPlanRequest request, SpiTransactionManager transactionManager) {
     if (bindCapture == null || request.since() < lastBindCapture) {
       // no bind capture since the last capture
       return false;
     }
 
-
     final Instant whenCaptured = Instant.ofEpochMilli(this.lastBindCapture);
     final BindCapture last = this.bindCapture;
     final Object tenantId = this.tenantId;
     final long startNanos = System.nanoTime();
+
     SpiDbQueryPlan queryPlan;
     try (Connection connection = transactionManager.queryPlanConnection(tenantId)) {
       queryPlan = manager.collectPlan(connection, this.queryPlan, last);
