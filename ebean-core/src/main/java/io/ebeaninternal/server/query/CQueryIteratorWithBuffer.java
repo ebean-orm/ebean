@@ -44,6 +44,7 @@ final class CQueryIteratorWithBuffer<T> implements QueryIterator<T> {
         }
         request.executeSecondaryQueries(true);
       }
+      request.unmodifiableFreeze(buffer);
       ret = !buffer.isEmpty();
       return ret;
     } catch (SQLException e) {

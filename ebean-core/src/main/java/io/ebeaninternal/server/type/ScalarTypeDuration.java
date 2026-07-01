@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.core.type.*;
 
 import java.io.DataInput;
@@ -90,13 +90,13 @@ class ScalarTypeDuration extends ScalarTypeBase<Duration> {
   }
 
   @Override
-  public Duration jsonRead(JsonParser parser) throws IOException {
-    return Duration.parse(parser.getValueAsString());
+  public Duration jsonRead(JsonReader parser) throws IOException {
+    return Duration.parse(parser.readString());
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, Duration value) throws IOException {
-    writer.writeString(value.toString());
+  public void jsonWrite(JsonWriter writer, Duration value) throws IOException {
+    writer.value(value.toString());
   }
 
   @Override

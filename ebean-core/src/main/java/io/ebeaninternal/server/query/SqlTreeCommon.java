@@ -7,13 +7,13 @@ final class SqlTreeCommon {
 
   private final SpiQuery.TemporalMode temporalMode;
   private final boolean disableLazyLoad;
-  private final boolean readOnly;
+  private final boolean unmodifiable;
   private final TableJoin includeJoin;
 
-  SqlTreeCommon(SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad, boolean readOnly, TableJoin includeJoin) {
+  SqlTreeCommon(SpiQuery.TemporalMode temporalMode, boolean disableLazyLoad, boolean unmodifiable, TableJoin includeJoin) {
     this.temporalMode = temporalMode;
     this.disableLazyLoad = disableLazyLoad;
-    this.readOnly = readOnly;
+    this.unmodifiable = unmodifiable;
     this.includeJoin = includeJoin;
   }
 
@@ -25,8 +25,8 @@ final class SqlTreeCommon {
     return disableLazyLoad;
   }
 
-  boolean readOnly() {
-    return readOnly;
+  boolean unmodifiable() {
+    return unmodifiable;
   }
 
   TableJoin includeJoin() {

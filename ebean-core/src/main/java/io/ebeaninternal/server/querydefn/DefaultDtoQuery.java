@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.avaje.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
 import io.ebean.DtoQuery;
 import io.ebean.ProfileLocation;
 import io.ebean.QueryIterator;
@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 /**
  * Default implementation of DtoQuery.
  */
-@NonNullApi
+@NullMarked
 public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQuery<T> {
 
   private final SpiEbeanServer server;
@@ -95,8 +95,8 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   }
 
   @Override
-  public DtoQuery<T> usingMaster() {
-    this.useMaster = true;
+  public DtoQuery<T> usingMaster(boolean useMaster) {
+    this.useMaster = useMaster;
     return this;
   }
 
@@ -273,6 +273,12 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
     return null;
   }
 
+  @Nullable
+  @Override
+  public String explicitLabel() {
+    return label;
+  }
+
   @Override
   public void obtainLocation() {
     if (profileLocation != null) {
@@ -333,6 +339,13 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   @Override
   public BindParams getBindParams() {
     return bindParams;
+  }
+
+  @Override
+  public void setDefaultFetchBuffer(int fetchSize) {
+    if (bufferFetchSizeHint == 0) {
+      bufferFetchSizeHint = fetchSize;
+    }
   }
 
   @Override

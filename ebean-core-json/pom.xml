@@ -1,0 +1,30 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>io.ebean</groupId>
+    <artifactId>ebean-parent</artifactId>
+    <version>18.1.0</version>
+  </parent>
+  <artifactId>ebean-core-json</artifactId>
+  <name>ebean-core-json</name>
+  <scm>
+    <developerConnection>scm:git:git@github.com:ebean-orm/ebean.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-api</artifactId>
+      <version>18.1.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-json-core</artifactId>
+      <version>${avaje-json-core.version}</version>
+    </dependency>
+
+  </dependencies>
+
+</project>

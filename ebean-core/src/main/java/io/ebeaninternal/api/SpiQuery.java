@@ -1,9 +1,10 @@
 package io.ebeaninternal.api;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import io.ebean.CacheMode;
 import io.ebean.CountDistinctOrder;
 import io.ebean.ExpressionList;
+import io.ebean.ImmutableBeanCache;
 import io.ebean.OrderBy;
 import io.ebean.PersistenceContextScope;
 import io.ebean.ProfileLocation;
@@ -27,6 +28,7 @@ import io.ebeaninternal.server.rawsql.SpiRawSql;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -343,9 +345,18 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   void fetchProperties(String path, OrmQueryProperties other);
 
   /**
-   * Set the on a secondary query given the label, relativePath and profile location of the parent query.
+   * Set the label on a secondary query by extending the parent query's full plan
+   * name with the relative path and load mode (joined with '.').
+   * <p>
+   * The {@code parentName} is the parent query's full plan name (without the
+   * leading "orm."), so for a root query labelled "custMain" on Customer the
+   * secondary lazy load of contacts becomes {@code Customer.custMain.contacts.lazy}.
+   * The profile location of the parent query is also propagated.
+   *
+   * @param parentName   the parent query's full plan name (no "orm." prefix)
+   * @param relativePath the path to the loaded property plus the load mode, e.g. {@code contacts.lazy}
    */
-  void setProfilePath(String label, String relativePath, @Nullable ProfileLocation profileLocation);
+  void setProfilePath(String parentName, String relativePath, @Nullable ProfileLocation profileLocation);
 
   /**
    * Set the query mode.
@@ -760,6 +771,16 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   boolean isBeanCacheGet();
 
   /**
+   * Register immutable bean cache to use for this query execution.
+   */
+  void putImmutableBeanCache(ImmutableBeanCache<?> beanCache);
+
+  /**
+   * Return immutable bean caches configured for this query by bean type.
+   */
+  Map<Class<?>, ImmutableBeanCache<?>> immutableBeanCaches();
+
+  /**
    * Return true if the query should PUT against the bean cache.
    */
   boolean isBeanCachePut();
@@ -780,9 +801,9 @@ public interface SpiQuery<T> extends Query<T>, SpiQueryFetch, TxnProfileEventCod
   CacheMode queryCacheMode();
 
   /**
-   * Return true if the beans returned by this query should be read only.
+   * Return true if the beans returned by this query should be unmodifiable.
    */
-  Boolean isReadOnly();
+  boolean isUnmodifiable();
 
   /**
    * Return the query timeout.

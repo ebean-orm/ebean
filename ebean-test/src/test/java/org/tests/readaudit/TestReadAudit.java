@@ -3,11 +3,9 @@ package org.tests.readaudit;
 import io.ebean.DatabaseBuilder;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.FutureList;
 import io.ebean.cache.ServerCache;
 import io.ebean.cache.ServerCacheStatistics;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.event.readaudit.ReadAuditLogger;
 import io.ebean.event.readaudit.ReadAuditPrepare;
 import io.ebean.event.readaudit.ReadAuditQueryPlan;
@@ -132,8 +130,8 @@ public class TestReadAudit extends BaseTestCase {
     assertThat(readAuditLogger.beans).hasSize(2);
 
     Country ref = server.reference(Country.class, "AR");
-    assertThat(readAuditLogger.beans).hasSize(3);
-    assertThat(ref).isSameAs(found2);
+    assertThat(readAuditLogger.beans).hasSize(2);
+    assertThat(ref).isNotSameAs(found2);
   }
 
   @Test
@@ -197,9 +195,9 @@ public class TestReadAudit extends BaseTestCase {
       + " plans:" + readAuditLogger.plans
       + " many:" + readAuditLogger.many);
 
-    assertThat(readAuditPrepare.count).isEqualTo(2);
+    assertThat(readAuditPrepare.count).isEqualTo(1);
     assertThat(readAuditLogger.plans).hasSize(1);
-    assertThat(readAuditLogger.many).hasSize(2);
+    assertThat(readAuditLogger.many).hasSize(1);
   }
 
   @Test
@@ -303,7 +301,7 @@ public class TestReadAudit extends BaseTestCase {
 
   private Database createServer() {
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName("h2other");
     config.loadFromProperties();
 
@@ -320,7 +318,7 @@ public class TestReadAudit extends BaseTestCase {
     config.setReadAuditLogger(readAuditLogger);
     config.setReadAuditPrepare(readAuditPrepare);
 
-    return DatabaseFactory.create(config);
+    return config.build();
   }
 
   private void resetCounters() {

@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.deploy.meta;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import io.ebean.annotation.*;
 import io.ebean.config.ScalarTypeConverter;
 import io.ebean.config.dbplatform.DbDefaultValue;
@@ -38,7 +38,7 @@ import java.util.Set;
  * Description of a property of a bean. Includes its deployment information such
  * as database column mapping information.
  */
-public class DeployBeanProperty {
+public class DeployBeanProperty implements DeployProperty {
 
   private static final int ID_ORDER = 1000000;
   private static final int UNIDIRECTIONAL_ORDER = 100000;
@@ -144,6 +144,7 @@ public class DeployBeanProperty {
   private String aggregationParsed;
   private String sqlFormulaSelect;
   private String sqlFormulaJoin;
+  private String formula2Expression;
   /**
    * The jdbc data type this maps to.
    */
@@ -229,6 +230,11 @@ public class DeployBeanProperty {
     return desc;
   }
 
+  @Override
+  public Class<?> ownerType() {
+    return desc.getBeanType();
+  }
+
   /**
    * Return the DB column length for character columns.
    * <p>
@@ -261,10 +267,12 @@ public class DeployBeanProperty {
     this.jsonDeserialize = jsonDeserialize;
   }
 
-  public MutationDetection getMutationDetection() {
+  @Override
+  public MutationDetection mutationDetection() {
     return mutationDetection;
   }
 
+  @Override
   public void setMutationDetection(MutationDetection dirtyDetection) {
     this.mutationDetection = dirtyDetection;
   }
@@ -428,10 +436,8 @@ public class DeployBeanProperty {
     this.setter = setter;
   }
 
-  /**
-   * Return the name of the property.
-   */
-  public String getName() {
+  @Override
+  public String name() {
     return name;
   }
 
@@ -478,9 +484,7 @@ public class DeployBeanProperty {
     this.generatedProperty = generatedValue;
   }
 
-  /**
-   * Return true if this property is mandatory.
-   */
+  @Override
   public boolean isNullable() {
     return nullable;
   }
@@ -556,6 +560,23 @@ public class DeployBeanProperty {
     this.dbUpdateable = false;
   }
 
+  /**
+   * Return the raw logical expression set by {@code @Formula2}.
+   */
+  public String getFormula2Expression() {
+    return formula2Expression;
+  }
+
+  /**
+   * Set the raw logical expression for a {@code @Formula2} property.
+   */
+  public void setFormula2Expression(String formula2Expression) {
+    this.formula2Expression = formula2Expression;
+    this.dbRead = true;
+    this.dbInsertable = false;
+    this.dbUpdateable = false;
+  }
+
   public void setImportedPrimaryKey() {
     this.importedPrimaryKey = true;
   }
@@ -617,6 +638,8 @@ public class DeployBeanProperty {
     this.dbRead = true;
     this.dbInsertable = false;
     this.dbUpdateable = false;
+    // aggregation by default not fetchEager
+    this.fetchEager = false;
   }
 
   /**
@@ -841,17 +864,13 @@ public class DeployBeanProperty {
     this.isTransient = true;
   }
 
-  /**
-   * Return the property type.
-   */
-  public Class<?> getPropertyType() {
+  @Override
+  public Class<?> propertyType() {
     return propertyType;
   }
 
-  /**
-   * Return the generic type for this property.
-   */
-  public Type getGenericType() {
+  @Override
+  public Type genericType() {
     return genericType;
   }
 
@@ -1055,8 +1074,9 @@ public class DeployBeanProperty {
     return null;
   }
 
+  @Override
   @SuppressWarnings("unchecked")
-  public <A extends Annotation> List<A> getMetaAnnotations(Class<A> annotationType) {
+  public <A extends Annotation> List<A> metaAnnotations(Class<A> annotationType) {
     List<A> result = new ArrayList<>();
     for (Annotation ann : metaAnnotations) {
       if (ann.annotationType() == annotationType) {
@@ -1087,6 +1107,22 @@ public class DeployBeanProperty {
           } else if (matchPlatform(platforms, platform)) {
             return formula;
           }
+        }
+      }
+    }
+    return fallback;
+  }
+
+  public Formula2 getMetaAnnotationFormula2(Platform platform) {
+    Formula2 fallback = null;
+    for (Annotation ann : metaAnnotations) {
+      if (ann.annotationType() == Formula2.class) {
+        Formula2 formula2 = (Formula2) ann;
+        final Platform[] platforms = formula2.platforms();
+        if (platforms.length == 0) {
+          fallback = formula2;
+        } else if (matchPlatform(platforms, platform)) {
+          return formula2;
         }
       }
     }

@@ -68,7 +68,7 @@ public final class GeneratedPropertyFactory {
   }
 
   public void setVersion(DeployBeanProperty property) {
-    if (isNumberType(property.getPropertyType().getName())) {
+    if (isNumberType(property.propertyType().getName())) {
       setCounter(property);
     } else {
       setUpdateTimestamp(property);

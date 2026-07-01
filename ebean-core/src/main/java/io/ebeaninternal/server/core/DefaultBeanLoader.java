@@ -67,12 +67,8 @@ final class DefaultBeanLoader {
     parentDesc.contextPutIfAbsent(pc, parentId, parentBean);
     boolean useManyIdCache = beanCollection != null && parentDesc.isManyPropCaching() && many.isUseCache();
     if (useManyIdCache) {
-      Boolean readOnly = null;
-      if (ebi.isReadOnly()) {
-        readOnly = Boolean.TRUE;
-      }
       final String parentKey = parentDesc.cacheKey(parentId);
-      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentKey, readOnly)) {
+      if (parentDesc.cacheManyPropLoad(many, beanCollection, parentKey)) {
         return;
       }
     }
@@ -102,8 +98,8 @@ final class DefaultBeanLoader {
     query.setMode(Mode.LAZYLOAD_MANY);
     query.setLazyLoadManyPath(many.name());
     query.setPersistenceContext(pc);
-    if (ebi.isReadOnly()) {
-      query.setReadOnly(true);
+    if (many.hasOrderColumn()) {
+      query.orderBy(many.path() + "." +  many.fetchOrderBy());
     }
 
     server.findOne(query);
@@ -192,7 +188,10 @@ final class DefaultBeanLoader {
     query.setLazyLoadProperty(ebi.lazyLoadProperty());
     if (draft) {
       query.asDraft();
-    } else if (mode == SpiQuery.Mode.LAZYLOAD_BEAN && desc.isSoftDelete()) {
+    } else if (desc.isSoftDelete()
+        && (mode == SpiQuery.Mode.LAZYLOAD_BEAN || mode == SpiQuery.Mode.REFRESH_BEAN)) {
+      // include soft-deleted rows when lazy loading or refreshing so a
+      // refresh() on a soft-deleted bean can reload it (issue #3641)
       query.setIncludeSoftDeletes();
     }
     if (embeddedOwnerIndex > -1) {
@@ -208,9 +207,6 @@ final class DefaultBeanLoader {
     if (embeddedOwnerIndex > -1 || mode == Mode.REFRESH_BEAN) {
       // make sure the query doesn't use the cache
       query.setBeanCacheMode(CacheMode.OFF);
-    }
-    if (ebi.isReadOnly()) {
-      query.setReadOnly(true);
     }
     if (Mode.REFRESH_BEAN == mode) {
       // explicitly state to load all properties on REFRESH.

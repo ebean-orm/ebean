@@ -93,7 +93,7 @@ public class TestCKeyLazyLoad extends BaseTestCase {
   private void exerciseMaxRowsQuery_with_embeddedId() {
 
     PagedList<CKeyParent> siteUserPage = DB.find(CKeyParent.class).where()
-      .order("name asc")
+      .orderBy("name asc")
       .setMaxRows(10)
       .findPagedList();
     siteUserPage.getList();

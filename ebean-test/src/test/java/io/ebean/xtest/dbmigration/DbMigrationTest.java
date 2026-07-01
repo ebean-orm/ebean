@@ -2,8 +2,8 @@ package io.ebean.xtest.dbmigration;
 
 import io.ebean.*;
 import io.ebean.annotation.Platform;
+import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.config.dbplatform.DbHistorySupport;
 import io.ebean.datasource.DataSourcePool;
 import io.ebean.xtest.BaseTestCase;
@@ -21,6 +21,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +41,7 @@ public class DbMigrationTest extends BaseTestCase {
   private void runScript(String scriptName) {
     URL url = getClass().getResource("/migrationtest/dbmigration/" + server().platform().name().toLowerCase() + "/" + scriptName);
     assert url != null : scriptName +  " not found for platform [" + server().platform().name().toLowerCase() + "]";
-    server().script().run(url);
+    server().script().run(url, Map.of("reorgArgs", "use tempspace1 resetdictionary"));
   }
 
   @IgnorePlatform({
@@ -50,7 +51,7 @@ public class DbMigrationTest extends BaseTestCase {
     Platform.YUGABYTE,
   })
   @Test
-  public void testRunMigration() throws IOException, SQLException {
+  public void testRunMigration() throws IOException, SQLException, InterruptedException {
     // Shutdown and reconnect - this prevents postgres from lock up
     ((DataSourcePool)server().dataSource()).offline();
     ((DataSourcePool)server().dataSource()).online();
@@ -207,7 +208,7 @@ public class DbMigrationTest extends BaseTestCase {
   }
 
   // do some history tests with V1.1 models
-  private void testVersioning() {
+  private void testVersioning() throws InterruptedException {
     if (isOracle()) {
       System.err.println("FIXME: Oracle history support seems to be broken");
       return;
@@ -216,22 +217,25 @@ public class DbMigrationTest extends BaseTestCase {
     if (history == null) {
       return;
     }
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName(server().name());
     config.loadFromProperties(server().pluginApi().config().getProperties());
     config.setDataSource(server().dataSource());
-    config.setReadOnlyDataSource(server().dataSource());
+    config.setReadOnlyDataSource(server().readOnlyDataSource());
     config.setDdlGenerate(false);
     config.setDdlRun(false);
     config.setRegister(false);
     config.setPackages(Collections.singletonList("misc.migration.v1_1"));
 
-    Database tmpServer = DatabaseFactory.create(config);
+    Database tmpServer = config.build();
     try {
       EHistory hist = new misc.migration.v1_1.EHistory();
       hist.setId(2);
       hist.setTestString(42L);
       tmpServer.save(hist);
+      // ensure a distinct period start time so SQL Server temporal records a
+      // non zero-duration history row (otherwise the prior version is omitted)
+      Thread.sleep(20);
       hist = tmpServer.find(EHistory.class).where().eq("testString", 42L).findOne();
       assert hist != null;
       hist.setTestString(45L);
@@ -249,6 +253,9 @@ public class DbMigrationTest extends BaseTestCase {
       hist2.setTestString2("bar1");
       hist2.setTestString3("baz1");
       tmpServer.save(hist2);
+      // ensure a distinct period start time so SQL Server temporal records a
+      // non zero-duration history row (otherwise the prior version is omitted)
+      Thread.sleep(20);
       hist2.setTestString("foo2");
       hist2.setTestString2("bar2");
       tmpServer.save(hist2);
@@ -288,17 +295,17 @@ public class DbMigrationTest extends BaseTestCase {
 
   // do some history tests with V1.1 models
   private void testReservedKeywords() {
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
     config.setName(server().name());
     config.loadFromProperties(server().pluginApi().config().getProperties());
     config.setDataSource(server().dataSource());
-    config.setReadOnlyDataSource(server().dataSource());
+    config.setReadOnlyDataSource(server().readOnlyDataSource());
     config.setDdlGenerate(false);
     config.setDdlRun(false);
     config.setRegister(false);
     config.setPackages(Collections.singletonList("misc.migration.v1_0"));
 
-    Database tmpServer = DatabaseFactory.create(config);
+    Database tmpServer = config.build();
     try {
       ETable table = new misc.migration.v1_0.ETable();
       table.setFrom("foo");

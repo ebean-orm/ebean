@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 import java.io.*;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ModifyAwareSetTest {
 
@@ -20,6 +22,13 @@ public class ModifyAwareSetTest {
   private ModifyAwareSet<String> createEmptySet() {
     HashSet<String> set = new HashSet<>();
     return new ModifyAwareSet<>(set);
+  }
+
+  @Test
+  void freeze() {
+    Set<String> frozen = createSet().freeze();
+    assertThatThrownBy(() -> frozen.add("junk"))
+      .isInstanceOf(UnsupportedOperationException.class);
   }
 
   @Test

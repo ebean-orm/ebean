@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.deploy;
 
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.bean.BeanCollection;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
@@ -13,16 +15,6 @@ import java.util.Map;
  * Context provided when a BeanProperty reads from a ResultSet.
  */
 public interface DbReadContext {
-
-  /**
-   * Return the state of the object graph.
-   */
-  Boolean isReadOnly();
-
-  /**
-   * Propagate the state to the bean.
-   */
-  void propagateState(Object e);
 
   /**
    * Return the DataReader.
@@ -70,6 +62,17 @@ public interface DbReadContext {
   void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc);
 
   /**
+   * Register a bean as a candidate for immutable cache population.
+   */
+  void registerForImmutable(EntityBeanIntercept ebi);
+
+  /**
+   * Return an immutable cached bean for the given descriptor and id if already present.
+   */
+  @Nullable
+  EntityBean immutableBeanHit(BeanDescriptor<?> descriptor, Object id);
+
+  /**
    * Set back the bean that has just been loaded with its id.
    */
   void setLazyLoadedChildBean(EntityBean loadedBean, Object parentId);
@@ -102,4 +105,14 @@ public interface DbReadContext {
    */
   void handleLoadError(String fullName, Exception e);
 
+  /**
+   * Return true if this many property should be included in unmodifiable
+   * query via a secondary query.
+   */
+  boolean includeSecondary(BeanPropertyAssocMany<?> many);
+
+  /**
+   * Return true if we are loading unmodifiable beans.
+   */
+  boolean unmodifiable();
 }

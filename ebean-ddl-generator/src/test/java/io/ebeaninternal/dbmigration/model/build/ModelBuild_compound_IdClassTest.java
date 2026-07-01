@@ -1,10 +1,7 @@
 package io.ebeaninternal.dbmigration.model.build;
 
-
-import io.ebean.DatabaseBuilder;
+import io.ebean.Database;
 import io.localtest.BaseTestCase;
-import io.ebean.DatabaseFactory;
-import io.ebean.config.DatabaseConfig;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.dbmigration.ddlgeneration.Helper;
 import io.ebeaninternal.dbmigration.model.CurrentModel;
@@ -21,18 +18,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ModelBuild_compound_IdClassTest extends BaseTestCase {
 
   private SpiEbeanServer createServer() {
-    DatabaseBuilder config = new DatabaseConfig();
-    config.setName("h2");
-    config.loadFromProperties();
-    config.setName("h2other");
-    config.setDdlGenerate(false);
-    config.setDdlRun(false);
-    config.setDdlExtra(false);
-    config.setDefaultServer(false);
-    config.setRegister(false);
-    config.addClass(CKSiteUser.class);
-    config.addClass(CKEmbId.class);
-    return (SpiEbeanServer) DatabaseFactory.create(config);
+    return (SpiEbeanServer) Database.builder()
+      .name("h2")
+      .loadFromProperties()
+      .name("h2other")
+      .ddlGenerate(false)
+      .ddlRun(false)
+      .ddlExtra(false)
+      .defaultDatabase(false)
+      .register(false)
+      .addClass(CKSiteUser.class)
+      .addClass(CKEmbId.class)
+      .build();
   }
 
   @Test

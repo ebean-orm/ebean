@@ -1,5 +1,7 @@
 package io.ebean.typequery;
 
+import org.jspecify.annotations.Nullable;
+
 /**
  * Base for property types that store as String Varchar types.
  *
@@ -238,6 +240,17 @@ public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
   }
 
   /**
+   * Is starts with if value is non-null and otherwise no expression is added to the query.
+   *
+   * @param value the value which can be null
+   * @return the root query bean instance
+   */
+  public final R startsWithIfPresent(@Nullable String value) {
+    expr().startsWithIfPresent(_name, value);
+    return _root;
+  }
+
+  /**
    * Ends with - uses a like with '%' wildcard added to the beginning.
    *
    * @param value the equal to bind value
@@ -260,6 +273,17 @@ public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
   }
 
   /**
+   * Is contains if value is non-null and otherwise no expression is added to the query.
+   *
+   * @param value the value which can be null
+   * @return the root query bean instance
+   */
+  public final R containsIfPresent(@Nullable String value) {
+    expr().containsIfPresent(_name, value);
+    return _root;
+  }
+
+  /**
    * Case-insensitive like.
    *
    * @param value the equal to bind value
@@ -271,6 +295,17 @@ public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
   }
 
   /**
+   * Is case-insensitive like if value is non-null and otherwise no expression is added to the query.
+   *
+   * @param value the value which can be null
+   * @return the root query bean instance
+   */
+  public final R ilikeIfPresent(@Nullable String value) {
+    expr().ilikeIfPresent(_name, value);
+    return _root;
+  }
+
+  /**
    * Case-insensitive starts with.
    *
    * @param value the equal to bind value
@@ -278,6 +313,17 @@ public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
    */
   public final R istartsWith(String value) {
     expr().istartsWith(_name, value);
+    return _root;
+  }
+
+  /**
+   * Is case-insensitive starts with if value is non-null and otherwise no expression is added to the query.
+   *
+   * @param value the value which can be null
+   * @return the root query bean instance
+   */
+  public final R istartsWithIfPresent(@Nullable String value) {
+    expr().istartsWithIfPresent(_name, value);
     return _root;
   }
 
@@ -300,6 +346,28 @@ public abstract class PBaseString<R, T> extends PBaseComparable<R, T> {
    */
   public final R icontains(String value) {
     expr().icontains(_name, value);
+    return _root;
+  }
+
+  /**
+   * Is case-insensitive contains if value is non-null and otherwise no expression is added to the query.
+   *
+   * @param value the value which can be null
+   * @return the root query bean instance
+   */
+  public final R icontainsIfPresent(@Nullable String value) {
+    expr().icontainsIfPresent(_name, value);
+    return _root;
+  }
+
+  /**
+   * Is like if value is non-null and otherwise no expression is added to the query.
+   *
+   * @param value the value which can be null
+   * @return the root query bean instance
+   */
+  public final R likeIfPresent(@Nullable String value) {
+    expr().likeIfPresent(_name, value);
     return _root;
   }
 

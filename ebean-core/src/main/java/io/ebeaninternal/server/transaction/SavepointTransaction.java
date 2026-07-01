@@ -91,12 +91,24 @@ final class SavepointTransaction extends SpiTransactionProxy {
     try {
       connection.releaseSavepoint(savepoint);
       state = STATE_COMMITTED;
-      manager.notifyOfCommit(this);
+      mergeIntoParent();
       transaction.logTxn(spPrefix + "commit");
     } catch (SQLException e) {
       throw new PersistenceException("Error trying to commit/release Savepoint", e);
     }
   }
+
+  private void mergeIntoParent() {
+    if (event == null) {
+      return;
+    }
+
+    TransactionEvent parentEvent = transaction.event();
+    parentEvent.merge(event);
+    // Prevent accidental reuse
+    event = null;
+  }
+
 
   private void rollbackSavepoint(Throwable cause) throws PersistenceException {
     try {

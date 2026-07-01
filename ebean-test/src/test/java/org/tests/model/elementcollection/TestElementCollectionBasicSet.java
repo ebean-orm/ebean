@@ -45,7 +45,7 @@ class TestElementCollectionBasicSet extends BaseTestCase {
     List<EcsPerson> found =
       DB.find(EcsPerson.class).where()
         .startsWith("name", "Fiona0")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
     Set<String> phoneNumbers0 = found.get(0).getPhoneNumbers();
@@ -67,7 +67,7 @@ class TestElementCollectionBasicSet extends BaseTestCase {
         .fetch("phoneNumbers")
         .where()
         .startsWith("name", "Fiona0")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
     assertThat(found2).hasSize(2);

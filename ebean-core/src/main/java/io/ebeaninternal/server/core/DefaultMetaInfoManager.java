@@ -35,19 +35,28 @@ final class DefaultMetaInfoManager implements MetaInfoManager {
 
   @Override
   public ServerMetrics collectMetrics() {
-    return visitBasic();
+    return collectMetrics(true);
+  }
+
+  @Override
+  public ServerMetrics collectMetrics(boolean reset) {
+    return collectBasic(reset);
   }
 
   @Override
   public BasicMetricVisitor visitBasic() {
-    BasicMetricVisitor basic = new BasicMetricVisitor(server.name(), naming);
-    visitMetrics(basic);
-    return basic;
+    return collectBasic(true);
   }
 
   @Override
   public void resetAllMetrics() {
     server.visitMetrics(new ResetVisitor());
+  }
+
+  private BasicMetricVisitor collectBasic(boolean reset) {
+    BasicMetricVisitor basic = new BasicMetricVisitor(server.name(), naming, reset, true, true, true);
+    visitMetrics(basic);
+    return basic;
   }
 
   /**

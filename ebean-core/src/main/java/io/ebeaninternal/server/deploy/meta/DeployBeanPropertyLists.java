@@ -136,7 +136,7 @@ public final class DeployBeanPropertyLists {
 
   private DeployBeanProperty findImported(DeployBeanDescriptor<?> deploy, DeployBeanProperty embeddedScalar) {
     // the logical name and db column we are looking for a match on
-    String name = embeddedScalar.getName();
+    String name = embeddedScalar.name();
     String dbColumn = embeddedScalar.getDbColumn();
 
     DeployBeanProperty match = deploy.getBeanProperty(name);
@@ -146,7 +146,7 @@ public final class DeployBeanPropertyLists {
     // could look to match more by dbColumn
 
     for (DeployBeanPropertyAssocOne<?> assocOne : deploy.propertiesAssocOne()) {
-      if (name.equals(assocOne.getName()) || (dbColumn != null && dbColumn.equals(assocOne.getDbColumn()))) {
+      if (name.equals(assocOne.name()) || (dbColumn != null && dbColumn.equals(assocOne.getDbColumn()))) {
         return assocOne;
       }
     }

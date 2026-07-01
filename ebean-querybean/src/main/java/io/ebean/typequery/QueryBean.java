@@ -1,7 +1,7 @@
 package io.ebean.typequery;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.search.MultiMatch;
 import io.ebean.search.TextCommonTerms;
@@ -56,8 +56,8 @@ import java.util.stream.Stream;
  * @param <T> the entity bean type (normal entity bean type e.g. Customer)
  * @param <R> the specific root query bean type (e.g. QCustomer)
  */
-@NonNullApi
-public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
+@NullMarked
+public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryBean<T, R> {
 
   /**
    * The underlying query.
@@ -100,22 +100,6 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   }
 
   /**
-   * Construct with a transaction.
-   */
-  protected QueryBean(Class<T> beanType, Transaction transaction) {
-    this(beanType);
-    query.usingTransaction(transaction);
-  }
-
-  /**
-   * Construct with a database and transaction.
-   */
-  protected QueryBean(Class<T> beanType, Database database, Transaction transaction) {
-    this(beanType, database);
-    query.usingTransaction(transaction);
-  }
-
-  /**
    * Construct using a query.
    */
   @SuppressWarnings("unchecked")
@@ -137,7 +121,7 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   /** Construct for FilterMany */
   protected QueryBean(ExpressionList<T> filter) {
     this.query = null;
-    this.root = null;
+    this.root = (R) this;
     this.whereStack = new ArrayStack<>();
     whereStack.push(filter);
   }
@@ -284,6 +268,14 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   @Override
   public final R alsoIf(BooleanSupplier predicate, Consumer<R> apply) {
     if (predicate.getAsBoolean()) {
+      apply.accept(root);
+    }
+    return root;
+  }
+
+  @Override
+  public final R alsoIfPresent(@Nullable Object value, Consumer<R> apply) {
+    if (value != null) {
       apply.accept(root);
     }
     return root;
@@ -510,8 +502,8 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   }
 
   @Override
-  public final R setReadOnly(boolean readOnly) {
-    query.setReadOnly(readOnly);
+  public R setUnmodifiable(boolean unmodifiable) {
+    query.setUnmodifiable(unmodifiable);
     return root;
   }
 
@@ -755,8 +747,14 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   }
 
   @Override
-  public final R usingMaster() {
-    query.usingMaster();
+  public R usingMaster(boolean useMaster) {
+    query.usingMaster(useMaster);
+    return root;
+  }
+
+  @Override
+  public R using(ImmutableBeanCache<?> beanCache) {
+    query.using(beanCache);
     return root;
   }
 
@@ -870,6 +868,11 @@ public abstract class QueryBean<T, R> implements IQueryBean<T, R> {
   @Override
   public final FutureList<T> findFutureList() {
     return query.findFutureList();
+  }
+
+  @Override
+  public final <K> FutureMap<K,T> findFutureMap() {
+    return query.findFutureMap();
   }
 
   @Override

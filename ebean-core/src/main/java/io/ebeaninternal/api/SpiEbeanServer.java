@@ -1,6 +1,7 @@
 package io.ebeaninternal.api;
 
-import io.avaje.lang.Nullable;
+import io.ebeaninternal.server.query.STreeProperty;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebean.bean.BeanCollectionLoader;
 import io.ebean.bean.CallOrigin;
@@ -26,7 +27,7 @@ import java.util.stream.Stream;
 /**
  * Service Provider extension to EbeanServer.
  */
-public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectionLoader {
+public interface SpiEbeanServer extends SpiServer, BeanCollectionLoader {
 
   /**
    * Return the NOW time from the Clock.
@@ -156,6 +157,12 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
   void remoteTransactionEvent(RemoteTransactionEvent event);
 
   /**
+   * Register immutable bean cache with this server for transactional invalidation.
+   * Typically called when the cache is created.
+   */
+  void registerImmutableCache(ImmutableBeanCache<?> beanCache);
+
+  /**
    * Compile a query.
    */
   <T> CQuery<T> compileQuery(Type type, SpiQuery<T> query, Transaction transaction);
@@ -215,16 +222,6 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
    * Check for slow query event.
    */
   void slowQueryCheck(long executionTimeMicros, int rowCount, SpiQuery<?> query);
-
-  /**
-   * Start an enhanced transactional method.
-   */
-  void scopedTransactionEnter(TxScope txScope);
-
-  /**
-   * Handle the end of an enhanced Transactional method.
-   */
-  void scopedTransactionExit(Object returnOrThrowable, int opCode);
 
   /**
    * SqlQuery find single attribute.
@@ -358,6 +355,8 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
 
   <T> FutureList<T> findFutureList(SpiQuery<T> query);
 
+  <K, T> FutureMap<K, T> findFutureMap(SpiQuery<T> query);
+
   <T> PagedList<T> findPagedList(SpiQuery<T> query);
 
   <T> Set<T> findSet(SpiQuery<T> query);
@@ -385,4 +384,6 @@ public interface SpiEbeanServer extends SpiServer, ExtendedServer, BeanCollectio
 
   @Nullable
   SqlRow findOne(SpiSqlQuery query);
+
+  <T> STreeProperty createFormulaProperty(SpiBeanType desc, String formula, String path);
 }

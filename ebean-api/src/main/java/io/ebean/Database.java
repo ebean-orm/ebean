@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
@@ -23,11 +23,18 @@ import java.util.concurrent.Callable;
 /**
  * Provides the API for fetching and saving beans to a particular database.
  *
+ * <h5>Constructing a Database</h5>
+ * <p>
+ * Databases are typically constructed via {@link #builder()} and {@link DatabaseBuilder#build()}.
+ * They can also be automatically constructed on demand using configuration information in
+ * the application.properties file. The underlying implementation is provided by
+ * {@link DatabaseFactory}.
+ *
  * <h5>Registration with the DB singleton</h5>
  * <p>
- * When a Database instance is created it can be registered with the DB
- * singleton (see {@link DatabaseConfig#setRegister(boolean)}). The DB
- * singleton is essentially a map of Database's that have been registered
+ * When a Database instance is created it can be registered with the {@link DB}
+ * singleton (see {@link DatabaseBuilder#register(boolean)}). The {@link DB}
+ * singleton is essentially a map of {@link Database}'s that have been registered
  * with it.
  * <p>
  * The Database can then be retrieved later via {@link DB#byName(String)}.
@@ -35,16 +42,10 @@ import java.util.concurrent.Callable;
  * <h5>The 'default' Database</h5>
  * <p>
  * One Database can be designated as the 'default' or 'primary' Database
- * (see {@link DatabaseConfig#setDefaultServer(boolean)}). Many methods on DB
+ * (see {@link DatabaseBuilder#defaultDatabase(boolean)}). Many methods on {@link DB}
  * such as {@link DB#find(Class)} etc are actually just a convenient way to
  * call methods on the 'default/primary' Database.
  *
- * <h5>Constructing a Database</h5>
- * <p>
- * Databases are constructed by the DatabaseFactory. They can be created
- * programmatically via {@link DatabaseFactory#create(DatabaseBuilder)} or they
- * can be automatically constructed on demand using configuration information in
- * the application.properties file.
  *
  * <h5>Example: Get a Database</h5>
  * <pre>{@code
@@ -80,10 +81,11 @@ import java.util.concurrent.Callable;
  * method. Example: a single thread requires more than one transaction.
  *
  * @see DB
+ * @see DatabaseBuilder
  * @see DatabaseFactory
  * @see DatabaseConfig
  */
-@NonNullApi
+@NullMarked
 public interface Database {
 
   /**
@@ -94,11 +96,13 @@ public interface Database {
    *   // from application.properties / application.yaml
    *
    *   Database db = Database.builder()
+   *     .name("db")
    *     .loadFromProperties()
    *     .build();
    *
    * }</pre>
    */
+  @SuppressWarnings("removal")
   static DatabaseBuilder builder() {
     return new DatabaseConfig();
   }
@@ -137,6 +141,7 @@ public interface Database {
   /**
    * Return the associated read only DataSource for this Database instance (can be null).
    */
+  @Nullable
   DataSource readOnlyDataSource();
 
   /**
@@ -400,7 +405,7 @@ public interface Database {
    *   // find orders and their customers
    *   List<Order> list = database.find(Order.class)
    *     .fetch("customer")
-   *     .order("id")
+   *     .orderBy("id")
    *     .findList();
    *
    *   // sort by customer name ascending, then by order shipDate
@@ -771,18 +776,6 @@ public interface Database {
    * @param id       the id value
    */
   <T> T reference(Class<T> beanType, Object id);
-
-  /**
-   * Return the extended API for Database.
-   * <p>
-   * The extended API has the options for executing queries that take an explicit
-   * transaction as an argument.
-   * <p>
-   * Typically, we only need to use the extended API when we do NOT want to use the
-   * usual ThreadLocal based mechanism to obtain the current transaction but instead
-   * supply the transaction explicitly.
-   */
-  ExtendedServer extended();
 
   /**
    * Either Insert or Update the bean depending on its state.

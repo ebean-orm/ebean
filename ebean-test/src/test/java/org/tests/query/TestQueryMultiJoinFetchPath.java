@@ -1,10 +1,15 @@
 package org.tests.query;
 
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import org.junit.jupiter.api.Test;
 import org.tests.model.join.*;
+import org.tests.model.join.initfields.Order;
+import org.tests.model.join.initfields.OrderDetail;
+import org.tests.model.join.initfields.OrderInvoice;
+import org.tests.model.join.initfields.OrderItem;
 
 import java.util.List;
 
@@ -65,4 +70,54 @@ class TestQueryMultiJoinFetchPath extends BaseTestCase {
     }
   }
 
+  @Test
+  public void test_manyNonRoot_RootHasNoMany() {
+    Order o = new Order();
+    DB.save(o);
+
+    OrderItem p1 = new OrderItem(o);
+    OrderItem p2 = new OrderItem(o);
+    OrderDetail d1 = new OrderDetail(o);
+    OrderDetail d2 = new OrderDetail(o);
+    OrderInvoice i1 = new OrderInvoice(o);
+    OrderInvoice i2 = new OrderInvoice(o);
+
+    DB.saveAll(p1, p2, d1, d2, i1, i2);
+
+    // This first query behaves as expected: a main query and its secondary query.
+    LoggedSql.start();
+    List<Order> list1 = DB.find(Order.class)
+      .fetch("orderItems")
+      .fetch("orderDetails")
+      .where().gt("id", 0)
+      .findList();
+
+    List<String> sql1 = LoggedSql.collect();
+    assertThat(sql1).hasSize(2);
+
+    assertThat(list1.get(0).orderItems()).hasSize(2);
+    assertThat(list1.get(0).orderDetails()).hasSize(2);
+
+    sql1 = LoggedSql.collect();
+    assertThat(sql1).describedAs("no further lazy loading occurs").isEmpty();
+
+    // This query does not eager fetch invoices. We get an NPE on orderInvoices. Only the main query is executed.
+    LoggedSql.collect();
+    List<Order> list2 = DB.find(Order.class)
+      .fetch("orderItems")
+      .fetch("orderInvoices")
+      .where().gt("id", 0)
+      .findList();
+
+    List<String> sql2 = LoggedSql.collect();
+    assertThat(sql2).hasSize(2);
+    assertThat(sql2.get(0)).contains("from join_initfields_order t0 left join join_initfields_order_item t1 on t1.order_id = t0.id where");
+    assertThat(sql2.get(1)).contains("from join_initfields_order_invoice t0 where ");
+
+    assertThat(list2.get(0).orderItems()).hasSize(2);
+    assertThat(list2.get(0).orderInvoices()).hasSize(2);
+
+    sql2 = LoggedSql.stop();
+    assertThat(sql2).describedAs("no further lazy loading occurs").isEmpty();
+  }
 }

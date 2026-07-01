@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.core;
 
-import com.fasterxml.jackson.core.JsonFactory;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.DatabaseBuilder;
 import io.ebean.ExpressionFactory;
 import io.ebean.annotation.Platform;
@@ -55,6 +55,7 @@ import io.ebeanservice.docstore.api.DocStoreIntegration;
 import io.ebeanservice.docstore.api.DocStoreUpdateProcessor;
 import io.ebeanservice.docstore.none.NoneDocStoreFactory;
 
+import java.time.Clock;
 import java.util.*;
 
 import static java.lang.System.Logger.Level.*;
@@ -75,11 +76,12 @@ public final class InternalConfiguration {
   private final DeployInherit deployInherit;
   private final TypeManager typeManager;
   private final DtoBeanManager dtoBeanManager;
-  private final ClockService clockService;
+  private final Clock clock;
   private final DataTimeZone dataTimeZone;
   private final Binder binder;
   private final DeployCreateProperties deployCreateProperties;
   private final DeployUtil deployUtil;
+  private final DataSourceSupplier dataSourceSupplier;
   private final BeanDescriptorManager beanDescriptorManager;
   private final CQueryEngine cQueryEngine;
   private final ClusterManager clusterManager;
@@ -88,7 +90,7 @@ public final class InternalConfiguration {
   private final boolean jacksonCorePresent;
   private final ExpressionFactory expressionFactory;
   private final SpiBackgroundExecutor backgroundExecutor;
-  private final JsonFactory jsonFactory;
+  private final JsonStream jsonStream;
   private final DocStoreFactory docStoreFactory;
   private final List<Plugin> plugins = new ArrayList<>();
   private final MultiValueBind multiValueBind;
@@ -103,11 +105,11 @@ public final class InternalConfiguration {
     this.online = online;
     this.config = config;
     this.jacksonCorePresent = config.getClassLoadConfig().isJacksonCorePresent();
-    this.clockService = new ClockService(config.settings().getClock());
+    this.clock = config.settings().getClock();
     this.tableModState = new TableModState();
     this.logManager = initLogManager();
     this.docStoreFactory = initDocStoreFactory(service(DocStoreFactory.class));
-    this.jsonFactory = config.getJsonFactory();
+    this.jsonStream = config.getJsonStream();
     this.clusterManager = clusterManager;
     this.backgroundExecutor = backgroundExecutor;
     this.bootupClasses = bootupClasses;
@@ -123,6 +125,7 @@ public final class InternalConfiguration {
 
     final InternalConfigXmlMap xmlMap = initExternalMapping();
     this.dtoBeanManager = new DtoBeanManager(typeManager, xmlMap.readDtoMapping());
+    this.dataSourceSupplier = createDataSourceSupplier();
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy(xmlMap.xmlDeployment());
     Map<String, String> draftTableMap = beanDescriptorManager.draftTableMap();
@@ -189,8 +192,8 @@ public final class InternalConfiguration {
     return docStoreFactory;
   }
 
-  ClockService getClockService() {
-    return clockService;
+  Clock clock() {
+    return clock;
   }
 
   public ExtraMetrics getExtraMetrics() {
@@ -291,7 +294,7 @@ public final class InternalConfiguration {
   }
 
   SpiJsonContext createJsonContext(SpiEbeanServer server) {
-    return jacksonCorePresent ? new DJsonContext(server, jsonFactory, typeManager) : null;
+    return jacksonCorePresent ? new DJsonContext(server, jsonStream, typeManager) : null;
   }
 
   AutoTuneService createAutoTuneService(SpiEbeanServer server) {
@@ -300,11 +303,12 @@ public final class InternalConfiguration {
   }
 
   DtoQueryEngine createDtoQueryEngine() {
-    return new DtoQueryEngine(binder);
+    return new DtoQueryEngine(binder, config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList(), databasePlatform.autoCommitFalseOnFindIterate());
   }
 
   RelationalQueryEngine createRelationalQueryEngine() {
-    return new DefaultRelationalQueryEngine(binder, config.getDatabaseBooleanTrue(), config.getPlatformConfig().getDbUuid().useBinaryOptimized());
+    return new DefaultRelationalQueryEngine(binder, config.getDatabaseBooleanTrue(), config.getPlatformConfig().getDbUuid().useBinaryOptimized(),
+      config.getJdbcFetchSizeFindEach(), config.getJdbcFetchSizeFindList(), databasePlatform.autoCommitFalseOnFindIterate(), config.isQueryPlanEnable());
   }
 
   OrmQueryEngine createOrmQueryEngine() {
@@ -389,8 +393,8 @@ public final class InternalConfiguration {
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(server, notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
-        indexUpdateProcessor, beanDescriptorManager, dataSource(), profileHandler(), logManager,
-        tableModState, cacheNotify, clockService);
+        indexUpdateProcessor, beanDescriptorManager, dataSourceSupplier, profileHandler(), logManager,
+        tableModState, cacheNotify);
 
     if (config.isDocStoreOnly()) {
       return new DocStoreTransactionManager(options);
@@ -399,22 +403,24 @@ public final class InternalConfiguration {
   }
 
   private SpiProfileHandler profileHandler() {
-
-    ProfilingConfig profilingConfig = config.getProfilingConfig();
-    if (!profilingConfig.isEnabled()) {
-      return new NoopProfileHandler();
-    }
     SpiProfileHandler handler = service(SpiProfileHandler.class);
-    if (handler == null) {
-      handler = new DefaultProfileHandler(profilingConfig);
+    if (handler != null) {
+      return plugin(handler);
     }
-    return plugin(handler);
+    return new NoopProfileHandler();
   }
 
   /**
-   * Return the DataSource supplier based on the tenancy mode.
+   * Return the DataSource supplier (multi-tenant aware) based on the tenancy mode.
    */
-  private DataSourceSupplier dataSource() {
+  public DataSourceSupplier getDataSourceSupplier() {
+    return dataSourceSupplier;
+  }
+
+  /**
+   * Create the DataSource supplier based on the tenancy mode.
+   */
+  private DataSourceSupplier createDataSourceSupplier() {
     switch (config.getTenantMode()) {
       case DB:
       case DB_WITH_MASTER:
@@ -584,25 +590,30 @@ public final class InternalConfiguration {
     }
     long threshold = config.getQueryPlanThresholdMicros();
     return new CQueryPlanManager(transactionManager, config.getCurrentTenantProvider(),
-      threshold, queryPlanLogger(databasePlatform.platform()), extraMetrics);
+      threshold, queryPlanLogger(databasePlatform.platform(), config), extraMetrics);
   }
 
   /**
    * Returns the logger to log query plans for the given platform.
    */
-  QueryPlanLogger queryPlanLogger(Platform platform) {
+  QueryPlanLogger queryPlanLogger(Platform platform, DatabaseBuilder.Settings config) {
     switch (platform.base()) {
       case SQLSERVER:
         return new QueryPlanLoggerSqlServer();
       case ORACLE:
         return new QueryPlanLoggerOracle();
       case POSTGRES:
-        return new QueryPlanLoggerExplain("explain (analyze, buffers) ");
+        return new QueryPlanLoggerExplain(explain(config, "explain (analyze, costs, verbose, buffers) "));
       case YUGABYTE:
-        return new QueryPlanLoggerExplain("explain (analyze, buffers, dist) ");
+        return new QueryPlanLoggerExplain(explain(config,"explain (analyze, buffers, dist) "));
       default:
-        return new QueryPlanLoggerExplain("explain ");
+        return new QueryPlanLoggerExplain(explain(config,"explain "));
     }
+  }
+
+  private static String explain(DatabaseBuilder.Settings config, String defaultExplain) {
+    String explain = config.getQueryPlanExplain();
+    return explain == null ? defaultExplain : explain + ' ';
   }
 
   /**

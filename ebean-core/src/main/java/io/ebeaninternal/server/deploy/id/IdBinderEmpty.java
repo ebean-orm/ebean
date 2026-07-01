@@ -29,11 +29,6 @@ final class IdBinderEmpty implements IdBinder {
   }
 
   @Override
-  public String idNullOr(String name, String filterManyExpression) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public String idSelect() {
     return "";
   }

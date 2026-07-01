@@ -19,9 +19,7 @@ final class DTimeMetricStats implements TimedMetricStats {
     this.collected = collected;
     this.count = count;
     this.total = total;
-    // collection is racy so sanitize the max value if it has not been set
-    // this most likely would happen when count = 1 so max = mean
-    this.max = max != Long.MIN_VALUE ? max : (count < 1 ? 0 : Math.round(total / count));
+    this.max = max;
   }
 
   @Override

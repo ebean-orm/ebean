@@ -245,7 +245,8 @@ public final class IdBinderSimple implements IdBinder {
       idValue = scalarType.toBeanType(idValue);
     }
     if (bean != null) {
-      idProperty.setValueIntercept(bean, idValue);
+      // not using interception to support unmodifiable entities
+      idProperty.setValue(bean, idValue);
     }
     return idValue;
   }
@@ -259,10 +260,5 @@ public final class IdBinderSimple implements IdBinder {
   public String cacheKeyFromBean(EntityBean bean) {
     final Object value = idProperty.getValue(bean);
     return scalarType.format(value);
-  }
-
-  @Override
-  public String idNullOr(String prefix, String filterManyExpression) {
-    return "(${" + prefix + "}" + idProperty.name() + " is null or (" + filterManyExpression + "))";
   }
 }

@@ -14,7 +14,7 @@ public class Pview {
   private String name;
 
   @Basic(optional = false)
-  @Column(length = 100, nullable = false)
+  @Column(length = 255, nullable = false)
   private String value;
 
   @JoinTable(name = "pp_to_ww", joinColumns = {@JoinColumn(name = "pp_id", referencedColumnName = "id")}, inverseJoinColumns = {@JoinColumn(name = "ww_id", referencedColumnName = "id")})

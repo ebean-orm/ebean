@@ -23,7 +23,7 @@ public class TestM2MSoftDeleteExists extends BaseTestCase {
 
     Query<MsManyA> query = DB.find(MsManyA.class)
       .where().isNotEmpty("manybs")
-      .order("aid").query();
+      .orderBy("aid").query();
 
     List<MsManyA> list = query.findList();
 
@@ -45,7 +45,7 @@ public class TestM2MSoftDeleteExists extends BaseTestCase {
 
     List<MsManyA> list = DB.find(MsManyA.class)
       .where().isNotEmpty("manybs")
-      .order("aid")
+      .orderBy("aid")
       .findList();
 
     assertThat(list).hasSize(2);
@@ -61,7 +61,7 @@ public class TestM2MSoftDeleteExists extends BaseTestCase {
 
     List<MsManyA> list = DB.find(MsManyA.class)
       .where().isNotEmpty("manybs")
-      .order("aid")
+      .orderBy("aid")
       .findList();
 
     assertThat(list).hasSize(1);

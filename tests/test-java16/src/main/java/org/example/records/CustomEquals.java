@@ -1,11 +1,11 @@
 package org.example.records;
 
-import io.avaje.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
 
 import jakarta.persistence.Embeddable;
 import java.util.Objects;
 
-@NonNullApi
+@NullMarked
 @Embeddable
 public record CustomEquals(String line1, String line2, String city) {
 

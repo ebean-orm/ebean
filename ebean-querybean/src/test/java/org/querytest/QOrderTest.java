@@ -190,7 +190,7 @@ class QOrderTest {
     final List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("select /* QOrderTest.fetchQueryWithBatch */ t0.id, t0.name, t0.phone_number from be_customer t0");
-    assertThat(sql.get(1)).contains("select /* QOrderTest.fetchQueryWithBatch_contacts__query */ t0.customer_id, t0.id, t0.first_name, t0.last_name, t0.email from be_contact t0 where");
+    assertThat(sql.get(1)).contains("select /* QOrderTest.fetchQueryWithBatch.contacts.query */ t0.customer_id, t0.id, t0.first_name, t0.last_name, t0.email from be_contact t0 where");
   }
 
   @Test
@@ -288,7 +288,7 @@ class QOrderTest {
     // assert fetching customer via fetchQuery
     assertThat(sql).hasSize(2);
     assertThat(sql.get(0)).contains("select /* QOrderTest.viaFetchGraph_withNested_fetchQuery */ t0.id, t0.status, t0.customer_id from o_order t0 where t0.id = ?");
-    assertThat(sql.get(1)).contains("select /* QOrderTest.viaFetchGraph_withNested_fetchQuery_customer__query */ t0.id, t0.name, t0.phone_number from be_customer t0 where t0.id = ?");
+    assertThat(sql.get(1)).contains("select /* QOrderTest.viaFetchGraph_withNested_fetchQuery.customer.query */ t0.id, t0.name, t0.phone_number from be_customer t0 where t0.id = ?");
 
     assertThat(found.getCustomer().getPhoneNumber().getMsisdn()).isEqualTo("Ph1");
   }

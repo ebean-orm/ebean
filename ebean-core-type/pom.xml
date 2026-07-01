@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.6.0</version>
+    <version>18.1.0</version>
   </parent>
 
   <artifactId>ebean-core-type</artifactId>
@@ -16,14 +16,13 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-api</artifactId>
-      <version>14.6.0</version>
+      <version>18.1.0</version>
     </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-      <optional>true</optional>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-json-core</artifactId>
+      <version>${avaje-json-core.version}</version>
     </dependency>
 
     <!-- Provided scope for Postgres JSON/JSONB support -->

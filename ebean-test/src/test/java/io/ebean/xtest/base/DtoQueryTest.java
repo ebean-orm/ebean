@@ -230,11 +230,30 @@ class DtoQueryTest extends BaseTestCase {
 
     assertThat(list2).isNotEmpty();
 
+    List<SqlRow> list3 = DB.sqlQuery("select id, name from o_customer where id in (:idList)")
+      .setParameter("idList", ids)
+      .findList();
+    assertThat(list3).isNotEmpty();
+
+    List<SqlRow> list4 = DB.sqlQuery("select id, name from o_customer where id = any(:idList)")
+      .setArrayParameter("idList", ids)
+      .findList();
+    assertThat(list4).isNotEmpty();
+
+    List<SqlRow> list5 = DB.sqlQuery("select id, name from o_customer where id = any(?) and name like ?")
+      .setArrayParameter(1, ids)
+      .setParameter(2, "foo%")
+      .findList();
+    assertThat(list5).isEmpty();
+
     List<String> sql = LoggedSql.stop();
-    assertThat(sql).hasSize(3);
+    assertThat(sql).hasSize(6);
     assertThat(sql.get(0)).contains(" id = any(?)");
     assertThat(sql.get(1)).contains(" id in (?,?)");
     assertThat(sql.get(2)).contains(" id = any(?)");
+    assertThat(sql.get(3)).contains(" id in (?,?)");
+    assertThat(sql.get(4)).contains(" id = any(?)");
+    assertThat(sql.get(5)).contains(" id = any(?) and name like ?");
   }
 
   @ForPlatform(Platform.POSTGRES)
@@ -297,7 +316,7 @@ class DtoQueryTest extends BaseTestCase {
     MetaQueryMetric queryMetric = stats.get(0);
     assertThat(queryMetric.label()).isEqualTo("basic");
     assertThat(queryMetric.count()).isEqualTo(3);
-    assertThat(queryMetric.name()).isEqualTo("dto.DCust_basic");
+    assertThat(queryMetric.name()).isEqualTo("dto.DCust.basic");
 
     server().findDto(DCust.class, "select c4.id, c4.name from o_customer c4 where lower(c4.name) = :name")
       .setLabel("basic2")
@@ -312,7 +331,7 @@ class DtoQueryTest extends BaseTestCase {
     log.info("stats " + stats);
 
     String asJson = metric2.asJson().withHash(false).withNewLine(false).json();
-    assertThat(asJson).contains("dto.DCust_basic2");
+    assertThat(asJson).contains("dto.DCust.basic2");
   }
 
   @Test

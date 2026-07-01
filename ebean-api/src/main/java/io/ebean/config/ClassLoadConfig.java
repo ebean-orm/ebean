@@ -1,5 +1,7 @@
 package io.ebean.config;
 
+import io.ebean.plugin.Lookups;
+
 /**
  * Helper to find classes taking into account the context class loader.
  */
@@ -58,7 +60,8 @@ public class ClassLoadConfig {
   }
 
   public boolean isJacksonCorePresent() {
-    return isPresent("com.fasterxml.jackson.core.JsonParser");
+    // Legacy method name retained for compatibility; now checks avaje JSON core.
+    return isPresent("io.avaje.json.JsonReader");
   }
 
   /**
@@ -73,9 +76,8 @@ public class ClassLoadConfig {
    */
   public Object newInstance(String className) {
     try {
-      Class<?> cls = forName(className);
-      return cls.getDeclaredConstructor().newInstance();
-    } catch (Exception e) {
+      return Lookups.newDefaultInstance(forName(className));
+    } catch (Throwable e) {
       throw new IllegalArgumentException("Error constructing " + className, e);
     }
   }
@@ -157,4 +159,3 @@ public class ClassLoadConfig {
     }
   }
 }
-

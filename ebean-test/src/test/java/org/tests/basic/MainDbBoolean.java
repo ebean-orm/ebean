@@ -1,11 +1,9 @@
 package org.tests.basic;
 
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.Query;
 import io.ebean.SqlRow;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.platform.postgres.PostgresPlatform;
 import io.ebean.datasource.DataSourceConfig;
 import org.tests.model.basic.TOne;
@@ -38,7 +36,7 @@ public class MainDbBoolean {
    * DDL generation etc.
    */
   private Database createOracleEbeanServer() {
-    DatabaseBuilder c = new DatabaseConfig();
+    DatabaseBuilder c = Database.builder();
     c.setName("ora");
     c.setDdlExtra(false);
 
@@ -67,11 +65,11 @@ public class MainDbBoolean {
     c.addClass(TSMaster.class);
     c.addClass(TSDetail.class);
 
-    return DatabaseFactory.create(c);
+    return c.build();
   }
 
   private Database createEbeanServer() {
-    DatabaseBuilder c = new DatabaseConfig();
+    DatabaseBuilder c = Database.builder();
     c.setName("pgtest");
     c.setDdlExtra(false);
 
@@ -97,7 +95,7 @@ public class MainDbBoolean {
 
     c.setDatabasePlatform(new PostgresPlatform());
     c.addClass(TOne.class);
-    return DatabaseFactory.create(c);
+    return c.build();
   }
 
   private void simpleCheck(Database server) {
@@ -118,7 +116,7 @@ public class MainDbBoolean {
 
     List<TOne> list = server.find(TOne.class)
       .setAutoTune(false)
-      .order("id")
+      .orderBy("id")
       .findList();
 
     assertThat(list).hasSize(2);
@@ -135,7 +133,7 @@ public class MainDbBoolean {
 
     Query<TOne> query = server.find(TOne.class)
       .setAutoTune(false)
-      .order("id");
+      .orderBy("id");
 
     int rc = query.findCount();
     assertThat(rc).isGreaterThan(0);

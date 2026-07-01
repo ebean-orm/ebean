@@ -1,10 +1,12 @@
 package io.ebean.xtest.base;
 
 import io.ebean.*;
+import io.ebean.annotation.Platform;
 import io.ebean.xtest.BaseTestCase;
-import org.junit.jupiter.api.AfterEach;
+import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
+import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.ResetBasicData;
 
 import java.time.Clock;
@@ -14,18 +16,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ExtendedServerTest extends BaseTestCase {
-
-  @AfterEach
-  public void cleanup() {
-    DB.getDefault()
-      .extended()
-      .setClock(Clock.systemUTC());
-  }
+class ExtendedServerTest extends BaseTestCase {
 
   @Test
-  public void findList() {
-
+  void findList() {
     ResetBasicData.reset();
 
     Database server = DB.getDefault();
@@ -51,47 +45,57 @@ public class ExtendedServerTest extends BaseTestCase {
     }
   }
 
+  @ForPlatform(Platform.H2)
   @Test
-  public void mockClock() {
-
-    Database database = DB.getDefault();
-    final Instant snapshot = Instant.now();
-    Instant backedSnapshot = snapshot.minus(1, ChronoUnit.DAYS);
+  void fixedClock() {
+    final Instant now = Instant.now();
+    Instant backedSnapshot = now.minus(1, ChronoUnit.DAYS);
     Clock snapshotClock = Clock.fixed(backedSnapshot, Clock.systemUTC().getZone());
 
-    database.extended().setClock(snapshotClock);
+    Database db = Database.builder()
+      .name("db")
+      .loadFromProperties()
+      .clock(snapshotClock)
+      .addClass(EBasicVer.class)
+      .ddlExtra(false)
+      .name("fixed-clock-db")
+      .register(false)
+      .defaultDatabase(false)
+      .build();
 
-    ResetBasicData.reset();
+    EBasicVer e0 = new EBasicVer("CheckClock");
+    db.save(e0);
 
-    int count = database
-      .find(Customer.class)
+    EBasicVer found = db.find(EBasicVer.class, e0.getId());
+    assertThat(found).isNotNull();
+
+    int count = db
+      .find(EBasicVer.class)
       .where()
-      .gt("cretime", snapshot)
+      .gt("lastUpdate", now)
       .findCount();
     assertThat(count).isEqualTo(0);
 
-    int count2 = database
-      .find(Customer.class)
+    int count2 = db
+      .find(EBasicVer.class)
       .where()
-      .ge("cretime", backedSnapshot)
+      .ge("lastUpdate", snapshotClock.instant().minusSeconds(60))
       .findCount();
-    assertThat(count2).isGreaterThan(0);
+    assertThat(count2).isEqualTo(1);
 
-    int count3 = database
-      .find(Customer.class)
+    int count3 = db
+      .find(EBasicVer.class)
       .where()
-      .gt("updtime", snapshot)
+      .gt("lastUpdate", now)
       .findCount();
     assertThat(count3).isEqualTo(0);
 
-    int count4 = database
-      .find(Customer.class)
+    int count4 = db
+      .find(EBasicVer.class)
       .where()
-      .ge("updtime", backedSnapshot)
+      .ge("lastUpdate", backedSnapshot.minus(2, ChronoUnit.DAYS))
       .findCount();
-    assertThat(count4).isGreaterThan(0);
-
-
+    assertThat(count4).isEqualTo(1);
   }
 
 }

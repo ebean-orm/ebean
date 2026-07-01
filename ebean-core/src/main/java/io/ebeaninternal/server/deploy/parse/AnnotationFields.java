@@ -118,7 +118,7 @@ final class AnnotationFields extends AnnotationParser {
 
   private void readField(DeployBeanProperty prop) {
     // all Enums will have a ScalarType assigned...
-    boolean isEnum = prop.getPropertyType().isEnum();
+    boolean isEnum = prop.propertyType().isEnum();
     Enumerated enumerated = get(prop, Enumerated.class);
     if (isEnum || enumerated != null) {
       util.setEnumScalarType(enumerated, prop);
@@ -135,7 +135,7 @@ final class AnnotationFields extends AnnotationParser {
     readJsonAnnotations(prop);
     if (prop.getDbColumn() == null) {
       // No @Column or @Column.name() so use NamingConvention
-      prop.setDbColumn(namingConvention.getColumnFromProperty(beanType, prop.getName()));
+      prop.setDbColumn(namingConvention.getColumnFromProperty(beanType, prop.name()));
     }
     initIdentity(prop);
     initTenantId(prop);
@@ -270,9 +270,13 @@ final class AnnotationFields extends AnnotationParser {
     if (formula != null) {
       prop.setSqlFormula(processFormula(formula.select()), processFormula(formula.join()));
     }
+    Formula2 formula2 = prop.getMetaAnnotationFormula2(platform);
+    if (formula2 != null) {
+      prop.setFormula2Expression(formula2.value());
+    }
     final Aggregation aggregation = prop.getMetaAnnotation(Aggregation.class);
     if (aggregation != null) {
-      prop.setAggregation(aggregation.value().replace("$1", prop.getName()));
+      prop.setAggregation(aggregation.value().replace("$1", prop.name()));
     }
   }
 
@@ -442,7 +446,7 @@ final class AnnotationFields extends AnnotationParser {
 
   private void readGenValue(GeneratedValue gen, Id id, DeployBeanProperty prop) {
     if (id == null) {
-      if (UUID.class.equals(prop.getPropertyType())) {
+      if (UUID.class.equals(prop.propertyType())) {
         generatedPropFactory.setUuid(prop);
         return;
       }
@@ -472,7 +476,7 @@ final class AnnotationFields extends AnnotationParser {
         if (idGenerator != null) {
           descriptor.setCustomIdGenerator(idGenerator);
         }
-      } else if (prop.getPropertyType().equals(UUID.class)) {
+      } else if (prop.propertyType().equals(UUID.class)) {
         descriptor.setUuidGenerator();
       }
     }

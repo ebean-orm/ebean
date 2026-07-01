@@ -1,6 +1,6 @@
 package io.ebean;
 
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -20,7 +20,7 @@ import java.util.stream.Stream;
  * @param <SELF> The type of the builder
  * @param <T>    The entity bean type
  */
-public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
+public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends QueryBuilderProjection<SELF, T> {
 
   /**
    * Set root table alias.
@@ -43,6 +43,16 @@ public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
    * @param apply     The changes to apply to the query
    */
   SELF alsoIf(BooleanSupplier predicate, Consumer<SELF> apply);
+
+  /**
+   * Apply changes to the query when the supplied value is non-null.
+   * <p>
+   * Typically, the changes are extra predicates etc.
+   *
+   * @param value The value which when non-null the changes are applied
+   * @param apply The changes to apply to the query
+   */
+  SELF alsoIfPresent(@Nullable Object value, Consumer<SELF> apply);
 
   /**
    * Perform an 'As of' query using history tables to return the object graph
@@ -116,6 +126,11 @@ public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
   SELF usingTransaction(Transaction transaction);
 
   /**
+   * Execute this query using immutable bean cache values for matching bean types.
+   */
+  SELF using(ImmutableBeanCache<?> beanCache);
+
+  /**
    * Execute the query using the given connection.
    */
   SELF usingConnection(Connection connection);
@@ -135,7 +150,17 @@ public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
    * source. We we use {@code usingMaster()} to instead ensure that the query is executed
    * against the master data source.
    */
-  SELF usingMaster();
+  default SELF usingMaster() {
+    return usingMaster(true);
+  }
+
+  /**
+   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
+   * data source can be used if defined.
+   *
+   * @see #usingMaster()
+   */
+  SELF usingMaster(boolean useMaster);
 
   /**
    * Set the base table to use for this query.
@@ -388,9 +413,19 @@ public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
   SELF setUseDocStore(boolean useDocStore);
 
   /**
-   * When set to true when you want the returned beans to be read only.
+   * When set to true when you want the returned beans to be unmodifiable read only.
+   * <p>
+   * This means that the returning graph can't be mutated via setters, all the collections
+   * are unmodifiable collections, lazy loading is disabled and that the query uses
+   * {@link PersistenceContextScope#QUERY}.
+   * <p>
+   * Attempting to mutate an unmodifiable bean will throw a <code>UnmodifiableEntityException</code>.
+   * Attempting to load an unloaded property will throw a <code>LazyInitialisationException</code>
+   *
+   * @see LazyInitialisationException
+   * @see UnmodifiableEntityException
    */
-  SELF setReadOnly(boolean readOnly);
+  SELF setUnmodifiable(boolean unmodifiable);
 
   /**
    * Set a timeout on this query.
@@ -437,6 +472,16 @@ public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
 
   /**
    * Set the {@link CacheMode} to use the query for executing this query.
+   * <p>
+   * Since version 16.x using the query bean will set the query to use unmodifiable (see
+   * {@link #setUnmodifiable(boolean)}) so the returned object graph is unmodifiable
+   * and safe to cache by the application.
+   * <p>
+   * Attempting to mutate an unmodifiable bean will throw a <code>UnmodifiableEntityException</code>.
+   * Attempting to load an unloaded property will throw a <code>LazyInitialisationException</code>
+   *
+   * @see LazyInitialisationException
+   * @see UnmodifiableEntityException
    */
   SELF setUseQueryCache(CacheMode cacheMode);
 
@@ -951,6 +996,16 @@ public interface QueryBuilder<SELF, T> extends QueryBuilderProjection<SELF, T> {
    * @return a Future object for the list result of the query
    */
   FutureList<T> findFutureList();
+
+  /**
+   * Execute find map query in a background thread.
+   * <p>
+   * This query will execute in it's own PersistenceContext and using its own transaction.
+   * What that means is that it will not share any bean instances with other queries.
+   *
+   * @return a Future object for the map result of the query
+   */
+  <K> FutureMap<K,T> findFutureMap();
 
   /**
    * Return a PagedList for this query using firstRow and maxRows.

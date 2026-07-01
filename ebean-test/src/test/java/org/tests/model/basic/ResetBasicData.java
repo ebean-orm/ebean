@@ -26,7 +26,7 @@ public class ResetBasicData {
         // OK, test data not modified
         outputCustomerIds();
       } else {
-        outputState();
+        outputState(true);
       }
       return;
     }
@@ -45,11 +45,11 @@ public class ResetBasicData {
       me.insertProducts();
       me.insertTestCustAndOrders();
     });
-    outputState();
+    outputState(false);
     runOnce = true;
   }
 
-  private static void outputState() {
+  private static void outputState(boolean warning) {
     StringBuilder sb = new StringBuilder();
     sb.append("CustomerIds:");
     server.find(Customer.class).findEach(c -> sb.append(' ').append(c.getId()));
@@ -59,8 +59,13 @@ public class ResetBasicData {
     server.find(Country.class).findEach(c -> sb.append(' ').append(c.getCode()));
     sb.append(", Products:");
     server.find(Product.class).findEach(c -> sb.append(' ').append(c.getId()));
-    System.err.println("WARNING: basic test data was modified. Current content:");
-    System.err.println(sb);
+    if (warning) {
+      System.err.println("WARNING: basic test data was modified. Current content:");
+      System.err.println(sb);
+    } else {
+      System.out.println("ResetBasicData. basic test data was initialized Current content:");
+      System.out.println(sb);
+    }
   }
 
   private static void outputCustomerIds() {

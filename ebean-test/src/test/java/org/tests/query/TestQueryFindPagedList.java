@@ -108,7 +108,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     PagedList<Order> pagedList2 = DB.find(Order.class)
       .setFirstRow(1)
       .setMaxRows(3)
-      .order("id")
+      .orderBy("id")
       .findPagedList();
 
     pagedList2.loadCount();
@@ -124,7 +124,7 @@ public class TestQueryFindPagedList extends BaseTestCase {
     PagedList<Order> pagedList3 = DB.find(Order.class)
       .setFirstRow(2)
       .setMaxRows(150)
-      .order("id")
+      .orderBy("id")
       .findPagedList();
 
     assertFalse(pagedList3.hasNext());

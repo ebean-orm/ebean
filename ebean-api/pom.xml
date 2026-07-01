@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.6.0</version>
+    <version>18.1.0</version>
   </parent>
 
   <name>ebean api</name>
@@ -26,20 +26,16 @@
       <version>1.0</version>
     </dependency>
 
-    <!--
-    Class retention Nonnull and Nullable annotations
-    to assist with IDE auto-completion with Ebean API
-    -->
     <dependency>
-      <groupId>io.avaje</groupId>
-      <artifactId>avaje-lang</artifactId>
-      <version>1.1</version>
+      <groupId>org.jspecify</groupId>
+      <artifactId>jspecify</artifactId>
+      <version>1.0.0</version>
     </dependency>
 
     <dependency>
       <groupId>io.avaje</groupId>
       <artifactId>avaje-config</artifactId>
-      <version>3.12</version>
+      <version>4.2</version>
     </dependency>
 
     <dependency>
@@ -74,38 +70,19 @@
       <optional>true</optional>
     </dependency>
 
-    <!-- Jackson core used internally by Ebean -->
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-      <optional>true</optional>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-json-core</artifactId>
+      <version>${avaje-json-core.version}</version>
     </dependency>
 
-    <!-- provided scope for JsonNode support -->
+    <!-- Jackson databind remains for ObjectMapper compatibility paths -->
     <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-databind</artifactId>
       <version>${jackson.version}</version>
       <optional>true</optional>
     </dependency>
-
-    <!-- JAVAX-DEPENDENCY-START ___
-    <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
-      <version>3.1.0</version>
-      <optional>true</optional>
-    </dependency>
-    ____ JAVAX-DEPENDENCY-END -->
-    <!-- JAKARTA-DEPENDENCY-START -->
-    <dependency>
-      <groupId>jakarta.servlet</groupId>
-      <artifactId>jakarta.servlet-api</artifactId>
-      <version>6.0.0</version>
-      <optional>true</optional>
-    </dependency>
-    <!-- JAKARTA-DEPENDENCY-END -->
 
   </dependencies>
 
@@ -126,6 +103,53 @@
         </excludes>
       </resource>
     </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <release>11</release>
+            </configuration>
+          </execution>
+          <execution>
+            <id>compile-21</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <release>21</release>
+              <compileSourceRoots>
+                <compileSourceRoot>${project.basedir}/src/main/java21</compileSourceRoot>
+              </compileSourceRoots>
+              <multiReleaseOutput>true</multiReleaseOutput>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <addMavenDescriptor>false</addMavenDescriptor>
+            <manifestEntries>
+              <Multi-Release>true</Multi-Release>
+            </manifestEntries>
+          </archive>
+        </configuration>
+<!--          <manifest>-->
+<!--            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>-->
+<!--          </manifest>-->
+
+      </plugin>
+    </plugins>
   </build>
 
 </project>

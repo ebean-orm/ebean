@@ -29,7 +29,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
 
     DB.find(Order.class)
       .setFirstRow(3)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     List<String> loggedSql = LoggedSql.stop();
@@ -69,7 +69,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     DB.find(Order.class)
       .setFirstRow(3)
       .setMaxRows(10)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     List<String> loggedSql = LoggedSql.stop();
@@ -129,7 +129,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     DB.find(Order.class)
       .setFirstRow(10)
       .setMaxRows(10)
-      .order("id")
+      .orderBy("id")
       .findPagedList()
       .getList();
 
@@ -150,7 +150,7 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     LoggedSql.start();
 
     DB.find(Order.class)
-      .order().asc("orderDate")
+      .orderBy().asc("orderDate")
       .setMaxRows(10)
       .findPagedList()
       .getList();
@@ -169,8 +169,8 @@ public class TestAddOrderByWithFirstRowsMaxRows extends BaseTestCase {
     LoggedSql.start();
 
     DB.find(Order.class)
-      .order().asc("orderDate")
-      .order().desc("id")
+      .orderBy().asc("orderDate")
+      .orderBy().desc("id")
       .setMaxRows(10)
       .findPagedList()
       .getList();

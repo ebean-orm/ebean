@@ -29,7 +29,7 @@ public class TestAggregationTopLevel extends BaseTestCase {
       .query();
 
     List<DMachineStatsAgg> result = query.findList();
-    assertThat(sqlOf(query)).contains("select t0.edate, t0.machine_id from d_machine_stats t0 where t0.edate > ?");
+    assertThat(sqlOf(query)).contains("select t0.machine_id, t0.edate from d_machine_stats t0 where t0.edate > ?");
     assertThat(result).isNotEmpty();
   }
 

@@ -1,6 +1,6 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.List;
 import java.util.Set;
@@ -79,7 +79,7 @@ import java.util.Set;
  *
  * @param <T> the entity bean type
  */
-@NonNullApi
+@NullMarked
 public interface Filter<T> {
 
   /**

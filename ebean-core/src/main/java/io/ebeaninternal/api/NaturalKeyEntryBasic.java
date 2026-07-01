@@ -41,11 +41,19 @@ final class NaturalKeyEntryBasic implements NaturalKeyEntry {
    * Create when query uses an IN PAIRS clause.
    */
   NaturalKeyEntryBasic(BeanNaturalKey naturalKey, List<NaturalKeyEq> eqList,
-                        String inMapProperty0, String inMapProperty1, Pairs.Entry pair) {
+                       String inMapProperty0, String inMapProperty1, Pairs.Entry pair) {
     load(eqList);
     map.put(inMapProperty0, pair.getA());
     map.put(inMapProperty1, pair.getB());
     this.inValue = pair;
+    this.key = calculateKey(naturalKey);
+  }
+
+  NaturalKeyEntryBasic(BeanNaturalKey naturalKey, List<NaturalKeyEq> eqList,
+                       Map<String, Object> properties, Object[] naturalKeyValue) {
+    load(eqList);
+    map.putAll(properties);
+    this.inValue = naturalKeyValue;
     this.key = calculateKey(naturalKey);
   }
 

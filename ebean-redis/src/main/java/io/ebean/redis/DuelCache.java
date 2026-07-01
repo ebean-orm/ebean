@@ -1,7 +1,6 @@
 package io.ebean.redis;
 
 import io.ebean.cache.ServerCache;
-import io.ebean.cache.ServerCacheStatistics;
 import io.ebean.meta.MetricVisitor;
 import io.ebeaninternal.server.cache.DefaultServerCache;
 

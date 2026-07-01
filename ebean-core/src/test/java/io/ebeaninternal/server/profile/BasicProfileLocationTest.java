@@ -55,7 +55,7 @@ class BasicProfileLocationTest {
     DProfileLocation loc = new DTimedProfileLocation("foo", MetricFactory.get().createTimedMetric("junk"));
 
     assertThat(loc.obtain()).isTrue();
-    assertThat(loc.fullLocation()).endsWith("org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:728)");
+    assertThat(loc.fullLocation()).endsWith("org.junit.platform.commons.util.ReflectionUtils.invokeMethod(ReflectionUtils.java:786)");
     assertThat(loc.location()).isEqualTo("org.junit.platform.commons.util.ReflectionUtils.invokeMethod");
     assertThat(loc.label()).isEqualTo("ReflectionUtils.invokeMethod");
   }

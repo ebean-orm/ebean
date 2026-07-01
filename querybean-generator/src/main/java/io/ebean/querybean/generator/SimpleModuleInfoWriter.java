@@ -88,7 +88,7 @@ class SimpleModuleInfoWriter {
       for (Set<String> value : processingContext.getOtherDbEntities().values()) {
         allEntities.addAll(value);
       }
-
+      allEntities.addAll(processingContext.getMappedSuper());
       if (!allEntities.isEmpty()) {
         FileObject jfo = processingContext.createNativeImageWriter(factoryPackage + ".ebean-entity");
         if (jfo != null) {
@@ -104,6 +104,13 @@ class SimpleModuleInfoWriter {
             writer.write("\n  {\"name\": \"");
             writer.write(entity);
             writer.write("\", \"allDeclaredConstructors\": true, \"allDeclaredFields\": true}");
+          }
+          if (processingContext.hasOtherClasses()) {
+            for (String otherClass : processingContext.getOtherClasses()) {
+              writer.write(",\n  {\"name\": \"");
+              writer.write(otherClass);
+              writer.write("\", \"allDeclaredConstructors\": true}");
+            }
           }
           writer.write("\n]\n");
           writer.write("\n");

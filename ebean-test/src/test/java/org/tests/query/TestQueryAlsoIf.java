@@ -33,4 +33,28 @@ class TestQueryAlsoIf {
     query.findList();
     assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.name from o_customer t0");
   }
+
+  @Test
+  void applyIfPresent() {
+    ResetBasicData.reset();
+    Object value = "yes";
+    Query<Customer> query = DB.find(Customer.class)
+      .select("name")
+      .alsoIfPresent(value, qy -> qy.where().isNotNull("name"));
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.name from o_customer t0 where t0.name is not null");
+  }
+
+  @Test
+  void notApplyIfPresent() {
+    ResetBasicData.reset();
+    Object value = null;
+    Query<Customer> query = DB.find(Customer.class)
+      .select("name")
+      .alsoIfPresent(value, qy -> qy.where().isNotNull("name"));
+
+    query.findList();
+    assertThat(query.getGeneratedSql()).isEqualTo("select t0.id, t0.name from o_customer t0");
+  }
 }

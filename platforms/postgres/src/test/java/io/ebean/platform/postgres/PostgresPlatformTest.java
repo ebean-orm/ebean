@@ -53,10 +53,19 @@ class PostgresPlatformTest {
   }
 
   @Test
+  void testStringType() {
+    PostgresPlatform platform = new PostgresPlatform();
+    platform.configure(new PlatformConfig());
+    DbPlatformType dbType = platform.dbTypeMap().get(DbType.VARCHAR);
+    String columnDefn = dbType.renderType(0, 0);
+
+    assertThat(columnDefn).isEqualTo("varchar");
+  }
+
+  @Test
   void testUuidType() {
     PostgresPlatform platform = new PostgresPlatform();
     platform.configure(new PlatformConfig());
-
     DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     String columnDefn = dbType.renderType(0, 0);
 

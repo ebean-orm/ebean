@@ -32,6 +32,7 @@ public class TestQueryUsingConnection extends BaseTestCase {
         .findCount();
 
       assertThat(count).isGreaterThan(0);
+      connection.rollback();
     }
   }
 
@@ -67,11 +68,15 @@ public class TestQueryUsingConnection extends BaseTestCase {
 
       final int otherCount = DB.find(Country.class).findCount();
       final int masterCount = DB.find(Country.class).usingMaster().findCount();
+      final int masterCount2 = DB.find(Country.class).usingMaster(true).findCount();
+      final int masterCount3 = DB.find(Country.class).usingMaster(false).findCount();
 
       transaction.rollback();
 
       assertThat(count).isEqualTo(otherCount + 1);
       assertThat(otherCount).isEqualTo(masterCount);
+      assertThat(otherCount).isEqualTo(masterCount2);
+      assertThat(otherCount).isEqualTo(masterCount3);
     }
   }
 

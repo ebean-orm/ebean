@@ -1,6 +1,7 @@
 package io.ebean.querybean.generator;
 
 import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.FilerException;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
@@ -17,9 +18,9 @@ public class Processor extends AbstractProcessor implements Constants {
 
   private ProcessingContext processingContext;
   private SimpleModuleInfoWriter moduleWriter;
+  private boolean initModuleWriter;
 
-  public Processor() {
-  }
+  private boolean wroteLookup;
 
   @Override
   public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -35,6 +36,8 @@ public class Processor extends AbstractProcessor implements Constants {
     annotations.add(CONVERTER);
     annotations.add(EBEAN_COMPONENT);
     annotations.add(MODULEINFO);
+    annotations.add(TYPEQUERYBEAN);
+    annotations.add(GENERATED);
     return annotations;
   }
 
@@ -57,6 +60,10 @@ public class Processor extends AbstractProcessor implements Constants {
       String msg = "Ebean APT generated %s query beans, loaded %s others - META-INF/ebean-generated-info.mf entity-packages: %s";
       processingContext.logNote(msg, count, loaded, processingContext.getAllEntityPackages());
     }
+    if (!wroteLookup) {
+      wroteLookup = true;
+      LookupWriter.write(processingContext, processingEnv.getElementUtils(), annotations, roundEnv);
+    }
     return true;
   }
 
@@ -70,7 +77,15 @@ public class Processor extends AbstractProcessor implements Constants {
       generateQueryBeans(element);
       count++;
     }
+    for (Element element : roundEnv.getElementsAnnotatedWith(processingContext.mappedSuperclassAnnotation())) {
+      addMappedSuperclasses(element);
+    }
     return count;
+  }
+
+  private void addMappedSuperclasses(Element element) {
+    String fullName = ((TypeElement)element).getQualifiedName().toString();
+    processingContext.addMappedSuper(fullName);
   }
 
   private void processOthers(RoundEnvironment round) {
@@ -88,24 +103,26 @@ public class Processor extends AbstractProcessor implements Constants {
 
   private void initModuleInfoBean() {
     try {
-      if (moduleWriter == null) {
+      if (!initModuleWriter) {
         moduleWriter = new SimpleModuleInfoWriter(processingContext);
       }
+    } catch (FilerException e) {
+      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
     } catch (Throwable e) {
-      e.printStackTrace();
       processingContext.logError(null, "Failed to initialise EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
+    } finally {
+      initModuleWriter = true;
     }
   }
 
   private void writeModuleInfoBean() {
     try {
       if (moduleWriter == null) {
-        processingContext.logError(null, "EntityClassRegister was not initialised and not written");
+        processingContext.logNote(null, "EntityClassRegister skipped");
       } else {
         moduleWriter.write();
       }
     } catch (Throwable e) {
-      e.printStackTrace();
       processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
   }
@@ -115,7 +132,6 @@ public class Processor extends AbstractProcessor implements Constants {
       SimpleQueryBeanWriter beanWriter = new SimpleQueryBeanWriter((TypeElement) element, processingContext);
       beanWriter.writeRootBean();
     } catch (Throwable e) {
-      e.printStackTrace();
       processingContext.logError(element, "Error generating query beans: " + e);
     }
   }

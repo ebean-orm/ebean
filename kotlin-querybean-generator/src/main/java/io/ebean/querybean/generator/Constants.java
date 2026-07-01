@@ -5,12 +5,17 @@ interface Constants {
   String AT_GENERATED = "@io.ebean.typequery.Generated(\"io.ebean.querybean.kotlin-generator\")";
   String AT_TYPEQUERYBEAN = "@io.ebean.typequery.TypeQueryBean(\"v1\")";
 
+  String GENERATED = "io.ebean.typequery.Generated";
+  String TYPEQUERYBEAN = "io.ebean.typequery.TypeQueryBean";
+
   String MAPPED_SUPERCLASS = "jakarta.persistence.MappedSuperclass";
   String DISCRIMINATOR_VALUE = "jakarta.persistence.DiscriminatorValue";
   String INHERITANCE = "jakarta.persistence.Inheritance";
   String ENTITY = "jakarta.persistence.Entity";
   String EMBEDDABLE = "jakarta.persistence.Embeddable";
   String CONVERTER = "jakarta.persistence.Converter";
+  String ONE_TO_MANY = "jakarta.persistence.OneToMany";
+  String MANY_TO_MANY = "jakarta.persistence.ManyToMany";
   String EBEAN_COMPONENT = "io.ebean.annotation.EbeanComponent";
 
   String DBARRAY = "io.ebean.annotation.DbArray";
@@ -18,14 +23,10 @@ interface Constants {
   String DBJSONB = "io.ebean.annotation.DbJsonB";
   String DBNAME = "io.ebean.annotation.DbName";
 
-  String TQASSOC = "io.ebean.typequery.TQAssoc";
-  String TQASSOCBEAN = "io.ebean.typequery.TQAssocBean";
-  String TQPROPERTY = "io.ebean.typequery.TQProperty";
-
   String MODULEINFO = "io.ebean.config.ModuleInfo";
   String METAINF_MANIFEST = "META-INF/ebean-generated-info.mf";
   String METAINF_SERVICES_MODULELOADER = "META-INF/services/io.ebean.config.EntityClassRegister";
 
-  String AVAJE_LANG_NULLABLE = "io.avaje.lang.Nullable";
+  String AVAJE_LANG_NULLABLE = "org.jspecify.annotations.Nullable";
   String JAVA_COLLECTION = "java.util.Collection";
 }

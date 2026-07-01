@@ -1,12 +1,9 @@
 package io.ebean.xtest.event;
 
-
 import io.ebean.BeanState;
 import io.ebean.DB;
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanPostLoad;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
@@ -49,21 +46,21 @@ public class BeanPostLoadTest extends BaseTestCase {
 
   private Database createDatabase() {
 
-    DatabaseBuilder config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
 
     config.setName("h2ebasicver");
+    config.setRegister(false);
+    config.setDefaultServer(false);
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.setDdlExtra(false);
 
-    config.setRegister(false);
-    config.setDefaultServer(false);
     config.addClass(EBasicVer.class);
 
     config.add(postLoad);
 
-    return DatabaseFactory.create(config);
+    return config.build();
   }
 
   static class PostLoad implements BeanPostLoad {

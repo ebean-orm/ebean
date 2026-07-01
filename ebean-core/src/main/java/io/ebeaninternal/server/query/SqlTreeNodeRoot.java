@@ -76,6 +76,7 @@ final class SqlTreeNodeRoot extends SqlTreeNodeBean {
 
   @Override
   public void dependentTables(Set<String> tables) {
+    tables.add(baseTable);
     for (SqlTreeNode child : children) {
       child.dependentTables(tables);
     }

@@ -3,18 +3,26 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>14.6.0</version>
+    <version>18.1.0</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>ebean-jackson-mapper</artifactId>
+  <name>ebean-jackson-mapper</name>
 
   <dependencies>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core-type</artifactId>
-      <version>14.6.0</version>
+      <version>18.1.0</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-json-core</artifactId>
+      <version>${avaje-json-core.version}</version>
       <scope>provided</scope>
     </dependency>
 

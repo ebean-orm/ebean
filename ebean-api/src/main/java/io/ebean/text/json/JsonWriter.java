@@ -1,19 +1,17 @@
 package io.ebean.text.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-
 import java.io.InputStream;
 import java.math.BigDecimal;
 
 /**
- * Wraps an underlying JsonGenerator taking into account null suppression and exposing isIncludeEmpty() etc.
+ * Wraps an underlying JsonWriter taking into account null suppression and exposing isIncludeEmpty() etc.
  */
 public interface JsonWriter {
 
   /**
-   * Return the Jackson core JsonGenerator.
+   * Return the underlying JsonWriter.
    */
-  JsonGenerator gen();
+  io.avaje.json.JsonWriter gen();
 
   /**
    * Return true if null values should be included in JSON output.

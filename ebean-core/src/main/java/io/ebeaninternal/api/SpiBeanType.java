@@ -14,4 +14,9 @@ public interface SpiBeanType {
    * or removals from the collection.
    */
   boolean isToManyDirty(EntityBean bean);
+
+  /**
+   * Return the FormulaBuilder for this type.
+   */
+  FormulaBuilder formulaBuilder();
 }

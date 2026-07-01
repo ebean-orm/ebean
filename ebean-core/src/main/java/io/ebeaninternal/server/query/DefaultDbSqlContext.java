@@ -22,6 +22,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
   private final ArrayStack<String> joinStack = new ArrayStack<>();
   private final ArrayStack<String> prefixStack = new ArrayStack<>();
   private final String fromForUpdate;
+  private final String dbFilterManyJoin;
   private boolean useColumnAlias;
   private int columnIndex;
   private int asOfTableCount;
@@ -41,7 +42,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
   private boolean joinSuppressed;
 
   DefaultDbSqlContext(SqlTreeAlias alias, String columnAliasPrefix, CQueryHistorySupport historySupport,
-                      CQueryDraftSupport draftSupport, String fromForUpdate) {
+                      CQueryDraftSupport draftSupport, String fromForUpdate, String dbFilterManyJoin) {
     this.alias = alias;
     this.columnAliasPrefix = columnAliasPrefix;
     this.useColumnAlias = columnAliasPrefix != null;
@@ -49,6 +50,14 @@ final class DefaultDbSqlContext implements DbSqlContext {
     this.historySupport = historySupport;
     this.historyQuery = (historySupport != null);
     this.fromForUpdate = fromForUpdate;
+    this.dbFilterManyJoin = dbFilterManyJoin;
+  }
+
+  @Override
+  public void includeFilterMany() {
+    if (dbFilterManyJoin != null) {
+      sb.append(" and ").append(dbFilterManyJoin);
+    }
   }
 
   @Override
@@ -261,6 +270,28 @@ final class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
+  public String parseFormula2(String formula, String prefix) {
+    return alias.parseFormula2(formula, prefix);
+  }
+
+  @Override
+  public void addFormula2Join(String joinLiteral, String table, String a2, String foreignIdCol, String resolvedFkExpr) {
+    if (tableJoins == null) {
+      tableJoins = new HashSet<>();
+    }
+    String joinKey = table + "-formula2-" + a2;
+    if (tableJoins.contains(joinKey)) {
+      joinSuppressed = true;
+      return;
+    }
+    joinSuppressed = false;
+    tableJoins.add(joinKey);
+    sb.append(' ').append(joinLiteral).append(' ').append(table).append(' ').append(a2);
+    sb.append(" on ").append(a2).append('.').append(foreignIdCol);
+    sb.append(" = ").append(resolvedFkExpr);
+  }
+
+  @Override
   public void appendParseSelect(String parseSelect, String columnAlias) {
     String converted = this.alias.parse(parseSelect);
     sb.append(COMMA);
@@ -270,6 +301,14 @@ final class DefaultDbSqlContext implements DbSqlContext {
     } else {
       appendColumnAlias();
     }
+  }
+
+  @Override
+  public void appendFormula2Select(String parseSelect) {
+    // resolve the path based placeholders relative to the current node prefix
+    sb.append(COMMA);
+    sb.append(alias.parseFormula2(parseSelect, currentPrefix));
+    appendColumnAlias();
   }
 
   @Override
@@ -295,9 +334,8 @@ final class DefaultDbSqlContext implements DbSqlContext {
     if (useColumnAlias) {
       sb.append(' ');
       sb.append(columnAliasPrefix);
-      sb.append(columnIndex);
+      sb.append(columnIndex++);
     }
-    columnIndex++;
   }
 
   @Override

@@ -6,7 +6,7 @@ package io.ebean;
  * @param <SELF> The builder type
  * @param <T>    The entity bean type
  */
-public interface QueryBuilderProjection<SELF, T> {
+public interface QueryBuilderProjection<SELF extends QueryBuilderProjection<SELF, T>, T> {
 
   /**
    * Apply the path properties replacing the select and fetch clauses.

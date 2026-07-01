@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.config.JsonConfig;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ public class ScalarTypeLocalDateTimeTest {
 
   private final ScalarTypeLocalDateTime type = new ScalarTypeLocalDateTime(JsonConfig.DateTime.MILLIS);
 
-  private final JsonFactory factory = new JsonFactory();
+  private final JsonStream jsonStream = JsonStream.builder().build();
 
   // warm up
   private final LocalDateTime warmUp = LocalDateTime.now();
@@ -91,7 +91,7 @@ public class ScalarTypeLocalDateTimeTest {
     ScalarTypeLocalDateTime typeIso = new ScalarTypeLocalDateTime(JsonConfig.DateTime.ISO8601);
 
     StringWriter writer = new StringWriter();
-    JsonGenerator generator = factory.createGenerator(writer);
+    JsonWriter generator = jsonStream.writer(writer);
 
     typeIso.jsonWrite(generator, of);
     generator.flush();
@@ -132,18 +132,15 @@ public class ScalarTypeLocalDateTimeTest {
   @Test
   public void testParseEbean11() throws IOException {
     ScalarTypeLocalDateTime type = new ScalarTypeLocalDateTime(JsonConfig.DateTime.ISO8601);
-    JsonFactory factory = new JsonFactory();
-    JsonParser parser11 = factory.createParser("1517627106000"); // its a number!
-    JsonParser parser13 = factory.createParser("\"2022-01-01T01:00:00\"");
+    JsonReader parser11 = jsonStream.reader("1517627106000"); // ebean 11 style number
 
     // test parsing an ebean 11/13 timestamp, we do not expect an exception
     LocalDateTime p = type.parse("1517627106000");
-    parser11.nextToken();
     LocalDateTime q = type.jsonRead(parser11);
     assertThat(p).isEqualTo(q);
 
+    JsonReader parser13 = jsonStream.reader("\"2022-01-01T01:00:00\"");
     p = type.parse("2022-01-01T01:00:00");
-    parser13.nextToken();
     q =  type.jsonRead(parser13);
     assertThat(p).isEqualTo(q);
     TimeZone tz = TimeZone.getDefault();

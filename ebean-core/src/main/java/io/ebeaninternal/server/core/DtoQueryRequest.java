@@ -2,9 +2,11 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.QueryIterator;
 import io.ebean.core.type.DataReader;
+import io.ebeaninternal.api.CoreLog;
 import io.ebeaninternal.api.SpiDtoQuery;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.bind.DataBindCapture;
 import io.ebeaninternal.server.dto.DtoColumn;
 import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
@@ -18,6 +20,8 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import static java.lang.System.Logger.Level.ERROR;
 
 /**
  * Wraps the objects involved in executing a DtoQuery.
@@ -67,7 +71,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   @Override
   protected void setResultSet(ResultSet resultSet, Object queryPlanKey) throws SQLException {
     this.resultSet = resultSet;
-    this.dataReader = new RsetDataReader(server.dataTimeZone(), resultSet);
+    this.dataReader = new RsetDataReader(false, server.dataTimeZone(), resultSet);
     obtainPlan(queryPlanKey);
   }
 
@@ -87,6 +91,22 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
     if (plan != null) {
       long exeMicros = (System.nanoTime() - startNano) / 1000L;
       plan.collect(exeMicros);
+      // native SQL only (binder set in executeAsSql); ORM-backed DTO queries
+      // capture the query plan via the underlying ORM query plan instead.
+      if (binder != null && plan.collectFor(exeMicros)) {
+        captureBindForQueryPlan(exeMicros);
+      }
+    }
+  }
+
+  private void captureBindForQueryPlan(long exeMicros) {
+    final long startNanos = System.nanoTime();
+    try {
+      DataBindCapture capture = DataBindCapture.of(server.dataTimeZone());
+      binder.bind(query.getBindParams(), capture, new StringBuilder());
+      plan.setBind(capture.bindCapture(), exeMicros, startNanos);
+    } catch (SQLException e) {
+      CoreLog.log.log(ERROR, "Error capturing DTO bind values", e);
     }
   }
 
@@ -127,7 +147,7 @@ public final class DtoQueryRequest<T> extends AbstractSqlQueryRequest {
   }
 
   private DtoMappingRequest mappingRequest() throws SQLException {
-    return new DtoMappingRequest(query, sql, readMeta());
+    return new DtoMappingRequest(server, query, sql, readMeta());
   }
 
   private DtoColumn[] readMeta() throws SQLException {

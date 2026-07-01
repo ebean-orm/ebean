@@ -50,7 +50,6 @@ class SimpleModuleInfoWriter {
       }
 
     } catch (IOException e) {
-      e.printStackTrace();
       processingContext.logError(null, "Failed to write services file " + e.getMessage());
     }
   }
@@ -70,7 +69,6 @@ class SimpleModuleInfoWriter {
       }
 
     } catch (IOException e) {
-      e.printStackTrace();
       processingContext.logError(null, "Failed to write services file " + e.getMessage());
     }
   }

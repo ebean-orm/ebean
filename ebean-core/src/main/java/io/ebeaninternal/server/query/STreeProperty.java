@@ -93,11 +93,26 @@ public interface STreeProperty extends ScalarDataReader<Object> {
   void appendSelect(DbSqlContext ctx, boolean subQuery);
 
   /**
+   * Append to group by.
+   */
+  default void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
+    appendSelect(ctx, subQuery);
+  }
+
+  /**
    * Append to the from clause.
    */
   void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere);
 
   default void extraIncludes(Set<String> predicateIncludes) {
     // do nothing
+  }
+
+  /**
+   * Return the association join paths required by a {@code @Formula2} property, or null.
+   * These paths are automatically added as joins when this property is selected.
+   */
+  default Set<String> formula2Joins() {
+    return null;
   }
 }

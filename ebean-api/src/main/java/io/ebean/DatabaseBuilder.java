@@ -1,6 +1,6 @@
 package io.ebean;
 
-import com.fasterxml.jackson.core.JsonFactory;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.annotation.*;
 import io.ebean.cache.ServerCachePlugin;
 import io.ebean.config.*;
@@ -61,6 +61,10 @@ public interface DatabaseBuilder {
 
   /**
    * Build and return the Database instance.
+   * <p>
+   * When {@link #setRegister(boolean)} is set to true, and a database with the same
+   * name is already registered, this may return the existing registered database
+   * rather than creating a new one.
    */
   Database build();
 
@@ -360,18 +364,18 @@ public interface DatabaseBuilder {
   DatabaseBuilder putServiceObject(Object configObject);
 
   /**
-   * Set the Jackson JsonFactory to use.
+   * Set the JsonStream to use.
    * <p>
    * If not set a default implementation will be used.
    */
-  default DatabaseBuilder jsonFactory(JsonFactory jsonFactory) {
-    return setJsonFactory(jsonFactory);
+  default DatabaseBuilder jsonStream(JsonStream jsonStream) {
+    return setJsonStream(jsonStream);
   }
 
   /**
-   * @deprecated migrate to {@link #jsonFactory(JsonFactory)}.
+   * @deprecated migrate to {@link #jsonStream(JsonStream)}.
    */
-  DatabaseBuilder setJsonFactory(JsonFactory jsonFactory);
+  DatabaseBuilder setJsonStream(JsonStream jsonStream);
 
   /**
    * Set the JSON format to use for DateTime types.
@@ -724,19 +728,6 @@ public interface DatabaseBuilder {
   DatabaseBuilder setReadAuditPrepare(ReadAuditPrepare readAuditPrepare);
 
   /**
-   * Set the configuration for profiling.
-   */
-  default DatabaseBuilder profilingConfig(ProfilingConfig profilingConfig) {
-    return setProfilingConfig(profilingConfig);
-  }
-
-  /**
-   * @deprecated migrate to {@link #profilingConfig(ProfilingConfig)}.
-   */
-  @Deprecated
-  DatabaseBuilder setProfilingConfig(ProfilingConfig profilingConfig);
-
-  /**
    * Set the suffix appended to the base table to derive the view that contains the union
    * of the base table and the history table in order to support asOf queries.
    */
@@ -897,6 +888,13 @@ public interface DatabaseBuilder {
   DatabaseBuilder setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper);
 
   /**
+   * Enable tenant-partitioned caches. When enabled each tenant gets its own cache namespace,
+   * improving cache-hit ratio by preventing cross-tenant key collisions.
+   * Use {@link SpiCacheManager#clearTenant(Object)} when a tenant is deactivated.
+   */
+  DatabaseBuilder tenantPartitionedCache(boolean tenantPartitionedCache);
+
+  /**
    * Set the L2 cache default max size.
    */
   default DatabaseBuilder cacheMaxSize(int cacheMaxSize) {
@@ -990,6 +988,14 @@ public interface DatabaseBuilder {
   DatabaseBuilder setNamingConvention(NamingConvention namingConvention);
 
   /**
+   * Set the AggregateFormulaContext which is used to determine if a database function
+   * is an aggregate function (like sum, min, max, avg etc).
+   * <p>
+   * Use this to override the default known aggregation functions.
+   */
+  DatabaseBuilder aggregateFormulaContext(AggregateFormulaContext aggregateFormulaContext);
+
+  /**
    * Set to true if all DB column and table names should use quoted identifiers.
    * <p>
    * For Postgres pgjdbc version 42.3.0 should be used with datasource property
@@ -1061,6 +1067,11 @@ public interface DatabaseBuilder {
    * and use readOnly=true and autoCommit=true.
    */
   DatabaseBuilder readOnlyDatabase(boolean readOnlyDatabase);
+
+  /**
+   * Set to false such that the instance does not register a JVM shutdown hook.
+   */
+  DatabaseBuilder shutdownHook(boolean shutdownHook);
 
   /**
    * Set a DataSource.
@@ -1968,8 +1979,8 @@ public interface DatabaseBuilder {
   DatabaseBuilder setLocalOnlyL2Cache(boolean localOnlyL2Cache);
 
   /**
-   * Controls if Ebean should ignore <code>&x64;javax.validation.contstraints.NotNull</code> or
-   * <code>&x64;jakarta.validation.contstraints.NotNull</code>
+   * Controls if Ebean should ignore <code>&#64;javax.validation.contstraints.NotNull</code> or
+   * <code>&#64;jakarta.validation.contstraints.NotNull</code>
    * with respect to generating a <code>NOT NULL</code> column.
    * <p>
    * Normally when Ebean sees javax NotNull annotation it means that column is defined as NOT NULL.
@@ -2018,6 +2029,11 @@ public interface DatabaseBuilder {
    */
   @Deprecated
   DatabaseBuilder setQueryPlanTTLSeconds(int queryPlanTTLSeconds);
+
+  /**
+   * Set the EXPLAIN (with options) to use for query plan capture.
+   */
+  DatabaseBuilder queryPlanExplain(String queryPlanExplain);
 
   /**
    * Create a new PlatformConfig based of the one held but with overridden properties by reading
@@ -2216,7 +2232,7 @@ public interface DatabaseBuilder {
    *
    * @param includeLabelInSql When true include a SQL inline comment in generated SELECT queries.
    */
-  DatabaseConfig includeLabelInSql(boolean includeLabelInSql);
+  DatabaseBuilder includeLabelInSql(boolean includeLabelInSql);
 
   /**
    * Set the naming convention to apply to metrics names.
@@ -2234,7 +2250,7 @@ public interface DatabaseBuilder {
   /**
    * Sets the length check mode.
    */
-  DatabaseConfig lengthCheck(LengthCheck lengthCheck);
+  DatabaseBuilder lengthCheck(LengthCheck lengthCheck);
 
   /**
    * Provides read access (getters) for the DatabaseBuilder configuration
@@ -2249,11 +2265,11 @@ public interface DatabaseBuilder {
     boolean isAutoLoadModuleInfo();
 
     /**
-     * Return the Jackson JsonFactory to use.
+     * Return the JsonStream to use.
      * <p>
      * If not set a default implementation will be used.
      */
-    JsonFactory getJsonFactory();
+    JsonStream getJsonStream();
 
     /**
      * Get the clock used for setting the timestamps (e.g. @UpdatedTimestamp) on objects.
@@ -2473,11 +2489,6 @@ public interface DatabaseBuilder {
     TenantCatalogProvider getTenantCatalogProvider();
 
     /**
-     * Return the configuration for profiling.
-     */
-    ProfilingConfig getProfilingConfig();
-
-    /**
      * Return the DB schema to use.
      */
     String getDbSchema();
@@ -2564,6 +2575,11 @@ public interface DatabaseBuilder {
     boolean isAutoPersistUpdates();
 
     /**
+     * Return true if caches are partitioned by tenant.
+     */
+    boolean isTenantPartitionedCache();
+
+    /**
      * Return the L2 cache default max size.
      */
     int getCacheMaxSize();
@@ -2599,6 +2615,11 @@ public interface DatabaseBuilder {
      * If none has been set the default UnderscoreNamingConvention is used.
      */
     NamingConvention getNamingConvention();
+
+    /**
+     * Return the AggregateFormulaContext.
+     */
+    AggregateFormulaContext aggregateFormulaContext();
 
     /**
      * Return true if all DB column and table names should use quoted identifiers.
@@ -2637,6 +2658,11 @@ public interface DatabaseBuilder {
      * and use readOnly=true and autoCommit=true.
      */
     boolean readOnlyDatabase();
+
+    /**
+     * Return if a JVM shutdown hook should be registered.
+     */
+    boolean shutdownHook();
 
     /**
      * Return the DataSource.
@@ -3043,6 +3069,11 @@ public interface DatabaseBuilder {
      * Return the time to live for ebean's internal query plan.
      */
     int getQueryPlanTTLSeconds();
+
+    /**
+     * Return the EXPLAIN (with options) to use for capturing query plans.
+     */
+    String getQueryPlanExplain();
 
     /**
      * Return mapping locations to search for xml mapping via class path search.

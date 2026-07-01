@@ -42,4 +42,8 @@ final class CacheChangeBeanRemove implements CacheChange {
   public void addId(Object id) {
     ids.add(id);
   }
+
+  void merge(CacheChangeBeanRemove other) {
+    this.ids.addAll(other.ids);
+  }
 }

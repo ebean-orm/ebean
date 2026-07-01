@@ -1,9 +1,12 @@
 package org.tests.cascade;
 
+import io.ebean.bean.BeanCollection;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.Test;
+import org.tests.model.basic.Section;
+import org.tests.model.basic.SubSection;
 
 import java.util.Collections;
 import java.util.List;
@@ -150,6 +153,44 @@ public class TestOrderedList extends BaseTestCase {
   }
 
   @Test
+  public void testModifyListenModeSet1() {
+    final OmOrderedMaster master = new OmOrderedMaster("Master");
+    final OmOrderedDetail detail1 = new OmOrderedDetail("Detail1");
+    DB.save(detail1);
+    DB.save(master);
+
+    master.getDetails().add(detail1);
+
+    DB.save(master);
+
+    master.getDetails().clear();
+
+    DB.save(master);
+
+    OmOrderedMaster masterDb = DB.find(OmOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).isEmpty();
+  }
+
+  @Test
+  public void testModifyListenModeSet2() {
+    final Section master = new Section();
+    final SubSection detail1 = new SubSection();
+    DB.save(detail1);
+    DB.save(master);
+
+    master.getSubSections().add(detail1);
+
+    DB.save(master);
+
+    master.getSubSections().clear();
+
+    DB.save(master);
+
+    Section masterDb = DB.find(Section.class, master.getId());
+    assertThat(masterDb.getSubSections()).isEmpty();
+  }
+
+  @Test
   public void testModifyListWithCache() {
     final OmCacheOrderedMaster master = new OmCacheOrderedMaster("Master");
     final OmCacheOrderedDetail detail1 = new OmCacheOrderedDetail("Detail1");
@@ -187,5 +228,57 @@ public class TestOrderedList extends BaseTestCase {
     masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
     assertThat(masterDb.getDetails()).containsExactlyInAnyOrder(detail3, detail1);
 
+  }
+
+  @Test
+  public void testModifyListWithCache2() {
+    final OmCacheOrderedMaster master = new OmCacheOrderedMaster("Master");
+    final OmCacheOrderedDetail detail1 = new OmCacheOrderedDetail("Detail1");
+    final OmCacheOrderedDetail detail2 = new OmCacheOrderedDetail("Detail2");
+    final OmCacheOrderedDetail detail3 = new OmCacheOrderedDetail("Detail3");
+    DB.save(detail1);
+    DB.save(detail2);
+    DB.save(detail3);
+    master.getDetails().add(detail1);
+    master.getDetails().add(detail2);
+    master.getDetails().add(detail3);
+
+    DB.save(master);
+
+    OmCacheOrderedMaster masterDb = DB.find(OmCacheOrderedMaster.class, master.getId()); // load cache
+    assertThat(masterDb.getDetails()).containsExactly(detail1, detail2, detail3);
+
+    masterDb = DB.find(OmCacheOrderedMaster.class, master.getId());
+    assertThat(masterDb.getDetails()).containsExactly(detail1, detail2, detail3); // hit cache
+
+    // 1 und 2 tauschen
+    masterDb.getDetails().add(0, masterDb.getDetails().remove(1));
+    DB.save(masterDb);
+
+    masterDb.getDetails().remove(2);
+    DB.save(masterDb);
+
+    LoggedSql.start();
+    OmCacheOrderedMaster masterDbNew = DB.find(OmCacheOrderedMaster.class, master.getId());
+    masterDbNew.getDetails().size();
+    assertThat(masterDbNew.getDetails()).containsExactly(detail2, detail1);
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1).first().asString()
+      .startsWith("select t0.id, t1.id, t1.name, t1.version, t1.sort_order, t1.master_id from om_cache_ordered_master t0 left join om_cache_ordered_detail t1 on t1.master_id = t0.id where t0.id = ? order by t1.sort_order;");
+
+    DB.cacheManager().clearAll();
+    masterDbNew = DB.find(OmCacheOrderedMaster.class, master.getId());
+    LoggedSql.start();
+    masterDbNew.getDetails().size();
+    sql = LoggedSql.stop();
+    if (isPostgresCompatible()) {
+      assertThat(sql).hasSize(1).first().asString()
+        .startsWith("select t0.master_id, t0.id, t0.name, t0.version, t0.sort_order, t0.master_id from om_cache_ordered_detail t0 where (t0.master_id) = any(?) order by t0.master_id, t0.sort_order;");
+    } else {
+      assertThat(sql).hasSize(1).first().asString()
+        .startsWith("select t0.master_id, t0.id, t0.name, t0.version, t0.sort_order, t0.master_id from om_cache_ordered_detail t0 where (t0.master_id) in (?) order by t0.master_id, t0.sort_order;");
+    }
+
+    assertThat(masterDbNew.getDetails()).containsExactly(detail2, detail1);
   }
 }

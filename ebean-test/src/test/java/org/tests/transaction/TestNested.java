@@ -9,11 +9,10 @@ import java.util.concurrent.Callable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestNested extends BaseTestCase {
+class TestNested extends BaseTestCase {
 
   @Test
-  public void testRunnableFail() {
-
+  void testRunnableFail() {
     try {
       DB.execute(this::willFail);
     } catch (PersistenceException e) {
@@ -22,8 +21,7 @@ public class TestNested extends BaseTestCase {
   }
 
   @Test
-  public void testCallableFail() {
-
+  void testCallableFail() {
     try {
       DB.execute(this::willFailCallable);
     } catch (PersistenceException e) {

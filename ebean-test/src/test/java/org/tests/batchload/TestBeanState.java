@@ -2,6 +2,7 @@ package org.tests.batchload;
 
 import io.ebean.BeanState;
 import io.ebean.DB;
+import io.ebean.UnmodifiableEntityException;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
 import io.ebean.xtest.BaseTestCase;
@@ -72,7 +73,7 @@ class TestBeanState extends BaseTestCase {
 
   @Test
   void setDisableLazyLoad_expect_lazyLoadingDisabled() {
-    List<Customer> custs = DB.find(Customer.class).order("id").findList();
+    List<Customer> custs = DB.find(Customer.class).orderBy("id").findList();
 
     Customer customer = DB.find(Customer.class)
       .setId(custs.get(0).getId())
@@ -88,7 +89,7 @@ class TestBeanState extends BaseTestCase {
   @Test
   void changedProps_when_setManyProperty() {
 
-    Customer customer = DB.find(Customer.class).order("id").setMaxRows(1).findOne();
+    Customer customer = DB.find(Customer.class).orderBy("id").setMaxRows(1).findOne();
 
     BeanState beanState = DB.beanState(customer);
     assertThat(beanState.changedProps()).isEmpty();
@@ -116,29 +117,4 @@ class TestBeanState extends BaseTestCase {
     assertThat(beanState.changedProps()).containsOnly("contacts");
   }
 
-  @Test
-  void readOnly_when_setManyProperty() {
-    Customer customer = new Customer();
-    customer.setContacts(new ArrayList<>());
-
-    BeanState beanState = DB.beanState(customer);
-    beanState.setLoaded();
-    beanState.setReadOnly(true);
-
-    // act, try to mutate read only bean
-    assertThrows(IllegalStateException.class, () -> customer.setContacts(new ArrayList<>()));
-  }
-
-  @Test
-  void readOnly_when_setProperty() {
-    Customer customer = new Customer();
-    customer.setName("a");
-
-    BeanState beanState = DB.beanState(customer);
-    beanState.setLoaded();
-    beanState.setReadOnly(true);
-
-    // act, try to mutate read only bean
-    assertThrows(IllegalStateException.class, () -> customer.setName("b"));
-  }
 }

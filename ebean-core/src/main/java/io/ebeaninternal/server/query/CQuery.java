@@ -1,5 +1,7 @@
 package io.ebeaninternal.server.query;
 
+import org.jspecify.annotations.Nullable;
+
 import io.ebean.CancelableQuery;
 import io.ebean.QueryIterator;
 import io.ebean.Version;
@@ -44,6 +46,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   private final ReentrantLock lock = new ReentrantLock();
 
   private final boolean loadContextBean;
+  private final boolean unmodifiable;
 
   /**
    * The resultSet rows read.
@@ -152,8 +155,6 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
 
   private final ProfilingListener profilingListener;
 
-  private final Boolean readOnly;
-
   private long profileOffset;
   private long startNano;
 
@@ -186,18 +187,17 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     this.queryMode = query.mode();
     this.loadContextBean = queryMode.isLoadContextBean() || query.getForUpdateLockType() != null;
     this.lazyLoadManyProperty = query.lazyLoadMany();
-    this.readOnly = query.isReadOnly();
     this.disableLazyLoading = query.isDisableLazyLoading();
     this.objectGraphNode = query.parentNode();
     this.profilingListener = query.profilingListener();
     this.autoTuneProfiling = profilingListener != null;
     // set the generated sql back to the query
     // so its available to the user...
-    query.setGeneratedSql(queryPlan.sql());
     SqlTreePlan sqlTree = queryPlan.sqlTree();
     this.rootNode = sqlTree.rootNode();
     this.manyProperty = sqlTree.manyProperty();
     this.sql = queryPlan.sql();
+    query.setGeneratedSql(sql);
     this.rawSql = queryPlan.isRawSql();
     this.logWhereSql = queryPlan.logWhereSql();
     this.desc = request.descriptor();
@@ -207,6 +207,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     } else {
       this.help = createHelp(request);
     }
+    this.unmodifiable = request.query().isUnmodifiable();
     this.collection = (help != null ? help.createEmptyNoParent() : null);
   }
 
@@ -239,17 +240,8 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   }
 
   @Override
-  public Boolean isReadOnly() {
-    return readOnly;
-  }
-
-  @Override
-  public void propagateState(Object e) {
-    if (Boolean.TRUE.equals(readOnly)) {
-      if (e instanceof EntityBean) {
-        ((EntityBean) e)._ebean_getIntercept().setReadOnly(true);
-      }
-    }
+  public boolean unmodifiable() {
+    return unmodifiable;
   }
 
   @Override
@@ -299,7 +291,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     if (resultSet == null) {
       return false;
     }
-    dataReader = queryPlan.createDataReader(resultSet);
+    dataReader = queryPlan.createDataReader(query.isUnmodifiable(), resultSet);
     return true;
   }
 
@@ -474,6 +466,14 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
     return result;
   }
 
+  EntityBean nextBean() {
+    EntityBean bean = next();
+    if (unmodifiable) {
+      request.unmodifiableFreeze(bean);
+    }
+    return bean;
+  }
+
   EntityBean next() {
     if (audit) {
       auditNextBean();
@@ -569,7 +569,7 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   public void profile() {
     transaction()
       .profileStream()
-      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), loadedBeanCount, query.profileId());
+      .addQueryEvent(query.profileEventId(), profileOffset, desc.name(), loadedBeanCount, query.profileId(), queryPlan.hash(), query.getGeneratedSql());
   }
 
   QueryIterator<T> readIterate(int bufferSize, OrmQueryRequest<T> request) {
@@ -601,6 +601,21 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   @Override
   public void register(BeanPropertyAssocMany<?> many, BeanCollection<?> bc) {
     request.loadContext().register(path(many.name()), many, bc);
+  }
+
+  @Override
+  public void registerForImmutable(EntityBeanIntercept ebi) {
+    request.loadContext().registerForImmutable(ebi);
+  }
+
+  @Override
+  public @Nullable EntityBean immutableBeanHit(BeanDescriptor<?> descriptor, Object id) {
+    return request.loadContext().immutableBeanHit(descriptor, id);
+  }
+
+  @Override
+  public boolean includeSecondary(BeanPropertyAssocMany<?> many) {
+    return request.loadContext().includeSecondary(many);
   }
 
   /**
@@ -752,9 +767,5 @@ public final class CQuery<T> implements DbReadContext, CancelableQuery, SpiProfi
   @Override
   public void handleLoadError(String fullName, Exception e) {
     query.handleLoadError(fullName, e);
-  }
-
-  public Set<String> dependentTables() {
-    return queryPlan.dependentTables();
   }
 }

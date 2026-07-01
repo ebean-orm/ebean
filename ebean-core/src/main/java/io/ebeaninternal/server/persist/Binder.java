@@ -329,6 +329,13 @@ public final class Binder {
           geoTypeBinder.bind(b, dataType, data);
           break;
 
+        case DbPlatformType.VECTOR:
+        case DbPlatformType.VECTOR_HALF:
+        case DbPlatformType.VECTOR_BIT:
+        case DbPlatformType.VECTOR_SPARSE:
+          b.setObject(data);
+          break;
+
         case java.sql.Types.OTHER:
           b.setObject(data, dataType);
           break;
@@ -401,7 +408,7 @@ public final class Binder {
     return new DataBind(dataTimeZone, stmt, connection);
   }
 
-  public DataReader createDataReader(ResultSet resultSet) {
-    return new RsetDataReader(dataTimeZone, resultSet);
+  public DataReader createDataReader(boolean unmodifiable, ResultSet resultSet) {
+    return new RsetDataReader(unmodifiable, dataTimeZone, resultSet);
   }
 }

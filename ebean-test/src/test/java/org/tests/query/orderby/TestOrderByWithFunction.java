@@ -20,7 +20,7 @@ public class TestOrderByWithFunction extends BaseTestCase {
       length = "len";
     }
 
-    Query<Customer> query = DB.find(Customer.class).order(length + "(name),name");
+    Query<Customer> query = DB.find(Customer.class).orderBy(length + "(name),name");
 
     query.findList();
     String sql = query.getGeneratedSql();

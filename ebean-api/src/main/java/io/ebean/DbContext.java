@@ -4,6 +4,8 @@ import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.datasource.DataSourceConfigurationException;
 
 import jakarta.persistence.PersistenceException;
+import org.jspecify.annotations.Nullable;
+
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
@@ -75,6 +77,11 @@ final class DbContext {
     return defaultDatabase;
   }
 
+  @Nullable
+  Database getRegistered(String name) {
+    return concMap.get(name);
+  }
+
   /**
    * Return the database by name.
    */
@@ -92,6 +99,7 @@ final class DbContext {
   /**
    * Read, create and put of Databases.
    */
+  @SuppressWarnings("deprecation")
   private Database getWithCreate(String name) {
     lock.lock();
     try {

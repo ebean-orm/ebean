@@ -15,8 +15,9 @@ import io.ebean.xtest.base.DtoQuery2Test;
 import io.ebeaninternal.api.SpiTransaction;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.*;
+import org.tests.query.cache.Acl;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,19 +42,22 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
       for (int i = 0; i < 3; i++) {
         Customer customer = ResetBasicData.createCustomer("BatchFlushPreInsert " + i, null, null, 3);
-        customer.addContact(new Contact("Fred" + i, "Blue"));
+        customer.addContact(new Contact("BatchFlush" + i, "Blue"));
         customers.add(customer);
       }
 
       for (int i = 3; i < 6; i++) {
         Customer customer = ResetBasicData.createCustomer("BatchFlushPostInsert " + i, null, null, 3);
-        customer.addContact(new Contact("Fred" + i, "Blue"));
+        customer.addContact(new Contact("BatchFlush" + i, "Blue"));
         customers.add(customer);
       }
 
       DB.saveAll(customers);
 
       txn.commit();
+    } finally {
+      DB.find(Customer.class).where().startsWith("name", "BatchFlush").delete();
+      DB.find(Contact.class).where().startsWith("firstName", "BatchFlush").startsWith("lastName", "Blue").delete();
     }
   }
 
@@ -320,7 +324,7 @@ public class TestBatchInsertFlush extends BaseTestCase {
       server.save(b2, txn);
 
       // flush here
-      Timestamp lastUpdate = b1.getLastUpdate();
+      Instant lastUpdate = b1.getLastUpdate();
       assertNotNull(lastUpdate);
 
       EBasicVer b3 = new EBasicVer("b3");
@@ -357,6 +361,24 @@ public class TestBatchInsertFlush extends BaseTestCase {
 
     } finally {
       txn.end();
+    }
+  }
+
+  @Test
+  public void testBatchEscalationInsert() {
+    try (Transaction txn = DB.beginTransaction()) {
+      assertThat(txn.isBatchMode()).isFalse();
+      DB.insertAll(List.of(new Acl("test")));
+      assertThat(txn.isBatchMode()).isFalse();
+    }
+  }
+
+  @Test
+  public void testBatchEscalationSave() {
+    try (Transaction txn = DB.beginTransaction()) {
+      assertThat(txn.isBatchMode()).isFalse();
+      DB.saveAll(List.of(new Acl("test")));
+      assertThat(txn.isBatchMode()).isFalse();
     }
   }
 }

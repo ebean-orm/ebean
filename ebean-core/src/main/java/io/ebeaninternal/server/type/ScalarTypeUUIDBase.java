@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarTypeBase;
@@ -70,13 +70,13 @@ abstract class ScalarTypeUUIDBase extends ScalarTypeBase<UUID> implements Scalar
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, UUID value) throws IOException {
-    writer.writeString(formatValue(value));
+  public void jsonWrite(JsonWriter writer, UUID value) throws IOException {
+    writer.value(formatValue(value));
   }
 
   @Override
-  public UUID jsonRead(JsonParser parser) throws IOException {
-    return parse(parser.getValueAsString());
+  public UUID jsonRead(JsonReader parser) throws IOException {
+    return parse(parser.readString());
   }
 
   @Override

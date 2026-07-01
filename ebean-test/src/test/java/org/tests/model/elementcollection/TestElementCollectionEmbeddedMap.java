@@ -47,7 +47,7 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
     List<EcbmPerson> found =
       DB.find(EcbmPerson.class).where()
         .startsWith("name", "Fiona640")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
     Map<String,EcPhone> phoneNumbers0 = found.get(0).getPhoneNumbers();
@@ -62,7 +62,7 @@ public class TestElementCollectionEmbeddedMap extends BaseTestCase {
         .fetch("phoneNumbers")
         .where()
         .startsWith("name", "Fiona640")
-        .order().asc("id")
+        .orderBy().asc("id")
         .findList();
 
     assertThat(found2).hasSize(2);

@@ -356,14 +356,14 @@ public class UpdateQueryTest extends BaseTestCase {
         .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
         .where()
         .gt("id", 10000)
-        .update(transaction); // .usingTransaction(transaction).update();
+        .usingTransaction(transaction).update();
 
       rowsQuery = server
         .update(Customer.class)
         .setRaw("status = coalesce(status, ?)", Customer.Status.ACTIVE)
         .where()
         .gt("id", 10001)
-        .query().update(transaction);
+        .usingTransaction(transaction).update();
 
       transaction.commit();
     }
@@ -387,13 +387,13 @@ public class UpdateQueryTest extends BaseTestCase {
         .update(Customer.class)
         .where()
         .gt("id", 10000)
-        .delete(transaction);
+        .usingTransaction(transaction).delete();
 
       rowsQuery = server
         .update(Customer.class)
         .where()
         .gt("id", 10001)
-        .query().delete(transaction);
+        .usingTransaction(transaction).delete();
 
       transaction.commit();
     }
@@ -436,5 +436,15 @@ public class UpdateQueryTest extends BaseTestCase {
     DB.save(b0);
 
     return b0.getId();
+  }
+
+  @Test
+  public void timeoutPropagation() {
+    int timeout = 7;
+
+    var updateQuery = DB.update(Customer.class)
+      .setTimeout(timeout);
+
+    assertThat(updateQuery.getTimeout()).isEqualTo(timeout);
   }
 }

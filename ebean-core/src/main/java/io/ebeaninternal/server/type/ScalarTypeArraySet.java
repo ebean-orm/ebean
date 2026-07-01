@@ -1,8 +1,8 @@
 package io.ebeaninternal.server.type;
 
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.ScalarType;
@@ -152,12 +152,16 @@ class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeA
   }
 
   @Override
-  public Set jsonRead(JsonParser parser) throws IOException {
-    return convert(EJson.parseList(parser, parser.getCurrentToken()));
+  public Set jsonRead(JsonReader parser) throws IOException {
+    if (parser.isNullValue()) {
+      return null;
+    }
+    List<Object> rawList = EJson.parseList(parser, parser.currentToken());
+    return convert(rawList);
   }
 
   @Override
-  public void jsonWrite(JsonGenerator writer, Set value) throws IOException {
+  public void jsonWrite(JsonWriter writer, Set value) throws IOException {
     EJson.write(value, writer);
   }
 

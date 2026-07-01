@@ -1,218 +1,122 @@
 package io.ebeaninternal.server.type;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
+import io.avaje.json.JsonWriter;
 import io.ebean.config.dbplatform.DbPlatformType;
-import io.ebean.core.type.*;
+import io.ebean.core.type.DocPropertyType;
+import io.ebean.core.type.PostgresHelper;
+import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
 import io.ebeaninternal.json.ModifyAwareList;
 
 import jakarta.persistence.PersistenceException;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Types for mapping List in JSON format to DB types VARCHAR, JSON and JSONB.
+ * Type which maps a List in JSON format to VARCHAR or Postgres JSON / JSONB.
  */
-final class ScalarTypeJsonList {
+@SuppressWarnings("rawtypes")
+class ScalarTypeJsonList extends ScalarTypeJsonCollectionValue<List> {
 
   /**
-   * Return the appropriate ScalarType based requested dbType and if Postgres.
+   * Return the appropriate ScalarType for the requested dbType and platform.
    */
   static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docType, boolean nullable, boolean keepSource) {
     if (postgres) {
       switch (dbType) {
         case DbPlatformType.JSONB:
-          return new ScalarTypeJsonList.JsonB(docType, nullable, keepSource);
+          return new ScalarTypeJsonList(DbPlatformType.JSONB, JsonStorage.postgres(PostgresHelper.JSONB_TYPE), docType, nullable, keepSource);
         case DbPlatformType.JSON:
-          return new ScalarTypeJsonList.Json(docType, nullable, keepSource);
+          return new ScalarTypeJsonList(DbPlatformType.JSON, JsonStorage.postgres(PostgresHelper.JSON_TYPE), docType, nullable, keepSource);
       }
     }
-    return new ScalarTypeJsonList.Varchar(docType, nullable, keepSource);
+    return new ScalarTypeJsonList(Types.VARCHAR, JsonStorage.VARCHAR, docType, nullable, keepSource);
   }
 
-  @SuppressWarnings("rawtypes")
-  static final class VarcharWithConverter extends ScalarTypeJsonList.Base {
+  ScalarTypeJsonList(int jdbcType, JsonStorage storage, DocPropertyType docType, boolean nullable, boolean keepSource) {
+    super(List.class, jdbcType, storage, keepSource, nullable, docType);
+  }
+
+  @Override
+  List readJson(String rawJson) {
+    try {
+      // parse JSON into a modifyAware list
+      return EJson.parseList(rawJson, true);
+    } catch (IOException e) {
+      throw new TextException("Failed to parse JSON [{}] as List", rawJson, e);
+    }
+  }
+
+  @Override
+  public List parse(String value) {
+    try {
+      return EJson.parseList(value, false);
+    } catch (IOException e) {
+      throw new TextException("Failed to parse JSON [{}] as List", value, e);
+    }
+  }
+
+  @Override
+  public String formatValue(List value) {
+    try {
+      return EJson.write(value);
+    } catch (IOException e) {
+      throw new PersistenceException("Failed to format List into JSON content", e);
+    }
+  }
+
+  @Override
+  public List jsonRead(JsonReader parser) throws IOException {
+    return EJson.parseList(parser, parser.currentToken());
+  }
+
+  @Override
+  public void jsonWrite(JsonWriter writer, List value) throws IOException {
+    EJson.write(value, writer);
+  }
+
+  /**
+   * List mapped to VARCHAR with element conversion - used as the {@code @DbArray} fallback
+   * on platforms without native array support.
+   */
+  static final class VarcharWithConverter extends ScalarTypeJsonList {
+
     private final ArrayElementConverter converter;
 
     VarcharWithConverter(DocPropertyType docType, boolean nullable, boolean keepSource, ArrayElementConverter converter) {
-      super(Types.VARCHAR, docType, nullable, keepSource);
+      super(Types.VARCHAR, JsonStorage.VARCHAR, docType, nullable, keepSource);
       this.converter = converter;
     }
 
     @Override
-    List readJsonConvert(String json) {
-      try {
-        return convertElements(EJson.parseList(json, false));
-      } catch (IOException e) {
-        throw new TextException("Failed to parse JSON [{}] as List", json, e);
-      }
+    List readJson(String rawJson) {
+      return convert(rawJson);
+    }
+
+    @Override
+    public List parse(String value) {
+      return convert(value);
     }
 
     @SuppressWarnings("unchecked")
-    private List convertElements(List<Object> rawList) {
-      if (rawList == null) {
-        return null;
-      }
-      final List result = new ArrayList<>(rawList.size());
-      for (Object o : rawList) {
-        result.add(converter.fromSerialized(o));
-      }
-      return new ModifyAwareList(result);
-    }
-
-    @Override
-    public List parse(String value) {
+    private List convert(String json) {
       try {
-        return convertElements(EJson.parseList(value, false));
-      } catch (IOException e) {
-        throw new TextException("Failed to parse JSON [{}] as List", value, e);
-      }
-    }
-  }
-
-  /**
-   * List mapped to DB VARCHAR.
-   */
-  static final class Varchar extends ScalarTypeJsonList.Base {
-    Varchar(DocPropertyType docType, boolean nullable, boolean keepSource) {
-      super(Types.VARCHAR, docType, nullable, keepSource);
-    }
-  }
-
-  /**
-   * List mapped to Postgres JSON.
-   */
-  private final static class Json extends ScalarTypeJsonList.PgBase {
-    Json(DocPropertyType docType, boolean nullable, boolean keepSource) {
-      super(DbPlatformType.JSON, PostgresHelper.JSON_TYPE, docType, nullable, keepSource);
-    }
-  }
-
-  /**
-   * List mapped to Postgres JSONB.
-   */
-  private static final class JsonB extends ScalarTypeJsonList.PgBase {
-    JsonB(DocPropertyType docType, boolean nullable, boolean keepSource) {
-      super(DbPlatformType.JSONB, PostgresHelper.JSONB_TYPE, docType, nullable, keepSource);
-    }
-  }
-
-  /**
-   * Base class for List handling.
-   */
-  @SuppressWarnings("rawtypes")
-  private abstract static class Base extends ScalarTypeJsonCollection<List> {
-    final boolean keepSource;
-
-    private Base(int dbType, DocPropertyType docType, boolean nullable, boolean keepSource) {
-      super(List.class, dbType, docType, nullable);
-      this.keepSource = keepSource;
-    }
-
-    @Override
-    public final boolean jsonMapper() {
-      return keepSource;
-    }
-
-    @Override
-    public final List read(DataReader reader) throws SQLException {
-      String json = reader.getString();
-      if (keepSource) {
-        reader.pushJson(json);
-      }
-      return readJsonConvert(json);
-    }
-
-    List readJsonConvert(String json) {
-      try {
-        // parse JSON into modifyAware list
-        return EJson.parseList(json, true);
+        List<Object> rawList = EJson.parseList(json, false);
+        if (rawList == null) {
+          return null;
+        }
+        final List result = new ArrayList<>(rawList.size());
+        for (Object o : rawList) {
+          result.add(converter.fromSerialized(o));
+        }
+        return new ModifyAwareList(result);
       } catch (IOException e) {
         throw new TextException("Failed to parse JSON [{}] as List", json, e);
       }
     }
-
-    @Override
-    public final void bind(DataBinder binder, List value) throws SQLException {
-      String rawJson = keepSource ? binder.popJson() : null;
-      if (rawJson == null && value != null) {
-        rawJson = formatValue(value);
-      }
-      if (value == null) {
-        bindNull(binder);
-      } else {
-        bindRawJson(binder, rawJson);
-      }
-    }
-
-    @Override
-    protected void bindNull(DataBinder binder) throws SQLException {
-      if (nullable) {
-        binder.setNull(Types.VARCHAR);
-      } else {
-        binder.setString("[]");
-      }
-    }
-
-    protected void bindRawJson(DataBinder binder, String rawJson) throws SQLException {
-      binder.setString(rawJson);
-    }
-
-    @Override
-    public final String formatValue(List value) {
-      try {
-        return EJson.write(value);
-      } catch (IOException e) {
-        throw new PersistenceException("Failed to format List into JSON content", e);
-      }
-    }
-
-    @Override
-    public List parse(String value) {
-      try {
-        return EJson.parseList(value, false);
-      } catch (IOException e) {
-        throw new TextException("Failed to parse JSON [{}] as List", value, e);
-      }
-    }
-
-    @Override
-    public final List jsonRead(JsonParser parser) throws IOException {
-      return EJson.parseList(parser, parser.getCurrentToken());
-    }
-
-    @Override
-    public final void jsonWrite(JsonGenerator writer, List value) throws IOException {
-      EJson.write(value, writer);
-    }
   }
-
-  /**
-   * Postgres extension to base List handling.
-   */
-  private static class PgBase extends ScalarTypeJsonList.Base {
-
-    final String pgType;
-
-    PgBase(int jdbcType, String pgType, DocPropertyType docType, boolean nullable, boolean keepSource) {
-      super(jdbcType, docType, nullable, keepSource);
-      this.pgType = pgType;
-    }
-
-    @Override
-    protected final void bindRawJson(DataBinder binder, String rawJson) throws SQLException {
-      binder.setObject(PostgresHelper.asObject(pgType, rawJson));
-    }
-
-    @Override
-    protected final void bindNull(DataBinder binder) throws SQLException {
-      binder.setObject(PostgresHelper.asObject(pgType, nullable ? null : "[]"));
-    }
-  }
-
 }

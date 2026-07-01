@@ -14,7 +14,7 @@ import java.sql.SQLException;
 abstract class AssocOneHelp {
 
   final BeanPropertyAssocOne<?> property;
-  private final BeanDescriptor<?> target;
+  protected final BeanDescriptor<?> target;
   private final String path;
 
   AssocOneHelp(BeanPropertyAssocOne<?> property) {
@@ -52,6 +52,30 @@ abstract class AssocOneHelp {
     return val;
   }
 
+  final Object contextGetOrImmutableHit(DbReadContext ctx, BeanDescriptor<?> desc, Object id) {
+    PersistenceContext pc = ctx.persistenceContext();
+    Object existing = desc.contextGet(pc, id);
+    if (existing != null) {
+      return existing;
+    }
+    return ctx.immutableBeanHit(desc, id);
+  }
+
+  final Object createRegisterRef(DbReadContext ctx, BeanDescriptor<?> desc, Object id) {
+    PersistenceContext pc = ctx.persistenceContext();
+    EntityBean ref = (EntityBean) desc.contextRef(pc, id, ctx.unmodifiable(), ctx.isDisableLazyLoading());
+    registerReference(ctx, ref);
+    return ref;
+  }
+
+  protected void registerReference(DbReadContext ctx, EntityBean ref) {
+    if (!ctx.unmodifiable() && !ctx.isDisableLazyLoading()) {
+      ctx.register(path, ref._ebean_getIntercept());
+    } else {
+      ctx.registerForImmutable(ref._ebean_getIntercept());
+    }
+  }
+
   /**
    * Read and return the bean.
    */
@@ -61,17 +85,8 @@ abstract class AssocOneHelp {
     if (id == null) {
       return null;
     }
-    PersistenceContext pc = ctx.persistenceContext();
-    Object existing = target.contextGet(pc, id);
-    if (existing != null) {
-      return existing;
-    }
-    boolean disableLazyLoading = ctx.isDisableLazyLoading();
-    Object ref = target.contextRef(pc, ctx.isReadOnly(), disableLazyLoading, id);
-    if (!disableLazyLoading) {
-      ctx.register(path, ((EntityBean) ref)._ebean_getIntercept());
-    }
-    return ref;
+    Object existing = contextGetOrImmutableHit(ctx, target, id);
+    return existing != null ? existing : createRegisterRef(ctx, target, id);
   }
 
   /**
@@ -81,7 +96,6 @@ abstract class AssocOneHelp {
     Object val = read(ctx);
     if (bean != null) {
       property.setValue(bean, val);
-      ctx.propagateState(val);
     }
     return val;
   }

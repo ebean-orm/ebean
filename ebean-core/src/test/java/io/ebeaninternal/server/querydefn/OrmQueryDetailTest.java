@@ -1,9 +1,12 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.server.deploy.BaseTest;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
+
+import java.lang.reflect.Proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -251,8 +254,86 @@ public class OrmQueryDetailTest extends BaseTest {
     assertThat(detail.getFetchPaths()).isEmpty();
   }
 
+  @Test
+  public void copyInto_when_reusingExisting_expect_filterManyTransferred() {
+
+    OrmQueryDetail source = new OrmQueryDetail();
+    source.fetch("customer", "name", null);
+
+    OrmQueryDetail existing = new OrmQueryDetail();
+    existing.fetch("customer", "id", null);
+    SpiExpressionList<?> filterMany = dummyFilterMany();
+    existing.getChunk("customer", false).setFilterMany(filterMany);
+
+    OrmQueryDetail result = source.copyInto(existing, existing);
+
+    assertThat(result).isSameAs(existing);
+    assertThat(result.getChunk("customer", false).getFilterMany()).isSameAs(filterMany);
+  }
+
+  @Test
+  public void copyInto_when_reusingExisting_expect_stalePathsCleared() {
+
+    OrmQueryDetail source = new OrmQueryDetail();
+    source.fetch("customer", "name", null);
+
+    OrmQueryDetail priorState = new OrmQueryDetail();
+    priorState.fetch("customer", "id", null);
+    priorState.fetch("details", "orderQty", null);
+
+    OrmQueryDetail result = source.copyInto(priorState, priorState);
+
+    assertThat(result.getFetchPaths()).containsExactly("customer");
+    assertThat(result.getChunk("details", false)).isNull();
+  }
+
+  @Test
+  public void copyInto_when_reusingExisting_expect_filterManyFromPriorStateRetained() {
+
+    OrmQueryDetail source = new OrmQueryDetail();
+    source.fetch("customer", "name", null);
+
+    OrmQueryDetail priorState = new OrmQueryDetail();
+    priorState.fetch("customer", "id", null);
+    priorState.fetch("details", "orderQty", null);
+    SpiExpressionList<?> customerFilter = dummyFilterMany();
+    SpiExpressionList<?> detailsFilter = dummyFilterMany();
+    priorState.getChunk("customer", false).setFilterMany(customerFilter);
+    priorState.getChunk("details", false).setFilterMany(detailsFilter);
+
+    OrmQueryDetail result = source.copyInto(priorState, priorState);
+
+    assertThat(result.getChunk("customer", false).getFilterMany()).isSameAs(customerFilter);
+    assertThat(result.getChunk("details", false).getFilterMany()).isSameAs(detailsFilter);
+  }
+
   BeanDescriptor<Order> orderDesc() {
     return getBeanDescriptor(Order.class);
+  }
+
+  private SpiExpressionList<?> dummyFilterMany() {
+    return (SpiExpressionList<?>) Proxy.newProxyInstance(
+      getClass().getClassLoader(),
+      new Class<?>[]{SpiExpressionList.class},
+      (proxy, method, args) -> {
+        Class<?> returnType = method.getReturnType();
+        if (returnType == boolean.class) {
+          return false;
+        }
+        if (returnType == int.class) {
+          return 0;
+        }
+        if (returnType == long.class) {
+          return 0L;
+        }
+        if (returnType == float.class) {
+          return 0f;
+        }
+        if (returnType == double.class) {
+          return 0d;
+        }
+        return null;
+      });
   }
 
 }

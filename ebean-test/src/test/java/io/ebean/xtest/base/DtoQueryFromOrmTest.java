@@ -57,7 +57,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
       DB.find(Contact.class)
         .setProfileLocation(loc0)
         .select("email, " + concat("lastName", ", ", "firstName") + " as fullName").where()
-        .istartsWith(concat("lastName", ", ", "firstName"), val).order().asc("lastName").setMaxRows(10)
+        .istartsWith(concat("lastName", ", ", "firstName"), val).orderBy().asc("lastName").setMaxRows(10)
         .asDto(ContactDto.class).setLabel("prefixLoop").findList();
     }
 
@@ -156,6 +156,34 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
   }
 
   @Test
+  public void asDto_usingMaster_true() {
+    asDtoUsingMaster(true);
+  }
+
+  @Test
+  public void asDto_usingMaster_false() {
+    asDtoUsingMaster(false);
+  }
+
+  private void asDtoUsingMaster(boolean useMaster) {
+    ResetBasicData.reset();
+    LoggedSql.start();
+
+    DtoQuery<ContactDto> query = DB.find(Contact.class)
+      .select("id, email")
+      .where().isNotNull("email")
+      .asDto(ContactDto.class)
+      .usingMaster(useMaster);
+
+    List<ContactDto> dtos = query.findList();
+
+    assertThat(dtos).isNotEmpty();
+    for (ContactDto dto : dtos) {
+      assertThat(dto.getEmail()).isNotNull();
+    }
+  }
+
+  @Test
   public void asDto_withExplicitId() {
 
     ResetBasicData.reset();
@@ -184,7 +212,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     }
 
     List<String> sql = LoggedSql.stop();
-    assertSql(sql.get(0)).contains("select /*+ SomeHint */ /* explicitId */ t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+    assertSql(sql.get(0)).contains("select /*+ SomeHint */ /* Contact.explicitId */ t0.id, t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
       + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
   }
 
@@ -196,7 +224,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     LoggedSql.start();
 
     DtoQuery<ContactDto2> query = DB.find(Contact.class)
-      .where().isNotNull("email").order().asc("lastName")
+      .where().isNotNull("email").orderBy().asc("lastName")
       .asDto(ContactDto2.class)
       .setRelaxedMode();
 
@@ -226,7 +254,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
       .where()
       .isNotNull("email")
       .isNotNull("lastName")
-      .order().asc("lastName")
+      .orderBy().asc("lastName")
       .asDto(ContactDto.class);
 
     List<ContactDto> dtos = query.findList();
@@ -270,11 +298,11 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     List<String> sql = LoggedSql.stop();
 
     if (isSqlServer()) {
-      assertSql(sql.get(0)).contains("select /* emailFullName */ top 10 t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+      assertSql(sql.get(0)).contains("select /* Contact.emailFullName */ top 10 t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
         + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
 
     } else {
-      assertSql(sql.get(0)).contains("select /* emailFullName */ t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
+      assertSql(sql.get(0)).contains("select /* Contact.emailFullName */ t0.email, " + concat("t0.last_name", ", ", "t0.first_name")
         + " fullName from contact t0 where t0.email is not null and t0.last_name is not null order by t0.last_name");
     }
   }
@@ -288,7 +316,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
 
     List<ContactDto> contactDtos = DB.find(Contact.class)
       .select("id, email, " + concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("email")
-      .isNotNull("lastName").order().asc("lastName").setMaxRows(10).asDto(ContactDto.class).findList();
+      .isNotNull("lastName").orderBy().asc("lastName").setMaxRows(10).asDto(ContactDto.class).findList();
 
     assertThat(contactDtos).isNotEmpty();
 
@@ -317,7 +345,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     LoggedSql.start();
 
     List<ContactDto> contactDtos = DB.find(Contact.class)
-      .select(concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("lastName").order()
+      .select(concat("lastName", ", ", "firstName") + " as fullName").where().isNotNull("lastName").orderBy()
       .asc("lastName").asDto(ContactDto.class).setFirstRow(2).setMaxRows(5).findList();
 
     assertThat(contactDtos).isNotEmpty();
@@ -340,7 +368,7 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
     LoggedSql.start();
 
     List<ContactTotals> contactDtos = DB.find(Contact.class).select("lastName, count(*) as totalCount").where()
-      .isNotNull("lastName").having().gt("count(*)", 1).order().desc("count(*)").asDto(ContactTotals.class)
+      .isNotNull("lastName").having().gt("count(*)", 1).orderBy().desc("count(*)").asDto(ContactTotals.class)
       .findList();
 
     assertThat(contactDtos).isNotEmpty();

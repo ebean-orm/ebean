@@ -1,0 +1,14 @@
+ebean:
+  dbSchema: mypgvectorapp
+
+  test:
+    #    useDocker: false
+    #    shutdown: stop # stop | remove
+    platform: pgvector
+    ddlMode: dropCreate # none | dropCreate | create | migration | createOnly | migrationDropCreate
+    dbName: mypgvectorapp
+
+    pgvector:
+      containerName: ebeanbuild_pgvector
+      port: 8432
+      image: pgvector/pgvector:pg18

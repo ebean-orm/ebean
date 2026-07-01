@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.avaje.json.JsonWriter;
 import io.ebean.FetchPath;
 import io.ebean.bean.EntityBean;
 import io.ebean.config.JsonConfig;
@@ -24,7 +24,7 @@ import java.util.Set;
 public final class WriteJson implements SpiJsonWriter {
 
   private final SpiEbeanServer server;
-  private final JsonGenerator generator;
+  private final JsonWriter generator;
   private final FetchPath fetchPath;
   private final Map<String, JsonWriteBeanVisitor<?>> visitors;
   private final PathStack pathStack;
@@ -37,7 +37,7 @@ public final class WriteJson implements SpiJsonWriter {
   /**
    * Construct for full bean use (normal).
    */
-  public WriteJson(SpiEbeanServer server, JsonGenerator generator, FetchPath fetchPath,
+  public WriteJson(SpiEbeanServer server, JsonWriter generator, FetchPath fetchPath,
                    Map<String, JsonWriteBeanVisitor<?>> visitors, Object objectMapper, JsonConfig.Include include,
                    boolean includeLoadedImplicit) {
 
@@ -50,12 +50,14 @@ public final class WriteJson implements SpiJsonWriter {
     this.includeLoadedImplicit = includeLoadedImplicit;
     this.parentBeans = new ArrayStack<>();
     this.pathStack = new PathStack();
+    this.generator.serializeNulls(isIncludeNull());
+    this.generator.serializeEmpty(isIncludeEmpty());
   }
 
   /**
    * Construct for Json scalar use.
    */
-  public WriteJson(JsonGenerator generator, JsonConfig.Include include) {
+  public WriteJson(JsonWriter generator, JsonConfig.Include include) {
     this.generator = generator;
     this.include = include;
     this.includeLoadedImplicit = true;
@@ -65,6 +67,8 @@ public final class WriteJson implements SpiJsonWriter {
     this.objectMapper = null;
     this.parentBeans = null;
     this.pathStack = null;
+    this.generator.serializeNulls(isIncludeNull());
+    this.generator.serializeEmpty(isIncludeEmpty());
   }
 
   /**
@@ -84,7 +88,7 @@ public final class WriteJson implements SpiJsonWriter {
   }
 
   @Override
-  public JsonGenerator gen() {
+  public JsonWriter gen() {
     return generator;
   }
 
@@ -95,171 +99,113 @@ public final class WriteJson implements SpiJsonWriter {
 
   @Override
   public void writeStartObject(String key) {
-    try {
-      if (key != null) {
-        generator.writeFieldName(key);
-      }
-      generator.writeStartObject();
-    } catch (IOException e) {
-      throw new JsonIOException(e);
+    if (key != null) {
+      generator.name(key);
     }
+    generator.beginObject();
   }
 
   @Override
   public void writeStartObject() {
-    try {
-      generator.writeStartObject();
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.beginObject();
   }
 
   @Override
   public void writeEndObject() {
-    try {
-      generator.writeEndObject();
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.endObject();
   }
 
   @Override
   public void writeStartArray(String key) {
-    try {
-      if (key != null) {
-        generator.writeFieldName(key);
-      }
-      generator.writeStartArray();
-    } catch (IOException e) {
-      throw new JsonIOException(e);
+    if (key != null) {
+      generator.name(key);
     }
+    generator.beginArray();
   }
 
   @Override
   public void writeStartArray() {
-    try {
-      generator.writeStartArray();
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.beginArray();
   }
 
   @Override
   public void writeEndArray() {
-    try {
-      generator.writeEndArray();
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.endArray();
   }
 
   @Override
   public void writeRaw(String text) {
-    try {
-      generator.writeRaw(text);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.rawChunkStart();
+    generator.rawChunk(text);
+    generator.rawChunkEnd();
   }
 
   @Override
   public void writeRawValue(String text) {
-    try {
-      generator.writeRawValue(text);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.rawValue(text);
   }
 
   @Override
   public void writeFieldName(String name) {
-    try {
-      generator.writeFieldName(name);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.name(name);
   }
 
   @Override
   public void writeNullField(String name) {
     if (isIncludeNull()) {
-      try {
-        generator.writeNullField(name);
-      } catch (IOException e) {
-        throw new JsonIOException(e);
-      }
+      generator.name(name);
+      generator.nullValue();
     }
   }
 
   @Override
   public void writeNumberField(String name, long value) {
-    try {
-      generator.writeNumberField(name, value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.name(name);
+    generator.value(value);
   }
 
   @Override
   public void writeNumberField(String name, double value) {
-    try {
-      generator.writeNumberField(name, value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.name(name);
+    generator.value(value);
   }
 
   @Override
   public void writeNumberField(String name, int value) {
-    try {
-      generator.writeNumberField(name, value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.name(name);
+    generator.value(value);
   }
 
   @Override
   public void writeNumberField(String name, short value) {
-    try {
-      generator.writeNumberField(name, value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.name(name);
+    generator.value(value);
   }
 
 
   @Override
   public void writeNumberField(String name, float value) {
-    try {
-      generator.writeNumberField(name, value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.name(name);
+    generator.value((double) value);
   }
 
 
   @Override
   public void writeNumberField(String name, BigDecimal value) {
-    try {
-      generator.writeNumberField(name, value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.name(name);
+    generator.value(value);
   }
 
   @Override
   public void writeStringField(String name, String value) {
-    try {
-      generator.writeStringField(name, value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.name(name);
+    generator.value(value);
   }
 
   @Override
   public void writeBinary(InputStream is, int length) {
     try {
-      generator.writeBinary(is, length);
+      generator.value(is.readNBytes(length));
     } catch (IOException e) {
       throw new JsonIOException(e);
     }
@@ -267,83 +213,49 @@ public final class WriteJson implements SpiJsonWriter {
 
   @Override
   public void writeBinaryField(String name, byte[] value) {
-    try {
-      generator.writeBinaryField(name, value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.name(name);
+    generator.value(value);
   }
 
   @Override
   public void writeBooleanField(String name, boolean value) {
-    try {
-      generator.writeBooleanField(name, value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.name(name);
+    generator.value(value);
   }
 
   @Override
   public void writeBoolean(boolean value) {
-    try {
-      generator.writeBoolean(value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.value(value);
   }
 
   @Override
   public void writeString(String value) {
-    try {
-      generator.writeString(value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.value(value);
   }
 
   @Override
   public void writeNumber(int value) {
-    try {
-      generator.writeNumber(value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.value(value);
   }
 
   @Override
   public void writeNumber(long value) {
-    try {
-      generator.writeNumber(value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.value(value);
   }
 
   @Override
   public void writeNumber(double value) {
-    try {
-      generator.writeNumber(value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.value(value);
   }
 
   @Override
   public void writeNumber(BigDecimal value) {
-    try {
-      generator.writeNumber(value);
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.value(value);
   }
 
   @Override
   public void writeNull() {
-    try {
-      generator.writeNull();
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    generator.nullValue();
   }
 
   @Override
@@ -375,55 +287,39 @@ public final class WriteJson implements SpiJsonWriter {
 
   @Override
   public void beginAssocMany(String key) {
-    try {
-      pathStack.pushPathKey(key);
-      if (key != null) {
-        generator.writeFieldName(key);
-      }
-      generator.writeStartArray();
-    } catch (IOException e) {
-      throw new JsonIOException(e);
+    pathStack.pushPathKey(key);
+    if (key != null) {
+      generator.name(key);
     }
+    generator.beginArray();
   }
 
   @Override
   public void endAssocMany() {
-    try {
-      pathStack.pop();
-      generator.writeEndArray();
-    } catch (IOException e) {
-      throw new JsonIOException(e);
-    }
+    pathStack.pop();
+    generator.endArray();
   }
 
   @Override
   public void beginAssocManyMap(String key, boolean elementCollection) {
-    try {
-      pathStack.pushPathKey(key);
-      if (key != null) {
-        generator.writeFieldName(key);
-      }
-      if (elementCollection) {
-        generator.writeStartObject();
-      } else {
-        generator.writeStartArray();
-      }
-    } catch (IOException e) {
-      throw new JsonIOException(e);
+    pathStack.pushPathKey(key);
+    if (key != null) {
+      generator.name(key);
+    }
+    if (elementCollection) {
+      generator.beginObject();
+    } else {
+      generator.beginArray();
     }
   }
 
   @Override
   public void endAssocManyMap(boolean elementCollection) {
-    try {
-      pathStack.pop();
-      if (elementCollection) {
-        generator.writeEndObject();
-      } else {
-        generator.writeEndArray();
-      }
-    } catch (IOException e) {
-      throw new JsonIOException(e);
+    pathStack.pop();
+    if (elementCollection) {
+      generator.endObject();
+    } else {
+      generator.endArray();
     }
   }
 
@@ -465,8 +361,8 @@ public final class WriteJson implements SpiJsonWriter {
       }
     }
     try {
-      generator.writeFieldName(name);
-      objectMapper().writeValue(generator, value);
+      generator.name(name);
+      generator.rawValue(objectMapper().writeValueAsString(value));
     } catch (IOException e) {
       throw new JsonIOException(e);
     }

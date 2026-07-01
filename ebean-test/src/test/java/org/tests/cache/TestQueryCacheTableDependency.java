@@ -1,9 +1,11 @@
 package org.tests.cache;
 
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.CacheMode;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
@@ -34,13 +36,13 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
       .where().eq("line2", "St Lukes")
       .findList();
 
-    int custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    int custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lukes")
       .findCount();
 
     assertThat(custs).isEqualTo(3);
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lukes")
       .findCount();
 
@@ -50,14 +52,14 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
     a1.setLine2("St Lucky");
     DB.save(a1);
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lukes")
       .findCount();
 
     assertThat(custs).isEqualTo(2);
 
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lucky")
       .findCount();
 
@@ -68,13 +70,13 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
       .where().eq("line2", "St Lucky")
       .update();
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lucky")
       .findCount();
 
     assertThat(custs).isEqualTo(0);
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lucky2")
       .findCount();
     assertThat(custs).isEqualTo(1);
@@ -83,12 +85,12 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
       .setParameters("St Lucky3", "St Lucky2")
       .execute();
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lucky2")
       .findCount();
     assertThat(custs).isEqualTo(0);
 
-    custs = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    custs = DB.find(Customer.class).setUseQueryCache(true)
       .where().eq("billingAddress.line2", "St Lucky3")
       .findCount();
 
@@ -101,7 +103,7 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
 
     Customer fi = DB.find(Customer.class).where().eq("name", "Fiona").findOne();
 
-    int custCount0 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    int custCount0 = DB.find(Customer.class).setUseQueryCache(true)
       .where()
       .eq("name", "Fiona")
       .isNull("contacts.phone")
@@ -117,7 +119,7 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
 
     assertThat(updateRows).isGreaterThan(0);
 
-    int custCount1 = DB.find(Customer.class).setUseQueryCache(true).setReadOnly(true)
+    int custCount1 = DB.find(Customer.class).setUseQueryCache(true)
       .where()
       .eq("name", "Fiona")
       .isNull("contacts.phone")
@@ -190,5 +192,99 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
     // clean up
     DB.delete(child);
     DB.delete(root);
+  }
+
+  /**
+   * findSingleAttributeList caches with dependent tables sourced from the query plan.
+   * A change to the joined (dependent) table must invalidate the query cache entry.
+   */
+  @Test
+  public void testFindSingleAttributeOnDependent() throws InterruptedException {
+    Address addr = new Address();
+    addr.setCity("qcache-sa-city");
+    DB.save(addr);
+
+    Customer cust = new Customer();
+    cust.setName("qcache-sa-cust");
+    cust.setBillingAddress(addr);
+    DB.save(cust);
+
+    DB.cacheManager().queryCache(Customer.class).clear();
+    Thread.sleep(10);
+
+    LoggedSql.start();
+    List<String> first = namesByBillingCity("qcache-sa-city");
+    assertThat(LoggedSql.stop()).as("first call executes SQL").hasSize(1);
+    assertThat(first).containsExactly("qcache-sa-cust");
+
+    LoggedSql.start();
+    List<String> second = namesByBillingCity("qcache-sa-city");
+    assertThat(LoggedSql.stop()).as("second call is a query cache hit").isEmpty();
+    assertThat(second).isEqualTo(first);
+
+    // modify the joined (dependent) o_address table -> evict the Customer query cache
+    addr.setCity("qcache-sa-city2");
+    DB.save(addr);
+
+    LoggedSql.start();
+    List<String> third = namesByBillingCity("qcache-sa-city");
+    assertThat(LoggedSql.stop()).as("cache invalidated after dependent table change").hasSize(1);
+    assertThat(third).isEmpty();
+
+    DB.delete(cust);
+  }
+
+  /**
+   * findList (unmodifiable query cache) caches with dependent tables sourced from the
+   * query plan. A change to the joined (dependent) table must invalidate the entry.
+   */
+  @Test
+  public void testFindListOnDependent() throws InterruptedException {
+    Address addr = new Address();
+    addr.setCity("qcache-list-city");
+    DB.save(addr);
+
+    Customer cust = new Customer();
+    cust.setName("qcache-list-cust");
+    cust.setBillingAddress(addr);
+    DB.save(cust);
+
+    DB.cacheManager().queryCache(Customer.class).clear();
+    Thread.sleep(10);
+
+    LoggedSql.start();
+    List<Customer> first = customersByBillingCity("qcache-list-city");
+    assertThat(LoggedSql.stop()).as("first call executes SQL").hasSize(1);
+    assertThat(first).hasSize(1);
+
+    LoggedSql.start();
+    List<Customer> second = customersByBillingCity("qcache-list-city");
+    assertThat(LoggedSql.stop()).as("second call is a query cache hit").isEmpty();
+    assertThat(second).isSameAs(first);
+
+    // modify the joined (dependent) o_address table -> evict the Customer query cache
+    addr.setCity("qcache-list-city2");
+    DB.save(addr);
+
+    LoggedSql.start();
+    List<Customer> third = customersByBillingCity("qcache-list-city");
+    assertThat(LoggedSql.stop()).as("cache invalidated after dependent table change").hasSize(1);
+    assertThat(third).isEmpty();
+
+    DB.delete(cust);
+  }
+
+  private List<String> namesByBillingCity(String city) {
+    return DB.find(Customer.class).setUseQueryCache(CacheMode.ON)
+      .select("name")
+      .where().eq("billingAddress.city", city)
+      .orderBy("name")
+      .findSingleAttributeList();
+  }
+
+  private List<Customer> customersByBillingCity(String city) {
+    return DB.find(Customer.class).setUseQueryCache(CacheMode.ON)
+      .where().eq("billingAddress.city", city)
+      .findList();
   }
 }

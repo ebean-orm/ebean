@@ -81,7 +81,7 @@ class PostgresReadOnlyDatabaseTest {
   }
 
   private static Database setupReadOnlyDatabase() {
-    PostgresContainer.builder("15")
+    PostgresContainer.builder("17")
       .dbName("readonly_test")
       .build()
       .start();

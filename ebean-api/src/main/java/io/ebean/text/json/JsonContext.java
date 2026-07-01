@@ -1,7 +1,6 @@
 package io.ebean.text.json;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
 import io.ebean.FetchPath;
 import io.ebean.plugin.BeanType;
 
@@ -49,14 +48,14 @@ public interface JsonContext {
    *
    * @throws JsonIOException When IOException occurs
    */
-  <T> T toBean(Class<T> cls, JsonParser parser) throws JsonIOException;
+  <T> T toBean(Class<T> cls, JsonReader parser) throws JsonIOException;
 
   /**
    * Convert json parser input into a Bean of a specific type additionally using JsonReadOptions..
    *
    * @throws JsonIOException When IOException occurs
    */
-  <T> T toBean(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException;
+  <T> T toBean(Class<T> cls, JsonReader parser, JsonReadOptions options) throws JsonIOException;
 
   /**
    * Read json parser input into a given Bean. <br>
@@ -65,19 +64,19 @@ public interface JsonContext {
    *
    * @throws JsonIOException When IOException occurs
    */
-  <T> void toBean(T target, JsonParser parser) throws JsonIOException;
+  <T> void toBean(T target, JsonReader parser) throws JsonIOException;
 
   /**
    * Read json parser input into a given Bean additionally using JsonReadOptions.<br>
-   * See {@link #toBean(Class, JsonParser)} for details modified.
+   * See {@link #toBean(Class, JsonReader)} for details modified.
    *
    * @throws JsonIOException When IOException occurs
    */
-  <T> void toBean(T target, JsonParser parser, JsonReadOptions options) throws JsonIOException;
+  <T> void toBean(T target, JsonReader parser, JsonReadOptions options) throws JsonIOException;
 
   /**
    * Read json reader input into a given Bean.<br>
-   * See {@link #toBean(Class, JsonParser)} for details
+   * See {@link #toBean(Class, JsonReader)} for details
    *
    * @throws JsonIOException When IOException occurs
    */
@@ -85,7 +84,7 @@ public interface JsonContext {
 
   /**
    * Read json reader input into a given Bean additionally using JsonReadOptions.<br>
-   * See {@link #toBean(Class, JsonParser)} for details modified.
+   * See {@link #toBean(Class, JsonReader)} for details modified.
    *
    * @throws JsonIOException When IOException occurs
    */
@@ -93,7 +92,7 @@ public interface JsonContext {
 
   /**
    * Read json string input into a given Bean.<br>
-   * See {@link #toBean(Class, JsonParser)} for details
+   * See {@link #toBean(Class, JsonReader)} for details
    *
    * @throws JsonIOException When IOException occurs
    */
@@ -101,7 +100,7 @@ public interface JsonContext {
 
   /**
    * Read json string input into a given Bean additionally using JsonReadOptions.<br>
-   * See {@link #toBean(Class, JsonParser)} for details
+   * See {@link #toBean(Class, JsonReader)} for details
    *
    * @throws JsonIOException When IOException occurs
    */
@@ -113,7 +112,7 @@ public interface JsonContext {
    * Note that JsonOption provides an option for setting a persistence context and also enabling further lazy loading. Further lazy
    * loading requires a persistence context so if that is set on then a persistence context is created if there is not one set.
    */
-  <T> JsonBeanReader<T> createBeanReader(Class<T> cls, JsonParser parser, JsonReadOptions options) throws JsonIOException;
+  <T> JsonBeanReader<T> createBeanReader(Class<T> cls, JsonReader parser, JsonReadOptions options) throws JsonIOException;
 
   /**
    * Create and return a new bean reading for the bean type given the JSON options and source.
@@ -122,7 +121,7 @@ public interface JsonContext {
    * further lazy loading. Further lazy loading requires a persistence context so if that is set
    * on then a persistence context is created if there is not one set.
    */
-  <T> JsonBeanReader<T> createBeanReader(BeanType<T> beanType, JsonParser parser, JsonReadOptions options) throws JsonIOException;
+  <T> JsonBeanReader<T> createBeanReader(BeanType<T> beanType, JsonReader parser, JsonReadOptions options) throws JsonIOException;
 
   /**
    * Convert json string input into a list of beans of a specific type.
@@ -157,14 +156,14 @@ public interface JsonContext {
    *
    * @throws JsonIOException When IOException occurs
    */
-  <T> List<T> toList(Class<T> cls, JsonParser json) throws JsonIOException;
+  <T> List<T> toList(Class<T> cls, JsonReader json) throws JsonIOException;
 
   /**
    * Convert json parser input into a list of beans of a specific type additionally using JsonReadOptions.
    *
    * @throws JsonIOException When IOException occurs
    */
-  <T> List<T> toList(Class<T> cls, JsonParser json, JsonReadOptions options) throws JsonIOException;
+  <T> List<T> toList(Class<T> cls, JsonReader json, JsonReadOptions options) throws JsonIOException;
 
   /**
    * Use the genericType to determine if this should be converted into a List or
@@ -188,7 +187,7 @@ public interface JsonContext {
    *
    * @throws JsonIOException When IOException occurs
    */
-  Object toObject(Type genericType, JsonParser jsonParser) throws JsonIOException;
+  Object toObject(Type genericType, JsonReader jsonParser) throws JsonIOException;
 
   /**
    * Return the bean or collection as JSON string.
@@ -212,11 +211,11 @@ public interface JsonContext {
   void toJson(Object value, Writer writer) throws JsonIOException;
 
   /**
-   * Write the bean or collection to the JsonGenerator.
+   * Write the bean or collection to the JsonWriter.
    *
    * @throws JsonIOException When IOException occurs
    */
-  void toJson(Object value, JsonGenerator generator) throws JsonIOException;
+  void toJson(Object value, io.avaje.json.JsonWriter generator) throws JsonIOException;
 
   /**
    * Return the bean or collection as JSON string using FetchPath.
@@ -231,15 +230,15 @@ public interface JsonContext {
   void toJson(Object value, Writer writer, FetchPath fetchPath) throws JsonIOException;
 
   /**
-   * Write the bean or collection to the JsonGenerator using the FetchPath.
+   * Write the bean or collection to the JsonWriter using the FetchPath.
    */
-  void toJson(Object value, JsonGenerator generator, FetchPath fetchPath) throws JsonIOException;
+  void toJson(Object value, io.avaje.json.JsonWriter generator, FetchPath fetchPath) throws JsonIOException;
 
   /**
    * Deprecated in favour of using PathProperties by itself.
-   * Write json to the JsonGenerator using the JsonWriteOptions.
+   * Write json to the JsonWriter using the JsonWriteOptions.
    */
-  void toJson(Object value, JsonGenerator generator, JsonWriteOptions options) throws JsonIOException;
+  void toJson(Object value, io.avaje.json.JsonWriter generator, JsonWriteOptions options) throws JsonIOException;
 
   /**
    * Deprecated in favour of using PathProperties by itself.
@@ -264,27 +263,27 @@ public interface JsonContext {
   boolean isSupportedType(Type genericType);
 
   /**
-   * Create and return a new JsonGenerator for the given writer.
+   * Create and return a new JsonWriter for the given writer.
    *
    * @throws JsonIOException When IOException occurs
    */
-  JsonGenerator createGenerator(Writer writer) throws JsonIOException;
+  io.avaje.json.JsonWriter createGenerator(Writer writer) throws JsonIOException;
 
   /**
-   * Create and return a new JsonParser for the given reader.
+   * Create and return a new JsonReader for the given reader.
    *
    * @throws JsonIOException When IOException occurs
    */
-  JsonParser createParser(Reader reader) throws JsonIOException;
+  JsonReader createParser(Reader reader) throws JsonIOException;
 
   /**
-   * Write a scalar types known to Ebean to Jackson.
+   * Write scalar types known to Ebean to JsonWriter.
    * <p>
    * Ebean has built in support for java8 and Joda types as well as the other
    * standard JDK types like URI, URL, UUID etc. This is a fast simple way to
-   * write any of those types to Jackson.
+   * write any of those types.
    * </p>
    */
-  void writeScalar(JsonGenerator generator, Object scalarValue) throws IOException;
+  void writeScalar(io.avaje.json.JsonWriter generator, Object scalarValue) throws IOException;
 
 }

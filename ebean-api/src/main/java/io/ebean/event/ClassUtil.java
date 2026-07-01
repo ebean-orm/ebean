@@ -1,5 +1,6 @@
 package io.ebean.event;
 
+import io.ebean.plugin.Lookups;
 
 /**
  * Helper to find classes taking into account the context class loader.
@@ -12,8 +13,8 @@ class ClassUtil {
   static Object newInstance(String className) {
     try {
       Class<?> cls = forName(className);
-      return cls.getDeclaredConstructor().newInstance();
-    } catch (Exception e) {
+      return Lookups.newDefaultInstance(cls);
+    } catch (Throwable e) {
       String msg = "Error constructing " + className;
       throw new IllegalArgumentException(msg, e);
     }

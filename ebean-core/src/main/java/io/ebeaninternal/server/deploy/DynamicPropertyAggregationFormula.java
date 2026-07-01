@@ -6,6 +6,8 @@ import io.ebeaninternal.server.query.SqlBeanLoad;
 
 import jakarta.persistence.PersistenceException;
 
+import java.util.Set;
+
 /**
  * Dynamic property based on aggregation (max, min, avg, count).
  */
@@ -15,13 +17,20 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
   private final boolean aggregate;
   final BeanProperty asTarget;
   private final String alias;
+  private final Set<String> formulaJoins;
 
-  DynamicPropertyAggregationFormula(String name, ScalarType<?> scalarType, String parsedFormula, boolean aggregate, BeanProperty asTarget, String alias) {
+  DynamicPropertyAggregationFormula(String name, ScalarType<?> scalarType, String parsedFormula, boolean aggregate, BeanProperty asTarget, String alias, Set<String> formulaJoins) {
     super(name, name, null, scalarType);
     this.parsedFormula = parsedFormula;
     this.aggregate = aggregate;
     this.asTarget = asTarget;
     this.alias = alias;
+    this.formulaJoins = formulaJoins.isEmpty() ? null : formulaJoins;
+  }
+
+  @Override
+  public Set<String> formula2Joins() {
+    return formulaJoins;
   }
 
   @Override
@@ -60,6 +69,11 @@ class DynamicPropertyAggregationFormula extends DynamicPropertyBase {
   @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
     ctx.appendParseSelect(parsedFormula, alias);
+  }
+
+  @Override
+  public final void appendGroupBy(DbSqlContext ctx, boolean subQuery) {
+    ctx.appendParseSelect(parsedFormula, null);
   }
 
   @Override

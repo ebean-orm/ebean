@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.core;
 
 import io.ebean.CancelableQuery;
-import io.ebean.Transaction;
 import io.ebean.util.JdbcClose;
 import io.ebeaninternal.api.*;
 import io.ebeaninternal.server.persist.Binder;
@@ -28,6 +27,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
   protected String bindLog = "";
   protected PreparedStatement pstmt;
   protected long startNano;
+  protected Binder binder;
   private final ReentrantLock lock = new ReentrantLock();
 
   /**
@@ -93,6 +93,19 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
   protected abstract void requestComplete();
 
   /**
+   * Set the JDBC buffer fetchSize hint if not set explicitly.
+   */
+  public void setDefaultFetchBuffer(int fetchSize) {
+    query.setDefaultFetchBuffer(fetchSize);
+  }
+
+  public void setAutoCommitOnFindIterate() {
+    if (createdTransaction) {
+      transaction.setAutoCommitOnFindIterate();
+    }
+  }
+
+  /**
    * Close the underlying resources.
    */
   public void close() {
@@ -132,6 +145,7 @@ public abstract class AbstractSqlQueryRequest implements CancelableQuery {
   }
 
   protected void executeAsSql(Binder binder) throws SQLException {
+    this.binder = binder;
     lock.lock();
     try {
       query.checkCancelled();

@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java_version: [GA,EA,23]
+        java_version: [GA,EA]
         os: [ubuntu-latest]
 
     steps:
@@ -37,5 +37,5 @@ jobs:
     - name: Maven version
       run: mvn --version
     - name: Build with Maven
-      run: mvn -T 8 test
+      run: mvn test -Pea
 

@@ -1,6 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Object relational query for finding a List, Set, Map or single entity bean.
@@ -13,7 +14,7 @@ import io.avaje.lang.NonNullApi;
  *     .where()
  *       .like("customer.name","rob%")
  *       .gt("orderDate",lastWeek)
- *     .order("customer.id, id desc")
+ *     .orderBy("customer.id, id desc")
  *     .setMaxRows(50)
  *     .findList();
  *
@@ -149,7 +150,7 @@ import io.avaje.lang.NonNullApi;
  *
  * @param <T> the type of Entity bean this query will fetch.
  */
-@NonNullApi
+@NullMarked
 public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
 
   /**
@@ -217,29 +218,6 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
    * Return true if this is countDistinct query.
    */
   boolean isCountDistinct();
-
-  /**
-   * @deprecated migrate to {@link #usingTransaction(Transaction)} then delete().
-   * <p>
-   * Execute as a delete query returning the number of rows deleted using the given transaction.
-   * <p>
-   * Note that if the query includes joins then the generated delete statement may not be
-   * optimal depending on the database platform.
-   *
-   * @return the number of beans/rows that were deleted.
-   */
-  @Deprecated(forRemoval = true, since = "14.1.0")
-  int delete(Transaction transaction);
-
-  /**
-   * @deprecated migrate to {@link #usingTransaction(Transaction)} then update().
-   * <p>
-   * Execute the UpdateQuery returning the number of rows updated using the given transaction.
-   *
-   * @return the number of beans/rows updated.
-   */
-  @Deprecated(forRemoval = true, since = "14.1.0")
-  int update(Transaction transaction);
 
   /**
    * Execute the UpdateQuery returning the number of rows updated.
@@ -333,6 +311,7 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
   /**
    * Return the Id value.
    */
+  @Nullable
   Object getId();
 
   /**
@@ -441,30 +420,6 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
   Query<T> having(Expression addExpressionToHaving);
 
   /**
-   * @deprecated migrate to {@link #orderBy()}.
-   */
-  @Deprecated(since = "13.19", forRemoval = true)
-  default Query<T> order(String orderByClause) {
-    return orderBy(orderByClause);
-  }
-
-  /**
-   * @deprecated migrate to {@link #orderBy()}.
-   */
-  @Deprecated(since = "13.19", forRemoval = true)
-  default OrderBy<T> order() {
-    return orderBy();
-  }
-
-  /**
-   * @deprecated migrate to {@link #setOrderBy(OrderBy)}.
-   */
-  @Deprecated(since = "13.19", forRemoval = true)
-  default Query<T> setOrder(OrderBy<T> orderBy) {
-    return setOrderBy(orderBy);
-  }
-
-  /**
    * Return the OrderBy so that you can append an ascending or descending
    * property to the order by clause.
    * <p>
@@ -493,11 +448,13 @@ public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
   /**
    * Return the "for update" wait mode to use.
    */
+  @Nullable
   LockWait getForUpdateLockWait();
 
   /**
    * Return the lock type (strength) to use with "for update".
    */
+  @Nullable
   LockType getForUpdateLockType();
 
   /**

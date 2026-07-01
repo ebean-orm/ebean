@@ -1,7 +1,7 @@
 package io.ebean.config;
 
-import com.fasterxml.jackson.core.JsonFactory;
 import io.avaje.config.Config;
+import io.avaje.json.stream.JsonStream;
 import io.ebean.*;
 import io.ebean.annotation.MutationDetection;
 import io.ebean.annotation.PersistBatch;
@@ -31,38 +31,15 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * The configuration used for creating a Database.
- * <p>
- * Used to programmatically construct an Database and optionally register it
- * with the DB singleton.
- * <p>
- * If you just use DB thout this programmatic configuration Ebean will read
- * the application.properties file and take the configuration from there. This usually
- * includes searching the class path and automatically registering any entity
- * classes and listeners etc.
- * <pre>{@code
- *
- * DatabaseConfig config = new DatabaseConfig();
- *
- * // read the ebean.properties and load
- * // those settings into this DatabaseConfig object
- * config.loadFromProperties();
- *
- * // explicitly register the entity beans to avoid classpath scanning
- * config.addClass(Customer.class);
- * config.addClass(User.class);
- *
- * Database db = DatabaseFactory.create(config);
- *
- * }</pre>
+ * Deprecated migrate to {@link Database#builder()} rather than constructing {@code DatabaseConfig} directly.
  *
  * <p>
- * Note that DatabaseConfigProvider provides a standard Java ServiceLoader mechanism that can
- * be used to apply configuration to the DatabaseConfig.
+ * Note that {@link DatabaseConfigProvider} provides a standard Java ServiceLoader mechanism that can
+ * be used to apply configuration to the {@link DatabaseBuilder}.
  *
  * @author emcgreal
  * @author rbygrave
- * @see DatabaseFactory
+ * @see Database#builder()
  */
 public class DatabaseConfig implements DatabaseBuilder.Settings {
 
@@ -251,7 +228,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   /**
    * The default batch size for lazy loading
    */
-  private int lazyLoadBatchSize = 10;
+  private int lazyLoadBatchSize = 100;
 
   /**
    * The default batch size for 'query joins'.
@@ -311,6 +288,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private boolean skipDataSourceCheck;
 
   private boolean readOnlyDatabase;
+  private boolean shutdownHook = true;
 
   /**
    * The data source (if programmatically provided).
@@ -354,6 +332,8 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    * The naming convention.
    */
   private NamingConvention namingConvention = new UnderscoreNamingConvention();
+
+  private AggregateFormulaContext aggregateFormulaContext = AggregateFormulaContext.builder().build();
 
   /**
    * Behaviour of updates in JDBC batch to by default include all properties.
@@ -440,7 +420,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    * The default PersistenceContextScope used if one is not explicitly set on a query.
    */
   private PersistenceContextScope persistenceContextScope = PersistenceContextScope.TRANSACTION;
-  private JsonFactory jsonFactory;
+  private JsonStream jsonStream;
   private boolean localTimeWithNanos;
   private boolean durationWithNanos;
   private int maxCallStack = 5;
@@ -451,6 +431,8 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private int backgroundExecutorSchedulePoolSize = 1;
   private int backgroundExecutorShutdownSecs = 30;
   private BackgroundExecutorWrapper backgroundExecutorWrapper = new MdcBackgroundExecutorWrapper();
+
+  private boolean tenantPartitionedCache;
 
   // defaults for the L2 bean caching
 
@@ -481,6 +463,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    * Time to live for query plans - defaults to 5 minutes.
    */
   private int queryPlanTTLSeconds = 60 * 5;
+  private String queryPlanExplain;
 
   /**
    * Set to true to globally disable L2 caching (typically for performance testing).
@@ -535,8 +518,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   private SlowQueryListener slowQueryListener;
 
-  private ProfilingConfig profilingConfig = new ProfilingConfig();
-
   /**
    * The mappingLocations for searching xml mapping.
    */
@@ -556,12 +537,14 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   private Function<String, String> metricNaming = MetricNamingMatch.INSTANCE;
 
   /**
-   * Construct a Database Configuration for programmatically creating an Database.
+   * @deprecated migrate to {@link Database#builder()} and configure the returned {@link DatabaseBuilder}.
    */
+  @Deprecated(forRemoval = true)
   public DatabaseConfig() {
   }
 
   @Override
+  @SuppressWarnings("removal")
   public Database build() {
     return DatabaseFactory.create(this);
   }
@@ -650,13 +633,13 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public JsonFactory getJsonFactory() {
-    return jsonFactory;
+  public JsonStream getJsonStream() {
+    return jsonStream;
   }
 
   @Override
-  public DatabaseConfig setJsonFactory(JsonFactory jsonFactory) {
-    this.jsonFactory = jsonFactory;
+  public DatabaseConfig setJsonStream(JsonStream jsonStream) {
+    this.jsonStream = jsonStream;
     return this;
   }
 
@@ -1025,17 +1008,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
-  public ProfilingConfig getProfilingConfig() {
-    return profilingConfig;
-  }
-
-  @Override
-  public DatabaseConfig setProfilingConfig(ProfilingConfig profilingConfig) {
-    this.profilingConfig = profilingConfig;
-    return this;
-  }
-
-  @Override
   public String getDbSchema() {
     return dbSchema;
   }
@@ -1206,6 +1178,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   }
 
   @Override
+  public boolean isTenantPartitionedCache() {
+    return tenantPartitionedCache;
+  }
+
+  @Override
+  public DatabaseConfig tenantPartitionedCache(boolean tenantPartitionedCache) {
+    this.tenantPartitionedCache = tenantPartitionedCache;
+    return this;
+  }
+
+  @Override
   public DatabaseConfig setCacheMaxSize(int cacheMaxSize) {
     this.cacheMaxSize = cacheMaxSize;
     return this;
@@ -1274,6 +1257,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public DatabaseConfig setNamingConvention(NamingConvention namingConvention) {
     this.namingConvention = namingConvention;
+    return this;
+  }
+
+  @Override
+  public AggregateFormulaContext aggregateFormulaContext() {
+    return aggregateFormulaContext;
+  }
+
+  @Override
+  public DatabaseConfig aggregateFormulaContext(AggregateFormulaContext aggregateFormulaContext) {
+    this.aggregateFormulaContext = aggregateFormulaContext;
     return this;
   }
 
@@ -1362,6 +1356,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public boolean readOnlyDatabase() {
     return readOnlyDatabase;
+  }
+
+  @Override
+  public DatabaseBuilder shutdownHook(boolean shutdownHook) {
+    this.shutdownHook = shutdownHook;
+    return this;
+  }
+
+  @Override
+  public boolean shutdownHook() {
+    return shutdownHook;
   }
 
   @Override
@@ -2111,7 +2116,6 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
    */
   protected void loadSettings(PropertiesWrapper p) {
     dbSchema = p.get("dbSchema", dbSchema);
-    profilingConfig.loadSettings(p, name);
     platformConfig.loadSettings(p);
     if (platformConfig.isAllQuotedIdentifiers()) {
       adjustNamingConventionForAllQuoted();
@@ -2136,6 +2140,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     loadDocStoreSettings(p);
 
     defaultServer = p.getBoolean("defaultServer", defaultServer);
+    shutdownHook = p.getBoolean("shutdownHook", shutdownHook);
     readOnlyDatabase = p.getBoolean("readOnlyDatabase", readOnlyDatabase);
     autoPersistUpdates = p.getBoolean("autoPersistUpdates", autoPersistUpdates);
     loadModuleInfo = p.getBoolean("loadModuleInfo", loadModuleInfo);
@@ -2151,6 +2156,7 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     queryPlanCapturePeriodSecs = p.getLong("queryPlan.capturePeriodSecs", queryPlanCapturePeriodSecs);
     queryPlanCaptureMaxTimeMillis = p.getLong("queryPlan.captureMaxTimeMillis", queryPlanCaptureMaxTimeMillis);
     queryPlanCaptureMaxCount = p.getInt("queryPlan.captureMaxCount", queryPlanCaptureMaxCount);
+    queryPlanExplain = p.get("queryPlan.explain", queryPlanExplain);
     docStoreOnly = p.getBoolean("docStoreOnly", docStoreOnly);
     disableL2Cache = p.getBoolean("disableL2Cache", disableL2Cache);
     localOnlyL2Cache = p.getBoolean("localOnlyL2Cache", localOnlyL2Cache);
@@ -2234,6 +2240,15 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
     ddlStrictMode = p.getBoolean("ddl.strictMode", ddlStrictMode);
     ddlPlaceholders = p.get("ddl.placeholders", ddlPlaceholders);
     ddlHeader = p.get("ddl.header", ddlHeader);
+
+    tenantPartitionedCache = p.getBoolean("tenantPartitionedCache", tenantPartitionedCache);
+
+    cacheMaxSize = p.getInt("cacheMaxSize", cacheMaxSize);
+    cacheMaxIdleTime = p.getInt("cacheMaxIdleTime", cacheMaxIdleTime);
+    cacheMaxTimeToLive = p.getInt("cacheMaxTimeToLive", cacheMaxTimeToLive);
+    queryCacheMaxSize = p.getInt("queryCacheMaxSize", queryCacheMaxSize);
+    queryCacheMaxIdleTime = p.getInt("queryCacheMaxIdleTime", queryCacheMaxIdleTime);
+    queryCacheMaxTimeToLive = p.getInt("queryCacheMaxTimeToLive", queryCacheMaxTimeToLive);
 
     // read tenant-configuration from config:
     // tenant.mode = NONE | DB | SCHEMA | CATALOG | PARTITION
@@ -2400,6 +2415,17 @@ public class DatabaseConfig implements DatabaseBuilder.Settings {
   @Override
   public int getQueryPlanTTLSeconds() {
     return queryPlanTTLSeconds;
+  }
+
+  @Override
+  public String getQueryPlanExplain() {
+    return queryPlanExplain;
+  }
+
+  @Override
+  public DatabaseBuilder queryPlanExplain(String queryPlanExplain) {
+    this.queryPlanExplain = queryPlanExplain;
+    return this;
   }
 
   @Override

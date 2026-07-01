@@ -10,7 +10,7 @@ import jakarta.persistence.PersistenceException;
 @SuppressWarnings({"rawtypes"})
 final class ScalarTypeClass extends ScalarTypeBaseVarchar<Class> {
 
-  public ScalarTypeClass() {
+  ScalarTypeClass() {
     super(Class.class);
   }
 

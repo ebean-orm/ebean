@@ -1,11 +1,9 @@
 package io.ebean.xtest.event;
 
 import io.ebean.Database;
-import io.ebean.DatabaseFactory;
 import io.ebean.bean.BeanCollection;
 import io.ebean.common.BeanList;
 import io.ebean.DatabaseBuilder;
-import io.ebean.config.DatabaseConfig;
 import io.ebean.event.BeanFindController;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.xtest.BaseTestCase;
@@ -27,24 +25,24 @@ public class BeanFindControllerTest extends BaseTestCase {
   @Test
   public void test() {
 
-    var config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
 
     config.setName("h2otherfind");
+    config.setRegister(false);
+    config.setDefaultServer(false);
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.setDdlExtra(false);
 
-    config.setRegister(false);
-    config.setDefaultServer(false);
     config.add(new ModUuidGenerator());
     config.addClass(EBasic.class);
     config.addClass(ECustomId.class);
 
     EBasicFindController findController = new EBasicFindController();
-    config.getFindControllers().add(findController);
+    config.settings().getFindControllers().add(findController);
 
-    Database db = DatabaseFactory.create(config);
+    Database db = config.build();
 
     assertFalse(findController.calledInterceptFind);
     db.find(EBasic.class, 42);
@@ -170,24 +168,24 @@ public class BeanFindControllerTest extends BaseTestCase {
   }
 
   private Database prepareSoftRefs() {
-    DatabaseConfig config = new DatabaseConfig();
+    DatabaseBuilder config = Database.builder();
 
     config.setName("h2otherfind");
+    config.setRegister(false);
+    config.setDefaultServer(false);
     config.loadFromProperties();
     config.setDdlGenerate(true);
     config.setDdlRun(true);
     config.setDdlExtra(false);
 
-    config.setRegister(false);
-    config.setDefaultServer(false);
     config.add(new ModUuidGenerator());
     config.addClass(FindControllerMain.class);
     config.addClass(SoftRefA.class);
     config.addClass(SoftRefB.class);
 
-    config.getFindControllers().add(new TestBeanFindController());
+    config.settings().getFindControllers().add(new TestBeanFindController());
 
-    Database db = DatabaseFactory.create(config);
+    Database db = config.build();
 
     final SoftRefA softRefA = new SoftRefA();
     softRefA.setTitle("softRefA");

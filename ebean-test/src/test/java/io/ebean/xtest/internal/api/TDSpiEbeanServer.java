@@ -1,6 +1,7 @@
 package io.ebean.xtest.internal.api;
 
-import io.avaje.lang.NonNullApi;
+import io.ebeaninternal.server.query.STreeProperty;
+import org.jspecify.annotations.NullMarked;
 import io.ebean.*;
 import io.ebean.annotation.Platform;
 import io.ebean.annotation.TxIsolation;
@@ -38,7 +39,7 @@ import java.util.stream.Stream;
 /**
  * Test double for SpiEbeanServer.
  */
-@NonNullApi
+@NullMarked
 public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
 
   String name;
@@ -51,17 +52,8 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public ExtendedServer extended() {
-    return this;
-  }
-
-  @Override
   public long clockNow() {
     return System.currentTimeMillis();
-  }
-
-  @Override
-  public void setClock(Clock clock) {
   }
 
   @Override
@@ -221,6 +213,11 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
 
   @Override
   public void remoteTransactionEvent(RemoteTransactionEvent event) {
+  }
+
+  @Override
+  public void registerImmutableCache(ImmutableBeanCache<?> beanCache) {
+
   }
 
   @Override
@@ -663,6 +660,11 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
+  public <K, T> FutureMap<K, T> findFutureMap(SpiQuery<T> query) {
+    return null;
+  }
+
+  @Override
   public <T> PagedList<T> findPagedList(SpiQuery<T> query) {
     return null;
   }
@@ -712,6 +714,11 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
 
   @Override
   public SqlRow findOne(SpiSqlQuery query) {
+    return null;
+  }
+
+  @Override
+  public <T> STreeProperty createFormulaProperty(SpiBeanType desc, String formula, String path) {
     return null;
   }
 

@@ -1,6 +1,6 @@
 package io.ebeaninternal.server.json;
 
-import com.fasterxml.jackson.core.JsonParser;
+import io.avaje.json.JsonReader;
 import io.ebean.PersistenceIOException;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.text.json.JsonBeanReader;
@@ -45,7 +45,7 @@ public final class DJsonBeanReader<T> implements JsonBeanReader<T> {
   }
 
   @Override
-  public JsonBeanReader<T> forJson(JsonParser moreJson) {
+  public JsonBeanReader<T> forJson(JsonReader moreJson) {
     return new DJsonBeanReader<>(desc, readJson.forJson(moreJson));
   }
 }

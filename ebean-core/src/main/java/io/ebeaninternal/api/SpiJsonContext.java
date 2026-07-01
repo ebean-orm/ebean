@@ -1,6 +1,6 @@
 package io.ebeaninternal.api;
 
-import com.fasterxml.jackson.core.JsonGenerator;
+import io.avaje.json.JsonWriter;
 import io.ebean.plugin.BeanType;
 import io.ebean.text.json.JsonContext;
 import io.ebean.text.json.JsonWriteOptions;
@@ -17,7 +17,7 @@ public interface SpiJsonContext extends JsonContext {
   /**
    * Create a Json Writer for writing beans as JSON.
    */
-  SpiJsonWriter createJsonWriter(JsonGenerator gen, JsonWriteOptions options);
+  SpiJsonWriter createJsonWriter(JsonWriter gen, JsonWriteOptions options);
 
   /**
    * Create a Json Writer for writing beans as JSON supplying a writer.

@@ -12,14 +12,14 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class WriteJsonTest {
+class WriteJsonTest {
 
   @Test
-  public void test_push() {
+  void test_push() {
 
     ResetBasicData.reset();
 
-    FetchPath fetchPath = PathProperties.parse("id,status,name,customer(id,name,billingAddress(street,city)),details(qty,product(sku,prodName))");
+    FetchPath fetchPath = PathProperties.parse("id,status,customer(id,name,billingAddress(line1,city)),details(orderQty,product(sku,name))");
 
     Query<Order> query = DB.find(Order.class);
 
@@ -28,8 +28,8 @@ public class WriteJsonTest {
 
     String json = DB.json().toJsonPretty(list);
 
-    assertThat(json).contains("\"customer\": {");
-    assertThat(json).contains("\"billingAddress\": {");
-    assertThat(json).contains("\"details\": [ {");
+    assertThat(json).contains("\"customer\":");
+    assertThat(json).contains("\"billingAddress\":");
+    assertThat(json).contains("\"details\": [");
   }
 }

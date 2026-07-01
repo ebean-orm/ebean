@@ -18,7 +18,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
   @Test
   public void selectSourceBaseSql() {
 
-    final Query<SourceBase> query = DB.find(SourceBase.class).order("pos");
+    final Query<SourceBase> query = DB.find(SourceBase.class).orderBy("pos");
     query.findList();
 
     assertThat(sqlOf(query)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t0.target_id, t1.dtype, t0.target_id from source_base t0 left join target_base t1 on t1.id = t0.target_id order by t0.pos");
@@ -27,7 +27,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
   @Test
   public void selectSourceASql() {
 
-    final Query<SourceA> query = DB.find(SourceA.class).order("pos");
+    final Query<SourceA> query = DB.find(SourceA.class).orderBy("pos");
     query.findList();
 
     assertThat(sqlOf(query)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t0.target_id from source_base t0 left join target_base t1 on t1.id = t0.target_id where t0.dtype = 'SourceA' order by t0.pos");
@@ -36,7 +36,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
   @Test
   public void selectSourceAWithJoin() {
 
-    final Query<SourceA> query = DB.find(SourceA.class).fetch("target", "name").order("pos");
+    final Query<SourceA> query = DB.find(SourceA.class).fetch("target", "name").orderBy("pos");
     query.findList();
 
     assertThat(sqlOf(query)).contains("select t0.dtype, t0.id, t0.name, t0.pos, t1.dtype, t1.id, t1.name from source_base t0 left join target_base t1 on t1.id = t0.target_id and t1.dtype = 'Target1' where t0.dtype = 'SourceA' order by t0.pos");
@@ -78,7 +78,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
 
     final List<SourceA> sourceAList = DB.find(SourceA.class)
       .fetch("target", "name")
-      .order("pos")
+      .orderBy("pos")
       .findList();
 
     final String joinedNames = sourceAList.stream()
@@ -99,7 +99,7 @@ public class TestInheritanceBothSides extends BaseTestCase {
 
     LoggedSql.start();
 
-    final List<SourceBase> sources = DB.find(SourceBase.class).order("pos").findList();
+    final List<SourceBase> sources = DB.find(SourceBase.class).orderBy("pos").findList();
     for (SourceBase source : sources) {
       if (source instanceof SourceA) {
         SourceA a = (SourceA) source;

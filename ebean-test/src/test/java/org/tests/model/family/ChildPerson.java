@@ -1,6 +1,6 @@
 package org.tests.model.family;
 
-import io.ebean.annotation.Formula;
+import io.ebean.annotation.Formula2;
 import org.tests.model.basic.EBasic;
 
 import jakarta.persistence.CascadeType;
@@ -11,9 +11,6 @@ import jakarta.persistence.ManyToOne;
 public class ChildPerson extends InheritablePerson {
   private static final long serialVersionUID = 1L;
 
-  private static final String PARENTS_JOIN = "join parent_person j1 on j1.identifier = ${ta}.parent_identifier "
-    + "join grand_parent_person j2 on j2.identifier = j1.parent_identifier";
-
   @ManyToOne(cascade = CascadeType.ALL)
   private ParentPerson parent;
 
@@ -21,15 +18,16 @@ public class ChildPerson extends InheritablePerson {
 
   private String address;
 
-  //@Coalesce({ "familyName", "parent.familyName", "parent.parent.familyName" })
-  @Formula(select = "coalesce(${ta}.family_name, j1.family_name, j2.family_name)", join = PARENTS_JOIN)
+  @Formula2("coalesce(familyName, parent.familyName, parent.parent.familyName)")
   private String effectiveFamilyName;
 
-  //@Coalesce({ "address", "parent.address", "parent.parent.address"  })
-  @Formula(select = "coalesce(${ta}.address, j1.address, j2.address)", join = PARENTS_JOIN)
+  @Formula2("coalesce(familyName, parent.familyName, parent.parent.familyName)")
+  private String derivedFamilyName;
+
+  @Formula2("coalesce(address, parent.address, parent.parent.address)")
   private String effectiveAddress;
 
-  @Formula(select = "coalesce(${ta}.some_bean_id, j1.some_bean_id, j2.some_bean_id)")
+  @Formula2("coalesce(someBean.id, parent.someBean.id, parent.parent.someBean.id)")
   @ManyToOne
   private EBasic effectiveBean;
 
@@ -59,6 +57,10 @@ public class ChildPerson extends InheritablePerson {
 
   public String getEffectiveFamilyName() {
     return effectiveFamilyName;
+  }
+
+  public String getDerivedFamilyName() {
+    return derivedFamilyName;
   }
 
   public String getEffectiveAddress() {

@@ -37,7 +37,7 @@ final class CQueryIteratorSimple<T> implements QueryIterator<T> {
   @Override
   @SuppressWarnings("unchecked")
   public T next() {
-    return (T) cquery.next();
+    return (T) cquery.nextBean();
   }
 
   @Override

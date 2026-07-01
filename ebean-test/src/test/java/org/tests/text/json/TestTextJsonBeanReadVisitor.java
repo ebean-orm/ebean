@@ -25,7 +25,7 @@ public class TestTextJsonBeanReadVisitor extends BaseTestCase {
       .fetch("billingAddress", "line1, city")
       .fetch("billingAddress.country", "*")
       .fetch("contacts", "firstName,email")
-      .order().desc("id").findList();
+      .orderBy().desc("id").findList();
 
     JsonContext json = DB.json();
 

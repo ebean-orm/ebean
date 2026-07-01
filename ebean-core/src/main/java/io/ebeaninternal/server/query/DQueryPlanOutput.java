@@ -9,7 +9,7 @@ import java.time.Instant;
 /**
  * Captured query plan details.
  */
-final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
+public final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
 
   private final Class<?> beanType;
   private final String label;
@@ -25,7 +25,7 @@ final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   private Instant whenCaptured;
   private Object tenantId;
 
-  DQueryPlanOutput(Class<?> beanType, String label, String hash, String sql, ProfileLocation profileLocation, String bind, String plan) {
+  public DQueryPlanOutput(Class<?> beanType, String label, String hash, String sql, ProfileLocation profileLocation, String bind, String plan) {
     this.beanType = beanType;
     this.label = label;
     this.hash = hash;

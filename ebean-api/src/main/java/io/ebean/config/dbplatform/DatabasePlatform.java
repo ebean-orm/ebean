@@ -167,6 +167,7 @@ public class DatabasePlatform {
    * findIterate() and findVisit().
    */
   protected boolean forwardOnlyHintOnFindIterate;
+  protected boolean autoCommitFalseOnFindIterate;
 
   /**
    * If set then use the CONCUR_UPDATABLE hint when creating ResultSets.
@@ -528,6 +529,10 @@ public class DatabasePlatform {
     this.forwardOnlyHintOnFindIterate = forwardOnlyHintOnFindIterate;
   }
 
+  public boolean autoCommitFalseOnFindIterate() {
+    return autoCommitFalseOnFindIterate;
+  }
+
   /**
    * Return true if the ResultSet CONCUR_UPDATABLE Hint should be used on
    * createNativeSqlTree() PreparedStatements.
@@ -780,4 +785,5 @@ public class DatabasePlatform {
   public String inlineSqlHint(String hint) {
     return "/*+ " + hint + " */ ";
   }
+
 }

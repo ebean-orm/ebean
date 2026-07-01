@@ -1,11 +1,11 @@
 package io.ebeaninternal.server.deploy;
 
-import io.ebean.Query;
 import io.ebean.SqlUpdate;
 import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.InterceptReadWrite;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarDataReader;
@@ -125,15 +125,9 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         // no imported or exported information
       } else if (!oneToOneExported) {
         importedId = createImportedId(this, targetDescriptor, tableJoin);
-        if (importedId.isScalar()) {
-          // limit JoinColumn mapping to the @Id / primary key
-          TableJoinColumn[] columns = tableJoin.columns();
-          String foreignJoinColumn = columns[0].getForeignDbColumn();
-          String foreignIdColumn = targetDescriptor.idProperty().dbColumn();
-          if (!foreignJoinColumn.equalsIgnoreCase(foreignIdColumn)) {
-            throw new PersistenceException("Mapping limitation - @JoinColumn on " + fullName() + " needs to map to a primary key as per Issue #529 "
-              + " - joining to " + foreignJoinColumn + " and not " + foreignIdColumn);
-          }
+        if (importedId == null) {
+          throw new PersistenceException("Cannot find imported id for " + fullName() + " from " + targetDescriptor
+          + ". If using native-image, possibly missing reflect-config for the Id property.");
         }
       } else {
         exportedProperties = createExported();
@@ -446,27 +440,29 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       if (embedded) {
         setValue(bean, targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData, context));
       } else {
+        // when the owning bean is unmodifiable the reference must also be unmodifiable
+        final boolean unmodifiable = !(bean._ebean_getIntercept() instanceof InterceptReadWrite);
         if (cacheData instanceof CachedBeanId) {
-          setValue(bean, refInheritBean((CachedBeanId) cacheData, context));
+          setValue(bean, refInheritBean((CachedBeanId) cacheData, context, unmodifiable));
         } else {
-          setValue(bean, refBean(targetDescriptor, cacheData, context));
+          setValue(bean, refBean(targetDescriptor, cacheData, context, unmodifiable));
         }
       }
     }
   }
 
-  private Object refInheritBean(CachedBeanId cacheId, PersistenceContext context) {
+  private Object refInheritBean(CachedBeanId cacheId, PersistenceContext context, boolean unmodifiable) {
     final InheritInfo rowInheritInfo = targetInheritInfo.readType(cacheId.getDiscValue());
-    return refBean(rowInheritInfo.desc(), cacheId.getId(), context);
+    return refBean(rowInheritInfo.desc(), cacheId.getId(), context, unmodifiable);
   }
 
-  private Object refBean(BeanDescriptor<?> desc, Object id, PersistenceContext context) {
+  private Object refBean(BeanDescriptor<?> desc, Object id, PersistenceContext context, boolean unmodifiable) {
     if (id instanceof String) {
       id = desc.idProperty().scalarType.parse((String) id);
     }
-    Object bean = desc.contextGet(context, id);
+    Object bean = context == null ? null : desc.contextGet(context, id);
     if (bean == null) {
-      bean = desc.createRef(id, context);
+      bean = desc.createReference(unmodifiable, false, id, context);
     }
     return bean;
   }
@@ -601,9 +597,17 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
+  public boolean isFormula() {
+    return super.isFormula() || formula2Select != null;
+  }
+
+  @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
     if (!isTransient) {
-      if (primaryKeyExport) {
+      if (formula2Select != null) {
+        // @Formula2 on @ManyToOne: use formula2 expression as FK selector
+        ctx.appendFormula2Select(formula2Select);
+      } else if (primaryKeyExport) {
         descriptor.idProperty().appendSelect(ctx, subQuery);
       } else {
         localHelp.appendSelect(ctx, subQuery);
@@ -622,9 +626,32 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return super.addJoin(joinType, a1, a2, ctx);
   }
 
+  /**
+   * Add table join using a prefix to resolve table aliases.
+   */
+  @Override
+  public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
+    if (formula2Select != null) {
+      // @Formula2 on @ManyToOne: join target table with formula2 FK expression as ON clause
+      String parentPrefix = SplitName.split(prefix)[0]; // null for root-level
+      String a2 = ctx.tableAlias(prefix);
+      String resolvedFk = ctx.parseFormula2(formula2Select, parentPrefix);
+      String joinLiteral = joinType.literal(SqlJoinType.OUTER);
+      String foreignIdCol = tableJoin.columns()[0].getForeignDbColumn();
+      ctx.addFormula2Join(joinLiteral, tableJoin.getTable(), a2, foreignIdCol, resolvedFk);
+      return SqlJoinType.OUTER;
+    }
+    return super.addJoin(joinType, prefix, ctx);
+  }
+
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (!isTransient && !primaryKeyExport) {
+      if (formula2Select != null) {
+        // @Formula2 on @ManyToOne: auto-joins for the formula are handled via formula2JoinIncludes;
+        // no additional join SQL is emitted here (the FK value comes from the formula2 SELECT expression)
+        return;
+      }
       localHelp.appendFrom(ctx, joinType);
       if (sqlFormulaJoin != null) {
         String alias = ctx.tableAliasManyWhere(manyWhere);
@@ -661,6 +688,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public void setTenantValue(EntityBean entityBean, Object tenantId) {
     setValue(entityBean, targetDescriptor.createRef(tenantId, null));
+  }
+
+  @Override
+  public void freeze(EntityBean entityBean) {
+    Object value = getValue(entityBean);
+    if (value instanceof EntityBean) {
+      targetDescriptor.freeze((EntityBean) value);
+    }
   }
 
   @Override

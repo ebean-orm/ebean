@@ -16,7 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java_version: [11]
+        java_version: [21]
         os: [ubuntu-latest]
 
     steps:
@@ -35,4 +35,4 @@ jobs:
           ~/.m2
         key: build-${{ env.cache-name }}
     - name: oracle
-      run: mvn -T 8 clean test -Dprops.file=testconfig/ebean-oracle.properties
+      run: mvn -T 1 clean test -Dprops.file=testconfig/ebean-oracle.properties

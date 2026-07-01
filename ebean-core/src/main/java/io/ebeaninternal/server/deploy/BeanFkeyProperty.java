@@ -37,11 +37,6 @@ public final class BeanFkeyProperty implements ElPropertyValue {
   }
 
   @Override
-  public String idNullOr(String filterManyExpression) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public boolean isAggregation() {
     return false;
   }

@@ -23,38 +23,6 @@ public interface TQAssocMany<T, R, QB> {
   R filterMany(ExpressionList<T> filter);
 
   /**
-   * @param expressions The expressions including and, or, not etc with ? and ?1 bind params.
-   * @param params      The bind parameter values
-   * @deprecated for removal - migrate to {@link #filterManyRaw(String, Object...)}.
-   * <p>
-   * Apply a filter when fetching these beans.
-   * <p>
-   * The expressions can use any valid Ebean expression and contain
-   * placeholders for bind values using <code>?</code> or <code>?1</code> style.
-   * </p>
-   *
-   * <pre>{@code
-   *
-   *     new QCustomer()
-   *       .name.startsWith("Postgres")
-   *       .contacts.filterMany("firstName istartsWith ?", "Rob")
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * <pre>{@code
-   *
-   *     new QCustomer()
-   *       .name.startsWith("Postgres")
-   *       .contacts.filterMany("whenCreated inRange ? to ?", startDate, endDate)
-   *       .findList();
-   *
-   * }</pre>
-   */
-  @Deprecated(forRemoval = true)
-  R filterMany(String expressions, Object... params);
-
-  /**
    * Add filter expressions for the many path. The expressions can include SQL functions if
    * desired and the property names are translated to column names.
    * <p>

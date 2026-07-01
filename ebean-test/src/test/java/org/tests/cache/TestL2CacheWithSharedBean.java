@@ -4,58 +4,45 @@ import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
-import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.FeatureDescription;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestL2CacheWithSharedBean extends BaseTestCase {
-
-//  private TunedQueryInfo createTunedQueryInfo(OrmQueryDetail tunedDetail) {
-//    Origin origin = new Origin();
-//    origin.setDetail(tunedDetail.toString());
-//    return new TunedQueryInfo(origin);
-//  }
+class TestL2CacheWithSharedBean extends BaseTestCase {
 
   @Test
-  public void test() {
-
+  void test() {
     FeatureDescription f1 = new FeatureDescription();
     f1.setName("one");
     f1.setDescription("helloOne");
-
     DB.save(f1);
 
     ServerCache beanCache = DB.cacheManager().beanCache(FeatureDescription.class);
     beanCache.statistics(true);
 
-    OrmQueryDetail tunedDetail = new OrmQueryDetail();
-    tunedDetail.select("name");
-//    TunedQueryInfo tunedInfo = createTunedQueryInfo(tunedDetail);
-
     Query<FeatureDescription> query = DB.find(FeatureDescription.class).setId(f1.getId());
-
-//    tunedInfo.tuneQuery((SpiQuery<?>) query);
-
     query.findOne(); // PUT into cache
 
-    FeatureDescription fd2 = query.findOne(); // LOAD cache
+    FeatureDescription fd2 = query.findOne(); // LOAD from cache
+    assertEquals("helloOne", fd2.getDescription());
 
-    String description0 = fd2.getDescription(); // invoke lazy load
-    assertEquals("helloOne", description0);
-
-    // load the cache
-    FeatureDescription fetchOne = DB.find(FeatureDescription.class, f1.getId());
+    // load from cache
+    FeatureDescription fetchOne = findByIdUnmodifiable(f1.getId());
     assertNotNull(fetchOne);
     assertEquals(1, beanCache.statistics(false).getSize());
 
-    FeatureDescription fetchTwo = DB.find(FeatureDescription.class, f1.getId());
-    FeatureDescription fetchThree = DB.find(FeatureDescription.class, f1.getId());
+    FeatureDescription fetchTwo = findByIdUnmodifiable(f1.getId());
+    FeatureDescription fetchThree = findByIdUnmodifiable(f1.getId());
     assertSame(fetchTwo, fetchThree);
+    assertEquals("helloOne", fetchThree.getDescription());
+  }
 
-    String description1 = fetchThree.getDescription();
-    assertEquals("helloOne", description1);
+  private static FeatureDescription findByIdUnmodifiable(Integer id) {
+    return DB.find(FeatureDescription.class)
+      .setId(id)
+      .setUnmodifiable(true) // with this true, we can return shared bean instances
+      .findOne();
   }
 
 }

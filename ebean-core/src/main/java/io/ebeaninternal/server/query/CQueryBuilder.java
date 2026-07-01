@@ -233,17 +233,19 @@ final class CQueryBuilder {
   <T> CQueryRowCount buildRowCountQuery(OrmQueryRequest<T> request) {
     SpiQuery<T> query = request.query();
     // always set the order by to null for row count query
-    query.setOrder(null);
+    query.setOrderBy(null);
     query.setFirstRow(0);
     query.setMaxRows(0);
 
     boolean countDistinct = query.isDistinct();
+    boolean useColumnAlias = selectCountWithColumnAlias;
     boolean withAgg = false;
     if (!countDistinct) {
       withAgg = includesAggregation(request, query);
-      if (!withAgg) {
+      if (!withAgg && request.descriptor().hasId()) {
         // minimise select clause for standard count
         query.setSelectId();
+        useColumnAlias = false;
       }
     }
 
@@ -256,7 +258,7 @@ final class CQueryBuilder {
     }
 
     predicates.prepare(true);
-    SqlTree sqlTree = createSqlTree(request, predicates, selectCountWithColumnAlias && withAgg);
+    SqlTree sqlTree = createSqlTree(request, predicates, useColumnAlias);
     if (SpiQuery.TemporalMode.CURRENT == query.temporalMode()) {
       sqlTree.addSoftDeletePredicate(query);
     }
@@ -278,7 +280,7 @@ final class CQueryBuilder {
         sql = wrapSelectCount(sql);
       } else if (wrap || query.isRawSql()) {
         // remove order by - mssql does not accept order by in subqueries
-        int pos = sql.lastIndexOf(" order by ");
+        int pos = lastTopLevelOrderBy(sql);
         if (pos != -1) {
           sql = sql.substring(0, pos);
         }
@@ -296,6 +298,34 @@ final class CQueryBuilder {
    */
   private <T> boolean includesAggregation(OrmQueryRequest<T> request, SpiQuery<T> query) {
     return request.descriptor().includesAggregation(query.detail());
+  }
+
+  /**
+   * Find the last " order by " that is not inside parentheses (i.e. not inside a subquery).
+   * Returns the position or -1 if not found.
+   */
+  static int lastTopLevelOrderBy(String sql) {
+    String target = " order by ";
+    int depth = 0;
+    int lastFound = -1;
+    for (int i = 0; i < sql.length(); i++) {
+      char c = sql.charAt(i);
+      if (c == '(') {
+        depth++;
+      } else if (c == ')') {
+        depth--;
+      } else if (depth == 0 && c == ' ' && sql.regionMatches(true, i, target, 0, target.length())) {
+        lastFound = i;
+      }
+    }
+    return lastFound;
+  }
+
+  static String inlineSqlCommentLabel(String label, ProfileLocation profileLocation, boolean secondary, String simpleName) {
+    if (label != null) {
+      return secondary ? label : CQueryPlan.planLabelWithType(label, simpleName);
+    }
+    return profileLocation == null ? null : profileLocation.label();
   }
 
   private String wrapSelectCount(String sql) {
@@ -622,13 +652,9 @@ final class CQueryBuilder {
       if (type == SpiQuery.Type.SQ_EX || type == SpiQuery.Type.SQ_EXISTS) {
         return "";
       }
-      final var label = query.label();
+      final var label = CQueryBuilder.inlineSqlCommentLabel(query.label(), query.profileLocation(), query.loadMode() != null, request.descriptor().simpleName());
       if (label != null) {
         return dbPlatform.inlineSqlComment(label);
-      }
-      final var profileLocation = query.profileLocation();
-      if (profileLocation != null) {
-        return dbPlatform.inlineSqlComment(profileLocation.label());
       }
       return "";
     }
@@ -713,7 +739,7 @@ final class CQueryBuilder {
       appendHistoryAsOfPredicate();
       appendFindId();
       appendToWhere(predicates.dbWhere());
-      appendToWhere(predicates.dbFilterMany());
+      appendToWhere(predicates.dbFilterManyWhere());
       if (!query.isIncludeSoftDeletes()) {
         appendSoftDelete();
       }

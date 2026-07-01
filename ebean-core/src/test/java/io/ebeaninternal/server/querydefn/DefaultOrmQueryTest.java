@@ -139,7 +139,7 @@ public class DefaultOrmQueryTest extends BaseExpressionTest {
   }
 
   private BindValuesKey bindKey(DefaultOrmQuery<Order> query) {
-    BindValuesKey key = new BindValuesKey();
+    BindValuesKey key = new BindValuesKey(spiEbeanServer());
     query.queryBindKey(key);
     return key;
   }

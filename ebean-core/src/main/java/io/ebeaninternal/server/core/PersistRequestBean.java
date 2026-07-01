@@ -54,10 +54,6 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * The unique id used for logging summary.
    */
   private Object idValue;
-  /**
-   * Hash value used to handle cascade delete both ways in a relationship.
-   */
-  private Integer beanHash;
   private boolean statelessUpdate;
   private boolean notifyCache;
   /**
@@ -228,6 +224,7 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       docStoreMode = calcDocStoreMode(transaction, type);
     }
     checkBatchEscalationOnCascade();
+    transaction.markNotQueryOnly();
   }
 
   /**
@@ -265,13 +262,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       GeneratedProperty generatedProperty = prop.generatedProperty();
       if (prop.isVersion()) {
         if (isLoadedProperty(prop)) {
-          // @Version property must be loaded to be involved
+          // @Version property must be loaded to be involved — always auto-incremented
           Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
           Object oldVal = prop.getValue(entityBean);
           setVersionValue(value);
           intercept.setOldValue(prop.propertyIndex(), oldVal);
         }
-      } else {
+      } else if (transaction == null || transaction.isGeneratedPropertiesEnabled()) {
         // @WhenModified set without invoking interception
         Object oldVal = prop.getValue(entityBean);
         Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
@@ -283,15 +280,22 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void onFailedUpdateUndoGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
-      Object oldVal = intercept.origValue(prop.propertyIndex());
-      prop.setValue(entityBean, oldVal);
+      if (prop.isVersion() || transaction == null || transaction.isGeneratedPropertiesEnabled()) {
+        // undo version always (it was always set); undo others only if they were set
+        Object oldVal = intercept.origValue(prop.propertyIndex());
+        if (oldVal != null) {
+          prop.setValue(entityBean, oldVal);
+        }
+      }
     }
   }
 
   private void onInsertGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenInsert()) {
-      Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
-      prop.setValueChanged(entityBean, value);
+      if (prop.isVersion() || transaction == null || transaction.isGeneratedPropertiesEnabled() || prop.getValue(entityBean) == null) {
+        Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
+        prop.setValueChanged(entityBean, value);
+      }
     }
   }
 
@@ -552,34 +556,17 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
-  /**
-   * The hash used to register the bean with the transaction.
-   * <p>
-   * Takes into account the class type and id value.
-   */
-  private Integer beanHash() {
-    if (beanHash == null) {
-      Object id = beanDescriptor.getId(entityBean);
-      int hc = 92821 * bean.getClass().getName().hashCode();
-      if (id != null) {
-        hc += id.hashCode();
-      }
-      beanHash = hc;
-    }
-    return beanHash;
-  }
-
   public void registerDeleteBean() {
-    Integer hash = beanHash();
-    transaction.registerDeleteBean(hash);
+    final Object id = beanDescriptor.id(entityBean);
+    transaction.registerDeleteBean(beanDescriptor.type(), id);
   }
 
   public boolean isRegisteredForDeleteBean() {
     if (transaction == null) {
       return false;
     } else {
-      Integer hash = beanHash();
-      return transaction.isRegisteredDeleteBean(hash);
+      final Object id = beanDescriptor.id(entityBean);
+      return transaction.isRegisteredDeleteBean(beanDescriptor.type(), id);
     }
   }
 
@@ -808,7 +795,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void checkRowCount(int rowCount) {
     if (rowCount != 1 && rowCount != Statement.SUCCESS_NO_INFO) {
       if (ConcurrencyMode.VERSION == concurrencyMode) {
-        onFailedUpdateUndoGeneratedProperties();
+        if (type == Type.UPDATE) {
+          onFailedUpdateUndoGeneratedProperties();
+        }
         throw new OptimisticLockException("Data has changed. updated row count " + rowCount, null, bean);
       } else if (rowCount == 0 && type == Type.UPDATE) {
         throw new EntityNotFoundException("No rows updated");

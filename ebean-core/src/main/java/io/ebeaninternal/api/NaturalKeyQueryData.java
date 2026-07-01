@@ -3,10 +3,7 @@ package io.ebeaninternal.api;
 import io.ebean.Pairs;
 import io.ebeaninternal.server.deploy.BeanNaturalKey;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Collects the data for processing the natural key cache processing.
@@ -19,8 +16,9 @@ public final class NaturalKeyQueryData<T> {
    */
   private boolean hasIn;
   // IN Pairs clause - only one allowed
-  private String inProperty0, inProperty1;
   private List<Pairs.Entry> inPairs;
+  private String[] properties;
+  private List<Object[]> inTuples;
   // IN clause - only one allowed
   private List<Object> inValues;
   private String inProperty;
@@ -47,10 +45,35 @@ public final class NaturalKeyQueryData<T> {
     }
     if (matchProperty(property0) && matchProperty(property1)) {
       this.hasIn = true;
-      this.inProperty0 = property0;
-      this.inProperty1 = property1;
+      this.properties = new String[]{property0, property1};
       this.inPairs = new ArrayList<>(inPairs); // will be modified
       return this.inPairs;
+    }
+    return null;
+  }
+
+  /**
+   * Match for In Tuples expression. We only allow one IN clause.
+   */
+  public List<Object[]> matchInTuples(String[] properties, List<Object[]> inTuples) {
+    if (hasIn) {
+      // only 1 IN allowed (to project naturalIds)
+      return null;
+    }
+
+    boolean matchAll = true;
+
+    for (String property : properties) {
+      if (!matchProperty(property)) {
+        matchAll = false;
+        break;
+      }
+    }
+    if (matchAll) {
+      this.hasIn = true;
+      this.properties = Arrays.copyOf(properties, properties.length);
+      this.inTuples = new ArrayList<>(inTuples);
+      return this.inTuples;
     }
     return null;
   }
@@ -100,6 +123,8 @@ public final class NaturalKeyQueryData<T> {
       addInValues();
     } else if (inPairs != null) {
       addInPairs();
+    } else if (inTuples != null) {
+      addInTuples();
     } else {
       addEqualsKey();
     }
@@ -110,7 +135,17 @@ public final class NaturalKeyQueryData<T> {
     // a findList() with an IN Map clause so we project
     // for every IN value a natural key combination
     for (Pairs.Entry entry : inPairs) {
-      set.add(new NaturalKeyEntryBasic(naturalKey, eqList, inProperty0, inProperty1, entry));
+      set.add(new NaturalKeyEntryBasic(naturalKey, eqList, properties[0], properties[1], entry));
+    }
+  }
+
+  private void addInTuples() {
+    for (Object[] inTuple : inTuples) {
+      Map<String, Object> map = new HashMap<>();
+      for (int i = 0; i < inTuple.length; i++) {
+        map.put(properties[i], inTuple[i]);
+      }
+      set.add(new NaturalKeyEntryBasic(naturalKey, eqList, map, inTuple));
     }
   }
 
@@ -152,11 +187,8 @@ public final class NaturalKeyQueryData<T> {
     if (inProperty != null) {
       exprProps.add(inProperty);
     }
-    if (inProperty0 != null) {
-      exprProps.add(inProperty0);
-    }
-    if (inProperty1 != null) {
-      exprProps.add(inProperty1);
+    if (properties != null) {
+      exprProps.addAll(Arrays.asList(properties));
     }
     if (eqList != null) {
       for (NaturalKeyEq eq : eqList) {
@@ -173,6 +205,7 @@ public final class NaturalKeyQueryData<T> {
     int defined = (inValues == null) ? 0 : 1;
     defined += (inPairs == null) ? 0 : 2;
     defined += (eqList == null) ? 0 : eqList.size();
+    defined += (inTuples == null) ? 0 : properties.length;
     return defined == naturalKey.length();
   }
 
@@ -206,6 +239,9 @@ public final class NaturalKeyQueryData<T> {
     } else if (inPairs != null) {
       //noinspection SuspiciousMethodCalls
       inPairs.remove(inValue);
+    } else if (inTuples != null) {
+      //noinspection SuspiciousMethodCalls
+      inTuples.remove(inValue);
     }
   }
 }

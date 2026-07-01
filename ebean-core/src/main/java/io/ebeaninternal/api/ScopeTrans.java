@@ -34,8 +34,8 @@ public final class ScopeTrans {
    * Explicit set of Exceptions that DO cause a rollback to occur.
    */
   private final ArrayList<Class<? extends Throwable>> rollbackFor;
-  private Boolean restoreBatch;
-  private Boolean restoreBatchOnCascade;
+  private boolean restoreBatch;
+  private boolean restoreBatchOnCascade;
   private int restoreBatchSize;
   private Boolean restoreBatchGeneratedKeys;
   private boolean restoreBatchFlushOnQuery;
@@ -61,7 +61,7 @@ public final class ScopeTrans {
     this.noRollbackFor = txScope.getNoRollbackFor();
     this.rollbackFor = txScope.getRollbackFor();
     if (transaction != null) {
-      if (!created && txScope.isBatchSet() || txScope.isBatchOnCascadeSet() || txScope.isBatchSizeSet()) {
+      if (!created) {
         restoreBatch = transaction.isBatchMode();
         restoreBatchOnCascade = transaction.isBatchOnCascade();
         restoreBatchSize = transaction.getBatchSize();
@@ -142,16 +142,12 @@ public final class ScopeTrans {
       transaction.commit();
     } else {
       nestedCommit = true;
+      transaction.flush();
+      // restore the batch settings
       transaction.setFlushOnQuery(restoreBatchFlushOnQuery);
-      if (restoreBatch != null) {
-        transaction.setBatchMode(restoreBatch);
-      }
-      if (restoreBatchOnCascade != null) {
-        transaction.setBatchOnCascade(restoreBatchOnCascade);
-      }
-      if (restoreBatchSize > 0) {
-        transaction.setBatchSize(restoreBatchSize);
-      }
+      transaction.setBatchMode(restoreBatch);
+      transaction.setBatchOnCascade(restoreBatchOnCascade);
+      transaction.setBatchSize(restoreBatchSize);
       if (restoreBatchGeneratedKeys != null) {
         transaction.setGetGeneratedKeys(restoreBatchGeneratedKeys);
       }

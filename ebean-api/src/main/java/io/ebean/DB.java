@@ -1,7 +1,7 @@
 package io.ebean;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.annotation.TxIsolation;
 import io.ebean.cache.ServerCacheManager;
 import io.ebean.plugin.Property;
@@ -57,7 +57,7 @@ import java.util.concurrent.Callable;
  *
  * }</pre>
  */
-@NonNullApi
+@NullMarked
 public final class DB {
 
   private static final DbContext context = DbContext.getInstance();
@@ -605,7 +605,7 @@ public final class DB {
    *   // find orders and their customers
    *   List<Order> list = DB.find(Order.class)
    *     .fetch("customer")
-   *     .order("id")
+   *     .orderBy("id")
    *     .findList();
    *
    *   // sort by customer name ascending, then by order shipDate

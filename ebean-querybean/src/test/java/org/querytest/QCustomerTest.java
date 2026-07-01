@@ -13,6 +13,7 @@ import org.example.domain.otherpackage.ValidEmail;
 import org.example.domain.query.QContact;
 import org.example.domain.query.QCustomer;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import javax.sql.DataSource;
@@ -47,8 +48,9 @@ public class QCustomerTest {
 
       database.save(customer, txn);
 
-      final Customer found = new QCustomer(txn)
+      final Customer found = new QCustomer()
         .name.eq("explicitTransaction")
+        .usingTransaction(txn)
         .findOne();
       assertThat(found).isNotNull();
 
@@ -326,7 +328,7 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterMany */ t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? escape'|' and t1.email is not null)) order by t0.id");
+    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterMany */ t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id and t1.first_name like ? escape'|' and t1.email is not null order by t0.id");
   }
 
   @Test
@@ -338,7 +340,7 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterManySingle */ t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? escape'|')) order by t0.id");
+    assertThat(q.getGeneratedSql()).isEqualTo("select /* QCustomerTest.filterManySingle */ t0.id, t0.name, t1.id, t1.first_name, t1.last_name from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id and t1.first_name like ? escape'|' order by t0.id");
   }
 
   @Test
@@ -373,7 +375,38 @@ public class QCustomerTest {
       .query();
 
     q.findList();
-    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id where (t1.id is null or (t1.first_name like ? and t1.first_name like ? escape'|')) order by t0.id");
+    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id and t1.first_name like ? and t1.first_name like ? escape'|' order by t0.id");
+  }
+
+  @Test
+  void filterManyOr() {
+    var q = new QCustomer()
+      .contacts.filterMany(c ->
+        c.or()
+          .firstName.startsWith("R")
+          .lastName.startsWith("R")
+          .endOr())
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).contains(" from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id and (t1.first_name like ? escape'|' or t1.last_name like ? escape'|') order by t0.id");
+  }
+
+  @Test
+  @DisplayName("Retain filterMany expression when select fetchGroup applied after filterMany")
+  void filterManyBeforeSelectFetchGroup_expect_filterManyExpressionRetained() {
+    var fetchGroup = QCustomer.forFetchGroup()
+      .select(name)
+      .contacts.fetch(QContact.Alias.email)
+      .buildFetchGroup();
+
+    var q = new QCustomer()
+      .contacts.filterMany(c -> c.firstName.startsWith("R"))
+      .select(fetchGroup)
+      .query();
+
+    q.findList();
+    assertThat(q.getGeneratedSql()).contains(" t0.id, t0.name, t1.id, t1.email from be_customer t0 left join be_contact t1 on t1.customer_id = t0.id and t1.first_name like ? escape'|' order by t0.id");
   }
 
   @Test
@@ -414,6 +447,22 @@ public class QCustomerTest {
   }
 
   @Test
+  public void usingMaster_true() {
+    new QCustomer()
+      .registered.isNull()
+      .usingMaster(true)
+      .findList();
+  }
+
+  @Test
+  public void usingMaster_false() {
+    new QCustomer()
+      .registered.isNull()
+      .usingMaster(false)
+      .findList();
+  }
+
+  @Test
   public void usingTransaction() {
     try (Transaction transaction = DB.getDefault().createTransaction()) {
 
@@ -441,6 +490,7 @@ public class QCustomerTest {
         .usingConnection(connection)
         .findList();
 
+      connection.rollback();
       assertThat(foo).hasSize(1);
     }
 
@@ -667,7 +717,7 @@ public class QCustomerTest {
 
     new QCustomer()
       .name.startsWith("Postgres")
-      .contacts.filterMany("firstName istartsWith ?", "Rob")
+      .contacts.filterManyRaw("firstName like ?", "Rob%")
       .findList();
 
     final LocalDate startDate = LocalDate.now().minusDays(7);
@@ -675,7 +725,7 @@ public class QCustomerTest {
 
     new QCustomer()
       .name.startsWith("Postgres")
-      .contacts.filterMany("whenCreated inRange ? to ?", startDate, endDate)
+      .contacts.filterManyRaw("whenCreated >= ? and whenCreated < ?", startDate, endDate)
       .findList();
   }
 

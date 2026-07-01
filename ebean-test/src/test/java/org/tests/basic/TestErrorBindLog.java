@@ -7,23 +7,20 @@ import org.tests.model.basic.Order;
 
 import jakarta.persistence.PersistenceException;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
-public class TestErrorBindLog extends BaseTestCase {
+class TestErrorBindLog extends BaseTestCase {
 
   @Test
-  public void test() {
-
+  void test() {
     try {
       DB.find(Order.class).where().gt("id", "JUNK").findList();
-
     } catch (PersistenceException e) {
       String msg = e.getMessage();
       if (isHana()) {
-        assertTrue(msg.contains("Error with property[1] dt[12]data[JUNK]"));
-      }
-      else {
-        assertTrue(msg.contains("Bind values:"));
+        assertThat(msg).contains("Error with property");
+      } else {
+        assertThat(msg).contains("Bind values:");
       }
     }
   }

@@ -16,6 +16,7 @@ alter table migtest_e_history2_history drop column obsolete_string2;
 -- apply post alter
 create view migtest_e_history2_with_history as select * from migtest_e_history2 union all select * from migtest_e_history2_history;
 create or replace function migtest_e_history2_history_version() returns trigger as $$
+-- play-ebean-start
 declare
   lowerTs timestamptz;
   upperTs timestamptz;
@@ -31,6 +32,7 @@ begin
     return old;
   end if;
 end;
+-- play-ebean-end
 $$ LANGUAGE plpgsql;
 
 create trigger migtest_e_history2_history_upd

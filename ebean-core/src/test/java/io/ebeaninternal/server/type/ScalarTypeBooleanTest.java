@@ -1,12 +1,7 @@
 package io.ebeaninternal.server.type;
 
-
-import io.ebean.DB;
-import io.ebean.text.json.JsonContext;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.tests.model.basic.TOne;
-
+import java.io.IOException;
 import java.sql.Types;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -14,34 +9,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ScalarTypeBooleanTest {
 
-  JsonContext jsonContext = DB.getDefault().json();
-
   @Test
-  public void json_true() {
-
-    TOne bean = new TOne();
-    bean.setId(42);
-    bean.setActive(true);
-
-    String json = jsonContext.toJson(bean);
-    TOne tOne = jsonContext.toBean(TOne.class, json);
-
-    Assertions.assertTrue(tOne.isActive());
-    assertEquals(json, "{\"id\":42,\"active\":true}");
+  public void json_true() throws IOException {
+    String json = new JsonTester<>(new ScalarTypeBoolean.Native()).test(true);
+    assertEquals(json, "{\"key\":true}");
   }
 
   @Test
-  public void json_false() {
-
-    TOne bean = new TOne();
-    bean.setId(42);
-    bean.setActive(false);
-
-    String json = jsonContext.toJson(bean);
-    TOne tOne = jsonContext.toBean(TOne.class, json);
-
-    Assertions.assertFalse(tOne.isActive());
-    assertEquals(json, "{\"id\":42,\"active\":false}");
+  public void json_false() throws IOException {
+    String json = new JsonTester<>(new ScalarTypeBoolean.Native()).test(false);
+    assertEquals(json, "{\"key\":false}");
   }
 
 

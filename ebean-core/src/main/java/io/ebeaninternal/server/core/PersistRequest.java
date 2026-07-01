@@ -146,6 +146,7 @@ public abstract class PersistRequest extends BeanRequest implements BatchPostExe
   public void initTransIfRequired() {
     createImplicitTransIfRequired();
     persistCascade = transaction.isPersistCascade();
+    transaction.markNotQueryOnly();
   }
 
   /**

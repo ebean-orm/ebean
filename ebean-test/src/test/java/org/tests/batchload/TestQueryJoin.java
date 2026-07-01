@@ -30,7 +30,7 @@ public class TestQueryJoin extends BaseTestCase {
 
     Query<Order> query = DB.find(Order.class).select("status")
       .fetchLazy("customer", "name, status")
-      .fetch("customer.contacts").order().asc("id");
+      .fetch("customer.contacts").orderBy().asc("id");
 
     List<Order> list = query.findList();
 

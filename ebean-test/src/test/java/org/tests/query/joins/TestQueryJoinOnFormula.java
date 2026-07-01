@@ -4,6 +4,7 @@ import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.ForPlatform;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Order;
@@ -16,6 +17,8 @@ import org.tests.model.family.ParentPerson;
 import java.sql.Date;
 import java.util.List;
 
+import static io.ebean.annotation.Platform.H2;
+import static io.ebean.annotation.Platform.POSTGRES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -79,14 +82,22 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     // Tests if SqlTreeBuilder.IncludesDistiller.createExtraJoin appends formulaJoinProperties
     Query<OrderShipment> shipQuery = DB.find(OrderShipment.class)
       .select("id")
-      .order().asc("order.totalAmount");
+      .orderBy().asc("order.totalAmount");
 
     shipQuery.findList();
-    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
-      + "from or_order_ship t0 "
-      + "left join o_order t1 on t1.id = t0.order_id "
-      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
-      + "order by z_bt1.total_amount");
+    if (platformDistinctOn()) {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct on (z_bt1.total_amount, t0.id) t0.id, z_bt1.total_amount " +
+        "from or_order_ship t0 " +
+        "left join o_order t1 on t1.id = t0.order_id " +
+        "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id " +
+        "order by z_bt1.total_amount");
+    } else {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id, z_bt1.total_amount "
+        + "from or_order_ship t0 "
+        + "left join o_order t1 on t1.id = t0.order_id "
+        + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
+        + "order by z_bt1.total_amount");
+    }
   }
 
   @Test
@@ -99,11 +110,19 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
       .where().isNotNull("order.totalAmount").query();
 
     shipQuery.findList();
-    assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id "
-      + "from or_order_ship t0 "
-      + "left join o_order t1 on t1.id = t0.order_id "
-      + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
-      + "where z_bt1.total_amount is not null");
+    if (platformDistinctOn()) {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct on (t0.id) t0.id " +
+        "from or_order_ship t0 " +
+        "left join o_order t1 on t1.id = t0.order_id " +
+        "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id " +
+        "where z_bt1.total_amount is not null");
+    } else {
+      assertSql(shipQuery.getGeneratedSql()).isEqualTo("select distinct t0.id "
+        + "from or_order_ship t0 "
+        + "left join o_order t1 on t1.id = t0.order_id "
+        + "left join (select order_id, count(*) as total_items, sum(order_qty*unit_price) as total_amount from o_order_detail group by order_id) z_bt1 on z_bt1.order_id = t1.id "
+        + "where z_bt1.total_amount is not null");
+    }
   }
 
   @Test
@@ -137,7 +156,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     Query<OrderShipment> shipQuery = DB.find(OrderShipment.class)
       .select("id")
       .fetch("order", "totalAmount")
-      .order().asc("order.totalAmount");
+      .orderBy().asc("order.totalAmount");
 
     shipQuery.findList();
     assertSql(shipQuery.getGeneratedSql()).isEqualTo("select t0.id, t1.id, z_bt1.total_amount "
@@ -198,6 +217,281 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     assertEquals(1, sql.size());
     assertSql(sql.get(0)).contains(" left join (select order_id, count(*) as total_items,");
     assertSql(sql.get(0)).contains("select t0.order_date from o_order t0");
+  }
+
+  @Test
+  void select_formala2_coalesceWithJoin() {
+    LoggedSql.start();
+
+    List<String> names = DB.find(ParentPerson.class)
+      .select("coalesce(familyName, parent.familyName) as family_name")
+      .fetch("parent.familyName")
+      .where().eq("identifier", 1)
+      .findSingleAttributeList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String querySql = sql.get(0);
+    assertThat(querySql).contains("select coalesce(t0.family_name, t1.family_name) family_name from parent_person t0 ");
+    assertThat(querySql).contains("from parent_person t0 left join grand_parent_person t1 on t1.identifier = t0.parent_identifier where t0.identifier = ?");
+  }
+
+  @Test
+  void formula2_autoJoin_parentPerson() {
+    LoggedSql.start();
+
+    // Select the @Formula2 property - the join to 'parent' should be auto-added without fetch()
+    List<ParentPerson> list = DB.find(ParentPerson.class)
+      .select("derivedFamilyName")
+      .where().eq("identifier", 1)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String querySql = sql.get(0);
+    // @Formula2("coalesce(familyName, parent.familyName)") should auto-join parent
+    assertThat(querySql).contains("coalesce(t0.family_name, t1.family_name)");
+    assertThat(querySql).contains("left join grand_parent_person t1 on t1.identifier = t0.parent_identifier");
+  }
+
+  @Test
+  void formula2_autoJoin_multiLevel_childPerson() {
+    LoggedSql.start();
+
+    // @Formula2("coalesce(familyName, parent.familyName, parent.parent.familyName)")
+    // should auto-join both parent and parent.parent
+    List<ChildPerson> list = DB.find(ChildPerson.class)
+      .select("derivedFamilyName")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String querySql = sql.get(0);
+    assertThat(querySql).contains("coalesce(t0.family_name, t1.family_name, t2.family_name)");
+    assertThat(querySql).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(querySql).contains("left join grand_parent_person t2 on t2.identifier = t1.parent_identifier");
+  }
+
+  @Test
+  void formula2_where_autoJoin_parentPerson() {
+    LoggedSql.start();
+
+    // @Formula2 property referenced in where (and NOT selected) should
+    // resolve to the formula and auto-add the join to 'parent'.
+    DB.find(ParentPerson.class)
+      .where().eq("derivedFamilyName", "Smith")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String querySql = sql.get(0);
+    assertThat(querySql).contains("left join grand_parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(querySql).contains("where coalesce(t0.family_name, t1.family_name) = ?");
+  }
+
+  @Test
+  void formula2_orderBy_autoJoin_parentPerson() {
+    LoggedSql.start();
+
+    // @Formula2 property referenced in order by (and NOT selected) should
+    // resolve to the formula and auto-add the join to 'parent'.
+    DB.find(ParentPerson.class)
+      .orderBy("derivedFamilyName")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String querySql = sql.get(0);
+    assertThat(querySql).contains("left join grand_parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(querySql).contains("order by coalesce(t0.family_name, t1.family_name)");
+  }
+
+  @Test
+  void formula2_where_autoJoin_multiLevel_childPerson() {
+    LoggedSql.start();
+
+    // @Formula2("coalesce(familyName, parent.familyName, parent.parent.familyName)")
+    // referenced in where should auto-join both parent and parent.parent.
+    DB.find(ChildPerson.class)
+      .where().eq("derivedFamilyName", "Smith")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String querySql = sql.get(0);
+    assertThat(querySql).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(querySql).contains("left join grand_parent_person t2 on t2.identifier = t1.parent_identifier");
+    assertThat(querySql).contains("where coalesce(t0.family_name, t1.family_name, t2.family_name) = ?");
+  }
+
+  @Test
+  void formula2_where_viaPath_nestedFormula2_childPerson() {
+    LoggedSql.start();
+
+    // Reference a @Formula2 property of an associated bean via a path:
+    // ChildPerson.parent -> ParentPerson.derivedFamilyName = coalesce(familyName, parent.familyName)
+    // The path placeholders must be resolved relative to 'parent', auto-joining
+    // parent (ParentPerson) and parent.parent (GrandParentPerson).
+    DB.find(ChildPerson.class)
+      .where().eq("parent.derivedFamilyName", "Smith")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String querySql = sql.get(0);
+    assertThat(querySql).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(querySql).contains("left join grand_parent_person t2 on t2.identifier = t1.parent_identifier");
+    assertThat(querySql).contains("where coalesce(t1.family_name, t2.family_name) = ?");
+  }
+
+  @Test
+  void formula2_includedByDefault() {
+    LoggedSql.start();
+
+    // A non-@Transient @Formula2 property is included by default (no explicit select),
+    // consistent with @Formula. Its join is auto-added.
+    DB.find(ParentPerson.class)
+      .where().eq("identifier", -1)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String querySql = sql.get(0);
+    // derivedFamilyName (@Formula2, not @Transient) present in the default select
+    assertThat(querySql).contains("coalesce(t0.family_name, t1.family_name)");
+    assertThat(querySql).contains("left join grand_parent_person t1 on t1.identifier = t0.parent_identifier");
+  }
+
+  @Test
+  void formula2_transient_excludedByDefault() {
+    LoggedSql.start();
+
+    // lazyDerivedFamilyName is @Formula2 + @Transient -> NOT selected by default
+    DB.find(ParentPerson.class)
+      .where().eq("identifier", -1)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String querySql = sql.get(0);
+    // two non-transient @Formula2 properties with same expression (effectiveFamilyName + derivedFamilyName).
+    // If the transient lazyDerivedFamilyName also leaked in there would be three.
+    int occurrences = querySql.split("coalesce\\(t0.family_name, t1.family_name\\)", -1).length - 1;
+    assertThat(occurrences)
+      .as("transient @Formula2 must not be selected by default")
+      .isEqualTo(2);
+  }
+
+  @Test
+  void formula2_transient_explicitlySelected() {
+    LoggedSql.start();
+
+    // A @Transient @Formula2 property can still be explicitly selected, with its join auto-added.
+    DB.find(ParentPerson.class)
+      .select("lazyDerivedFamilyName")
+      .where().eq("identifier", -1)
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String querySql = sql.get(0);
+    assertThat(querySql).contains("coalesce(t0.family_name, t1.family_name)");
+    assertThat(querySql).contains("left join grand_parent_person t1 on t1.identifier = t0.parent_identifier");
+  }
+
+  /**
+   * Tests covering the scenario from PR #2773:
+   * fetch and/or where on a @Formula2 @ManyToOne via path should produce correct SQL joins.
+   * Previously (with old @Formula + physical join SQL), the join was incorrectly added to the
+   * root bean instead of the already-existing child node when fetch and where were combined.
+   * With @Formula2, the join ordering is always correct regardless of fetch/where combination.
+   */
+  @Test
+  void formula2_manyToOne_fetchOnly() {
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class)
+      .select("name")
+      .fetch("parent.effectiveBean")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+    String q = sql.get(0);
+    // parent join must appear, grand_parent join for formula2 dependency, then effectiveBean join
+    assertThat(q).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(q).containsPattern("left join grand_parent_person t\\d+ on t\\d+\\.identifier = t1\\.parent_identifier");
+    // effectiveBean join uses formula2: resolves through join aliases (someBean.id, parent.someBean.id)
+    assertThat(q).containsPattern("left join e_basic t\\d+ on t\\d+\\.id = coalesce\\(t\\d+\\.id, t\\d+\\.id\\)");
+  }
+
+  @Test
+  void formula2_manyToOne_whereOnly() {
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class)
+      .select("name")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+    String q = sql.get(0);
+    assertThat(q).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(q).containsPattern("left join grand_parent_person t\\d+ on t\\d+\\.identifier = t1\\.parent_identifier");
+    assertThat(q).containsPattern("left join e_basic t\\d+ on t\\d+\\.id = coalesce\\(t\\d+\\.id, t\\d+\\.id\\)");
+    assertThat(q).contains("where t");
+    assertThat(q).contains(".name = ?");
+  }
+
+  @Test
+  void formula2_manyToOne_fetchPartialWithWhere() {
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class)
+      .select("name")
+      .fetch("parent", "name")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+    String q = sql.get(0);
+    assertThat(q).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(q).containsPattern("left join grand_parent_person t\\d+ on t\\d+\\.identifier = t1\\.parent_identifier");
+    assertThat(q).containsPattern("left join e_basic t\\d+ on t\\d+\\.id = coalesce\\(t\\d+\\.id, t\\d+\\.id\\)");
+    assertThat(q).contains("where t");
+    assertThat(q).contains(".name = ?");
+  }
+
+  @Test
+  void formula2_manyToOne_fetchCompleteWithWhere() {
+    LoggedSql.start();
+
+    DB.find(ChildPerson.class)
+      .select("name")
+      .fetch("parent")
+      .where().eq("parent.effectiveBean.name", "foo")
+      .findList();
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+    String q = sql.get(0);
+    assertThat(q).contains("left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(q).containsPattern("left join grand_parent_person t\\d+ on t\\d+\\.identifier = t1\\.parent_identifier");
+    assertThat(q).containsPattern("left join e_basic t\\d+ on t\\d+\\.id = coalesce\\(t\\d+\\.id, t\\d+\\.id\\)");
+    assertThat(q).contains("where t");
+    assertThat(q).contains(".name = ?");
   }
 
   @Test
@@ -313,7 +607,7 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
     List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
     assertThat(loggedSql.get(0))
-      .contains("select t0.identifier from child_person t0")
+      .contains("select distinct t0.identifier from child_person t0")
       .contains("left join (select i2.parent_identifier")
       .contains("where coalesce(f2.child_age, 0) = ?");
   }
@@ -329,8 +623,54 @@ public class TestQueryJoinOnFormula extends BaseTestCase {
 
     List<String> loggedSql = LoggedSql.stop();
     assertEquals(1, loggedSql.size());
-    assertThat(loggedSql.get(0)).contains("select count(*) from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
-    assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?");
+    assertThat(loggedSql.get(0)).contains("select count(*) from ( select distinct t0.identifier from child_person t0 left join parent_person t1 on t1.identifier = t0.parent_identifier");
+    assertThat(loggedSql.get(0)).contains("where coalesce(f2.child_age, 0) = ?)");
+  }
+
+  /**
+   * Test for https://github.com/ebean-orm/ebean/issues/3686
+   * findCount with Formula join + subquery containing ORDER BY
+   * should produce valid SQL with properly balanced parentheses.
+   *
+   * Before the fix, lastIndexOf(" order by ") matched the ORDER BY inside the
+   * IN subquery, stripping its closing parenthesis and producing invalid SQL.
+   */
+  @ForPlatform({H2, POSTGRES})
+  @Test
+  public void test_findCount_formulaJoin_subqueryWithOrderBy_issue3686() {
+
+    LoggedSql.start();
+
+    // Subquery with orderBy — the order by inside the subquery triggers the bug.
+    Query<Order> subQuery = DB.find(Order.class)
+      .select("id")
+      .orderBy("id");
+
+    // Outer query: formula join (totalItems) via where clause + findCount
+    int count = DB.find(Order.class)
+      .where()
+      .in("id", subQuery)
+      .eq("totalItems", 3)
+      .findCount();
+
+    assertThat(count).isEqualTo(2);
+
+    List<String> sql = LoggedSql.stop();
+    assertEquals(1, sql.size());
+
+    String countSql = sql.get(0);
+    // The count query must wrap with select count(*) from ( ... )
+    assertThat(countSql).contains("select count(*) from (");
+    // The subquery's ORDER BY and closing ) must be preserved
+    assertThat(countSql).contains("order by t0.id)");
+
+    // Parentheses must be balanced in the generated SQL
+    int open = 0, close = 0;
+    for (char c : countSql.toCharArray()) {
+      if (c == '(') open++;
+      if (c == ')') close++;
+    }
+    assertThat(open).as("parentheses must be balanced in: " + countSql).isEqualTo(close);
   }
 
   @Test

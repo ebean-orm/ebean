@@ -55,7 +55,7 @@ class TestBitwiseExpressions extends BaseTestCase {
   void bitwiseAny() {
     List<BwBean> list = DB.find(BwBean.class)
       .where().bitwiseAny("flags", BwFlags.HAS_BULK + BwFlags.HAS_SIZE)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(list).hasSize(3);
@@ -65,21 +65,21 @@ class TestBitwiseExpressions extends BaseTestCase {
 
     list = DB.find(BwBean.class)
       .where().bitwiseAny("flags", BwFlags.HAS_BULK + BwFlags.HAS_SIZE + BwFlags.HAS_COLOUR)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(list).hasSize(4);
 
     list = DB.find(BwBean.class)
       .where().bitwiseAny("flags", BwFlags.HAS_SIZE + BwFlags.HAS_COLOUR)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(list).hasSize(4);
 
     list = DB.find(BwBean.class)
       .where().bitwiseAny("flags", BwFlags.HAS_SIZE)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(list).hasSize(2);
@@ -88,7 +88,7 @@ class TestBitwiseExpressions extends BaseTestCase {
 
     list = DB.find(BwBean.class)
       .where().bitwiseAny("flags", BwFlags.HAS_COLOUR)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(list).hasSize(3);
@@ -108,7 +108,7 @@ class TestBitwiseExpressions extends BaseTestCase {
 
     list = DB.find(BwBean.class)
       .where().bitwiseAll("flags", BwFlags.HAS_BULK + BwFlags.HAS_COLOUR)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(list).hasSize(2);
@@ -117,7 +117,7 @@ class TestBitwiseExpressions extends BaseTestCase {
 
     list = DB.find(BwBean.class)
       .where().bitwiseAll("flags", BwFlags.HAS_SIZE)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(list).hasSize(2);
@@ -126,7 +126,7 @@ class TestBitwiseExpressions extends BaseTestCase {
 
     list = DB.find(BwBean.class)
       .where().bitwiseAll("flags", BwFlags.HAS_COLOUR)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(list).hasSize(3);

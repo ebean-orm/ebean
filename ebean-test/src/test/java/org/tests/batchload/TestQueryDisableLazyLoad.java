@@ -25,7 +25,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
 
     List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(l0).isNotEmpty();
@@ -51,7 +51,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
 
     List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(l0).isNotEmpty();
@@ -75,7 +75,7 @@ public class TestQueryDisableLazyLoad extends BaseTestCase {
     List<Order> l0 = DB.find(Order.class)
       .setDisableLazyLoading(true)
       .fetch("customer", "smallnote")
-      .order().asc("id")
+      .orderBy().asc("id")
       .findList();
 
     assertThat(l0).isNotEmpty();

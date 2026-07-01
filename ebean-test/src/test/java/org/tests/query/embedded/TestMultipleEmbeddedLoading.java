@@ -1,5 +1,6 @@
 package org.tests.query.embedded;
 
+import io.ebean.CacheMode;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.Database;
@@ -14,13 +15,14 @@ import org.tests.model.embedded.EInvoice.State;
 import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class TestMultipleEmbeddedLoading extends BaseTestCase {
+class TestMultipleEmbeddedLoading extends BaseTestCase {
 
   @Test
-  public void testSimpleCase() {
+  void testSimpleCase() {
 
     // prepare test
     EAddress ship = new EAddress();
@@ -50,6 +52,19 @@ public class TestMultipleEmbeddedLoading extends BaseTestCase {
     assertThat(invoice2.getInvoiceDate()).isEqualToIgnoringMillis(invoice.getInvoiceDate());
     assertEquals("2 Apple St", invoice.getBillAddress().getStreet());
     assertEquals("2 Apple St", invoice2.getBillAddress().getStreet());
+
+    EInvoice readOnlyInvoice = DB.find(EInvoice.class)
+      .setId(invoice.getId())
+      .setUnmodifiable(true)
+      .setBeanCacheMode(CacheMode.OFF)
+      .findOne();
+
+    assertThatThrownBy(() -> readOnlyInvoice.getBillAddress().setCity("junk"))
+      .describedAs("embedded bean is unmodifiable")
+      .isInstanceOf(UnsupportedOperationException.class);
+    assertThatThrownBy(() -> readOnlyInvoice.getShipAddress().setCity("junk"))
+      .describedAs("embedded bean is unmodifiable")
+      .isInstanceOf(UnsupportedOperationException.class);
 
     // act: only update one of the embedded fields
     invoice2.getBillAddress().setStreet("3 Pineapple St");

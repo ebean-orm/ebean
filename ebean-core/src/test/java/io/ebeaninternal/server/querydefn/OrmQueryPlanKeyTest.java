@@ -151,11 +151,11 @@ public class OrmQueryPlanKeyTest extends BaseTest {
   @Test
   public void equals_when_diffOrderByNull() {
 
-    CQueryPlanKey key1 = planKey(query().order("id"));
+    CQueryPlanKey key1 = planKey(query().orderBy("id"));
     CQueryPlanKey key2 = planKey(query());
     assertDifferent(key1, key2);
 
-    key1 = planKey(query().order().asc("id"));
+    key1 = planKey(query().orderBy().asc("id"));
     key2 = planKey(query());
     assertDifferent(key1, key2);
   }
@@ -163,8 +163,8 @@ public class OrmQueryPlanKeyTest extends BaseTest {
   @Test
   public void equals_when_orderBySame() {
 
-    CQueryPlanKey key1 = planKey(query().order("id, name"));
-    CQueryPlanKey key2 = planKey(query().order("id, name"));
+    CQueryPlanKey key1 = planKey(query().orderBy("id, name"));
+    CQueryPlanKey key2 = planKey(query().orderBy("id, name"));
     assertSame(key1, key2);
   }
 

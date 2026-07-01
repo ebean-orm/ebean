@@ -1,7 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
-import io.avaje.lang.NonNullApi;
-import io.avaje.lang.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 import io.ebean.*;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -10,6 +10,7 @@ import io.ebeaninternal.api.SpiTransaction;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 
 import java.sql.Connection;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -18,7 +19,7 @@ import java.util.function.Predicate;
 /**
  * Default implementation of SQuery - SQL Query.
  */
-@NonNullApi
+@NullMarked
 public final class DefaultRelationalQuery extends AbstractQuery implements SpiSqlQuery {
 
   private static final long serialVersionUID = -1098305779779591068L;
@@ -59,8 +60,8 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   }
 
   @Override
-  public SqlQuery usingMaster() {
-    this.useMaster = true;
+  public SqlQuery usingMaster(boolean useMaster) {
+    this.useMaster = useMaster;
     return this;
   }
 
@@ -134,8 +135,20 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   }
 
   @Override
+  public DefaultRelationalQuery setArrayParameter(int position, Collection<?> value) {
+    bindParams.setArrayParameter(position, value);
+    return this;
+  }
+
+  @Override
   public DefaultRelationalQuery setParameter(String paramName, Object value) {
     bindParams.setParameter(paramName, value);
+    return this;
+  }
+
+  @Override
+  public DefaultRelationalQuery setArrayParameter(String paramName, Collection<?> value) {
+    bindParams.setArrayParameter(paramName, value);
     return this;
   }
 
@@ -191,6 +204,13 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
   @Override
   public BindParams getBindParams() {
     return bindParams;
+  }
+
+  @Override
+  public final void setDefaultFetchBuffer(int fetchSize) {
+    if (bufferFetchSizeHint == 0) {
+      bufferFetchSizeHint = fetchSize;
+    }
   }
 
   @Override
@@ -250,6 +270,12 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
     }
 
     @Override
+    public TypeQuery<T> usingMaster(boolean useMaster) {
+      DefaultRelationalQuery.this.usingMaster(useMaster);
+      return this;
+    }
+
+    @Override
     public TypeQuery<T> usingTransaction(Transaction transaction) {
       transaction(transaction);
       return this;
@@ -286,6 +312,12 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
 
     Mapper(RowMapper<T> mapper) {
       this.mapper = mapper;
+    }
+
+    @Override
+    public TypeQuery<T> usingMaster(boolean useMaster) {
+      DefaultRelationalQuery.this.usingMaster(useMaster);
+      return this;
     }
 
     @Override

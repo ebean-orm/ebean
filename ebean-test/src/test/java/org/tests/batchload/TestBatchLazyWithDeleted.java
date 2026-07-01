@@ -47,7 +47,7 @@ public class TestBatchLazyWithDeleted extends BaseTestCase {
     List<UUTwo> list = DB.find(UUTwo.class)
       .fetchLazy("master")
       .where().startsWith("name", "two-bld-")
-      .order("name")
+      .orderBy("name")
       .findList();
 
     // delete a bean that will be batch lazy loaded but
