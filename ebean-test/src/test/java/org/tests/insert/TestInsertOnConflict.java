@@ -25,7 +25,7 @@ class TestInsertOnConflict extends BaseTestCase {
     .getGeneratedKeys(true)
     .build();
 
-  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
   void insertTestEntity() {
     var entity1 = new EStrIdBean();
@@ -43,7 +43,7 @@ class TestInsertOnConflict extends BaseTestCase {
       .build());
   }
 
-  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
   void insertOnConflictUpdateExplicitTransaction() {
     Database db = DB.getDefault();
@@ -76,7 +76,7 @@ class TestInsertOnConflict extends BaseTestCase {
     assertThat(list.get(0).getWhenUpdated()).isEqualTo(bean2.getWhenUpdated());
   }
 
-  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
   void insertOnConflictUpdate_when_noIdValue() {
     Database db = DB.getDefault();
@@ -103,7 +103,7 @@ class TestInsertOnConflict extends BaseTestCase {
     assertThat(list.get(0).getWhenUpdated()).isEqualTo(bean2.getWhenUpdated());
   }
 
-  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
   void insertOnConflictUpdate_when_idValueSupplied() {
     Database db = DB.getDefault();
@@ -132,7 +132,7 @@ class TestInsertOnConflict extends BaseTestCase {
     assertThat(list.get(0).getWhenUpdated()).isEqualTo(bean2.getWhenUpdated());
   }
 
-  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
   void insertAll_onConflictUpdate_when_noIdValue() {
     Database db = DB.getDefault();
@@ -160,7 +160,7 @@ class TestInsertOnConflict extends BaseTestCase {
     assertThat(list).hasSize(4);
   }
 
-  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
   void insertAll_onConflictUpdate_explicitTransaction() {
     Database db = DB.getDefault();
@@ -222,7 +222,7 @@ class TestInsertOnConflict extends BaseTestCase {
     assertThat(list).hasSize(3);
   }
 
-  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
   void explicitUniqueColumns() {
     Database db = DB.getDefault();
@@ -252,7 +252,7 @@ class TestInsertOnConflict extends BaseTestCase {
     assertThat(list).hasSize(3);
   }
 
-  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
   void explicitUpdateSet() {
     Database db = DB.getDefault();
@@ -280,7 +280,7 @@ class TestInsertOnConflict extends BaseTestCase {
     assertThat(list).hasSize(2);
   }
 
-  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
   void insertOnConflictNothing_when_noIdValue() {
     Database db = DB.getDefault();
