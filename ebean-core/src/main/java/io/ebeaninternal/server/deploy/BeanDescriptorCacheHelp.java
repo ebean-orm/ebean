@@ -63,6 +63,12 @@ final class BeanDescriptorCacheHelp<T> {
    * Set to true if delete changes need to notify cache.
    */
   private boolean cacheNotifyOnDelete;
+  /**
+   * Set to true if this bean type has owning OneToOne properties pointing to cached targets.
+   * When true, all persist events must evict the target bean caches regardless of whether
+   * this bean type itself has a bean cache (bypasses the cacheRegion.isEnabled() gate).
+   */
+  private boolean cacheNotifyOneToOneOwner;
 
   BeanDescriptorCacheHelp(BeanDescriptor<T> desc, SpiCacheManager cacheManager, CacheOptions cacheOptions,
                           boolean cacheSharableBeans, BeanPropertyAssocOne<?>[] propertiesOneImported) {
@@ -108,13 +114,23 @@ final class BeanDescriptorCacheHelp<T> {
   void deriveNotifyFlags() {
     cacheNotifyOnAll = (invalidateQueryCache || beanCache != null || queryCache != null);
     cacheNotifyOnDelete = !cacheNotifyOnAll && isNotifyOnDeletes();
+    cacheNotifyOneToOneOwner = hasOwningOneToOneWithCachedTarget();
     if (log.isLoggable(DEBUG)) {
-      if (cacheNotifyOnAll || cacheNotifyOnDelete) {
-        String notifyMode = cacheNotifyOnAll ? "All" : "Delete";
+      if (cacheNotifyOnAll || cacheNotifyOnDelete || cacheNotifyOneToOneOwner) {
+        String notifyMode = cacheNotifyOnAll ? "All" : (cacheNotifyOnDelete ? "Delete" : "OneToOneOwner");
         log.log(DEBUG, "l2 caching on {0} - beanCaching:{1} queryCaching:{2} notifyMode:{3} ",
           desc.fullName(), isBeanCaching(), isQueryCaching(), notifyMode);
       }
     }
+  }
+
+  private boolean hasOwningOneToOneWithCachedTarget() {
+    for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
+      if (imported.isCacheNotifyOwningOneToOne()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -135,6 +151,9 @@ final class BeanDescriptorCacheHelp<T> {
    */
   boolean isCacheNotify(PersistRequest.Type type) {
     if (hasImmutableCaches()) {
+      return true;
+    }
+    if (cacheNotifyOneToOneOwner) {
       return true;
     }
     return cacheRegion.isEnabled()
@@ -756,7 +775,7 @@ final class BeanDescriptorCacheHelp<T> {
   }
 
   void cacheUpdateQuery(boolean update, SpiTransaction transaction) {
-    if (invalidateQueryCache || cacheNotifyOnAll || (!update && cacheNotifyOnDelete)) {
+    if (invalidateQueryCache || cacheNotifyOnAll || cacheNotifyOneToOneOwner || (!update && cacheNotifyOnDelete)) {
       transaction.event().add(desc.baseTable(), false, update, !update);
     }
   }
@@ -776,6 +795,7 @@ final class BeanDescriptorCacheHelp<T> {
         changeSet.addBeanRemoveMany(desc, ids);
       }
       cacheDeleteImported(true, null, changeSet);
+      cacheClearImportedOneToOne(changeSet);
     }
   }
 
@@ -794,6 +814,7 @@ final class BeanDescriptorCacheHelp<T> {
         changeSet.addBeanRemove(desc, id);
       }
       cacheDeleteImported(true, deleteRequest.entityBean(), changeSet);
+      cacheDeleteImportedOneToOne(deleteRequest.entityBean(), changeSet);
     }
   }
 
@@ -806,6 +827,7 @@ final class BeanDescriptorCacheHelp<T> {
     } else {
       queryCacheClear(changeSet);
       cacheDeleteImported(false, insertRequest.entityBean(), changeSet);
+      cacheDeleteImportedOneToOne(insertRequest.entityBean(), changeSet);
       changeSet.addBeanInsert(desc.baseTable());
     }
   }
@@ -813,6 +835,42 @@ final class BeanDescriptorCacheHelp<T> {
   private void cacheDeleteImported(boolean clear, EntityBean entityBean, CacheChangeSet changeSet) {
     for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
       imported.cacheDelete(clear, entityBean, changeSet);
+    }
+  }
+
+  /**
+   * Evict the target bean cache for each owning OneToOne property on insert or delete.
+   */
+  private void cacheDeleteImportedOneToOne(EntityBean entityBean, CacheChangeSet changeSet) {
+    for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
+      imported.cacheDeleteOneToOneOwned(entityBean, changeSet);
+    }
+  }
+
+  /**
+   * Clear the target bean cache for each owning OneToOne property on bulk delete-by-ids.
+   */
+  private void cacheClearImportedOneToOne(CacheChangeSet changeSet) {
+    for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
+      imported.cacheClearOneToOneOwned(changeSet);
+    }
+  }
+
+  /**
+   * Evict inverse caches for any imported FK properties whose value changed in this update.
+   * Handles collection-ids caches (ManyToOne FK reassignment) and bean caches (owning OneToOne FK change).
+   */
+  private void cacheUpdateImportedFKs(PersistRequestBean<T> updateRequest, CacheChangeSet changeSet) {
+    boolean[] dirty = updateRequest.dirtyProperties();
+    if (dirty == null) {
+      return;
+    }
+    EntityBean entityBean = updateRequest.entityBean();
+    for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
+      int propIdx = imported.propertyIndex();
+      if (propIdx < dirty.length && dirty[propIdx]) {
+        imported.cacheUpdateFKchange(entityBean, updateRequest.origValue(imported), changeSet);
+      }
     }
   }
 
@@ -828,6 +886,7 @@ final class BeanDescriptorCacheHelp<T> {
 
     } else {
       queryCacheClear(changeSet);
+      cacheUpdateImportedFKs(updateRequest, changeSet);
       if (beanCache == null) {
         // query caching only
         return;
@@ -858,15 +917,17 @@ final class BeanDescriptorCacheHelp<T> {
       changeSet.addInvalidate(desc);
       return;
     }
-    if (noCaching) {
+    if (noCaching && !cacheNotifyOneToOneOwner) {
       return;
     }
-    changeSet.addClearQuery(desc);
-    // inserts don't invalidate the bean cache
-    if (tableIUD.isUpdateOrDelete()) {
-      changeSet.addClearBean(desc);
+    if (!noCaching) {
+      changeSet.addClearQuery(desc);
+      // inserts don't invalidate the bean cache
+      if (tableIUD.isUpdateOrDelete()) {
+        changeSet.addClearBean(desc);
+      }
     }
-    // any change invalidates the collection IDs cache
+    // any change invalidates the collection IDs cache and owning OneToOne target bean caches
     for (BeanPropertyAssocOne<?> imported : propertiesOneImported) {
       imported.cacheClear(changeSet);
     }

@@ -48,7 +48,7 @@ public final class TableModState implements QueryCacheEntryValidate, ServerCache
   boolean isValid(Set<String> tables, Instant sinceTime) {
     for (String tableName : tables) {
       final var modTime = tableModStamp.get(tableName);
-      if (modTime != null && !modTime.isBefore(sinceTime)) {
+      if (modTime != null && modTime.compareTo(sinceTime) > 0) {
         if (log.isLoggable(TRACE)) {
           log.log(TRACE, "Invalidate on table:{0}", tableName);
         }

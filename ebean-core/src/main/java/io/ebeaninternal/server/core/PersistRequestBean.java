@@ -57,6 +57,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private boolean statelessUpdate;
   private boolean notifyCache;
   /**
+   * Snapshot of origValues taken before intercept.setLoaded() clears them.
+   * Used so that cache update code can access old FK values after setLoaded().
+   */
+  private Object[] capturedOrigValues;
+  /**
    * Flag used to detect when only many properties where updated via a cascade. Used to ensure
    * appropriate caches are updated in that case.
    */
@@ -710,7 +715,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return the original / old value for the given property.
    */
   public Object origValue(BeanProperty prop) {
-    return intercept.origValue(prop.propertyIndex());
+    int idx = prop.propertyIndex();
+    if (capturedOrigValues != null && idx < capturedOrigValues.length) {
+      return capturedOrigValues[idx];
+    }
+    return intercept.origValue(idx);
   }
 
   @Override
@@ -867,6 +876,15 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (type == Type.UPDATE) {
       // get the dirty properties for notify cache & orphanRemoval of vanilla collection detection
       dirtyProperties = intercept.dirtyProperties();
+      // snapshot orig values before setLoaded() clears them - needed by cache FK-eviction logic
+      if (dirtyProperties != null && notifyCache) {
+        capturedOrigValues = new Object[dirtyProperties.length];
+        for (int i = 0; i < dirtyProperties.length; i++) {
+          if (dirtyProperties[i]) {
+            capturedOrigValues[i] = intercept.origValue(i);
+          }
+        }
+      }
     }
     if (isChangeLog) {
       changeLog();
