@@ -588,14 +588,17 @@ final class BeanDescriptorCacheHelp<T> {
    */
   EntityBean loadBeanDirect(Object id, boolean unmodifiable, CachedBeanData data, PersistenceContext context) {
     id = desc.convertId(id);
-    EntityBean bean = context == null ? null : (EntityBean) desc.contextGet(context, id);;
+    EntityBean bean = context == null ? null : (EntityBean) desc.contextGet(context, id);
     if (bean == null) {
       bean = desc.createEntityBean2(unmodifiable);
       desc.setId(id, bean);
+      if (context == null) {
+        // a context is required to resolve @ManyToOne references when converting
+        // the cached data to the bean - even for unmodifiable beans (which are
+        // not themselves registered in the persistence context)
+        context = new DefaultPersistenceContext();
+      }
       if (!unmodifiable) {
-        if (context == null) {
-          context = new DefaultPersistenceContext();
-        }
         desc.contextPut(context, id, bean);
         EntityBeanIntercept ebi = bean._ebean_getIntercept();
         ebi.setPersistenceContext(context);

@@ -5,6 +5,7 @@ import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.InterceptReadWrite;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarDataReader;
@@ -421,18 +422,20 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       if (embedded) {
         setValue(bean, targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData, context));
       } else {
-        setValue(bean, refBean(targetDescriptor, cacheData, context));
+        // when the owning bean is unmodifiable the reference must also be unmodifiable
+        final boolean unmodifiable = !(bean._ebean_getIntercept() instanceof InterceptReadWrite);
+        setValue(bean, refBean(targetDescriptor, cacheData, context, unmodifiable));
       }
     }
   }
 
-  private Object refBean(BeanDescriptor<?> desc, Object id, PersistenceContext context) {
+  private Object refBean(BeanDescriptor<?> desc, Object id, PersistenceContext context, boolean unmodifiable) {
     if (id instanceof String) {
       id = desc.idProperty().scalarType.parse((String) id);
     }
-    Object bean = desc.contextGet(context, id);
+    Object bean = context == null ? null : desc.contextGet(context, id);
     if (bean == null) {
-      bean = desc.createRef(id, context);
+      bean = desc.createReference(unmodifiable, false, id, context);
     }
     return bean;
   }
