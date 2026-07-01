@@ -1034,7 +1034,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @SuppressWarnings("unchecked")
   private <T> T findId(SpiQuery<T> query) {
     query.setType(Type.BEAN);
-    if (SpiQuery.Mode.NORMAL == query.mode() && !query.isForceHitDatabase() && !query.isAsOfQuery()) {
+    if (SpiQuery.Mode.NORMAL == query.mode() && !query.isForceHitDatabase()) {
       // See if we can skip doing the fetch completely by getting the bean from the
       // persistence context or the bean cache
       T bean = findIdCheckPersistenceContextAndCache(query, query.getId());
