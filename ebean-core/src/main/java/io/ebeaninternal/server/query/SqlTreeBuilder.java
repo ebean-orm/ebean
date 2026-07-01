@@ -227,7 +227,7 @@ public final class SqlTreeBuilder {
       alias.addJoin(queryDetail.getFetchPaths(), desc);
       alias.addJoin(predicates.predicateIncludes(), desc);
       alias.addJoin(formula2JoinIncludes, desc);
-      alias.addManyWhereJoins(manyWhereJoins.propertyNames());
+      alias.addManyWhereJoins(manyWhereJoins.propertyNames(), desc);
       // build set of table alias
       alias.buildAlias();
       predicates.parseTableAlias(alias);
@@ -398,7 +398,7 @@ public final class SqlTreeBuilder {
     // the 'select' part of the query. We may need to add other joins to
     // support the predicates or order by clauses.
 
-    // remove ManyWhereJoins from the predicateIncludes
+    // remove ManyWhereJoins from the predicateIncludes (they are handled as manyWhere correlated joins)
     predicateIncludes.removeAll(manyWhereJoins.propertyNames());
     predicateIncludes.addAll(predicates.orderByIncludes());
 
@@ -778,11 +778,15 @@ public final class SqlTreeBuilder {
      * Create a SqlTreeNodeExtraJoin, register and return it.
      */
     private SqlTreeNodeExtraJoin createJoinLeaf(String propertyName) {
+      SqlTreeNodeExtraJoin extraJoin = joinRegister.get(propertyName);
+      if (extraJoin != null) {
+        return extraJoin;
+      }
       ExtraJoin extra = desc.extraJoin(propertyName);
       if (extra == null) {
         return null;
       } else {
-        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
+        extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
         joinRegister.put(propertyName, extraJoin);
         return extraJoin;
       }
@@ -803,30 +807,30 @@ public final class SqlTreeBuilder {
           // no parent possible(parent is root)
           return childJoin;
 
-        } else {
-          // look in register ...
-          String parentPropertyName = includeProp.substring(0, dotPos);
-          if (selectIncludes.contains(parentPropertyName)) {
-            // parent already handled by select
-            return childJoin;
-          }
-
-          SqlTreeNodeExtraJoin parentJoin = joinRegister.get(parentPropertyName);
-          if (parentJoin == null) {
-            // we need to create this the parent implicitly...
-            parentJoin = createJoinLeaf(parentPropertyName);
-          }
-
-          // formula2 dependency joins must appear before formula2 property joins that reference
-          // their table aliases — use addChildFirst to push dependencies ahead
-          if (isFormula2Dependency(childJoin.prefix())) {
-            parentJoin.addChildFirst(childJoin);
-          } else {
-            parentJoin.addChild(childJoin);
-          }
-          childJoin = parentJoin;
-          includeProp = parentPropertyName;
         }
+        String parentPropertyName = includeProp.substring(0, dotPos);
+        if (desc.isEmbeddedPath(parentPropertyName)) {
+          // digging in embedded property, skip to parent
+          includeProp = parentPropertyName;
+          continue;
+        }
+        // look in register ...
+        if (selectIncludes.contains(parentPropertyName)) {
+          // parent already handled by select
+          return childJoin;
+        }
+
+        SqlTreeNodeExtraJoin parentJoin = createJoinLeaf(parentPropertyName);
+
+        // formula2 dependency joins must appear before formula2 property joins that reference
+        // their table aliases — use addChildFirst to push dependencies ahead
+        if (isFormula2Dependency(childJoin.prefix())) {
+          parentJoin.addChildFirst(childJoin);
+        } else {
+          parentJoin.addChild(childJoin);
+        }
+        childJoin = parentJoin;
+        includeProp = parentPropertyName;
       }
     }
 

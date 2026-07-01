@@ -17,14 +17,13 @@ public final class ElPropertyChainBuilder {
 
   private final String expression;
   private final List<ElPropertyValue> chain = new ArrayList<>();
-  private boolean embedded;
-  private boolean containsMany;
+  private boolean containsMany = false;
+  private boolean embedded = false;
 
   /**
    * Create with the original expression.
    */
-  public ElPropertyChainBuilder(boolean embedded, String expression) {
-    this.embedded = embedded;
+  public ElPropertyChainBuilder(String expression) {
     this.expression = expression;
   }
 
@@ -32,12 +31,16 @@ public final class ElPropertyChainBuilder {
     return containsMany;
   }
 
-  public void setContainsMany() {
-    this.containsMany = true;
-  }
-
   public String expression() {
     return expression;
+  }
+
+  /**
+   * Mark the chain as going through an embedded property.
+   * This affects how the prefix (table alias) is computed for SQL generation.
+   */
+  public void setEmbedded(boolean embedded) {
+    this.embedded = embedded;
   }
 
   /**
@@ -48,6 +51,9 @@ public final class ElPropertyChainBuilder {
       throw new NullPointerException("element null in expression " + expression);
     }
     chain.add(element);
+    if (element.containsMany()) {
+      containsMany = true;
+    }
     return this;
   }
 
@@ -55,13 +61,6 @@ public final class ElPropertyChainBuilder {
    * Build the immutable ElGetChain from the build information.
    */
   public ElPropertyChain build() {
-    return new ElPropertyChain(containsMany, embedded, expression, chain.toArray(new ElPropertyValue[0]));
-  }
-
-  /**
-   * Permits to set whole chain as embedded when the leaf is embedded
-   */
-  public void setEmbedded(boolean embedded) {
-    this.embedded = embedded;
+    return new ElPropertyChain(expression, containsMany, embedded, chain.toArray(new ElPropertyValue[0]));
   }
 }

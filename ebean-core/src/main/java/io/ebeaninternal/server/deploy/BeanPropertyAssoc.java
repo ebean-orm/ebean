@@ -161,13 +161,7 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
   ElPropertyValue createElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
     // associated or embedded bean
     BeanDescriptor<?> embDesc = targetDescriptor();
-    if (chain == null) {
-      chain = new ElPropertyChainBuilder(isEmbedded(), propName);
-    }
     chain.add(this);
-    if (containsMany()) {
-      chain.setContainsMany();
-    }
     return embDesc.buildElGetValue(remainder, chain, propertyDeploy);
   }
 
@@ -217,6 +211,10 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * Return the BeanDescriptor of the target.
    */
   public BeanDescriptor<T> targetDescriptor() {
+    if (targetDescriptor == null) {
+      // lazily resolve for association properties inside an @Embeddable used as override copy
+      targetDescriptor = descriptor.descriptor(targetType);
+    }
     return targetDescriptor;
   }
 
