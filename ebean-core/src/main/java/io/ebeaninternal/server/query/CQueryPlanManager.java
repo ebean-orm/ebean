@@ -62,17 +62,10 @@ public final class CQueryPlanManager implements QueryPlanManager {
 
   private List<MetaQueryPlan> collectPlans(QueryPlanRequest request) {
     CQueryPlanRequest req = new CQueryPlanRequest(transactionManager, request, plans.keySet().iterator());
-      while (req.hasNext()) {
-        req.nextCapture();
-      }
-      if (!connection.getAutoCommit()) {
-        // CHECKME: commit or rollback here?
-        // arguments for rollback: the collecting should never modify data.
-        // if there are collectors that may copy the plan into tables, it's up to the collector to
-        // commit the transaction.
-        connection.rollback();
-      }
-      return req.plans();
+    while (req.hasNext()) {
+      req.nextCapture();
+    }
+    return req.plans();
   }
 
   public SpiDbQueryPlan collectPlan(Connection connection, SpiQueryPlan queryPlan, BindCapture last) {
