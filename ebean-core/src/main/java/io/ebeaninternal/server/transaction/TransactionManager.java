@@ -257,8 +257,8 @@ public class TransactionManager implements SpiTransactionManager {
   }
 
   @Override
-  public final Connection queryPlanConnection() throws SQLException {
-    return dataSourceSupplier.connection(null);
+  public final Connection queryPlanConnection(Object tenantId) throws SQLException {
+    return dataSourceSupplier.connection(tenantId);
   }
 
   @Override

@@ -23,6 +23,7 @@ public final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
   private long captureCount;
   private long captureMicros;
   private Instant whenCaptured;
+  private Object tenantId;
 
   public DQueryPlanOutput(Class<?> beanType, String label, String hash, String sql, ProfileLocation profileLocation, String bind, String plan) {
     this.beanType = beanType;
@@ -39,17 +40,11 @@ public final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
     return hash;
   }
 
-  /**
-   * Return the associated bean.
-   */
   @Override
   public Class<?> beanType() {
     return beanType;
   }
 
-  /**
-   * Return the query label if set.
-   */
   @Override
   public String label() {
     return label;
@@ -60,42 +55,31 @@ public final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
     return profileLocation;
   }
 
-  /**
-   * Return the sql of query.
-   */
   @Override
   public String sql() {
     return sql;
   }
 
-  /**
-   * Return a description of the bind values used.
-   */
   @Override
   public String bind() {
     return bind;
   }
 
-  /**
-   * Return the query plan.
-   */
   @Override
   public String plan() {
     return plan;
   }
 
-  /**
-   * Return the query execution time associated with the capture of bind values used
-   * to build the query plan.
-   */
+  @Override
+  public Object tenantId() {
+    return tenantId;
+  }
+
   @Override
   public long queryTimeMicros() {
     return queryTimeMicros;
   }
 
-  /**
-   * Return the total count of times bind capture has occurred.
-   */
   @Override
   public long captureCount() {
     return captureCount;
@@ -113,18 +97,24 @@ public final class DQueryPlanOutput implements MetaQueryPlan, SpiDbQueryPlan {
 
   @Override
   public String toString() {
-    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName()) + " planHash:" + hash + " label:" + label + " queryTimeMicros:" + queryTimeMicros + " captureCount:" + captureCount + "\n SQL:" + sql + "\nBIND:" + bind + "\nPLAN:" + plan;
+    return " BeanType:" + ((beanType == null) ? "" : beanType.getSimpleName())
+      + " planHash:" + hash
+      + " label:" + label
+      + " queryTimeMicros:" + queryTimeMicros
+      + " captureCount:" + captureCount
+      + (tenantId == null ? "" : (" tenant:" + tenantId))
+      + "\n SQL:" + sql
+      + "\nBIND:" + bind
+      + "\nPLAN:" + plan;
   }
 
-  /**
-   * Additionally set the query execution time and the number of bind captures.
-   */
   @Override
-  public DQueryPlanOutput with(long queryTimeMicros, long captureCount, long captureMicros, Instant whenCaptured) {
+  public DQueryPlanOutput with(long queryTimeMicros, long captureCount, long captureMicros, Instant whenCaptured, Object tenantId) {
     this.queryTimeMicros = queryTimeMicros;
     this.captureCount = captureCount;
     this.captureMicros = captureMicros;
     this.whenCaptured = whenCaptured;
+    this.tenantId = tenantId;
     return this;
   }
 }
