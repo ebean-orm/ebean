@@ -60,10 +60,10 @@ public class TestDeleteByQuery extends BaseTestCase {
       .delete();
 
     List<String> loggedSql = LoggedSql.stop();
-    assertThat(loggedSql).hasSize(6);
+    assertThat(loggedSql).hasSize(8);
     if (isH2()) {
       assertThat(loggedSql.get(0)).contains("select t0.id from article t0 where t0.name = ? limit 10");
-      assertThat(loggedSql.get(3)).contains("select t0.id from article t0 where t0.name = ? limit 20");
+      assertThat(loggedSql.get(4)).contains("select t0.id from article t0 where t0.name = ? limit 20");
     }
   }
 
