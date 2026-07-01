@@ -54,7 +54,7 @@ final class SqlTreeAlias {
    */
   public void addJoin(Set<String> propJoins, STreeType desc) {
     if (propJoins == null) {
-        return;
+      return;
     }
     for (String propJoin : propJoins) {
       addPropertyJoin(propJoin, joinProps, desc);

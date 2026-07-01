@@ -18,6 +18,7 @@ public final class ElPropertyChainBuilder {
   private final String expression;
   private final List<ElPropertyValue> chain = new ArrayList<>();
   private boolean containsMany = false;
+  private boolean embedded = false;
 
   /**
    * Create with the original expression.
@@ -32,6 +33,14 @@ public final class ElPropertyChainBuilder {
 
   public String expression() {
     return expression;
+  }
+
+  /**
+   * Mark the chain as going through an embedded property.
+   * This affects how the prefix (table alias) is computed for SQL generation.
+   */
+  public void setEmbedded(boolean embedded) {
+    this.embedded = embedded;
   }
 
   /**
@@ -52,6 +61,6 @@ public final class ElPropertyChainBuilder {
    * Build the immutable ElGetChain from the build information.
    */
   public ElPropertyChain build() {
-    return new ElPropertyChain(expression, containsMany, chain.toArray(new ElPropertyValue[0]));
+    return new ElPropertyChain(expression, containsMany, embedded, chain.toArray(new ElPropertyValue[0]));
   }
 }

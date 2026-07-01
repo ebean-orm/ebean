@@ -211,6 +211,10 @@ public abstract class BeanPropertyAssoc<T> extends BeanProperty implements STree
    * Return the BeanDescriptor of the target.
    */
   public BeanDescriptor<T> targetDescriptor() {
+    if (targetDescriptor == null) {
+      // lazily resolve for association properties inside an @Embeddable used as override copy
+      targetDescriptor = descriptor.descriptor(targetType);
+    }
     return targetDescriptor;
   }
 

@@ -398,8 +398,7 @@ public final class SqlTreeBuilder {
     // the 'select' part of the query. We may need to add other joins to
     // support the predicates or order by clauses.
 
-    // remove ManyWhereJoins from the predicateIncludes and orderByIncludes
-    predicates.orderByIncludes().removeAll(manyWhereJoins.propertyNames());
+    // remove ManyWhereJoins from the predicateIncludes (they are handled as manyWhere correlated joins)
     predicateIncludes.removeAll(manyWhereJoins.propertyNames());
     predicateIncludes.addAll(predicates.orderByIncludes());
 

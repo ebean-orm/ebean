@@ -287,9 +287,11 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
     if (embedded) {
       String embName = remainder;
+      String embRemainder = null;
       int basePos = remainder.indexOf('.');
       if (basePos > -1) {
         embName = remainder.substring(0, basePos);
+        embRemainder = remainder.substring(basePos + 1);
       }
       BeanProperty embProp = embeddedPropsMap.get(embName);
 
@@ -297,6 +299,15 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         String msg = "Embedded Property " + embName + " not found in " + fullName();
         throw new PersistenceException(msg);
       }
+      chain.add(this);
+      if (embRemainder != null && embProp instanceof BeanPropertyAssocOne) {
+        // @ManyToOne using the overridden property, e.g. "ma_country_code" instead of "country_code")
+        return embProp.buildElPropertyValue(propName, embRemainder, chain, propertyDeploy);
+      }
+      // direct scalar/assoc access within embedded — mark as embedded so the prefix
+      // strips the embedded segment (keeps parent table alias, not the embedded segment)
+      chain.setEmbedded(true);
+      return chain.add(embProp).build();
     }
     return createElPropertyValue(propName, remainder, chain, propertyDeploy);
   }

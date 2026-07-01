@@ -42,15 +42,22 @@ public final class ElPropertyChain implements ElPropertyValue {
   private final ScalarType<?> scalarType;
   private final ElPropertyValue lastElPropertyValue;
 
-  public ElPropertyChain(String expression, boolean containsMany, ElPropertyValue chain[]) {
+  public ElPropertyChain(String expression, boolean containsMany, boolean embedded, ElPropertyValue[] chain) {
     this.chain = chain;
     this.expression = expression;
     this.containsMany = containsMany;
-    
+
     int dotPos = expression.lastIndexOf('.');
     if (dotPos > -1) {
       this.name = expression.substring(dotPos + 1);
-      this.prefix = expression.substring(0, dotPos);
+      if (embedded) {
+        // embedded segments are transparent (share parent table) — strip the embedded
+        // segment from the prefix so the alias points to the parent join, not the embedded
+        int embPos = expression.lastIndexOf('.', dotPos - 1);
+        this.prefix = embPos == -1 ? null : expression.substring(0, embPos);
+      } else {
+        this.prefix = expression.substring(0, dotPos);
+      }
     } else {
       this.prefix = null;
       this.name = expression;

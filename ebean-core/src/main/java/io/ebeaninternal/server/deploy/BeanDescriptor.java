@@ -2404,7 +2404,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       }
       // this method is an entry-point, although it introduces recursive calls via
       // buildElPropertyValue -> createElPropertyValue -> buildElGetValue (back to here)
-      // it seams we can initialize ElPropertyChainBuilder at this point and skip further checks.
+      // it seems we can initialize ElPropertyChainBuilder at this point and skip further checks.
       if (chain == null) {
         chain = new ElPropertyChainBuilder(propName);
       }
@@ -2868,7 +2868,9 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       BeanProperty beanProperty = elGetValue.beanProperty();
       if (beanProperty instanceof BeanPropertyAssoc<?>) {
         BeanPropertyAssoc<?> assocProp = (BeanPropertyAssoc<?>) beanProperty;
-        return new ExtraJoin(assocProp, elGetValue.containsMany());
+        if (!assocProp.isEmbedded()) {
+          return new ExtraJoin(assocProp, elGetValue.containsMany());
+        }
       }
     }
     return null;
