@@ -100,6 +100,12 @@ public final class CQueryPredicates {
         // bind the asOf value for each table alias as part of the from/join clauses
         // there is one effective date predicate per table alias
         Timestamp asOf = query.getAsOf();
+        if (asOf == null) {
+          // findVersions()/findVersionsBetween() have no explicit asOf but can still
+          // join to other @History tables - use the current time for those join predicates
+          // (i.e. join to the related history entities as they are now)
+          asOf = new Timestamp(System.currentTimeMillis());
+        }
         dataBind.append("asOf ").append(asOf);
         for (int i = 0; i < asOfTableCount * binder.getAsOfBindCount(); i++) {
           binder.bindObject(dataBind, asOf);

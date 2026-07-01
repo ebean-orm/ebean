@@ -184,6 +184,32 @@ public final class CacheChangeSet {
     return manyChangeMap.computeIfAbsent(key, ManyChange::new);
   }
 
+  public void merge(CacheChangeSet other) {
+    if (other == null) {
+      return;
+    }
+
+    this.entries.addAll(other.entries);
+    this.touchedTables.addAll(other.touchedTables);
+    this.queryCaches.addAll(other.queryCaches);
+    this.beanCaches.addAll(other.beanCaches);
+
+    other.beanRemoveMap.forEach((desc, remove) ->
+      this.beanRemoveMap.merge(desc, remove, (a, b) -> {
+        a.merge(b);
+        return a;
+      })
+    );
+
+    other.manyChangeMap.forEach((key, change) ->
+      this.manyChangeMap.merge(key, change, (a, b) -> {
+        a.merge(b);
+        return a;
+      })
+    );
+  }
+
+
   /**
    * Changes for a specific many property.
    */
@@ -214,6 +240,32 @@ public final class CacheChangeSet {
         removes.add(parentKey);
       }
     }
+
+    void merge(ManyChange other) {
+      // clear dominates everything
+      if (other.clear) {
+        this.clear = true;
+        this.removes.clear();
+        this.puts.clear();
+        return;
+      }
+
+      if (this.clear) {
+        // already clearing, ignore finer changes
+        return;
+      }
+
+      // merge puts (put overrides remove)
+      this.puts.putAll(other.puts);
+
+      // merge removes, but do not remove something we just put
+      for (String key : other.removes) {
+        if (!this.puts.containsKey(key)) {
+          this.removes.add(key);
+        }
+      }
+    }
+
 
     /**
      * Put entry for the given parentId.
