@@ -54,6 +54,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   private String deleteByParentIdInSql;
   private BeanPropertyAssocMany<?> relationshipProperty;
   private boolean cacheNotifyRelationship;
+  private boolean cacheNotifyOwningOneToOne;
 
   /**
    * Create based on deploy information of an EmbeddedId.
@@ -143,6 +144,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   void initialisePostTarget() {
     this.cacheNotifyRelationship = isCacheNotifyRelationship();
+    this.cacheNotifyOwningOneToOne = oneToOne && !oneToOneExported && targetDescriptor.isBeanCaching();
   }
 
   /**
@@ -165,17 +167,30 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   /**
-   * Clear the L2 relationship cache for this property.
+   * Return true if this owning OneToOne property requires target bean cache eviction on change.
+   */
+  boolean isCacheNotifyOwningOneToOne() {
+    return cacheNotifyOwningOneToOne;
+  }
+
+  /**
+   * Clear the L2 relationship cache for this property (used from beanCacheApplyInvalidate).
    */
   void cacheClear() {
     if (cacheNotifyRelationship) {
       targetDescriptor.cacheManyPropClear(relationshipProperty.name());
+    }
+    if (cacheNotifyOwningOneToOne) {
+      targetDescriptor.clearBeanCache();
     }
   }
 
   void cacheClear(CacheChangeSet changeSet) {
     if (cacheNotifyRelationship) {
       changeSet.addManyClear(targetDescriptor, relationshipProperty.name());
+    }
+    if (cacheNotifyOwningOneToOne) {
+      changeSet.addClearBean(targetDescriptor);
     }
   }
 
@@ -194,6 +209,66 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
             final String parentKey = targetDescriptor.cacheKey(parentId);
             changeSet.addManyRemove(targetDescriptor, relationshipProperty.name(), parentKey);
           }
+        }
+      }
+    }
+  }
+
+  /**
+   * Evict the target's bean cache entry when this owning OneToOne bean is inserted or deleted.
+   */
+  void cacheDeleteOneToOneOwned(EntityBean bean, CacheChangeSet changeSet) {
+    if (cacheNotifyOwningOneToOne) {
+      Object assocBean = getValue(bean);
+      if (assocBean != null) {
+        Object targetId = targetDescriptor.id(assocBean);
+        if (targetId != null) {
+          changeSet.addBeanRemove(targetDescriptor, targetId);
+        }
+      }
+    }
+  }
+
+  /**
+   * Clear the target's entire bean cache when owning OneToOne beans are deleted by IDs.
+   */
+  void cacheClearOneToOneOwned(CacheChangeSet changeSet) {
+    if (cacheNotifyOwningOneToOne) {
+      changeSet.addClearBean(targetDescriptor);
+    }
+  }
+
+  /**
+   * Evict the inverse caches for BOTH old and new targets when the FK changes on update.
+   * Handles collection-ids caches (ManyToOne) and bean caches (owning OneToOne).
+   */
+  void cacheUpdateFKchange(EntityBean bean, Object origAssocBean, CacheChangeSet changeSet) {
+    Object newAssocBean = getValue(bean);
+    if (cacheNotifyRelationship) {
+      if (origAssocBean != null) {
+        Object oldId = targetDescriptor.id(origAssocBean);
+        if (oldId != null) {
+          changeSet.addManyRemove(targetDescriptor, relationshipProperty.name(), targetDescriptor.cacheKey(oldId));
+        }
+      }
+      if (newAssocBean != null) {
+        Object newId = targetDescriptor.id(newAssocBean);
+        if (newId != null) {
+          changeSet.addManyRemove(targetDescriptor, relationshipProperty.name(), targetDescriptor.cacheKey(newId));
+        }
+      }
+    }
+    if (cacheNotifyOwningOneToOne) {
+      if (origAssocBean != null) {
+        Object oldId = targetDescriptor.id(origAssocBean);
+        if (oldId != null) {
+          changeSet.addBeanRemove(targetDescriptor, oldId);
+        }
+      }
+      if (newAssocBean != null) {
+        Object newId = targetDescriptor.id(newAssocBean);
+        if (newId != null) {
+          changeSet.addBeanRemove(targetDescriptor, newId);
         }
       }
     }

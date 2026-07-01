@@ -15,8 +15,9 @@ class TableModStateTest {
   private final TableModState tableModState = new TableModState();
 
   @Test
-  void isValid() {
+  void isValid() throws InterruptedException {
     Instant before = Instant.now();
+    Thread.sleep(5);
 
     tableModState.touch(setOf("one", "two", "three"));
 
