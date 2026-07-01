@@ -69,6 +69,7 @@ public final class InternalConfiguration {
   private final Binder binder;
   private final DeployCreateProperties deployCreateProperties;
   private final DeployUtil deployUtil;
+  private final DataSourceSupplier dataSourceSupplier;
   private final BeanDescriptorManager beanDescriptorManager;
   private final CQueryEngine cQueryEngine;
   private final ClusterManager clusterManager;
@@ -108,6 +109,7 @@ public final class InternalConfiguration {
     this.cacheManager = initCacheManager();
 
     this.dtoBeanManager = new DtoBeanManager(typeManager);
+    this.dataSourceSupplier = createDataSourceSupplier();
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy();
     beanDescriptorManager.scheduleBackgroundTrim();
@@ -323,7 +325,7 @@ public final class InternalConfiguration {
 
     TransactionManagerOptions options =
       new TransactionManagerOptions(server, notifyL2CacheInForeground, config, scopeManager, clusterManager, backgroundExecutor,
-        beanDescriptorManager, dataSource(), profileHandler(), logManager,
+        beanDescriptorManager, dataSourceSupplier, profileHandler(), logManager,
         tableModState, cacheNotify);
 
     return new TransactionManager(options);
@@ -338,9 +340,16 @@ public final class InternalConfiguration {
   }
 
   /**
-   * Return the DataSource supplier based on the tenancy mode.
+   * Return the DataSource supplier (multi-tenant aware) based on the tenancy mode.
    */
-  private DataSourceSupplier dataSource() {
+  public DataSourceSupplier getDataSourceSupplier() {
+    return dataSourceSupplier;
+  }
+
+  /**
+   * Create the DataSource supplier based on the tenancy mode.
+   */
+  private DataSourceSupplier createDataSourceSupplier() {
     switch (config.getTenantMode()) {
       case DB:
       case DB_WITH_MASTER:
