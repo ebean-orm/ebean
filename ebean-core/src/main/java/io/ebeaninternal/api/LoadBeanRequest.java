@@ -100,7 +100,9 @@ public final class LoadBeanRequest extends LoadRequest {
     query.setLoadDescription(mode(), description());
     if (lazy) {
       query.setLazyLoadBatchSize(loadBuffer.batchSize());
-      if (alreadyLoaded) {
+      if (alreadyLoaded || !loadCache) {
+        // alreadyLoaded: bean is being re-loaded, skip the cache to avoid a stale hit
+        // !loadCache: parent context disabled cache (e.g. CacheMode.OFF or asOf query),
         query.setBeanCacheMode(CacheMode.OFF);
       }
     } else {

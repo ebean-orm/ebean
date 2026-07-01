@@ -371,6 +371,10 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   public final Query<T> asOf(Timestamp asOfDateTime) {
     this.temporalMode = (asOfDateTime != null) ? TemporalMode.AS_OF : TemporalMode.CURRENT;
     this.asOf = asOfDateTime;
+    if (asOfDateTime != null) {
+      // bean cache holds current state only — asOf queries must bypass it entirely
+      this.useBeanCache = CacheMode.OFF;
+    }
     return this;
   }
 
