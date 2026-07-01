@@ -300,9 +300,14 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
         throw new PersistenceException(msg);
       }
       chain.add(this);
-      if (embRemainder != null && embProp instanceof BeanPropertyAssocOne) {
-        // @ManyToOne using the overridden property, e.g. "ma_country_code" instead of "country_code")
-        return embProp.buildElPropertyValue(propName, embRemainder, chain, propertyDeploy);
+      if (embRemainder != null) {
+        if (embProp instanceof BeanPropertyAssocOne) {
+          // @ManyToOne using the overridden property, e.g. "ma_country_code" instead of "country_code")
+          return embProp.buildElPropertyValue(propName, embRemainder, chain, propertyDeploy);
+        }
+        // scalar (or non-navigable) leaf with a further path segment - invalid path
+        String msg = "Embedded Property " + embName + "." + embRemainder + " not found in " + fullName();
+        throw new PersistenceException(msg);
       }
       // direct scalar/assoc access within embedded — mark as embedded so the prefix
       // strips the embedded segment (keeps parent table alias, not the embedded segment)
