@@ -458,8 +458,8 @@ public final class DB {
   /**
    * Same as {@link #checkUniqueness(Object)} but with given transaction.
    */
-  public static Set<Property> checkUniqueness(Object bean, Transaction transaction) {
-    return getDefault().checkUniqueness(bean, transaction);
+  public static Set<Property> checkUniqueness(Object bean, Transaction transaction, boolean useQueryCache, boolean skipClean) {
+    return getDefault().checkUniqueness(bean, transaction, useQueryCache, skipClean);
   }
 
   /**
