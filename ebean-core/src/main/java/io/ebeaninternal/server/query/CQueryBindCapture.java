@@ -84,9 +84,12 @@ final class CQueryBindCapture implements SpiQueryBindCapture {
 
     SpiDbQueryPlan queryPlan;
     try (Connection connection = transactionManager.queryPlanConnection(tenantId)) {
-      queryPlan = manager.collectPlan(connection, this.queryPlan, last);
-      if (!connection.getAutoCommit()) {
-        connection.rollback();
+      try {
+        queryPlan = manager.collectPlan(connection, this.queryPlan, last);
+      } finally {
+        if (!connection.getAutoCommit()) {
+          connection.rollback();
+        }
       }
     } catch (SQLException e) {
       CoreLog.log.log(ERROR, "Error during query plan collection", e);
