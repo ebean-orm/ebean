@@ -9,6 +9,7 @@ import io.ebean.config.CurrentTenantProvider;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.util.AnnotationUtil;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -32,6 +33,7 @@ final class DefaultCacheHolder {
   private final ServerCacheOptions queryDefault;
   private final CurrentTenantProvider tenantProvider;
   private final QueryCacheEntryValidate queryCacheEntryValidate;
+  private final boolean tenantPartitionedCache;
 
   DefaultCacheHolder(CacheManagerOptions builder) {
     this.cacheFactory = builder.getCacheFactory();
@@ -39,6 +41,7 @@ final class DefaultCacheHolder {
     this.queryDefault = builder.getQueryDefault();
     this.tenantProvider = builder.getCurrentTenantProvider();
     this.queryCacheEntryValidate = builder.getQueryCacheEntryValidate();
+    this.tenantPartitionedCache = builder.isTenantPartitionedCache();
   }
 
   void visitMetrics(MetricVisitor visitor) {
@@ -56,16 +59,31 @@ final class DefaultCacheHolder {
     return getCacheInternal(beanType, ServerCacheType.COLLECTION_IDS, collectionProperty);
   }
 
+  private String tenantKey(String beanName) {
+    if (tenantPartitionedCache) {
+      return beanName + '.' + tenantProvider.currentId();
+    }
+    return beanName;
+  }
+
   private String key(String beanName, ServerCacheType type) {
+    if (tenantPartitionedCache) {
+      return beanName + '.' + tenantProvider.currentId() + type.code();
+    }
     return beanName + type.code();
   }
 
   private String key(String beanName, String collectionProperty, ServerCacheType type) {
-    if (collectionProperty != null) {
-      return beanName + "." + collectionProperty + type.code();
-    } else {
-      return beanName + type.code();
+    StringBuilder sb = new StringBuilder(beanName.length() + 64);
+    sb.append(beanName);
+    if (tenantPartitionedCache) {
+      sb.append('.').append(tenantProvider.currentId());
     }
+    if (collectionProperty != null) {
+      sb.append('.').append(collectionProperty);
+    }
+    sb.append(type.code());
+    return sb.toString();
   }
 
   /**
@@ -82,12 +100,15 @@ final class DefaultCacheHolder {
     if (type == ServerCacheType.COLLECTION_IDS) {
       lock.lock();
       try {
-        collectIdCaches.computeIfAbsent(beanType.getName(), s -> new ConcurrentSkipListSet<>()).add(key);
+        collectIdCaches.computeIfAbsent(tenantKey(beanType.getName()), s -> new ConcurrentSkipListSet<>()).add(key);
       } finally {
         lock.unlock();
       }
     }
-    return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options, tenantProvider, queryCacheEntryValidate));
+    // in partitioned mode each ServerCache instance is already tenant-scoped via its key,
+    // so the tenantProvider is not needed inside the cache itself
+    CurrentTenantProvider cacheProvider = tenantPartitionedCache ? null : tenantProvider;
+    return cacheFactory.createCache(new ServerCacheConfig(type, key, shortName, options, cacheProvider, queryCacheEntryValidate));
   }
 
   void clearAll() {
@@ -100,15 +121,73 @@ final class DefaultCacheHolder {
 
   public void clear(String name) {
     log.log(DEBUG, "clear {0}", name);
-    clearIfExists(key(name, ServerCacheType.QUERY));
-    clearIfExists(key(name, ServerCacheType.BEAN));
-    clearIfExists(key(name, ServerCacheType.NATURAL_KEY));
-    Set<String> keys = collectIdCaches.get(name);
-    if (keys != null) {
-      for (String collectionIdKey : keys) {
-        clearIfExists(collectionIdKey);
+    if (tenantPartitionedCache) {
+      // In partitioned mode, tenantProvider.currentId() may be null/wrong on a background
+      // invalidation thread. Scan all cache entries for this entity type across all tenants.
+      clearAllTenantsFor(name);
+    } else {
+      clearIfExists(key(name, ServerCacheType.QUERY));
+      clearIfExists(key(name, ServerCacheType.BEAN));
+      clearIfExists(key(name, ServerCacheType.NATURAL_KEY));
+      Set<String> keys = collectIdCaches.get(name);
+      if (keys != null) {
+        for (String collectionIdKey : keys) {
+          clearIfExists(collectionIdKey);
+        }
       }
     }
+  }
+
+  private void clearAllTenantsFor(String name) {
+    // Keys in partitioned mode: beanName.tenantId_X or beanName.tenantId.prop_X
+    // collectIdCaches keys: beanName.tenantId
+    // Both start with beanName + '.' so we can use prefix scan.
+    String prefix = name + '.';
+    for (Map.Entry<String, ServerCache> entry : allCaches.entrySet()) {
+      if (entry.getKey().startsWith(prefix)) {
+        log.log(TRACE, "clear cache {0}", entry.getKey());
+        entry.getValue().clear();
+      }
+    }
+    lock.lock();
+    try {
+      for (Map.Entry<String, Set<String>> entry : collectIdCaches.entrySet()) {
+        if (entry.getKey().startsWith(prefix)) {
+          for (String collectionIdKey : entry.getValue()) {
+            clearIfExists(collectionIdKey);
+          }
+        }
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
+   * Remove all cache entries belonging to the given tenant.
+   * Call this when a tenant is deactivated to prevent unbounded memory growth.
+   */
+  void clearTenant(Object tenantId) {
+    String tenantIdStr = String.valueOf(tenantId);
+    // Keys look like: beanName.tenantId_X  or  beanName.tenantId.prop_X
+    String segmentBeforeTypeCode = '.' + tenantIdStr + '_';
+    String segmentBeforeProperty = '.' + tenantIdStr + '.';
+    allCaches.entrySet().removeIf(e -> {
+      String k = e.getKey();
+      return k.contains(segmentBeforeTypeCode) || k.contains(segmentBeforeProperty);
+    });
+    // collectIdCaches keys look like: beanName.tenantId
+    String collectKeySuffix = '.' + tenantIdStr;
+    lock.lock();
+    try {
+      collectIdCaches.entrySet().removeIf(e -> e.getKey().endsWith(collectKeySuffix));
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  boolean isTenantPartitionedCache() {
+    return tenantPartitionedCache;
   }
 
   private void clearIfExists(String fullKey) {

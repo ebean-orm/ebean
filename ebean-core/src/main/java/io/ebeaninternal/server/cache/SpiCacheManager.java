@@ -88,4 +88,17 @@ public interface SpiCacheManager {
    */
   void clearLocal(Class<?> beanType);
 
+  /**
+   * Returns true if this cache manager runs in tenant-partitioned mode.
+   * In this mode caches are namespaced per tenant to improve cache-hit ratio.
+   */
+  boolean isTenantPartitionedCache();
+
+  /**
+   * Remove all cache entries belonging to the given tenant.
+   * Call this when a tenant is deactivated to prevent unbounded memory growth
+   * in tenant-partitioned mode.
+   */
+  void clearTenant(Object tenantId);
+
 }
