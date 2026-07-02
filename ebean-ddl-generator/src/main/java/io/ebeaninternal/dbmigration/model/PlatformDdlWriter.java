@@ -29,11 +29,13 @@ public class PlatformDdlWriter {
   private final DatabaseBuilder.Settings config;
   private final PlatformDdl platformDdl;
   private final int lockTimeoutSeconds;
+  private final boolean formatterGuards;
 
-  public PlatformDdlWriter(DatabasePlatform platform, DatabaseBuilder.Settings config, int lockTimeoutSeconds) {
+  public PlatformDdlWriter(DatabasePlatform platform, DatabaseBuilder.Settings config, int lockTimeoutSeconds, boolean formatterGuards) {
     this.platformDdl = PlatformDdlBuilder.create(platform);
     this.config = config;
     this.lockTimeoutSeconds = lockTimeoutSeconds;
+    this.formatterGuards = formatterGuards;
   }
 
   /**
@@ -87,11 +89,17 @@ public class PlatformDdlWriter {
    * Write the 'Apply' DDL buffers to the writer.
    */
   protected void writeApplyDdl(Writer writer, DdlWrite ddl) throws IOException {
+    if (formatterGuards) {
+      writer.append("-- @formatter:off\n");
+    }
     String header = config.getDdlHeader();
     if (header != null && !header.isEmpty()) {
       writer.append(header).append('\n');
     }
     ddl.writeApply(writer);
+    if (formatterGuards) {
+      writer.append("-- @formatter:on\n");
+    }
   }
 
   /**

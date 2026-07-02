@@ -158,6 +158,14 @@ public interface DbMigration {
   void setHeader(String header);
 
   /**
+   * Set to true to add {@code -- @formatter:off} / {@code -- @formatter:on} guards to generated DDL scripts.
+   * <p>
+   * This prevents IDE formatters (e.g. IntelliJ "Reformat Code on commit") from modifying the SQL.
+   * Can also be enabled via the system property {@code ddl.migration.formatterGuards=true}.
+   */
+  void setAddFormatterGuards(boolean formatterGuards);
+
+  /**
    * Set the prefix for the version. Set this to "V" for use with Flyway.
    */
   void setApplyPrefix(String applyPrefix);
