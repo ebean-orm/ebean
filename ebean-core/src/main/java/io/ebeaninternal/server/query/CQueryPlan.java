@@ -14,7 +14,6 @@ import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.query.CQueryPlanStats.Snapshot;
 import io.ebeaninternal.server.bind.DataBind;
 import io.ebeaninternal.server.bind.DataBindCapture;
-import io.ebeaninternal.server.querydefn.OrmQueryDetail;
 import io.ebeaninternal.server.querydefn.OrmQueryProperties;
 import io.ebeaninternal.server.type.RsetDataReader;
 import io.ebeaninternal.server.util.Md5;
@@ -26,7 +25,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.LinkedHashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import static java.lang.System.Logger.Level.ERROR;
@@ -102,7 +101,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.encryptedProps();
     this.stats = new CQueryPlanStats(this);
-    this.dependentTables = buildDependentTables(request.descriptor(), request.query().detail(), sqlTree.dependentTables());
+    this.dependentTables = buildDependentTables(request.descriptor(), request.secondaryQueries(), sqlTree.dependentTables());
     this.bindCapture = initBindCapture(query);
     this.hash = Md5.hash(sql, name, location);
   }
@@ -127,7 +126,7 @@ public class CQueryPlan implements SpiQueryPlan {
     this.logWhereSql = logWhereSql;
     this.encryptedProps = sqlTree.encryptedProps();
     this.stats = new CQueryPlanStats(this);
-    this.dependentTables = buildDependentTables(request.descriptor(), request.query().detail(), sqlTree.dependentTables());
+    this.dependentTables = buildDependentTables(request.descriptor(), request.secondaryQueries(), sqlTree.dependentTables());
     this.bindCapture = initBindCaptureRaw(sql, query);
     this.hash = Md5.hash(sql, name, location);
   }
@@ -141,25 +140,27 @@ public class CQueryPlan implements SpiQueryPlan {
    * fetchQuery paths fire secondary SQL queries whose results are included in the query
    * cache entry, so the cache must be invalidated when those tables are modified.
    */
-  private static Set<String> buildDependentTables(BeanDescriptor<?> desc, OrmQueryDetail detail, Set<String> sqlTables) {
-    Set<String> extra = null;
-    for (Map.Entry<String, OrmQueryProperties> entry : detail.entries()) {
-      if (entry.getValue().isQueryFetch()) {
-        try {
-          String table = desc.descriptor(entry.getKey()).baseTable();
-          if (extra == null) extra = new LinkedHashSet<>();
-          extra.add(table);
-        } catch (PersistenceException ignore) {
-          // invalid path — ignore
-        }
-      }
-    }
-    if (extra == null || extra.isEmpty()) {
+  private static Set<String> buildDependentTables(BeanDescriptor<?> desc, SpiQuerySecondary secondary, Set<String> sqlTables) {
+    if (secondary == null) {
       return sqlTables;
     }
-    Set<String> merged = new LinkedHashSet<>(sqlTables);
-    merged.addAll(extra);
-    return merged;
+    List<OrmQueryProperties> queryJoins = secondary.queryJoins();
+    if (queryJoins == null || queryJoins.isEmpty()) {
+      return sqlTables;
+    }
+    Set<String> merged = null;
+    for (OrmQueryProperties join : queryJoins) {
+      try {
+        String table = desc.descriptor(join.getPath()).baseTable();
+        if (merged == null) {
+          merged = new LinkedHashSet<>(sqlTables);
+        }
+        merged.add(table);
+      } catch (PersistenceException ignore) {
+        // invalid path — ignore
+      }
+    }
+    return merged != null ? merged : sqlTables;
   }
 
   /**

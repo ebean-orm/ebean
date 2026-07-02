@@ -128,6 +128,13 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   /**
+   * Return the secondary queries (fetchQuery and lazy joins) extracted from the query detail.
+   */
+  public SpiQuerySecondary secondaryQueries() {
+    return secondaryQueries;
+  }
+
+  /**
    * For use with QueryIterator and secondary queries this returns the minimum
    * batch size that should be loaded before executing the secondary queries.
    * <p>
