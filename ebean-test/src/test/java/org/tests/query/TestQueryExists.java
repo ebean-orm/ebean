@@ -80,7 +80,13 @@ public class TestQueryExists extends BaseTestCase {
     assertThat(first).isTrue();
     assertThat(second).isTrue();
     assertThat(sqls).hasSize(2);
-    assertThat(sqls.get(0)).isEqualTo(sqls.get(1));
+    // strip the --micros(...) timing suffix
+    String sql0 = sqls.get(0).split(";")[0];
+    String sql1 = sqls.get(1).split(";")[0];
+    assertThat(sql0).isEqualTo(sql1);
+    if (isH2() || isPostgresCompatible()) {
+      assertThat(sql0).isEqualTo("select exists(select 1 from o_order t0 where t0.id > ?)");
+    }
   }
 
   @Test
