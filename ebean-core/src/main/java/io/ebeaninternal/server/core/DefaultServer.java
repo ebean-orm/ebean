@@ -1197,15 +1197,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> boolean exists(SpiQuery<T> ormQuery) {
     SpiQuery<T> ormQueryCopy = ormQuery.copy();
-    ormQueryCopy.setMaxRows(1);
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.EXISTS, ormQueryCopy);
-    List<Object> ids = request.getFromQueryCache();
-    if (ids != null) {
-      return !ids.isEmpty();
+    Object cached = request.getFromQueryCache();
+    if (cached != null) {
+      return (Boolean) cached;
     }
     try {
       request.initTransIfRequired();
-      return !request.findIds().isEmpty();
+      return request.findExists();
     } finally {
       request.endTransIfRequired();
     }

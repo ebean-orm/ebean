@@ -171,6 +171,29 @@ public final class CQueryEngine {
   }
 
   /**
+   * Build and execute the exists query using select exists(...).
+   */
+  public <T> boolean findExists(OrmQueryRequest<T> request) {
+    CQueryExists rcQuery = queryBuilder.buildExistsQuery(request);
+    request.setCancelableQuery(rcQuery);
+    try {
+      boolean exists = rcQuery.findExists();
+      if (request.logSql()) {
+        logGeneratedSql(request, rcQuery.generatedSql(), rcQuery.bindLog(), rcQuery.micros());
+      }
+      if (request.logSummary()) {
+        request.transaction().logSummary(rcQuery.summary());
+      }
+      if (request.isQueryCachePut()) {
+        request.putToQueryCache(exists);
+      }
+      return exists;
+    } catch (SQLException e) {
+      throw translate(request, rcQuery.bindLog(), rcQuery.generatedSql(), e);
+    }
+  }
+
+  /**
    * Read many beans using an iterator (except you need to close() the iterator
    * when you have finished).
    */

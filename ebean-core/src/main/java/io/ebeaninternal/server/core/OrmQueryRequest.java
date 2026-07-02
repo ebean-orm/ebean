@@ -363,6 +363,11 @@ public final class OrmQueryRequest<T> extends BeanRequest implements SpiOrmQuery
   }
 
   @Override
+  public boolean findExists() {
+    return queryEngine.findExists(this);
+  }
+
+  @Override
   public <A> List<A> findIds() {
     return queryEngine.findIds(this);
   }
