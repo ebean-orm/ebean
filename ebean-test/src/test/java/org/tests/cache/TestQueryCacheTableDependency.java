@@ -291,44 +291,46 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
     contact.setPhone("555-0000");
     DB.save(contact);
 
-    DB.cacheManager().queryCache(Customer.class).clear();
-    Thread.sleep(10);
+    try {
+      DB.cacheManager().queryCache(Customer.class).clear();
+      Thread.sleep(10);
 
-    LoggedSql.start();
-    List<Customer> first = DB.find(Customer.class)
-      .setUseQueryCache(CacheMode.ON)
-      .fetchQuery("contacts")
-      .where().eq("name", "qcache-fq-many-cust")
-      .findList();
-    assertThat(LoggedSql.stop()).as("first call executes main SQL + secondary contacts query").hasSize(2);
-    assertThat(first).hasSize(1);
+      LoggedSql.start();
+      List<Customer> first = DB.find(Customer.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("contacts")
+        .where().eq("name", "qcache-fq-many-cust")
+        .findList();
+      assertThat(LoggedSql.stop()).as("first call executes main SQL + secondary contacts query").hasSize(2);
+      assertThat(first).hasSize(1);
 
-    LoggedSql.start();
-    List<Customer> second = DB.find(Customer.class)
-      .setUseQueryCache(CacheMode.ON)
-      .fetchQuery("contacts")
-      .where().eq("name", "qcache-fq-many-cust")
-      .findList();
-    assertThat(LoggedSql.stop()).as("second call is a query cache hit").isEmpty();
-    assertThat(second).isSameAs(first);
+      LoggedSql.start();
+      List<Customer> second = DB.find(Customer.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("contacts")
+        .where().eq("name", "qcache-fq-many-cust")
+        .findList();
+      assertThat(LoggedSql.stop()).as("second call is a query cache hit").isEmpty();
+      assertThat(second).isSameAs(first);
 
-    // update the contact — modifies the 'contact' table, must invalidate Customer query cache
-    contact.setPhone("555-1234");
-    DB.save(contact);
+      // update the contact — modifies the 'contact' table, must invalidate Customer query cache
+      contact.setPhone("555-1234");
+      DB.save(contact);
 
-    LoggedSql.start();
-    List<Customer> third = DB.find(Customer.class)
-      .setUseQueryCache(CacheMode.ON)
-      .fetchQuery("contacts")
-      .where().eq("name", "qcache-fq-many-cust")
-      .findList();
-    assertThat(LoggedSql.stop()).as("cache invalidated after contact table update").hasSize(2);
-    assertThat(third).hasSize(1);
-    assertThat(third.get(0).getContacts()).hasSize(1);
-    assertThat(third.get(0).getContacts().get(0).getPhone()).isEqualTo("555-1234");
-
-    DB.delete(contact);
-    DB.delete(customer);
+      LoggedSql.start();
+      List<Customer> third = DB.find(Customer.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("contacts")
+        .where().eq("name", "qcache-fq-many-cust")
+        .findList();
+      assertThat(LoggedSql.stop()).as("cache invalidated after contact table update").hasSize(2);
+      assertThat(third).hasSize(1);
+      assertThat(third.get(0).getContacts()).hasSize(1);
+      assertThat(third.get(0).getContacts().get(0).getPhone()).isEqualTo("555-1234");
+    } finally {
+      DB.delete(contact);
+      DB.delete(customer);
+    }
   }
 
   /**
@@ -346,46 +348,48 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
     child.setRoot(root);
     DB.save(child);
 
-    DB.cacheManager().queryCache(ECacheChild.class).clear();
-    Thread.sleep(10);
+    try {
+      DB.cacheManager().queryCache(ECacheChild.class).clear();
+      Thread.sleep(10);
 
-    LoggedSql.start();
-    List<ECacheChild> first = DB.find(ECacheChild.class)
-      .setUseQueryCache(CacheMode.ON)
-      .fetchQuery("root")
-      .where().eq("name", "qcache-fq-one-child")
-      .findList();
-    assertThat(LoggedSql.stop()).as("first call executes main SQL (secondary root query not fired on unmodifiable query)").hasSize(1);
-    assertThat(first).hasSize(1);
+      LoggedSql.start();
+      List<ECacheChild> first = DB.find(ECacheChild.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("root")
+        .where().eq("name", "qcache-fq-one-child")
+        .findList();
+      assertThat(LoggedSql.stop()).as("first call executes main SQL (secondary root query not fired on unmodifiable query)").hasSize(1);
+      assertThat(first).hasSize(1);
 
-    LoggedSql.start();
-    List<ECacheChild> second = DB.find(ECacheChild.class)
-      .setUseQueryCache(CacheMode.ON)
-      .fetchQuery("root")
-      .where().eq("name", "qcache-fq-one-child")
-      .findList();
-    assertThat(LoggedSql.stop()).as("second call is a query cache hit").isEmpty();
-    assertThat(second).isSameAs(first);
+      LoggedSql.start();
+      List<ECacheChild> second = DB.find(ECacheChild.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("root")
+        .where().eq("name", "qcache-fq-one-child")
+        .findList();
+      assertThat(LoggedSql.stop()).as("second call is a query cache hit").isEmpty();
+      assertThat(second).isSameAs(first);
 
-    // update the root — modifies 'ecache_root' table, must invalidate ECacheChild query cache
-    root.setName("qcache-fq-one-root-updated");
-    DB.save(root);
+      // update the root — modifies 'ecache_root' table, must invalidate ECacheChild query cache
+      root.setName("qcache-fq-one-root-updated");
+      DB.save(root);
 
-    LoggedSql.start();
-    List<ECacheChild> third = DB.find(ECacheChild.class)
-      .setUseQueryCache(CacheMode.ON)
-      .fetchQuery("root")
-      .where().eq("name", "qcache-fq-one-child")
-      .findList();
-    assertThat(LoggedSql.stop()).as("cache invalidated after ecache_root table update").hasSize(1);
-    assertThat(third).hasSize(1);
-    // root is an unloaded reference in the result (secondary query does not fire for unmodifiable
-    // AssocOne beans), so verify the updated name via the root ID from the result
-    UUID rootId = third.get(0).getRoot().getId();
-    assertThat(DB.find(ECacheRoot.class, rootId).getName()).isEqualTo("qcache-fq-one-root-updated");
-
-    DB.delete(child);
-    DB.delete(root);
+      LoggedSql.start();
+      List<ECacheChild> third = DB.find(ECacheChild.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("root")
+        .where().eq("name", "qcache-fq-one-child")
+        .findList();
+      assertThat(LoggedSql.stop()).as("cache invalidated after ecache_root table update").hasSize(1);
+      assertThat(third).hasSize(1);
+      // root is an unloaded reference in the result (secondary query does not fire for unmodifiable
+      // AssocOne beans), so verify the updated name via the root ID from the result
+      UUID rootId = third.get(0).getRoot().getId();
+      assertThat(DB.find(ECacheRoot.class, rootId).getName()).isEqualTo("qcache-fq-one-root-updated");
+    } finally {
+      DB.delete(child);
+      DB.delete(root);
+    }
   }
 
   private List<String> namesByBillingCity(String city) {
