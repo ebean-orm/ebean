@@ -937,6 +937,20 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     }
   }
 
+  /**
+   * Ensure the preUpdate event fires (for case where only a ManyToMany collection has changed).
+   */
+  public void preManyToManyUpdate() {
+    if (controller != null && !dirty) {
+      // fire preUpdate notification when only ManyToMany intersection updated
+      controller.preUpdate(this);
+      pendingPostUpdateNotify = true;
+    }
+    if (!dirty) {
+      setNotifyCache();
+    }
+  }
+
   public boolean isNotifyCache() {
     return notifyCache;
   }

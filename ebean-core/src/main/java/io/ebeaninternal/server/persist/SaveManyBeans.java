@@ -292,6 +292,17 @@ final class SaveManyBeans extends SaveManyBase {
       manyValue.modifyReset();
     }
 
+    if (!insertedParent) {
+      // only fire controller when the intersection actually changes:
+      // vanillaCollection/forcedUpdate always do a full replace,
+      // tracked BeanCollection fires only when additions or removals exist
+      boolean intersectionChanged = vanillaCollection || forcedUpdate
+          || (additions != null && !additions.isEmpty())
+          || (deletions != null && !deletions.isEmpty());
+      if (intersectionChanged) {
+        request.preManyToManyUpdate();
+      }
+    }
     transaction.depth(+1);
     if (deletions != null && !deletions.isEmpty()) {
       for (Object other : deletions) {
