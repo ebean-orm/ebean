@@ -89,6 +89,12 @@ public final class DefaultOrmQueryEngine implements OrmQueryEngine {
   }
 
   @Override
+  public <T> boolean findExists(OrmQueryRequest<T> request) {
+    flushJdbcBatchOnQuery(request);
+    return queryEngine.findExists(request);
+  }
+
+  @Override
   public <A> List<A> findIds(OrmQueryRequest<?> request) {
     flushJdbcBatchOnQuery(request);
     return queryEngine.findIds(request);

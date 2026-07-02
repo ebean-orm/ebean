@@ -30,11 +30,57 @@ public class TestQueryExists extends BaseTestCase {
     assertThat(check).isTrue();
 
     if (isH2() || isPostgresCompatible()) {
-      assertThat(sql).contains("select t0.id from o_order t0 where t0.id > ? limit 1");
+      assertThat(sql).contains("select exists(select 1 from o_order t0 where t0.id > ?)");
     }
 
     assertThat(DB.find(Order.class).where().gt("id", 1).exists()).isTrue();
     assertThat(DB.find(Order.class).where().or().gt("id", 1).isNull("shipDate").exists()).isTrue();
+  }
+
+  @Test
+  public void testExistsBoolean_returnsFalse() {
+    ResetBasicData.reset();
+
+    // no order will ever have id = -1
+    assertThat(DB.find(Order.class).where().eq("id", -1).exists()).isFalse();
+  }
+
+  @Test
+  public void testExistsBoolean_withJoin() {
+    ResetBasicData.reset();
+
+    // customers that have at least one contact — exercises the join path in buildExistsQuery
+    Query<Customer> query = DB.find(Customer.class)
+      .where().isNotNull("contacts.firstName")
+      .query();
+
+    LoggedSql.start();
+    boolean result = query.exists();
+    String sql = LoggedSql.stop().get(0);
+
+    assertThat(result).isTrue();
+    if (isH2() || isPostgresCompatible()) {
+      assertThat(sql).contains("select exists(select 1");
+    }
+
+    // no customer has a contact with this name — should return false
+    assertThat(DB.find(Customer.class).where().eq("contacts.firstName", "NoSuchPerson_xyz").exists()).isFalse();
+  }
+
+  @Test
+  public void testExistsBoolean_queryPlanReuse() {
+    ResetBasicData.reset();
+
+    // first call builds the plan; second call should reuse it (no extra SQL generation)
+    LoggedSql.start();
+    boolean first = DB.find(Order.class).where().gt("id", 1).exists();
+    boolean second = DB.find(Order.class).where().gt("id", 1).exists();
+    List<String> sqls = LoggedSql.stop();
+
+    assertThat(first).isTrue();
+    assertThat(second).isTrue();
+    assertThat(sqls).hasSize(2);
+    assertThat(sqls.get(0)).isEqualTo(sqls.get(1));
   }
 
   @Test

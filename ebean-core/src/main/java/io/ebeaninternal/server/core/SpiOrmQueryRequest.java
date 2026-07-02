@@ -76,6 +76,11 @@ public interface SpiOrmQueryRequest<T> extends BeanQueryRequest<T>, DocQueryRequ
   int findCount();
 
   /**
+   * Execute the find exists query using select exists(...).
+   */
+  boolean findExists();
+
+  /**
    * Execute the find ids query.
    */
   <A> List<A> findIds();
