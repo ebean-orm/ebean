@@ -10,8 +10,11 @@ import java.sql.SQLException;
  */
 final class AssocOneHelpEmbedded extends AssocOneHelp {
 
-  AssocOneHelpEmbedded(BeanPropertyAssocOne<?> property) {
+  private final boolean allowEmpty;
+
+  AssocOneHelpEmbedded(BeanPropertyAssocOne<?> property, boolean allowEmpty) {
     super(property);
+    this.allowEmpty = allowEmpty;
   }
 
   @Override
@@ -40,7 +43,7 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
         notNull = true;
       }
     }
-    if (notNull) {
+    if (notNull || allowEmpty) {
       return embeddedBean;
     } else {
       return null;
@@ -69,7 +72,7 @@ final class AssocOneHelpEmbedded extends AssocOneHelp {
         notNull = true;
       }
     }
-    return notNull ? embeddedBean : null;
+    return (notNull || allowEmpty) ? embeddedBean : null;
   }
 
   @Override

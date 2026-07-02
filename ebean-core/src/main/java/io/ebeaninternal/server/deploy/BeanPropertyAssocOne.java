@@ -45,6 +45,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   private final boolean orphanRemoval;
   private final boolean primaryKeyExport;
   private final boolean primaryKeyJoin;
+  private final boolean embeddedAllowEmpty;
 
   private AssocOneHelp localHelp;
   final BeanProperty[] embeddedProps;
@@ -74,6 +75,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
     orphanRemoval = deploy.isOrphanRemoval();
+    embeddedAllowEmpty = deploy.isEmbeddedAllowEmpty();
     if (embedded) {
       // Overriding of the columns and use table alias of owning BeanDescriptor
       BeanEmbeddedMeta overrideMeta = BeanEmbeddedMetaFactory.create(owner, deploy);
@@ -100,6 +102,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     oneToOne = source.oneToOne;
     oneToOneExported = source.oneToOneExported;
     orphanRemoval = source.orphanRemoval;
+    embeddedAllowEmpty = source.embeddedAllowEmpty;
     embeddedProps = null;
     embeddedPropsMap = null;
   }
@@ -840,7 +843,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   private AssocOneHelp createHelp(boolean embedded, boolean oneToOneExported, String embeddedPrefix) {
     if (embedded) {
-      return new AssocOneHelpEmbedded(this);
+      return new AssocOneHelpEmbedded(this, embeddedAllowEmpty);
     } else if (oneToOneExported) {
       return new AssocOneHelpRefExported(this);
     } else {

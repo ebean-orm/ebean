@@ -245,6 +245,13 @@ final class AnnotationAssocOnes extends AnnotationAssoc {
     } catch (NoSuchMethodError e) {
       // using standard JPA API without prefix option, maybe in EE container
     }
+    try {
+      if (!embedded.nullable()) {
+        prop.setEmbeddedAllowEmpty(true);
+      }
+    } catch (NoSuchMethodError e) {
+      // older persistence-api without nullable() extension
+    }
     readEmbeddedAttributeOverrides(prop);
   }
 
