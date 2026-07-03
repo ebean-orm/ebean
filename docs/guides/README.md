@@ -48,6 +48,7 @@ existing Maven project. Complete the steps in order.
 |-------|-------------|
 | [Write Ebean queries with query beans](writing-ebean-query-beans.md) | Step-by-step guidance for AI agents to write type-safe Ebean queries; choose the right terminal method; tune `select()` / `fetch()` / `fetchQuery()`; and project to DTOs when entity beans are not the right output |
 | [Immutable bean cache for read-only references](immutable-bean-cache.md) | Use `ImmutableBeanCache` and `ImmutableBeanCaches.loading(...)` to resolve assoc-one references in read-only/unmodifiable queries, including secondary `fetchQuery`/`fetchLazy` loads |
+| [Using `RawSql` with Ebean](using-rawsql-with-ebean.md) | Choose between `RawSqlBuilder.parse()`, `unparsed()`, and `withPlaceholders()`; the `${where}`/`${andWhere}`/`${having}`/`${andHaving}` placeholder reference for CTEs, window functions, and subqueries; column mapping; and using `RawSql` with query beans |
 
 ## Persisting & transactions
 

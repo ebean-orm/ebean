@@ -483,6 +483,30 @@ Prefer the following order:
 Do **not** jump to raw SQL just because the query joins multiple tables. Query
 beans already handle ordinary relationship traversal well.
 
+### Using `RawSql` with query beans
+
+`RawSql` is not limited to the plain `Query<T>` API - it also works with a
+generated query bean, giving type-safe `where()`/`having()` expressions over
+hand-written SQL. Every generated query bean exposes `setRawSql(...)`:
+
+```java
+RawSql rawSql = RawSqlBuilder.parse("select id, name, status from customer")
+  .columnMapping("id", "id")
+  .columnMapping("name", "name")
+  .columnMapping("status", "status")
+  .create();
+
+List<Customer> customers = new QCustomer()
+  .setRawSql(rawSql)
+  .status.equalTo(Customer.Status.ACTIVE) // typed expression, injected into the parsed WHERE clause
+  .findList();
+```
+
+For the full guide to building `RawSql` - including `unparsed()`,
+`withPlaceholders()` for CTEs/window functions, the `${where}` / `${andWhere}`
+/ `${having}` / `${andHaving}` placeholder reference, and column mapping - see
+[Using `RawSql` with Ebean](using-rawsql-with-ebean.md).
+
 ---
 
 ## Common anti-patterns
@@ -570,4 +594,5 @@ When asked to add or modify an Ebean query:
 - [Add Ebean Postgres Maven POM](add-ebean-postgres-maven-pom.md)
 - [Entity Bean Creation](entity-bean-creation.md)
 - [Immutable bean cache for read-only references](immutable-bean-cache.md)
+- [Using `RawSql` with Ebean](using-rawsql-with-ebean.md)
 - [Ebean query docs](https://ebean.io/docs/query/)

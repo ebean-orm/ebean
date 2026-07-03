@@ -182,6 +182,36 @@ class TestRawSqlWithPlaceholders extends BaseTestCase {
   }
 
   @Test
+  void withPlaceholders_fetchQuery_loadsAssociatedGraphViaSecondaryQuery() {
+    // the RawSql query is the root query; fetchQuery() adds secondary ORM queries
+    // to build out more of the object graph rather than hand-writing it into the
+    // raw SQL itself. Because the raw SQL only maps "order.id" (a partial "order"
+    // reference), we explicitly fetchQuery("order") as well as fetchQuery("order.details") -
+    // fetchQuery("order.details") alone would leave "details" as a deferred/lazy
+    // collection since the intermediate "order" fetch node isn't otherwise requested.
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(cteSql)
+      .fetchQuery("order")
+      .fetchQuery("order.details")
+      .where().gt("totalAmount", 50)
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    // one query for the raw-sql root, plus one secondary (ORM) query per fetchQuery() path
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).containsIgnoringCase("with order_totals as");
+    assertThat(sql.get(1)).containsIgnoringCase("from o_order ");
+    assertThat(sql.get(2)).containsIgnoringCase("from o_order_detail");
+
+    assertThat(list).hasSize(2);
+    for (OrderAggregate orderAggregate : list) {
+      // order.details was populated by the secondary query - no further lazy loading needed
+      assertThat(orderAggregate.getOrder().getDetails()).isNotEmpty();
+    }
+  }
+
+  @Test
   void parse_failsOnCteSql() {
     // Demonstrates why withPlaceholders() is needed — parse() cannot handle CTEs
     assertThatThrownBy(() -> RawSqlBuilder.parse(CTE_SQL).create())
