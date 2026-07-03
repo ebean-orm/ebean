@@ -1,0 +1,17 @@
+singleServerConfig:
+  address: "redis://127.0.0.1:6379"
+  password: null
+  database: 0
+  connectionMinimumIdleSize: 2
+  connectionPoolSize: 10
+  idleConnectionTimeout: 3000
+  connectTimeout: 3000
+  timeout: 3000
+  retryAttempts: 2
+
+threads: 4
+nettyThreads: 8
+referenceEnabled: false
+keepPubSubOrder: false
+checkLockSyncedSlaves: false
+lockWatchdogTimeout: 10000
