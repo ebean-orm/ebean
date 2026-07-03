@@ -28,6 +28,13 @@ public interface SpiRawSqlService extends BootstrapService {
   RawSqlBuilder unparsed(String sql);
 
   /**
+   * SQL with ${where}/${having} placeholder(s) but no SELECT column parsing.
+   * Supports complex SQL (CTEs, window functions) where keyword parsing would fail.
+   * Explicit column mapping is required (as with unparsed).
+   */
+  RawSqlBuilder withPlaceholders(String sql);
+
+  /**
    * Create based on a JDBC ResultSet.
    *
    * @param resultSet           The ResultSet row to read as a SqlRow

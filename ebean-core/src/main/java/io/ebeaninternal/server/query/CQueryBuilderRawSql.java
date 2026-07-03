@@ -48,9 +48,12 @@ final class CQueryBuilderRawSql {
       // wrap with a limit offset or ROW_NUMBER() etc
       return sqlLimiter.limit(new OrmQueryLimitRequest(sql, orderBy, query, dbPlatform, rsql.isDistinct() || query.isDistinct()));
     } else {
-      // add back select keyword (it was removed to support sqlQueryLimiter)
-      String prefix = "select " + (rsql.isDistinct() ? "distinct " : "");
-      sql = prefix + sql;
+      if (hasValue(rsql.getPreFrom())) {
+        // add back select keyword (it was removed to support sqlQueryLimiter)
+        String prefix = "select " + (rsql.isDistinct() ? "distinct " : "");
+        sql = prefix + sql;
+      }
+      // else: template mode — SQL is already complete (no keyword stripping was done)
       return new SqlLimitResponse(sql);
     }
   }
@@ -67,10 +70,12 @@ final class CQueryBuilderRawSql {
         sb.append(selectProperty);
         first = false;
       }
-    } else {
-      sb.append(sql.getPreFrom());
+      sb.append(' ');
+    } else if (hasValue(sql.getPreFrom())) {
+      // standard parsed mode: column list with "select" prefix added in buildSql()
+      sb.append(sql.getPreFrom()).append(' ');
     }
-    sb.append(' ');
+    // else: template mode (preFrom empty) — the full SQL is in preWhere/preHaving, no prefix needed
 
     String s = sql.getPreWhere();
     BindParams bindParams = request.query().bindParams();

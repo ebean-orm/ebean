@@ -42,6 +42,38 @@ public interface RawSqlBuilder {
   }
 
   /**
+   * Return a RawSqlBuilder for SQL containing {@code ${where}} and/or {@code ${having}}
+   * placeholder(s). Unlike {@link #parse(String)} this does NOT attempt to parse the SELECT
+   * columns, so it supports complex SQL such as CTEs, subqueries, and window functions.
+   * <p>
+   * Explicit column mappings must be provided (as with {@link #unparsed(String)}), but
+   * WHERE and HAVING expressions can be added dynamically via the query API.
+   * </p>
+   * <h3>Example:</h3>
+   * <pre>{@code
+   *
+   *   String sql = """
+   *     with agg as (
+   *       select company_id, sum(amount) as total
+   *       from orders
+   *       ${where}
+   *       group by company_id
+   *     )
+   *     select company_id, total from agg order by total desc
+   *     """;
+   *
+   *   RawSql rawSql = RawSqlBuilder.withPlaceholders(sql)
+   *     .columnMapping("company_id", "companyId")
+   *     .columnMapping("total", "total")
+   *     .create();
+   *
+   * }</pre>
+   */
+  static RawSqlBuilder withPlaceholders(String sql) {
+    return XBootstrapService.rawSql().withPlaceholders(sql);
+  }
+
+  /**
    * Return a RawSqlBuilder parsing the sql.
    * <p>
    * The sql statement will be parsed so that Ebean can determine where it can

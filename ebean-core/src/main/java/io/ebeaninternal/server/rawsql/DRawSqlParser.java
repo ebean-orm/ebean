@@ -40,6 +40,17 @@ final class DRawSqlParser {
     return new DRawSqlParser(sql).parse();
   }
 
+  /**
+   * Parse for template mode: finds ${where} / ${having} placeholder positions without
+   * attempting SELECT/FROM keyword parsing. This supports complex SQL (CTEs, window functions,
+   * subqueries) where keyword-based parsing would fail.
+   * <p>
+   * The caller is expected to provide manual column mappings (like unparsed mode).
+   */
+  public static Sql parseAsTemplate(String sql) {
+    return new DRawSqlParser(sql).parseTemplate();
+  }
+
   private DRawSqlParser(String sqlString) {
     sqlString = sqlString.trim();
     sqlString = sqlString.replace('\n', ' ');
@@ -244,6 +255,42 @@ final class DRawSqlParser {
       return orderByPos;
     }
     return -1;
+  }
+
+  private Sql parseTemplate() {
+    if (!hasPlaceHolders) {
+      throw new IllegalArgumentException("withPlaceholders() requires at least ${where} or ${andWhere} in the SQL");
+    }
+    whereExprPos = findWhereExprPosition();
+    havingExprPos = findHavingExprPosition();
+
+    // Split the placeholder-stripped SQL at the injection point positions.
+    // preFrom is empty — signals template mode to CQueryBuilderRawSql (no "select" prefix handling).
+    String preWhere;
+    String preHaving = null;
+    String afterHaving = null;
+    if (whereExprPos > -1 && havingExprPos > whereExprPos) {
+      // both ${where} and ${having}/${andHaving} present, in that order
+      preWhere = sql.substring(0, whereExprPos).trim();
+      preHaving = sql.substring(whereExprPos, havingExprPos).trim();
+      afterHaving = sql.substring(havingExprPos).trim();
+    } else if (whereExprPos > -1) {
+      // only ${where}/${andWhere} present - any trailing static SQL (e.g. order by)
+      // stays embedded in preHaving as there is no dynamic having to inject after it
+      preWhere = sql.substring(0, whereExprPos).trim();
+      preHaving = sql.substring(whereExprPos).trim();
+    } else if (havingExprPos > -1) {
+      // only ${having}/${andHaving} present, no ${where}
+      preWhere = sql.substring(0, havingExprPos).trim();
+      afterHaving = sql.substring(havingExprPos).trim();
+    } else {
+      preWhere = sql.trim();
+    }
+    // when a having placeholder is present, any trailing static SQL (e.g. "order by ...") must be
+    // appended AFTER the dynamically injected having clause - carry it via the orderBy slot with
+    // an empty prefix (rather than the default "order by" keyword) so it is emitted verbatim.
+    String orderByPrefix = (afterHaving != null) ? "" : null;
+    return new Sql(sql, "", preWhere, whereExprAnd, preHaving, havingExprAnd, orderByPrefix, afterHaving, false);
   }
 
   private String removeWhitespace(String sql) {
