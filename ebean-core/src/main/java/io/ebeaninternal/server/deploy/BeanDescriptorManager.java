@@ -39,6 +39,8 @@ import io.ebeaninternal.server.type.TypeManager;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.PersistenceException;
 import jakarta.persistence.Transient;
+import io.ebeaninternal.server.transaction.DataSourceSupplier;
+import io.ebeaninternal.server.transaction.SequenceDataSource;
 import javax.sql.DataSource;
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -86,7 +88,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   private final Map<String, List<BeanDescriptor<?>>> tableToDescMap = new HashMap<>();
   private final Map<String, List<BeanDescriptor<?>>> tableToViewDescMap = new HashMap<>();
   private final DbIdentity dbIdentity;
-  private final DataSource dataSource;
+  private final DataSourceSupplier dataSourceSupplier;
   private final DatabasePlatform databasePlatform;
   private final SpiCacheManager cacheManager;
   private final BackgroundExecutor backgroundExecutor;
@@ -117,7 +119,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     this.serverName = InternString.intern(this.config.getName());
     this.cacheManager = config.getCacheManager();
     this.backgroundExecutor = config.getBackgroundExecutor();
-    this.dataSource = this.config.getDataSource();
+    this.dataSourceSupplier = config.getDataSourceSupplier();
     this.encryptKeyManager = this.config.getEncryptKeyManager();
     this.databasePlatform = this.config.getDatabasePlatform();
     this.multiValueBind = config.getMultiValueBind();
@@ -430,6 +432,14 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
       d.initialiseDocMapping();
     }
 
+    // PASS 5:
+    // parse @Formula2 expressions — runs after all descriptors are fully
+    // initialised so cross-descriptor property paths (e.g. parent.parent.someBean.id)
+    // can be resolved safely without hitting null targetDescriptors
+    for (BeanDescriptor<?> d : descMap.values()) {
+      d.initFormula2Properties();
+    }
+
     // create BeanManager for each non-embedded entity bean
     for (BeanDescriptor<?> d : descMap.values()) {
       d.initLast();
@@ -657,7 +667,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
           throw new RuntimeException(msg);
         }
         DeployTableJoin tableJoin = assocOne.getTableJoin();
-        prop.setSecondaryTableJoin(tableJoin, assocOne.getName());
+        prop.setSecondaryTableJoin(tableJoin, assocOne.name());
       }
     }
   }
@@ -715,8 +725,8 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     for (DeployBeanPropertyAssocOne<?> possibleMappedBy : ones) {
       Class<?> possibleMappedByType = possibleMappedBy.getTargetType();
       if (possibleMappedByType.equals(owningType)) {
-        prop.setMappedBy(possibleMappedBy.getName());
-        matchSet.add(possibleMappedBy.getName());
+        prop.setMappedBy(possibleMappedBy.name());
+        matchSet.add(possibleMappedBy.name());
       }
     }
 
@@ -733,7 +743,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     if (matchSet.size() == 2) {
       // try to find a match implicitly using a common naming convention
       // e.g. List<Bug> loggedBugs; ... search for "logged" in matchSet
-      String name = prop.getName();
+      String name = prop.name();
 
       // get the target type short name
       String targetType = prop.getTargetType().getName();
@@ -1109,7 +1119,10 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   private PlatformIdGenerator createSequenceIdGenerator(String seqName, int stepSize) {
-    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, dataSource, stepSize, seqName);
+    DataSource ds = config.getTenantMode().isDynamicDataSource()
+      ? new SequenceDataSource(dataSourceSupplier)
+      : dataSourceSupplier.dataSource();
+    return databasePlatform.createSequenceIdGenerator(backgroundExecutor, ds, stepSize, seqName);
   }
 
   private void setAccessors(DeployBeanDescriptor<?> deploy) {
@@ -1151,7 +1164,7 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
     // abstract classes as well.
     BeanPropertiesReader reflectProps = new BeanPropertiesReader(desc.propertyNames());
     for (DeployBeanProperty prop : desc.propertiesAll()) {
-      String propName = prop.getName();
+      String propName = prop.name();
       Integer pos = reflectProps.propertyIndex(propName);
       if (pos == null) {
         if (isPersistentField(prop)) {

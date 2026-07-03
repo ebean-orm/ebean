@@ -208,6 +208,11 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public int deletePermanent() {
+    return query.deletePermanent();
+  }
+
+  @Override
   public int update() {
     return query.update();
   }

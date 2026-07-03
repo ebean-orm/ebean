@@ -16,11 +16,12 @@ import io.ebeaninternal.api.DbOffline;
 import io.ebeaninternal.api.GeoTypeProvider;
 import io.ebeaninternal.server.core.ServiceUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
-import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import io.ebeaninternal.server.deploy.meta.DeployProperty;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.EnumType;
 import java.io.File;
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -191,7 +192,8 @@ public final class DefaultTypeManager implements TypeManager {
   }
 
   @Override
-  public ScalarType<?> type(Type propertyType, Class<?> propertyClass) {
+  public ScalarType<?> type(DeployProperty prop) {
+    Type propertyType = prop.genericType();
     if (propertyType instanceof ParameterizedType) {
       ParameterizedType pt = (ParameterizedType) propertyType;
       Type rawType = pt.getRawType();
@@ -199,7 +201,7 @@ public final class DefaultTypeManager implements TypeManager {
         return dbArrayType((Class<?>) rawType, propertyType, true);
       }
     }
-    return type(propertyClass);
+    return type(prop.propertyType());
   }
 
   /**
@@ -300,19 +302,25 @@ public final class DefaultTypeManager implements TypeManager {
     return TypeReflectHelper.isEnumType(valueType);
   }
 
+
   @Override
-  public ScalarType<?> dbJsonType(DeployBeanProperty prop, int dbType, int dbLength) {
-    Class<?> type = prop.getPropertyType();
+  public Class<? extends Annotation> jsonMarkerAnnotation() {
+    return jsonMapper == null ? null : jsonMapper.markerAnnotation();
+  }
+
+  @Override
+  public ScalarType<?> dbJsonType(DeployProperty prop, int dbType, int dbLength) {
+    Class<?> type = prop.propertyType();
     if (type.equals(String.class)) {
       return ScalarTypeJsonString.typeFor(postgres, dbType);
     }
     if (jsonMapper != null) {
       var markerAnnotation = jsonMapper.markerAnnotation();
-      if (markerAnnotation != null && !prop.getMetaAnnotations(markerAnnotation).isEmpty()) {
+      if (markerAnnotation != null && !prop.metaAnnotations(markerAnnotation).isEmpty()) {
         return createJsonObjectMapperType(prop, dbType, docPropertyType(prop, type));
       }
     }
-    Type genericType = prop.getGenericType();
+    Type genericType = prop.genericType();
     if (type.equals(List.class) && isValueTypeSimple(genericType)) {
       return ScalarTypeJsonList.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), keepSource(prop));
     }
@@ -326,7 +334,7 @@ public final class DefaultTypeManager implements TypeManager {
       }
       return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource(prop));
     }
-    if (objectMapperPresent && prop.getMutationDetection() == MutationDetection.DEFAULT) {
+    if (objectMapperPresent && prop.mutationDetection() == MutationDetection.DEFAULT) {
       ScalarTypeSet<?> typeSet = typeSets.get(type);
       if (typeSet != null) {
         return typeSet.forType(dbType);
@@ -335,11 +343,11 @@ public final class DefaultTypeManager implements TypeManager {
     return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
   }
 
-  private boolean keepSource(DeployBeanProperty prop) {
-    if (prop.getMutationDetection() == MutationDetection.DEFAULT) {
-      prop.setMutationDetection(jsonManager.mutationDetection());
+  private boolean keepSource(DeployProperty prop) {
+    if (prop.mutationDetection() == MutationDetection.DEFAULT) {
+      prop.setMutationDetection(jsonManager != null ? jsonManager.mutationDetection() : MutationDetection.NONE);
     }
-    return prop.getMutationDetection() == MutationDetection.SOURCE;
+    return prop.mutationDetection() == MutationDetection.SOURCE;
   }
 
   @SuppressWarnings("unchecked")
@@ -349,8 +357,8 @@ public final class DefaultTypeManager implements TypeManager {
     return ScalarTypeJsonMapEnum.typeFor(postgres, dbType, enumScalarType, keepSource);
   }
 
-  private DocPropertyType docPropertyType(DeployBeanProperty prop, Class<?> type) {
-    return type.equals(List.class) || type.equals(Set.class) ? docType(prop.getGenericType()) : DocPropertyType.OBJECT;
+  private DocPropertyType docPropertyType(DeployProperty prop, Class<?> type) {
+    return type.equals(List.class) || type.equals(Set.class) ? docType(prop.genericType()) : DocPropertyType.OBJECT;
   }
 
   private DocPropertyType docType(Type genericType) {
@@ -396,14 +404,14 @@ public final class DefaultTypeManager implements TypeManager {
     return Object.class.equals(valueType) || String.class.equals(valueType) || "?".equals(valueType.toString());
   }
 
-  private ScalarType<?> createJsonObjectMapperType(DeployBeanProperty prop, int dbType, DocPropertyType docType) {
+  private ScalarType<?> createJsonObjectMapperType(DeployProperty prop, int dbType, DocPropertyType docType) {
     if (jsonMapper == null) {
       throw new IllegalArgumentException("Unsupported @DbJson mapping - Missing dependency ebean-jackson-mapper? Jackson ObjectMapper not present for " + prop);
     }
-    if (MutationDetection.DEFAULT == prop.getMutationDetection()) {
+    if (MutationDetection.DEFAULT == prop.mutationDetection()) {
       prop.setMutationDetection(jsonManager.mutationDetection());
     }
-    var req = new ScalarJsonRequest(jsonManager, dbType, docType, prop.getDesc().getBeanType(), prop.getMutationDetection(), prop.getName());
+    var req = new ScalarJsonRequest(jsonManager, dbType, docType, prop.ownerType(), prop.mutationDetection(), prop.name());
     return jsonMapper.createType(req);
   }
 

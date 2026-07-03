@@ -36,6 +36,7 @@ public final class SqlTreeBuilder {
   private final SqlTreeAlias alias;
   private final DefaultDbSqlContext ctx;
   private final HashSet<String> selectIncludes = new HashSet<>();
+  private final HashSet<String> formula2JoinIncludes = new HashSet<>();
   private final ManyWhereJoins manyWhereJoins;
   private final TableJoin includeJoin;
   private final boolean rawSql;
@@ -129,7 +130,6 @@ public final class SqlTreeBuilder {
       encryptedProps = ctx.encryptedProps();
       query.incrementAsOfTableCount(ctx.asOfTableCount());
     }
-
     boolean includeJoins = alias != null && alias.isIncludeJoins();
     return new SqlTree(rootNode, distinctOn, selectSql, fromSql, groupBy, inheritanceWhereSql, encryptedProps, manyProperty, includeJoins);
   }
@@ -214,16 +214,45 @@ public final class SqlTreeBuilder {
   }
 
   private SqlTreeNode buildRootNode(STreeType desc) {
+    if (!rawSql) {
+      // Populate formula2JoinIncludes from predicate paths BEFORE buildSelectChain runs,
+      // because buildSelectChain → buildNode → buildExtraJoins needs formula2JoinIncludes
+      // to already have predicate-based formula2 dependency joins (the where-only case).
+      addFormula2JoinsFromPredicates(desc, predicates.predicateIncludes());
+    }
     SqlTreeNode root = buildSelectChain(null, null, desc, null);
     if (!rawSql) {
       alias.addJoin(queryDetail.getFetchPaths(), desc);
       alias.addJoin(predicates.predicateIncludes(), desc);
-      alias.addManyWhereJoins(manyWhereJoins.propertyNames());
+      alias.addJoin(formula2JoinIncludes, desc);
+      alias.addManyWhereJoins(manyWhereJoins.propertyNames(), desc);
       // build set of table alias
       alias.buildAlias();
       predicates.parseTableAlias(alias);
     }
     return root;
+  }
+
+  /**
+   * Scan predicate include paths for @Formula2 properties and add their dependency joins to
+   * formula2JoinIncludes. This covers the case where a @Formula2 @ManyToOne is referenced in
+   * a where/order-by clause but not fetched (so addFormula2Joins was never called for it during
+   * tree building).
+   */
+  private void addFormula2JoinsFromPredicates(STreeType desc, Set<String> predicateIncludes) {
+    if (predicateIncludes == null) return;
+    for (String path : predicateIncludes) {
+      ExtraJoin extra = desc.extraJoin(path);
+      if (extra != null) {
+        Set<String> f2Joins = extra.property().formula2Joins();
+        if (f2Joins != null) {
+          String prefix = SplitName.split(path)[0]; // parent of this path
+          for (String join : f2Joins) {
+            formula2JoinIncludes.add(SplitName.add(prefix, join));
+          }
+        }
+      }
+    }
   }
 
   /**
@@ -253,7 +282,7 @@ public final class SqlTreeBuilder {
     }
 
     OrmQueryProperties queryProps = queryDetail.getChunk(prefix, false);
-    SqlTreeProperties props = getBaseSelect(desc, queryProps);
+    SqlTreeProperties props = getBaseSelect(desc, queryProps, prefix);
 
     if (prefix == null && !rawSql) {
       if (props.requireSqlDistinct(manyWhereJoins)) {
@@ -352,7 +381,14 @@ public final class SqlTreeBuilder {
     }
     Set<String> predicateIncludes = predicates.predicateIncludes();
     if (predicateIncludes == null) {
-      return;
+      if (formula2JoinIncludes.isEmpty()) {
+        return;
+      }
+      // no predicate includes but we have formula2 joins - use formula2 set directly
+      predicateIncludes = new HashSet<>(formula2JoinIncludes);
+    } else {
+      // add formula2 required joins alongside predicate includes
+      predicateIncludes.addAll(formula2JoinIncludes);
     }
 
     // Note includes - basically means joins.
@@ -360,19 +396,25 @@ public final class SqlTreeBuilder {
     // the 'select' part of the query. We may need to add other joins to
     // support the predicates or order by clauses.
 
-    // remove ManyWhereJoins from the predicateIncludes
+    // remove ManyWhereJoins from the predicateIncludes (they are handled as manyWhere correlated joins)
     predicateIncludes.removeAll(manyWhereJoins.propertyNames());
     predicateIncludes.addAll(predicates.orderByIncludes());
 
     // look for predicateIncludes that are not in selectIncludes and add
     // them as extra joins to the query
-    IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes, predicateIncludes, manyWhereJoins, temporalMode);
+    IncludesDistiller extraJoinDistill = new IncludesDistiller(desc, selectIncludes, predicateIncludes, manyWhereJoins, temporalMode, formula2JoinIncludes);
     Collection<SqlTreeNodeExtraJoin> extraJoins = extraJoinDistill.getExtraJoinRootNodes();
     if (!extraJoins.isEmpty()) {
       // add extra joins required to support predicates and/or order by clause
       for (SqlTreeNodeExtraJoin extraJoin : extraJoins) {
         if (!addToParent(extraJoin, myList)) {
-          myList.add(extraJoin);
+          if (isFormula2Dependency(extraJoin.prefix())) {
+            // formula2 dependency joins at root level must come before tree nodes
+            // that reference their table aliases in ON clauses
+            myList.add(0, extraJoin);
+          } else {
+            myList.add(extraJoin);
+          }
         }
         if (extraJoin.isManyJoin()) {
           // as we are now going to join to the many then we need
@@ -386,14 +428,36 @@ public final class SqlTreeBuilder {
 
   /**
    * Return true if the extra join was added as a child to one of the nodes.
+   * Formula2 dependency joins are prepended (addChildFirst) so they appear in SQL
+   * before the tree nodes that reference their table aliases.
    */
   private boolean addToParent(SqlTreeNodeExtraJoin extraJoin, List<SqlTreeNode> myList) {
     String parentPath = SplitName.split(extraJoin.prefix())[0];
     for (SqlTreeNode maybeParent : myList) {
       if (maybeParent.prefix().equals(parentPath)) {
-        maybeParent.addChild(extraJoin);
+        if (isFormula2Dependency(extraJoin.prefix())) {
+          // formula2 dependency joins must precede child tree nodes that reference their aliases
+          maybeParent.addChildFirst(extraJoin);
+        } else {
+          maybeParent.addChild(extraJoin);
+        }
         return true;
       }
+    }
+    return false;
+  }
+
+  /**
+   * Return true if the path is a formula2 dependency — either directly in formula2JoinIncludes,
+   * or an ancestor of a path in formula2JoinIncludes (e.g. "parent.parent" is an ancestor of
+   * "parent.parent.someBean" and must also be ordered before any formula2 tree node that
+   * references its descendants' table aliases).
+   */
+  private boolean isFormula2Dependency(String path) {
+    if (formula2JoinIncludes.contains(path)) return true;
+    String prefix = path + ".";
+    for (String dep : formula2JoinIncludes) {
+      if (dep.startsWith(prefix)) return true;
     }
     return false;
   }
@@ -480,6 +544,23 @@ public final class SqlTreeBuilder {
         if (p.isAggregationManyToOne()) {
           p.extraIncludes(predicates.predicateIncludes());
         }
+        addFormula2Joins(p, queryProps.getPath());
+      }
+    }
+  }
+
+  /**
+   * Accumulate the auto-join paths required by a @Formula2 property.
+   * <p>
+   * The property's formula2Joins() are relative to the property's own bean, so they are
+   * prefixed with the node path to give root-descriptor-relative join paths. These are later
+   * turned into extra joins (see buildExtraJoins) and registered with the SqlTreeAlias.
+   */
+  private void addFormula2Joins(STreeProperty p, String prefix) {
+    Set<String> f2Joins = p.formula2Joins();
+    if (f2Joins != null) {
+      for (String join : f2Joins) {
+        formula2JoinIncludes.add(SplitName.add(prefix, join));
       }
     }
   }
@@ -514,21 +595,35 @@ public final class SqlTreeBuilder {
     return selectProps;
   }
 
-  private SqlTreeProperties getBaseSelect(STreeType desc, OrmQueryProperties queryProps) {
+  private SqlTreeProperties getBaseSelect(STreeType desc, OrmQueryProperties queryProps, String prefix) {
     boolean partial = queryProps != null && !queryProps.allProperties();
     if (partial) {
-      return getBaseSelectPartial(desc, queryProps);
+      SqlTreeProperties result = getBaseSelectPartial(desc, queryProps);
+      // Even in partial select mode, we must register formula2 dependency joins for any
+      // @Formula2 @ManyToOne properties that are included as bean joins (tree nodes).
+      // These properties are not in the partial property list, but their formula2 dependency
+      // joins still need to appear in the FROM clause before the tree node's formula2 join.
+      for (STreePropertyAssocOne p : desc.propsOne()) {
+        if (queryProps.isIncludedBeanJoin(p.name())) {
+          addFormula2Joins(p, prefix);
+        }
+      }
+      return result;
     }
 
     SqlTreeProperties selectProps = new SqlTreeProperties();
     selectProps.setAllProperties();
 
     // normal simple properties of the bean
-    selectProps.add(desc.propsBaseScalar());
+    STreeProperty[] baseScalar = desc.propsBaseScalar();
+    selectProps.add(baseScalar);
+    for (STreeProperty p : baseScalar) {
+      // @Formula2 auto-join: prefix the (bean relative) join paths with this node path
+      addFormula2Joins(p, prefix);
+    }
     selectProps.add(desc.propsEmbedded());
 
     for (STreePropertyAssocOne propertyAssocOne : desc.propsOne()) {
-      //noinspection StatementWithEmptyBody
       if (queryProps != null
         && queryProps.isIncludedBeanJoin(propertyAssocOne.name())
         && propertyAssocOne.hasForeignKey()
@@ -537,6 +632,8 @@ public final class SqlTreeBuilder {
         // as it will have its own entire Node in the SqlTree
       } else {
         selectProps.add(propertyAssocOne);
+        // @Formula2 on @ManyToOne: register auto-join paths so the required joins are added
+        addFormula2Joins(propertyAssocOne, prefix);
       }
     }
     return selectProps;
@@ -591,6 +688,7 @@ public final class SqlTreeBuilder {
     private final STreeType desc;
     private final Set<String> selectIncludes;
     private final Set<String> predicateIncludes;
+    private final Set<String> formula2Deps;
     private final SpiQuery.TemporalMode temporalMode;
     private final ManyWhereJoins manyWhereJoins;
 
@@ -598,12 +696,28 @@ public final class SqlTreeBuilder {
     private final Map<String, SqlTreeNodeExtraJoin> rootRegister = new HashMap<>();
 
     private IncludesDistiller(STreeType desc, Set<String> selectIncludes,
-                              Set<String> predicateIncludes, ManyWhereJoins manyWhereJoins, SpiQuery.TemporalMode temporalMode) {
+                              Set<String> predicateIncludes, ManyWhereJoins manyWhereJoins, SpiQuery.TemporalMode temporalMode,
+                              Set<String> formula2Deps) {
       this.desc = desc;
       this.selectIncludes = selectIncludes;
       this.predicateIncludes = predicateIncludes;
       this.manyWhereJoins = manyWhereJoins;
       this.temporalMode = temporalMode;
+      this.formula2Deps = formula2Deps;
+    }
+
+    /**
+     * Return true if this path is a formula2 dependency — either directly in formula2Deps or
+     * an ancestor of a path in formula2Deps. Such joins must appear before formula2 joins that
+     * reference their table aliases.
+     */
+    private boolean isFormula2Dependency(String path) {
+      if (formula2Deps.contains(path)) return true;
+      String prefix = path + ".";
+      for (String dep : formula2Deps) {
+        if (dep.startsWith(prefix)) return true;
+      }
+      return false;
     }
 
     /**
@@ -655,11 +769,15 @@ public final class SqlTreeBuilder {
      * Create a SqlTreeNodeExtraJoin, register and return it.
      */
     private SqlTreeNodeExtraJoin createJoinLeaf(String propertyName) {
+      SqlTreeNodeExtraJoin extraJoin = joinRegister.get(propertyName);
+      if (extraJoin != null) {
+        return extraJoin;
+      }
       ExtraJoin extra = desc.extraJoin(propertyName);
       if (extra == null) {
         return null;
       } else {
-        SqlTreeNodeExtraJoin extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
+        extraJoin = new SqlTreeNodeExtraJoin(propertyName, extra.property(), extra.isContainsMany(), temporalMode);
         joinRegister.put(propertyName, extraJoin);
         return extraJoin;
       }
@@ -680,24 +798,30 @@ public final class SqlTreeBuilder {
           // no parent possible(parent is root)
           return childJoin;
 
-        } else {
-          // look in register ...
-          String parentPropertyName = includeProp.substring(0, dotPos);
-          if (selectIncludes.contains(parentPropertyName)) {
-            // parent already handled by select
-            return childJoin;
-          }
-
-          SqlTreeNodeExtraJoin parentJoin = joinRegister.get(parentPropertyName);
-          if (parentJoin == null) {
-            // we need to create this the parent implicitly...
-            parentJoin = createJoinLeaf(parentPropertyName);
-          }
-
-          parentJoin.addChild(childJoin);
-          childJoin = parentJoin;
-          includeProp = parentPropertyName;
         }
+        String parentPropertyName = includeProp.substring(0, dotPos);
+        if (desc.isEmbeddedPath(parentPropertyName)) {
+          // digging in embedded property, skip to parent
+          includeProp = parentPropertyName;
+          continue;
+        }
+        // look in register ...
+        if (selectIncludes.contains(parentPropertyName)) {
+          // parent already handled by select
+          return childJoin;
+        }
+
+        SqlTreeNodeExtraJoin parentJoin = createJoinLeaf(parentPropertyName);
+
+        // formula2 dependency joins must appear before formula2 property joins that reference
+        // their table aliases — use addChildFirst to push dependencies ahead
+        if (isFormula2Dependency(childJoin.prefix())) {
+          parentJoin.addChildFirst(childJoin);
+        } else {
+          parentJoin.addChild(childJoin);
+        }
+        childJoin = parentJoin;
+        includeProp = parentPropertyName;
       }
     }
 

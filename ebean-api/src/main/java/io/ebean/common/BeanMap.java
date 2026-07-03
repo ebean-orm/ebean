@@ -1,9 +1,6 @@
 package io.ebean.common;
 
-import io.ebean.bean.BeanCollection;
-import io.ebean.bean.BeanCollectionLoader;
-import io.ebean.bean.EntityBean;
-import io.ebean.bean.ToStringBuilder;
+import io.ebean.bean.*;
 
 import java.util.*;
 
@@ -17,12 +14,12 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
   /**
    * The underlying map implementation.
    */
-  private Map<K, E> map;
+  private LinkedHashMap<K, E> map;
 
   /**
    * Create with a given Map.
    */
-  public BeanMap(Map<K, E> map) {
+  public BeanMap(LinkedHashMap<K, E> map) {
     this.map = map;
   }
 
@@ -165,18 +162,23 @@ public final class BeanMap<K, E> extends AbstractBeanCollection<E> implements Ma
     }
   }
 
-  /**
-   * Set the actual underlying map. Used for performing lazy fetch.
-   */
+  public LinkedHashMap<K, E> collectionAdd() {
+    if (map == null) {
+      map = new LinkedHashMap<>();
+    }
+    return map;
+  }
+
   @SuppressWarnings("unchecked")
-  public void setActualMap(Map<?, ?> map) {
-    this.map = (Map<K, E>) map;
+  public void refresh(ModifyListenMode modifyListenMode, BeanMap<?, ?> newMap) {
+    setModifyListening(modifyListenMode);
+    this.map = (LinkedHashMap<K, E>) newMap.actualMap();
   }
 
   /**
    * Return the actual underlying map.
    */
-  public Map<K, E> actualMap() {
+  public LinkedHashMap<K, E> actualMap() {
     return map;
   }
 

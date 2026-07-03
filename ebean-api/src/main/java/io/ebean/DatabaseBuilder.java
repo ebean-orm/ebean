@@ -59,6 +59,10 @@ public interface DatabaseBuilder {
 
   /**
    * Build and return the Database instance.
+   * <p>
+   * When {@link #setRegister(boolean)} is set to true, and a database with the same
+   * name is already registered, this may return the existing registered database
+   * rather than creating a new one.
    */
   Database build();
 
@@ -848,6 +852,13 @@ public interface DatabaseBuilder {
    */
   @Deprecated
   DatabaseBuilder setBackgroundExecutorWrapper(BackgroundExecutorWrapper backgroundExecutorWrapper);
+
+  /**
+   * Enable tenant-partitioned caches. When enabled each tenant gets its own cache namespace,
+   * improving cache-hit ratio by preventing cross-tenant key collisions.
+   * Use {@link SpiCacheManager#clearTenant(Object)} when a tenant is deactivated.
+   */
+  DatabaseBuilder tenantPartitionedCache(boolean tenantPartitionedCache);
 
   /**
    * Set the L2 cache default max size.
@@ -2508,6 +2519,11 @@ public interface DatabaseBuilder {
      * Return true if dirty beans are automatically persisted.
      */
     boolean isAutoPersistUpdates();
+
+    /**
+     * Return true if caches are partitioned by tenant.
+     */
+    boolean isTenantPartitionedCache();
 
     /**
      * Return the L2 cache default max size.

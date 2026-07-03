@@ -60,6 +60,6 @@ public interface SpiTransactionManager {
   /**
    * Return a connection used for query plan collection.
    */
-  Connection queryPlanConnection() throws SQLException;
+  Connection queryPlanConnection(Object tenantId) throws SQLException;
 
 }

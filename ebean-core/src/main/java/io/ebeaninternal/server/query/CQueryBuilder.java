@@ -326,6 +326,43 @@ final class CQueryBuilder {
     return sql;
   }
 
+  private String wrapSelectExists(String sql) {
+    return "select exists(" + sql + ")";
+  }
+
+  /**
+   * Build the exists query using select exists(...) for efficient boolean result.
+   */
+  <T> CQueryExists buildExistsQuery(OrmQueryRequest<T> request) {
+    SpiQuery<T> query = request.query();
+    query.setOrderBy(null);
+    query.setFirstRow(0);
+    query.setMaxRows(0);
+    if (request.descriptor().hasId()) {
+      query.setSelectId();
+    }
+
+    CQueryPredicates predicates = new CQueryPredicates(binder, request);
+    CQueryPlan queryPlan = request.queryPlan();
+    if (queryPlan != null) {
+      predicates.prepare(false);
+      return new CQueryExists(queryPlan, request, predicates);
+    }
+
+    predicates.prepare(true);
+    SqlTree sqlTree = createSqlTree(request, predicates, false);
+    if (SpiQuery.TemporalMode.CURRENT == query.temporalMode()) {
+      sqlTree.addSoftDeletePredicate(query);
+    }
+
+    SqlLimitResponse s = buildSql("select 1", request, predicates, sqlTree);
+    String sql = wrapSelectExists(s.getSql());
+
+    queryPlan = new CQueryPlan(request, sql, sqlTree.plan(), predicates.logWhereSql());
+    request.putQueryPlan(queryPlan);
+    return new CQueryExists(queryPlan, request, predicates);
+  }
+
   /**
    * Return the SQL Select statement as a String. Converts logical property
    * names to physical deployment column names.

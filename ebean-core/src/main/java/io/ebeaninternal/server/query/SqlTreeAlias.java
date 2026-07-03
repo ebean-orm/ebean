@@ -8,6 +8,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Special Map of the logical property joins to table alias.
@@ -32,41 +34,44 @@ final class SqlTreeAlias {
   /**
    * Add joins to support where predicates
    */
-  void addManyWhereJoins(Set<String> manyWhereJoins) {
+  void addManyWhereJoins(Set<String> manyWhereJoins, STreeType desc) {
     if (manyWhereJoins != null) {
       for (String include : manyWhereJoins) {
-        addPropertyJoin(include, manyWhereJoinProps);
+        addPropertyJoin(include, manyWhereJoinProps, desc);
       }
     }
   }
 
-  private void addEmbeddedPropertyJoin(String embProp) {
+  private boolean addEmbeddedPropertyJoin(String embProp) {
     if (embeddedPropertyJoins == null) {
       embeddedPropertyJoins = new HashSet<>();
     }
-    embeddedPropertyJoins.add(embProp);
+    return embeddedPropertyJoins.add(embProp);
   }
 
   /**
    * Add joins.
    */
   public void addJoin(Set<String> propJoins, STreeType desc) {
-    if (propJoins != null) {
-      for (String propJoin : propJoins) {
-        if (desc.isEmbeddedPath(propJoin)) {
-          addEmbeddedPropertyJoin(propJoin);
-        } else {
-          addPropertyJoin(propJoin, joinProps);
-        }
-      }
+    if (propJoins == null) {
+      return;
+    }
+    for (String propJoin : propJoins) {
+      addPropertyJoin(propJoin, joinProps, desc);
     }
   }
 
-  private void addPropertyJoin(String include, TreeSet<String> set) {
-    if (set.add(include)) {
+  private void addPropertyJoin(String include, TreeSet<String> set, STreeType desc) {
+    boolean added = false;
+    if (desc.isEmbeddedPath(include)) {
+      added = addEmbeddedPropertyJoin(include);
+    } else {
+      added = set.add(include);
+    }
+    if (added) {
       String[] split = SplitName.split(include);
       if (split[0] != null) {
-        addPropertyJoin(split[0], set);
+        addPropertyJoin(split[0], set, desc);
       }
     }
   }
@@ -89,7 +94,7 @@ final class SqlTreeAlias {
       for (String propJoin : embeddedPropertyJoins) {
         String[] split = SplitName.split(propJoin);
         // the table alias of the parent path
-        String alias = tableAlias(split[0]);
+        String alias = tableAliasManyWhere(split[0]);
         aliasMap.put(propJoin, alias);
       }
     }
@@ -150,6 +155,33 @@ final class SqlTreeAlias {
   public String parse(String clause) {
     clause = parseRootAlias(clause);
     return parseAliasMap(clause, aliasMap);
+  }
+
+  /**
+   * Placeholder pattern for @Formula2 path based formulas e.g. ${} or ${parent}.
+   */
+  private static final Pattern FORMULA2_PLACEHOLDER = Pattern.compile("\\$\\{([^}]*)}");
+
+  /**
+   * Parse a @Formula2 select/predicate replacing the path based placeholders.
+   * <p>
+   * The placeholder paths are relative to the bean the formula is declared on. They are combined
+   * with the current node prefix to give the root descriptor relative path and then mapped to the
+   * appropriate table alias. e.g. with currentPrefix "children.children" the placeholder ${parent}
+   * resolves via the path "children.children.parent".
+   */
+  String parseFormula2(String clause, String currentPrefix) {
+    Matcher matcher = FORMULA2_PLACEHOLDER.matcher(clause);
+    StringBuilder sb = new StringBuilder(clause.length() + 16);
+    while (matcher.find()) {
+      String relativePath = matcher.group(1);
+      String fullPath = relativePath.isEmpty() ? currentPrefix : SplitName.add(currentPrefix, relativePath);
+      String tableAlias = tableAlias(fullPath);
+      String replacement = tableAlias == null ? "" : tableAlias + ".";
+      matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
   }
 
   /**

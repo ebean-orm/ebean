@@ -5,6 +5,7 @@ import io.ebean.Transaction;
 import io.ebean.ValuePair;
 import io.ebean.bean.EntityBean;
 import io.ebean.bean.EntityBeanIntercept;
+import io.ebean.bean.InterceptReadWrite;
 import io.ebean.bean.PersistenceContext;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.ScalarDataReader;
@@ -43,6 +44,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   private final boolean orphanRemoval;
   private final boolean primaryKeyExport;
   private final boolean primaryKeyJoin;
+  private final boolean embeddedAllowEmpty;
 
   private AssocOneHelp localHelp;
   final BeanProperty[] embeddedProps;
@@ -52,6 +54,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   private String deleteByParentIdInSql;
   private BeanPropertyAssocMany<?> relationshipProperty;
   private boolean cacheNotifyRelationship;
+  private boolean cacheNotifyOwningOneToOne;
 
   /**
    * Create based on deploy information of an EmbeddedId.
@@ -71,6 +74,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     oneToOne = deploy.isOneToOne();
     oneToOneExported = deploy.isOneToOneExported();
     orphanRemoval = deploy.isOrphanRemoval();
+    embeddedAllowEmpty = deploy.isEmbeddedAllowEmpty();
     if (embedded) {
       // Overriding of the columns and use table alias of owning BeanDescriptor
       BeanEmbeddedMeta overrideMeta = BeanEmbeddedMetaFactory.create(owner, deploy);
@@ -97,6 +101,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     oneToOne = source.oneToOne;
     oneToOneExported = source.oneToOneExported;
     orphanRemoval = source.orphanRemoval;
+    embeddedAllowEmpty = source.embeddedAllowEmpty;
     embeddedProps = null;
     embeddedPropsMap = null;
   }
@@ -141,6 +146,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
    */
   void initialisePostTarget() {
     this.cacheNotifyRelationship = isCacheNotifyRelationship();
+    this.cacheNotifyOwningOneToOne = oneToOne && !oneToOneExported && targetDescriptor.isBeanCaching();
   }
 
   /**
@@ -163,17 +169,30 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   /**
-   * Clear the L2 relationship cache for this property.
+   * Return true if this owning OneToOne property requires target bean cache eviction on change.
+   */
+  boolean isCacheNotifyOwningOneToOne() {
+    return cacheNotifyOwningOneToOne;
+  }
+
+  /**
+   * Clear the L2 relationship cache for this property (used from beanCacheApplyInvalidate).
    */
   void cacheClear() {
     if (cacheNotifyRelationship) {
       targetDescriptor.cacheManyPropClear(relationshipProperty.name());
+    }
+    if (cacheNotifyOwningOneToOne) {
+      targetDescriptor.clearBeanCache();
     }
   }
 
   void cacheClear(CacheChangeSet changeSet) {
     if (cacheNotifyRelationship) {
       changeSet.addManyClear(targetDescriptor, relationshipProperty.name());
+    }
+    if (cacheNotifyOwningOneToOne) {
+      changeSet.addClearBean(targetDescriptor);
     }
   }
 
@@ -197,6 +216,66 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     }
   }
 
+  /**
+   * Evict the target's bean cache entry when this owning OneToOne bean is inserted or deleted.
+   */
+  void cacheDeleteOneToOneOwned(EntityBean bean, CacheChangeSet changeSet) {
+    if (cacheNotifyOwningOneToOne) {
+      Object assocBean = getValue(bean);
+      if (assocBean != null) {
+        Object targetId = targetDescriptor.id(assocBean);
+        if (targetId != null) {
+          changeSet.addBeanRemove(targetDescriptor, targetId);
+        }
+      }
+    }
+  }
+
+  /**
+   * Clear the target's entire bean cache when owning OneToOne beans are deleted by IDs.
+   */
+  void cacheClearOneToOneOwned(CacheChangeSet changeSet) {
+    if (cacheNotifyOwningOneToOne) {
+      changeSet.addClearBean(targetDescriptor);
+    }
+  }
+
+  /**
+   * Evict the inverse caches for BOTH old and new targets when the FK changes on update.
+   * Handles collection-ids caches (ManyToOne) and bean caches (owning OneToOne).
+   */
+  void cacheUpdateFKchange(EntityBean bean, Object origAssocBean, CacheChangeSet changeSet) {
+    Object newAssocBean = getValue(bean);
+    if (cacheNotifyRelationship) {
+      if (origAssocBean != null) {
+        Object oldId = targetDescriptor.id(origAssocBean);
+        if (oldId != null) {
+          changeSet.addManyRemove(targetDescriptor, relationshipProperty.name(), targetDescriptor.cacheKey(oldId));
+        }
+      }
+      if (newAssocBean != null) {
+        Object newId = targetDescriptor.id(newAssocBean);
+        if (newId != null) {
+          changeSet.addManyRemove(targetDescriptor, relationshipProperty.name(), targetDescriptor.cacheKey(newId));
+        }
+      }
+    }
+    if (cacheNotifyOwningOneToOne) {
+      if (origAssocBean != null) {
+        Object oldId = targetDescriptor.id(origAssocBean);
+        if (oldId != null) {
+          changeSet.addBeanRemove(targetDescriptor, oldId);
+        }
+      }
+      if (newAssocBean != null) {
+        Object newId = targetDescriptor.id(newAssocBean);
+        if (newId != null) {
+          changeSet.addBeanRemove(targetDescriptor, newId);
+        }
+      }
+    }
+  }
+
   @Override
   Object naturalKeyVal(Map<String, Object> values) {
     EntityBean bean = (EntityBean) values.get(name);
@@ -209,15 +288,31 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   @Override
   public ElPropertyValue buildElPropertyValue(String propName, String remainder, ElPropertyChainBuilder chain, boolean propertyDeploy) {
     if (embedded) {
-      BeanProperty embProp = embeddedPropsMap.get(remainder);
+      String embName = remainder;
+      String embRemainder = null;
+      int basePos = remainder.indexOf('.');
+      if (basePos > -1) {
+        embName = remainder.substring(0, basePos);
+        embRemainder = remainder.substring(basePos + 1);
+      }
+      BeanProperty embProp = embeddedPropsMap.get(embName);
+
       if (embProp == null) {
-        String msg = "Embedded Property " + remainder + " not found in " + fullName();
+        String msg = "Embedded Property " + embName + " not found in " + fullName();
         throw new PersistenceException(msg);
       }
-      if (chain == null) {
-        chain = new ElPropertyChainBuilder(true, propName);
-      }
       chain.add(this);
+      if (embRemainder != null) {
+        if (embProp instanceof BeanPropertyAssocOne) {
+          // @ManyToOne using the overridden property, e.g. "ma_country_code" instead of "country_code")
+          return embProp.buildElPropertyValue(propName, embRemainder, chain, propertyDeploy);
+        }
+        // scalar (or non-navigable) leaf with a further path segment - invalid path
+        String msg = "Embedded Property " + embName + "." + embRemainder + " not found in " + fullName();
+        throw new PersistenceException(msg);
+      }
+      // direct scalar/assoc access within embedded — mark as embedded so the prefix
+      // strips the embedded segment (keeps parent table alias, not the embedded segment)
       chain.setEmbedded(true);
       return chain.add(embProp).build();
     }
@@ -421,18 +516,20 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
       if (embedded) {
         setValue(bean, targetDescriptor.cacheEmbeddedBeanLoad((CachedBeanData) cacheData, context));
       } else {
-        setValue(bean, refBean(targetDescriptor, cacheData, context));
+        // when the owning bean is unmodifiable the reference must also be unmodifiable
+        final boolean unmodifiable = !(bean._ebean_getIntercept() instanceof InterceptReadWrite);
+        setValue(bean, refBean(targetDescriptor, cacheData, context, unmodifiable));
       }
     }
   }
 
-  private Object refBean(BeanDescriptor<?> desc, Object id, PersistenceContext context) {
+  private Object refBean(BeanDescriptor<?> desc, Object id, PersistenceContext context, boolean unmodifiable) {
     if (id instanceof String) {
       id = desc.idProperty().scalarType.parse((String) id);
     }
-    Object bean = desc.contextGet(context, id);
+    Object bean = context == null ? null : desc.contextGet(context, id);
     if (bean == null) {
-      bean = desc.createRef(id, context);
+      bean = desc.createReference(unmodifiable, false, id, context);
     }
     return bean;
   }
@@ -567,9 +664,17 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
   }
 
   @Override
+  public boolean isFormula() {
+    return super.isFormula() || formula2Select != null;
+  }
+
+  @Override
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
     if (!isTransient) {
-      if (primaryKeyExport) {
+      if (formula2Select != null) {
+        // @Formula2 on @ManyToOne: use formula2 expression as FK selector
+        ctx.appendFormula2Select(formula2Select);
+      } else if (primaryKeyExport) {
         descriptor.idProperty().appendSelect(ctx, subQuery);
       } else {
         localHelp.appendSelect(ctx, subQuery);
@@ -588,9 +693,32 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
     return super.addJoin(joinType, a1, a2, ctx);
   }
 
+  /**
+   * Add table join using a prefix to resolve table aliases.
+   */
+  @Override
+  public SqlJoinType addJoin(SqlJoinType joinType, String prefix, DbSqlContext ctx) {
+    if (formula2Select != null) {
+      // @Formula2 on @ManyToOne: join target table with formula2 FK expression as ON clause
+      String parentPrefix = SplitName.split(prefix)[0]; // null for root-level
+      String a2 = ctx.tableAlias(prefix);
+      String resolvedFk = ctx.parseFormula2(formula2Select, parentPrefix);
+      String joinLiteral = joinType.literal(SqlJoinType.OUTER);
+      String foreignIdCol = tableJoin.columns()[0].getForeignDbColumn();
+      ctx.addFormula2Join(joinLiteral, tableJoin.getTable(), a2, foreignIdCol, resolvedFk);
+      return SqlJoinType.OUTER;
+    }
+    return super.addJoin(joinType, prefix, ctx);
+  }
+
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType, String manyWhere) {
     if (!isTransient && !primaryKeyExport) {
+      if (formula2Select != null) {
+        // @Formula2 on @ManyToOne: auto-joins for the formula are handled via formula2JoinIncludes;
+        // no additional join SQL is emitted here (the FK value comes from the formula2 SELECT expression)
+        return;
+      }
       localHelp.appendFrom(ctx, joinType);
       if (sqlFormulaJoin != null) {
         String alias = ctx.tableAliasManyWhere(manyWhere);
@@ -688,7 +816,7 @@ public class BeanPropertyAssocOne<T> extends BeanPropertyAssoc<T> implements STr
 
   private AssocOneHelp createHelp(boolean embedded, boolean oneToOneExported, String embeddedPrefix) {
     if (embedded) {
-      return new AssocOneHelpEmbedded(this);
+      return new AssocOneHelpEmbedded(this, embeddedAllowEmpty);
     } else if (oneToOneExported) {
       return new AssocOneHelpRefExported(this);
     } else {

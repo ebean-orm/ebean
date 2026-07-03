@@ -9,6 +9,8 @@ import io.ebeaninternal.api.SpiExpressionRequest;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
 import java.util.Arrays;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -24,6 +26,9 @@ import java.util.Arrays;
  */
 public final class ElPropertyChain implements ElPropertyValue {
 
+  /** Matches placeholders of the form ${} or ${path} (e.g. ${parent}) used by @Formula2. */
+  private static final Pattern PLACEHOLDER = Pattern.compile("\\$\\{([^}]*)}");
+
   private final String prefix;
   private final String placeHolder;
   private final String placeHolderEncrypted;
@@ -37,17 +42,19 @@ public final class ElPropertyChain implements ElPropertyValue {
   private final ScalarType<?> scalarType;
   private final ElPropertyValue lastElPropertyValue;
 
-  public ElPropertyChain(boolean containsMany, boolean embedded, String expression, ElPropertyValue[] chain) {
-    this.containsMany = containsMany;
+  public ElPropertyChain(String expression, boolean containsMany, boolean embedded, ElPropertyValue[] chain) {
     this.chain = chain;
     this.expression = expression;
+    this.containsMany = containsMany;
+
     int dotPos = expression.lastIndexOf('.');
     if (dotPos > -1) {
       this.name = expression.substring(dotPos + 1);
       if (embedded) {
+        // embedded segments are transparent (share parent table) — strip the embedded
+        // segment from the prefix so the alias points to the parent join, not the embedded
         int embPos = expression.lastIndexOf('.', dotPos - 1);
         this.prefix = embPos == -1 ? null : expression.substring(0, embPos);
-
       } else {
         this.prefix = expression.substring(0, dotPos);
       }
@@ -56,19 +63,18 @@ public final class ElPropertyChain implements ElPropertyValue {
       this.name = expression;
     }
 
-    this.assocId = chain[chain.length - 1].isAssocId();
-
-    this.last = chain.length - 1;
-    this.lastBeanProperty = chain[chain.length - 1].beanProperty();
+    this.last = this.chain.length - 1;
+    this.lastElPropertyValue = this.chain[this.last];
+    this.assocId = this.lastElPropertyValue.isAssocId();
+    this.lastBeanProperty = lastElPropertyValue.beanProperty();
     if (lastBeanProperty != null) {
       this.scalarType = lastBeanProperty.scalarType();
     } else {
       // case for nested compound type (non-scalar)
       this.scalarType = null;
     }
-    this.lastElPropertyValue = chain[chain.length - 1];
-    this.placeHolder = placeHolder(prefix, lastElPropertyValue, false);
-    this.placeHolderEncrypted = placeHolder(prefix, lastElPropertyValue, true);
+    this.placeHolder = placeHolder(this.prefix, lastElPropertyValue, false);
+    this.placeHolderEncrypted = placeHolder(this.prefix, lastElPropertyValue, true);
   }
 
   @Override
@@ -94,9 +100,18 @@ public final class ElPropertyChain implements ElPropertyValue {
     if (!el.contains("${}")) {
       // typically a secondary table property
       return el.replace("${", "${" + prefix + ".");
-    } else {
-      return el.replace(ROOT_ELPREFIX, "${" + prefix + "}");
     }
+    // prefix the root placeholder ${} as well as any path placeholders ${path}
+    // (e.g. ${parent} used by a @Formula2 property referenced via a path)
+    Matcher matcher = PLACEHOLDER.matcher(el);
+    StringBuilder sb = new StringBuilder();
+    while (matcher.find()) {
+      String path = matcher.group(1);
+      String replacement = path.isEmpty() ? "${" + prefix + "}" : "${" + prefix + "." + path + "}";
+      matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
+    }
+    matcher.appendTail(sb);
+    return sb.toString();
   }
 
   /**

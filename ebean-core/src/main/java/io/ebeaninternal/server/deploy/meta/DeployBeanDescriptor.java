@@ -567,7 +567,7 @@ public class DeployBeanDescriptor<T> {
    * Add a bean property.
    */
   public DeployBeanProperty addBeanProperty(DeployBeanProperty prop) {
-    return propMap.put(prop.getName(), prop);
+    return propMap.put(prop.name(), prop);
   }
 
   public Collection<DeployBeanProperty> properties() {
@@ -705,7 +705,7 @@ public class DeployBeanDescriptor<T> {
     for (DeployBeanProperty prop : propMap.values()) {
       if (!prop.isTransient() && !(prop instanceof DeployBeanPropertyAssocMany<?>)) {
         if (prop.isFetchEager()) {
-          sb.append(prop.getName()).append(',');
+          sb.append(prop.name()).append(',');
         } else {
           hasLazyFetch = true;
         }

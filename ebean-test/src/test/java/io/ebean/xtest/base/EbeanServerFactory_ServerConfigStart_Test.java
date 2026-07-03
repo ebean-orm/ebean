@@ -2,6 +2,8 @@ package io.ebean.xtest.base;
 
 import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
+import io.ebean.DatabaseFactory;
+import io.ebean.config.DatabaseConfig;
 import io.ebean.event.ServerConfigStartup;
 import io.ebeaninternal.api.SpiLogger;
 import io.ebeaninternal.api.SpiLoggerFactory;
@@ -10,6 +12,7 @@ import org.tests.model.basic.UTDetail;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -77,6 +80,59 @@ public class EbeanServerFactory_ServerConfigStart_Test {
 
     Database restartedServer = config.build();
     restartedServer.shutdown(true, false);
+  }
+
+  @Test
+  public void create_registeredDatabase_twice_returnsExistingInstance() {
+
+    DatabaseBuilder config = new DatabaseConfig();
+    config.setName("h2");
+    config.loadFromProperties();
+    config.setName("dup-" + System.nanoTime());
+    config.setDdlGenerate(false);
+    config.setDdlRun(false);
+    config.setDdlExtra(false);
+    config.setDefaultServer(false);
+    config.setRegister(true);
+    config.addClass(UTDetail.class);
+
+    AtomicInteger startupCount = new AtomicInteger();
+    config.addServerConfigStartup(serverConfig -> startupCount.incrementAndGet());
+
+    Database db = DatabaseFactory.create(config);
+    Database existing = DatabaseFactory.create(config);
+
+    assertThat(existing).isSameAs(db);
+    assertThat(startupCount.get()).isEqualTo(1);
+
+    db.shutdown(true, false);
+  }
+
+  @Test
+  public void create_unregisteredDatabase_twice_returnsDifferentInstances() {
+
+    DatabaseBuilder config = new DatabaseConfig();
+    config.setName("h2");
+    config.loadFromProperties();
+    config.setName("dup-unregistered-" + System.nanoTime());
+    config.setDdlGenerate(false);
+    config.setDdlRun(false);
+    config.setDdlExtra(false);
+    config.setDefaultServer(false);
+    config.setRegister(false);
+    config.addClass(UTDetail.class);
+
+    AtomicInteger startupCount = new AtomicInteger();
+    config.addServerConfigStartup(serverConfig -> startupCount.incrementAndGet());
+
+    Database db = DatabaseFactory.create(config);
+    Database other = DatabaseFactory.create(config);
+
+    assertThat(other).isNotSameAs(db);
+    assertThat(startupCount.get()).isEqualTo(2);
+
+    db.shutdown(true, false);
+    other.shutdown(true, false);
   }
 
   public static class OnStartup implements ServerConfigStartup {

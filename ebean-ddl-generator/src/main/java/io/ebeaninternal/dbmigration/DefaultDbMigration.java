@@ -86,6 +86,7 @@ public class DefaultDbMigration implements DbMigration {
   private int lockTimeoutSeconds;
   protected boolean includeBuiltInPartitioning = true;
   protected boolean includeIndex;
+  private boolean formatterGuards;
 
   /**
    * Create for offline migration generation.
@@ -184,6 +185,11 @@ public class DefaultDbMigration implements DbMigration {
   @Override
   public void setHeader(String header) {
     this.header = header;
+  }
+
+  @Override
+  public void setAddFormatterGuards(boolean formatterGuards) {
+    this.formatterGuards = formatterGuards;
   }
 
   /**
@@ -653,7 +659,15 @@ public class DefaultDbMigration implements DbMigration {
   }
 
   private PlatformDdlWriter createDdlWriter(DatabasePlatform platform) {
-    return new PlatformDdlWriter(platform, databaseBuilder, lockTimeoutSeconds);
+    return new PlatformDdlWriter(platform, databaseBuilder, lockTimeoutSeconds, formatterGuards());
+  }
+
+  private boolean formatterGuards() {
+    String val = System.getProperty("ddl.migration.formatterGuards");
+    if (val != null) {
+      return Boolean.parseBoolean(val);
+    }
+    return formatterGuards;
   }
 
   /**

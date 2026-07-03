@@ -1,7 +1,6 @@
 package io.ebeaninternal.server.deploy;
 
 import io.avaje.json.JsonReader;
-import io.avaje.json.JsonReader.Token;
 import io.ebean.DataIntegrityException;
 import io.ebean.ModifyAwareType;
 import io.ebean.ValuePair;
@@ -120,6 +119,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   final String elPlaceHolderEncrypted;
   private final String sqlFormulaSelect;
   final String sqlFormulaJoin;
+  protected String formula2Select;
+  private Set<String> formula2Includes;
+  private final String formula2RawExpression;
   private final String aggregation;
   private final boolean formula;
   private final boolean dbEncrypted;
@@ -179,7 +181,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   public BeanProperty(BeanDescriptor<?> descriptor, DeployBeanProperty deploy) {
     this.descriptor = descriptor;
-    this.name = InternString.intern(deploy.getName());
+    this.name = InternString.intern(deploy.name());
     this.propertyIndex = deploy.getPropertyIndex();
     this.unidirectionalShadow = deploy.isUndirectionalShadow();
     this.importedPrimaryKey = deploy.isImportedPrimaryKey();
@@ -228,10 +230,11 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.sqlFormulaJoin = InternString.intern(deploy.getSqlFormulaJoin());
     this.sqlFormulaSelect = InternString.intern(deploy.getSqlFormulaSelect());
     this.formula = sqlFormulaSelect != null;
+    this.formula2RawExpression = deploy.getFormula2Expression();
     this.dbType = deploy.getDbType();
     this.scalarType = deploy.getScalarType();
     this.lob = isLobType(dbType);
-    this.propertyType = deploy.getPropertyType();
+    this.propertyType = deploy.propertyType();
     this.field = deploy.getField();
     this.elPlaceHolder = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), false, null);
     this.elPlaceHolderEncrypted = tableAliasIntern(descriptor, deploy.getElPlaceHolder(), dbEncrypted, dbColumn);
@@ -283,6 +286,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     this.sqlFormulaJoin = null;
     this.sqlFormulaSelect = null;
     this.formula = false;
+    this.formula2RawExpression = null;
     this.aggregation = null;
     this.excludedFromHistory = source.excludedFromHistory;
     this.tenantId = source.tenantId;
@@ -381,7 +385,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Return true if this property should have a DB Column created in DDL.
    */
   public boolean isDDLColumn() {
-    return !formula && !secondaryTable && (aggregation == null);
+    return !formula && formula2RawExpression == null && !secondaryTable && (aggregation == null);
   }
 
   /**
@@ -467,6 +471,8 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   public void appendSelect(DbSqlContext ctx, boolean subQuery) {
     if (aggregation != null) {
       ctx.appendFormulaSelect(aggregation);
+    } else if (formula2Select != null) {
+      ctx.appendFormula2Select(formula2Select);
     } else if (formula) {
       ctx.appendFormulaSelect(sqlFormulaSelect);
     } else if (!isTransient) {
@@ -824,6 +830,30 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
     return formula && sqlFormulaJoin != null;
   }
 
+  /**
+   * Initialise this property's formula2 parsed expression and required join paths.
+   * Called by BeanDescriptor.initialise() after all relationships are wired.
+   */
+  public void initFormula2(String parsedSelect, Set<String> includes) {
+    this.formula2Select = parsedSelect;
+    this.formula2Includes = includes.isEmpty() ? null : java.util.Collections.unmodifiableSet(includes);
+  }
+
+  /**
+   * Return the raw @Formula2 expression (before parsing), or null.
+   */
+  public String formula2RawExpression() {
+    return formula2RawExpression;
+  }
+
+  /**
+   * Return the join paths required by this @Formula2 property, or null if not a formula2.
+   */
+  @Override
+  public Set<String> formula2Joins() {
+    return formula2Includes;
+  }
+
   @Override
   public boolean containsManySince(String sinceProperty) {
     return containsMany();
@@ -891,6 +921,10 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
 
   @Override
   public String elPlaceholder(boolean encrypted) {
+    if (formula2Select != null) {
+      // resolve to the parsed @Formula2 expression (with ${} / ${path} placeholders)
+      return formula2Select;
+    }
     return encrypted ? elPlaceHolderEncrypted : elPlaceHolder;
   }
 

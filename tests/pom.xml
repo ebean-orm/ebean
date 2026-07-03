@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>18.0.0</version>
+    <version>18.2.0</version>
   </parent>
 
   <artifactId>tests</artifactId>
@@ -19,12 +19,14 @@
 
   <profiles>
     <profile>
-      <id>jdk16plus</id>
+      <id>jdk21plus</id>
       <activation>
-        <jdk>[17,21]</jdk>
+        <jdk>21</jdk>
       </activation>
       <modules>
-        <module>test-java16</module>
+        <!-- test-java16 uses SequencedSet/SequencedMap which requires the MR-JAR in ebean-api.
+             It must be run AFTER mvn install so it resolves ebean-api from the local repository
+             (as a JAR with MR-JAR support) rather than from target/classes in the reactor. -->
       </modules>
     </profile>
     <profile>

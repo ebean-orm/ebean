@@ -14,6 +14,8 @@ final class InsertMetaPlatform {
       case YUGABYTE:
       case COCKROACH:
         return new InsertMetaOptionsPostgres(meta, desc);
+      case SQLITE:
+        return new InsertMetaOptionsSqlite(meta, desc);
       default:
         return NOT_SUPPORTED;
     }

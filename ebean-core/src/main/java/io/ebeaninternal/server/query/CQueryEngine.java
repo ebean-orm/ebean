@@ -105,7 +105,6 @@ public final class CQueryEngine {
         request.transaction().logSummary(rcQuery.summary());
       }
       if (request.isQueryCachePut()) {
-        request.addDependentTables(rcQuery.dependentTables());
         if (collection instanceof List) {
           collection = (A) Collections.unmodifiableList((List<?>) collection);
           request.putToQueryCache(collection);
@@ -163,10 +162,32 @@ public final class CQueryEngine {
         request.transaction().logSummary(rcQuery.summary());
       }
       if (request.isQueryCachePut()) {
-        request.addDependentTables(rcQuery.dependentTables());
         request.putToQueryCache(count);
       }
       return count;
+    } catch (SQLException e) {
+      throw translate(request, rcQuery.bindLog(), rcQuery.generatedSql(), e);
+    }
+  }
+
+  /**
+   * Build and execute the exists query using select exists(...).
+   */
+  public <T> boolean findExists(OrmQueryRequest<T> request) {
+    CQueryExists rcQuery = queryBuilder.buildExistsQuery(request);
+    request.setCancelableQuery(rcQuery);
+    try {
+      boolean exists = rcQuery.findExists();
+      if (request.logSql()) {
+        logGeneratedSql(request, rcQuery.generatedSql(), rcQuery.bindLog(), rcQuery.micros());
+      }
+      if (request.logSummary()) {
+        request.transaction().logSummary(rcQuery.summary());
+      }
+      if (request.isQueryCachePut()) {
+        request.putToQueryCache(exists);
+      }
+      return exists;
     } catch (SQLException e) {
       throw translate(request, rcQuery.bindLog(), rcQuery.generatedSql(), e);
     }
@@ -345,9 +366,6 @@ public final class CQueryEngine {
       }
       request.executeSecondaryQueries(false);
       request.populateFromImmutableCache();
-      if (request.isQueryCachePut()) {
-        request.addDependentTables(cquery.dependentTables());
-      }
       request.unmodifiableFreeze(beanCollection);
       return beanCollection;
 

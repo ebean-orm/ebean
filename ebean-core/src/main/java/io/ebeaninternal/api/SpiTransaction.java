@@ -104,6 +104,11 @@ public interface SpiTransaction extends Transaction {
   Boolean isUpdateAllLoadedProperties();
 
   /**
+   * Return true if generated properties ({@code @WhenCreated} etc.) are enabled for this transaction.
+   */
+  boolean isGeneratedPropertiesEnabled();
+
+  /**
    * Return the batchSize specifically set for this transaction or 0.
    * <p>
    * Returning 0 implies to use the system wide default batch size.

@@ -5,6 +5,7 @@ import io.ebean.CacheMode;
 import io.ebean.DB;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Article;
+import org.tests.model.basic.ArticleAuthor;
 import org.tests.model.basic.Section;
 
 import java.util.List;
@@ -49,4 +50,20 @@ public class TestQueryFindReadOnly extends BaseTestCase {
 
   }
 
+  @Test
+  public void test_readOnly_not_inserted() {
+    ArticleAuthor author = new ArticleAuthor("name1");
+    DB.save(author);
+
+    ArticleAuthor articleAuthor = DB.find(ArticleAuthor.class)
+      .setUnmodifiable(true)
+      .setId(author.getId()).findOne();
+
+    assertNotNull(articleAuthor);
+    assertTrue(DB.beanState(articleAuthor).isUnmodifiable());
+
+    Article article = new Article("art1", "name1");
+    article.setArticleAuthor(articleAuthor);
+    assertDoesNotThrow(() -> DB.save(article));
+  }
 }

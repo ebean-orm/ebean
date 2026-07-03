@@ -261,6 +261,28 @@ final class DefaultDbSqlContext implements DbSqlContext {
   }
 
   @Override
+  public String parseFormula2(String formula, String prefix) {
+    return alias.parseFormula2(formula, prefix);
+  }
+
+  @Override
+  public void addFormula2Join(String joinLiteral, String table, String a2, String foreignIdCol, String resolvedFkExpr) {
+    if (tableJoins == null) {
+      tableJoins = new HashSet<>();
+    }
+    String joinKey = table + "-formula2-" + a2;
+    if (tableJoins.contains(joinKey)) {
+      joinSuppressed = true;
+      return;
+    }
+    joinSuppressed = false;
+    tableJoins.add(joinKey);
+    sb.append(' ').append(joinLiteral).append(' ').append(table).append(' ').append(a2);
+    sb.append(" on ").append(a2).append('.').append(foreignIdCol);
+    sb.append(" = ").append(resolvedFkExpr);
+  }
+
+  @Override
   public void appendParseSelect(String parseSelect, String columnAlias) {
     String converted = this.alias.parse(parseSelect);
     sb.append(COMMA);
@@ -270,6 +292,14 @@ final class DefaultDbSqlContext implements DbSqlContext {
     } else {
       appendColumnAlias();
     }
+  }
+
+  @Override
+  public void appendFormula2Select(String parseSelect) {
+    // resolve the path based placeholders relative to the current node prefix
+    sb.append(COMMA);
+    sb.append(alias.parseFormula2(parseSelect, currentPrefix));
+    appendColumnAlias();
   }
 
   @Override

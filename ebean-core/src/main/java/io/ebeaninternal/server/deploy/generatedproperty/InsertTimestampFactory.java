@@ -43,7 +43,7 @@ final class InsertTimestampFactory {
    * Create the insert GeneratedProperty depending on the property type.
    */
   GeneratedProperty createInsertTimestamp(DeployBeanProperty property) {
-    Class<?> propType = property.getPropertyType();
+    Class<?> propType = property.propertyType();
     GeneratedProperty generatedProperty = map.get(propType);
     if (generatedProperty != null) {
       return generatedProperty;

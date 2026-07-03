@@ -209,6 +209,11 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
+  public <T> int deletePermanent(SpiQuery<T> query) {
+    return 0;
+  }
+
+  @Override
   public <T> UpdateQuery<T> update(Class<T> beanType) {
     return null;
   }

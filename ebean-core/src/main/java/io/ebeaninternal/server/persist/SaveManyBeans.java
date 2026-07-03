@@ -290,6 +290,17 @@ final class SaveManyBeans extends SaveManyBase {
       manyValue.modifyReset();
     }
 
+    if (!insertedParent) {
+      // only fire controller when the intersection actually changes:
+      // vanillaCollection/forcedUpdate always do a full replace,
+      // tracked BeanCollection fires only when additions or removals exist
+      boolean intersectionChanged = vanillaCollection || forcedUpdate
+          || (additions != null && !additions.isEmpty())
+          || (deletions != null && !deletions.isEmpty());
+      if (intersectionChanged) {
+        request.preManyToManyUpdate();
+      }
+    }
     transaction.depth(+1);
     if (deletions != null && !deletions.isEmpty()) {
       for (Object other : deletions) {
@@ -343,6 +354,10 @@ final class SaveManyBeans extends SaveManyBase {
       if (insertedParent) {
         // after insert set the modify listening mode for private owned etc
         c.setModifyListening(many.modifyListenMode());
+      } else {
+        // a lazily initialized collection (e.g. first save had null value) has no
+        // listen mode yet - set it now so that subsequent modifications are tracked
+        setListenMode(c, many);
       }
       // We must not reset when we still have to update other entities in the collection and set their new orderColumn value
       if (!hasOrderColumn) {

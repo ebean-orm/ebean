@@ -781,6 +781,11 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   }
 
   @Override
+  public final int deletePermanent() {
+    return query.deletePermanent();
+  }
+
+  @Override
   public final String getGeneratedSql() {
     return query.getGeneratedSql();
   }

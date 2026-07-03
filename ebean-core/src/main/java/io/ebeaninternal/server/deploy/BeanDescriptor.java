@@ -279,7 +279,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     this.idOnlyReference = isIdOnlyReference(propertiesBaseScalar);
     boolean noRelationships = propertiesOne.length + propertiesMany.length == 0;
     this.cacheSharableBeans = noRelationships && deploy.getCacheOptions().isReadOnly();
-    this.cacheHelp = new BeanDescriptorCacheHelp<>(this, owner.cacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
+    this.cacheHelp = BeanDescriptorCacheHelp.create(this, owner.cacheManager(), deploy.getCacheOptions(), cacheSharableBeans, propertiesOneImported);
     this.jsonHelp = initJsonHelp();
     // Check if there are no cascade save associated beans ( subject to change
     // in initialiseOther()). Note that if we are in an inheritance hierarchy
@@ -498,6 +498,23 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
         props[i] = beanProperty(naturalKey[i]);
       }
       this.beanNaturalKey = new BeanNaturalKey(naturalKey, props);
+    }
+  }
+
+  /**
+   * Parse @Formula2 logical expressions into placeholder-form SQL after all
+   * relationships have been wired up and elPropertyDeploy() is fully functional.
+   * Called from BeanDescriptorManager in a dedicated pass after all descriptors
+   * have been fully initialised, so cross-descriptor paths are safe to navigate.
+   */
+  void initFormula2Properties() {
+    for (BeanProperty prop : propertiesAll()) {
+      String rawExpr = prop.formula2RawExpression();
+      if (rawExpr != null) {
+        DeployPropertyParser parser = parser().setCatchFirst(true);
+        String parsed = parser.parse(rawExpr);
+        prop.initFormula2(parsed, parser.includes());
+      }
     }
   }
 
@@ -2058,6 +2075,12 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
       if (assocProp == null) {
         return null;
       }
+      // this method is an entry-point, although it introduces recursive calls via
+      // buildElPropertyValue -> createElPropertyValue -> buildElGetValue (back to here)
+      // it seems we can initialize ElPropertyChainBuilder at this point and skip further checks.
+      if (chain == null) {
+        chain = new ElPropertyChainBuilder(propName);
+      }
       String remainder = propName.substring(basePos + 1);
       return assocProp.buildElPropertyValue(propName, remainder, chain, propertyDeploy);
     }
@@ -2069,9 +2092,7 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
     if (property == null) {
       throw new PersistenceException("No property found for [" + propName + "] in expression " + chain.expression());
     }
-    if (property.containsMany()) {
-      chain.setContainsMany();
-    }
+
     return chain.add(property).build();
   }
 
@@ -2862,6 +2883,15 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
    */
   public BeanPropertyAssocMany<?>[] propertiesManySave() {
     return propertiesManySave;
+  }
+
+  /**
+   * Return true if this bean has cascade-save children (OneToMany or exported OneToOne)
+   * that hold a FK back to this bean. Used to decide whether an ON CONFLICT NOTHING
+   * insert must be executed immediately so the row-count is known before cascading.
+   */
+  public boolean hasCascadeChildren() {
+    return propertiesManySave.length > 0 || propertiesOneExportedSave.length > 0;
   }
 
   /**

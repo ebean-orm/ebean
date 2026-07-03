@@ -1,9 +1,11 @@
 package org.tests.cache;
 
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.CacheMode;
 import io.ebean.DB;
 import io.ebean.Query;
 import io.ebean.cache.ServerCache;
+import io.ebean.test.LoggedSql;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Address;
@@ -14,6 +16,7 @@ import org.tests.model.basic.cache.ECacheChild;
 import org.tests.model.basic.cache.ECacheRoot;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -190,5 +193,216 @@ public class TestQueryCacheTableDependency extends BaseTestCase {
     // clean up
     DB.delete(child);
     DB.delete(root);
+  }
+
+  /**
+   * findSingleAttributeList caches with dependent tables sourced from the query plan.
+   * A change to the joined (dependent) table must invalidate the query cache entry.
+   */
+  @Test
+  public void testFindSingleAttributeOnDependent() throws InterruptedException {
+    Address addr = new Address();
+    addr.setCity("qcache-sa-city");
+    DB.save(addr);
+
+    Customer cust = new Customer();
+    cust.setName("qcache-sa-cust");
+    cust.setBillingAddress(addr);
+    DB.save(cust);
+
+    DB.cacheManager().queryCache(Customer.class).clear();
+    Thread.sleep(10);
+
+    LoggedSql.start();
+    List<String> first = namesByBillingCity("qcache-sa-city");
+    assertThat(LoggedSql.stop()).as("first call executes SQL").hasSize(1);
+    assertThat(first).containsExactly("qcache-sa-cust");
+
+    LoggedSql.start();
+    List<String> second = namesByBillingCity("qcache-sa-city");
+    assertThat(LoggedSql.stop()).as("second call is a query cache hit").isEmpty();
+    assertThat(second).isEqualTo(first);
+
+    // modify the joined (dependent) o_address table -> evict the Customer query cache
+    addr.setCity("qcache-sa-city2");
+    DB.save(addr);
+
+    LoggedSql.start();
+    List<String> third = namesByBillingCity("qcache-sa-city");
+    assertThat(LoggedSql.stop()).as("cache invalidated after dependent table change").hasSize(1);
+    assertThat(third).isEmpty();
+
+    DB.delete(cust);
+  }
+
+  /**
+   * findList (unmodifiable query cache) caches with dependent tables sourced from the
+   * query plan. A change to the joined (dependent) table must invalidate the entry.
+   */
+  @Test
+  public void testFindListOnDependent() throws InterruptedException {
+    Address addr = new Address();
+    addr.setCity("qcache-list-city");
+    DB.save(addr);
+
+    Customer cust = new Customer();
+    cust.setName("qcache-list-cust");
+    cust.setBillingAddress(addr);
+    DB.save(cust);
+
+    DB.cacheManager().queryCache(Customer.class).clear();
+    Thread.sleep(10);
+
+    LoggedSql.start();
+    List<Customer> first = customersByBillingCity("qcache-list-city");
+    assertThat(LoggedSql.stop()).as("first call executes SQL").hasSize(1);
+    assertThat(first).hasSize(1);
+
+    LoggedSql.start();
+    List<Customer> second = customersByBillingCity("qcache-list-city");
+    assertThat(LoggedSql.stop()).as("second call is a query cache hit").isEmpty();
+    assertThat(second).isSameAs(first);
+
+    // modify the joined (dependent) o_address table -> evict the Customer query cache
+    addr.setCity("qcache-list-city2");
+    DB.save(addr);
+
+    LoggedSql.start();
+    List<Customer> third = customersByBillingCity("qcache-list-city");
+    assertThat(LoggedSql.stop()).as("cache invalidated after dependent table change").hasSize(1);
+    assertThat(third).isEmpty();
+
+    DB.delete(cust);
+  }
+
+  /**
+   * Fix #3821 — fetchQuery("contacts") must include the "contact" table in the query cache
+   * dependent tables so that an update to a contact invalidates the Customer query cache.
+   */
+  @Test
+  void fetchQuery_oneToMany_invalidatesQueryCacheOnSecondaryTableUpdate() throws InterruptedException {
+    Customer customer = new Customer();
+    customer.setName("qcache-fq-many-cust");
+    DB.save(customer);
+
+    Contact contact = new Contact();
+    contact.setFirstName("qcache-fq-many-contact");
+    contact.setCustomer(customer);
+    contact.setPhone("555-0000");
+    DB.save(contact);
+
+    try {
+      DB.cacheManager().queryCache(Customer.class).clear();
+      Thread.sleep(10);
+
+      LoggedSql.start();
+      List<Customer> first = DB.find(Customer.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("contacts")
+        .where().eq("name", "qcache-fq-many-cust")
+        .findList();
+      assertThat(LoggedSql.stop()).as("first call executes main SQL + secondary contacts query").hasSize(2);
+      assertThat(first).hasSize(1);
+
+      LoggedSql.start();
+      List<Customer> second = DB.find(Customer.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("contacts")
+        .where().eq("name", "qcache-fq-many-cust")
+        .findList();
+      assertThat(LoggedSql.stop()).as("second call is a query cache hit").isEmpty();
+      assertThat(second).isSameAs(first);
+
+      // update the contact — modifies the 'contact' table, must invalidate Customer query cache
+      contact.setPhone("555-1234");
+      DB.save(contact);
+
+      LoggedSql.start();
+      List<Customer> third = DB.find(Customer.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("contacts")
+        .where().eq("name", "qcache-fq-many-cust")
+        .findList();
+      assertThat(LoggedSql.stop()).as("cache invalidated after contact table update").hasSize(2);
+      assertThat(third).hasSize(1);
+      assertThat(third.get(0).getContacts()).hasSize(1);
+      assertThat(third.get(0).getContacts().get(0).getPhone()).isEqualTo("555-1234");
+    } finally {
+      DB.delete(contact);
+      DB.delete(customer);
+    }
+  }
+
+  /**
+   * Fix #3821 — fetchQuery("root") must include the "ecache_root" table in the ECacheChild query
+   * cache dependent tables so that an update to the root invalidates the child query cache.
+   */
+  @Test
+  void fetchQuery_manyToOne_invalidatesQueryCacheOnSecondaryTableUpdate() throws InterruptedException {
+    ECacheRoot root = new ECacheRoot();
+    root.setName("qcache-fq-one-root");
+    DB.save(root);
+
+    ECacheChild child = new ECacheChild();
+    child.setName("qcache-fq-one-child");
+    child.setRoot(root);
+    DB.save(child);
+
+    try {
+      DB.cacheManager().queryCache(ECacheChild.class).clear();
+      Thread.sleep(10);
+
+      LoggedSql.start();
+      List<ECacheChild> first = DB.find(ECacheChild.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("root")
+        .where().eq("name", "qcache-fq-one-child")
+        .findList();
+      assertThat(LoggedSql.stop()).as("first call executes main SQL (secondary root query not fired on unmodifiable query)").hasSize(1);
+      assertThat(first).hasSize(1);
+
+      LoggedSql.start();
+      List<ECacheChild> second = DB.find(ECacheChild.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("root")
+        .where().eq("name", "qcache-fq-one-child")
+        .findList();
+      assertThat(LoggedSql.stop()).as("second call is a query cache hit").isEmpty();
+      assertThat(second).isSameAs(first);
+
+      // update the root — modifies 'ecache_root' table, must invalidate ECacheChild query cache
+      root.setName("qcache-fq-one-root-updated");
+      DB.save(root);
+
+      LoggedSql.start();
+      List<ECacheChild> third = DB.find(ECacheChild.class)
+        .setUseQueryCache(CacheMode.ON)
+        .fetchQuery("root")
+        .where().eq("name", "qcache-fq-one-child")
+        .findList();
+      assertThat(LoggedSql.stop()).as("cache invalidated after ecache_root table update").hasSize(1);
+      assertThat(third).hasSize(1);
+      // root is an unloaded reference in the result (secondary query does not fire for unmodifiable
+      // AssocOne beans), so verify the updated name via the root ID from the result
+      UUID rootId = third.get(0).getRoot().getId();
+      assertThat(DB.find(ECacheRoot.class, rootId).getName()).isEqualTo("qcache-fq-one-root-updated");
+    } finally {
+      DB.delete(child);
+      DB.delete(root);
+    }
+  }
+
+  private List<String> namesByBillingCity(String city) {
+    return DB.find(Customer.class).setUseQueryCache(CacheMode.ON)
+      .select("name")
+      .where().eq("billingAddress.city", city)
+      .orderBy("name")
+      .findSingleAttributeList();
+  }
+
+  private List<Customer> customersByBillingCity(String city) {
+    return DB.find(Customer.class).setUseQueryCache(CacheMode.ON)
+      .where().eq("billingAddress.city", city)
+      .findList();
   }
 }

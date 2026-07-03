@@ -137,4 +137,45 @@ public final class TransactionEvent implements Serializable {
     return changeSet;
   }
 
+  public void merge(TransactionEvent other) {
+    if (other == null) {
+      return;
+    }
+
+    // Merge table events
+    if (other.eventTables != null) {
+      if (this.eventTables == null) {
+        this.eventTables = other.eventTables;
+      } else {
+        this.eventTables.add(other.eventTables);
+      }
+    }
+
+    // Merge listeners
+    if (other.listenerNotify != null) {
+      if (this.listenerNotify == null) {
+        this.listenerNotify = other.listenerNotify;
+      } else {
+        this.listenerNotify.addAll(other.listenerNotify);
+      }
+    }
+
+    // Merge delete-by-id
+    if (other.deleteByIdMap != null) {
+      if (this.deleteByIdMap == null) {
+        this.deleteByIdMap = other.deleteByIdMap;
+      } else {
+        this.deleteByIdMap.merge(other.deleteByIdMap);
+      }
+    }
+
+    // Merge cache changes
+    if (other.changeSet != null) {
+      if (this.changeSet == null) {
+        this.changeSet = other.changeSet;
+      } else {
+        this.changeSet.merge(other.changeSet);
+      }
+    }
+  }
 }

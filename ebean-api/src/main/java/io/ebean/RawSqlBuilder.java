@@ -42,6 +42,49 @@ public interface RawSqlBuilder {
   }
 
   /**
+   * Return a RawSqlBuilder for SQL containing {@code ${where}}, {@code ${having}} and/or
+   * {@code ${orderBy}} placeholder(s). Unlike {@link #parse(String)} this does NOT attempt to parse
+   * the SELECT columns, so it supports complex SQL such as CTEs, subqueries, and window functions.
+   * <p>
+   * Explicit column mappings must be provided (as with {@link #unparsed(String)}), but
+   * WHERE, HAVING and ORDER BY expressions can be added dynamically via the query API - provided
+   * the corresponding placeholder is present in the SQL. If a query calls {@code .orderBy(...)}
+   * on a template with no {@code ${orderBy}}/{@code ${andOrderBy}} placeholder, that ordering is
+   * ignored (there is no injection point for it) rather than producing invalid SQL.
+   * </p>
+   * <p>
+   * Available placeholders:
+   * </p>
+   * <ul>
+   *   <li>{@code ${where}} / {@code ${andWhere}} - inject "where &lt;expr&gt;" / "and &lt;expr&gt;"</li>
+   *   <li>{@code ${having}} / {@code ${andHaving}} - inject "having &lt;expr&gt;" / "and &lt;expr&gt;"</li>
+   *   <li>{@code ${orderBy}} / {@code ${andOrderBy}} - inject "order by &lt;expr&gt;" / ", &lt;expr&gt;"</li>
+   * </ul>
+   * <h3>Example:</h3>
+   * <pre>{@code
+   *
+   *   String sql = """
+   *     with agg as (
+   *       select company_id, sum(amount) as total
+   *       from orders
+   *       ${where}
+   *       group by company_id
+   *     )
+   *     select company_id, total from agg ${orderBy}
+   *     """;
+   *
+   *   RawSql rawSql = RawSqlBuilder.withPlaceholders(sql)
+   *     .columnMapping("company_id", "companyId")
+   *     .columnMapping("total", "total")
+   *     .create();
+   *
+   * }</pre>
+   */
+  static RawSqlBuilder withPlaceholders(String sql) {
+    return XBootstrapService.rawSql().withPlaceholders(sql);
+  }
+
+  /**
    * Return a RawSqlBuilder parsing the sql.
    * <p>
    * The sql statement will be parsed so that Ebean can determine where it can

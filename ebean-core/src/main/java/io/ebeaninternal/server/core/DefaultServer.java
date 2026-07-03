@@ -1118,15 +1118,14 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   @Override
   public <T> boolean exists(SpiQuery<T> ormQuery) {
     SpiQuery<T> ormQueryCopy = ormQuery.copy();
-    ormQueryCopy.setMaxRows(1);
     SpiOrmQueryRequest<?> request = createQueryRequest(Type.EXISTS, ormQueryCopy);
-    List<Object> ids = request.getFromQueryCache();
-    if (ids != null) {
-      return !ids.isEmpty();
+    Object cached = request.getFromQueryCache();
+    if (cached != null) {
+      return (Boolean) cached;
     }
     try {
       request.initTransIfRequired();
-      return !request.findIds().isEmpty();
+      return request.findExists();
     } finally {
       request.endTransIfRequired();
     }
@@ -1155,6 +1154,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> int delete(SpiQuery<T> query) {
+    return delete(query, false);
+  }
+
+  @Override
+  public <T> int deletePermanent(SpiQuery<T> query) {
+    return delete(query, true);
+  }
+
+  private <T> int delete(SpiQuery<T> query, boolean permanent) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.DELETE, query);
     try {
       request.initTransIfRequired();
@@ -1168,7 +1176,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         if (ids.isEmpty()) {
           return 0;
         } else {
-          return persister.deleteByIds(request.descriptor(), ids, request.transaction(), false);
+          return persister.deleteByIds(request.descriptor(), ids, request.transaction(), permanent);
         }
       }
     } finally {

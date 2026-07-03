@@ -50,6 +50,11 @@ public interface OrmQueryEngine {
   <T> int findCount(OrmQueryRequest<T> request);
 
   /**
+   * Execute the exists query using SELECT EXISTS(...).
+   */
+  <T> boolean findExists(OrmQueryRequest<T> request);
+
+  /**
    * Execute the find id's query.
    */
   <A> List<A> findIds(OrmQueryRequest<?> request);

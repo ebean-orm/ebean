@@ -127,7 +127,7 @@ final class FormulaPropertyPath {
 
   private DynamicPropertyAggregationFormula create(ScalarType<?> scalarType) {
     String logicalName = logicalName();
-    return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), target(logicalName), alias);
+    return new DynamicPropertyAggregationFormula(logicalName, scalarType, parsedAggregation, isAggregate(), target(logicalName), alias, includes);
   }
 
   @SuppressWarnings("rawtypes")

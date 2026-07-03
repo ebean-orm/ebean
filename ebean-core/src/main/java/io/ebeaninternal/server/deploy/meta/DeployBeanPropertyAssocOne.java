@@ -13,6 +13,7 @@ public final class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc
   private boolean oneToOneExported;
   private boolean primaryKeyJoin;
   private boolean primaryKeyExport;
+  private boolean embeddedAllowEmpty;
   private DeployBeanEmbedded deployEmbedded;
   private String columnPrefix;
 
@@ -101,6 +102,14 @@ public final class DeployBeanPropertyAssocOne<T> extends DeployBeanPropertyAssoc
     if (columns.length == 1) {
       columns[0].setLocalSqlFormula(formulaSelect);
     }
+  }
+
+  public void setEmbeddedAllowEmpty(boolean allowEmpty) {
+    this.embeddedAllowEmpty = allowEmpty;
+  }
+
+  public boolean isEmbeddedAllowEmpty() {
+    return embeddedAllowEmpty;
   }
 
   public void setColumnPrefix(String columnPrefix) {

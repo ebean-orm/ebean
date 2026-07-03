@@ -282,7 +282,7 @@ public final class DefaultPersister implements Persister {
         saveAssocOne(request);
       }
       request.executeOrQueue();
-      if (request.isPersistCascade()) {
+      if (request.isPersistCascade() && !request.isInsertConflictSkipped()) {
         // save any associated List held beans
         saveAssocMany(request);
       }

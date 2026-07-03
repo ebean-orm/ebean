@@ -97,7 +97,9 @@ public abstract class DmlHandler implements PersistHandler, BindableRequest {
   void checkRowCount(int rowCount) throws OptimisticLockException {
     try {
       persistRequest.checkRowCount(rowCount);
-      persistRequest.postExecute();
+      if (!persistRequest.isInsertConflictSkipped()) {
+        persistRequest.postExecute();
+      }
     } catch (OptimisticLockException e) {
       // add the SQL and bind values to error message
       final String m = e.getMessage() + " sql[" + sql + "] bind[" + bindLog + "]";

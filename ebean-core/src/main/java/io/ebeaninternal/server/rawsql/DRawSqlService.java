@@ -33,6 +33,12 @@ public final class DRawSqlService implements SpiRawSqlService {
   }
 
   @Override
+  public RawSqlBuilder withPlaceholders(String sql) {
+    SpiRawSql.Sql s = DRawSqlParser.parseAsTemplate(sql);
+    return new DRawSqlBuilder(s, new SpiRawSql.ColumnMapping());
+  }
+
+  @Override
   public SqlRow sqlRow(ResultSet resultSet, String dbTrueValue, boolean binaryOptimizedUUID) throws SQLException {
     ResultSetMetaData meta = resultSet.getMetaData();
     int estCap = (int) (meta.getColumnCount() / 0.7f) + 1;

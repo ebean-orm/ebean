@@ -136,7 +136,7 @@ final class TypeResolver {
     return genericType instanceof Class ? (Class<?>) genericType : Unknown.class;
   }
 
-  private static Map<TypeVariable<?>, Type> getTypeVariableMap(final Class<?> targetType) {
+  static Map<TypeVariable<?>, Type> getTypeVariableMap(final Class<?> targetType) {
     Map<TypeVariable<?>, Type> map = new HashMap<>();
     // Populate interfaces
     populateSuperTypeArgs(targetType.getGenericInterfaces(), map);

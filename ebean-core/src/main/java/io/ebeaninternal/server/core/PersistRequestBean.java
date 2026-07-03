@@ -49,6 +49,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   private boolean statelessUpdate;
   private boolean notifyCache;
   /**
+   * Snapshot of origValues taken before intercept.setLoaded() clears them.
+   * Used so that cache update code can access old FK values after setLoaded().
+   */
+  private Object[] capturedOrigValues;
+  /**
    * Flag used to detect when only many properties where updated via a cascade. Used to ensure
    * appropriate caches are updated in that case.
    */
@@ -114,6 +119,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    */
   private List<SaveMany> saveMany;
   private InsertOptions insertOptions;
+  /**
+   * Set true when an ON CONFLICT NOTHING insert is skipped (0 rows affected).
+   * Cascade to children must be suppressed to avoid FK violations.
+   */
+  private boolean insertConflictSkipped;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, int flags) {
@@ -229,13 +239,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
       GeneratedProperty generatedProperty = prop.generatedProperty();
       if (prop.isVersion()) {
         if (isLoadedProperty(prop)) {
-          // @Version property must be loaded to be involved
+          // @Version property must be loaded to be involved — always auto-incremented
           Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
           Object oldVal = prop.getValue(entityBean);
           setVersionValue(value);
           intercept.setOldValue(prop.propertyIndex(), oldVal);
         }
-      } else {
+      } else if (transaction == null || transaction.isGeneratedPropertiesEnabled()) {
         // @WhenModified set without invoking interception
         Object oldVal = prop.getValue(entityBean);
         Object value = generatedProperty.getUpdateValue(prop, entityBean, now());
@@ -247,17 +257,22 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
 
   private void onFailedUpdateUndoGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenUpdate()) {
-      Object oldVal = intercept.origValue(prop.propertyIndex());
-      if (oldVal != null) {
-        prop.setValue(entityBean, oldVal);
+      if (prop.isVersion() || transaction == null || transaction.isGeneratedPropertiesEnabled()) {
+        // undo version always (it was always set); undo others only if they were set
+        Object oldVal = intercept.origValue(prop.propertyIndex());
+        if (oldVal != null) {
+          prop.setValue(entityBean, oldVal);
+        }
       }
     }
   }
 
   private void onInsertGeneratedProperties() {
     for (BeanProperty prop : beanDescriptor.propertiesGenInsert()) {
-      Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
-      prop.setValueChanged(entityBean, value);
+      if (prop.isVersion() || transaction == null || transaction.isGeneratedPropertiesEnabled() || prop.getValue(entityBean) == null) {
+        Object value = prop.generatedProperty().getInsertValue(prop, entityBean, now());
+        prop.setValueChanged(entityBean, value);
+      }
     }
   }
 
@@ -593,7 +608,11 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Return the original / old value for the given property.
    */
   public Object origValue(BeanProperty prop) {
-    return intercept.origValue(prop.propertyIndex());
+    int idx = prop.propertyIndex();
+    if (capturedOrigValues != null && idx < capturedOrigValues.length) {
+      return capturedOrigValues[idx];
+    }
+    return intercept.origValue(idx);
   }
 
   @Override
@@ -684,6 +703,9 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         throw new OptimisticLockException("Data has changed. updated row count " + rowCount, null, bean);
       } else if (rowCount == 0 && type == Type.UPDATE) {
         throw new EntityNotFoundException("No rows updated");
+      } else if (rowCount == 0 && type == Type.INSERT && isConflictNothingInsert()) {
+        insertConflictSkipped = true;
+        return;
       }
     }
     switch (type) {
@@ -696,6 +718,14 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
         break;
       default: // do nothing
     }
+  }
+
+  private boolean isConflictNothingInsert() {
+    return insertOptions != null && insertOptions.key().charAt(0) == 'N';
+  }
+
+  public boolean isInsertConflictSkipped() {
+    return insertConflictSkipped;
   }
 
   /**
@@ -750,6 +780,15 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
     if (type == Type.UPDATE) {
       // get the dirty properties for update notification to the doc store
       dirtyProperties = intercept.dirtyProperties();
+      // snapshot orig values before setLoaded() clears them - needed by cache FK-eviction logic
+      if (dirtyProperties != null && notifyCache) {
+        capturedOrigValues = new Object[dirtyProperties.length];
+        for (int i = 0; i < dirtyProperties.length; i++) {
+          if (dirtyProperties[i]) {
+            capturedOrigValues[i] = intercept.origValue(i);
+          }
+        }
+      }
     }
     if (isChangeLog) {
       changeLog();
@@ -778,6 +817,20 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   public void preElementCollectionUpdate() {
     if (controller != null && !dirty) {
       // fire preUpdate notification when only element collection updated
+      controller.preUpdate(this);
+      pendingPostUpdateNotify = true;
+    }
+    if (!dirty) {
+      setNotifyCache();
+    }
+  }
+
+  /**
+   * Ensure the preUpdate event fires (for case where only a ManyToMany collection has changed).
+   */
+  public void preManyToManyUpdate() {
+    if (controller != null && !dirty) {
+      // fire preUpdate notification when only ManyToMany intersection updated
       controller.preUpdate(this);
       pendingPostUpdateNotify = true;
     }
@@ -1234,7 +1287,12 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   public void setInsertOptions(InsertOptions insertOptions) {
-    this.insertOptions  = insertOptions;
+    this.insertOptions = insertOptions;
+    if (insertOptions != null && insertOptions.key().charAt(0) == 'N' && beanDescriptor.hasCascadeChildren()) {
+      // force immediate (non-batch) execution of this insert so we know whether it
+      // was actually inserted before attempting cascade saves on children.
+      skipBatchForTopLevel = true;
+    }
   }
 
   public InsertOptions insertOptions() {

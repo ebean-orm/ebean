@@ -9,6 +9,7 @@ import io.ebean.event.BeanPersistRequest;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.m2m.MnyTopic;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTDetail;
 import org.tests.model.basic.UTMaster;
@@ -145,6 +146,26 @@ public class BeanPersistControllerTest {
     log.info("done testInsertUpdateDelete_given_stopPersistingAdapter");
   }
 
+  @Test
+  public void manyToManyOnlyChange_firesController() {
+    Database db = createDatabase(continuePersistingAdapter);
+
+    MnyTopic parent = new MnyTopic("parent");
+    MnyTopic child = new MnyTopic("child");
+    db.save(parent);
+    db.save(child);
+    continuePersistingAdapter.methodsCalled.clear();
+
+    // load parent and add a sub-topic — only the M2M intersection changes, not the parent bean
+    MnyTopic loaded = db.find(MnyTopic.class, parent.getId());
+    loaded.getSubTopics().add(child);
+    db.save(loaded);
+
+    assertThat(continuePersistingAdapter.methodsCalled).containsExactly("preUpdate", "postUpdate");
+
+    db.shutdown();
+  }
+
   private Database createDatabase(PersistAdapter persistAdapter) {
     DatabaseBuilder config = Database.builder();
     config.setName("h2ebasicver");
@@ -158,6 +179,7 @@ public class BeanPersistControllerTest {
     config.addClass(EBasicVer.class);
     config.addClass(UTMaster.class);
     config.addClass(UTDetail.class);
+    config.addClass(MnyTopic.class);
 
     config.add(persistAdapter);
     return config.build();
