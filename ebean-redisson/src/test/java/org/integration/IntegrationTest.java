@@ -282,7 +282,7 @@ class IntegrationTest {
 
         // prime cache at version 1
         DB.find(RCust.class, id);
-        Thread.sleep(5);
+        Thread.sleep(150);
         Object staleV1 = beanCache.get(id);
         assertThat(staleV1).isNotNull();
 
@@ -290,7 +290,7 @@ class IntegrationTest {
         cust.setName("stale-test-updated");
         DB.save(cust);
         DB.find(RCust.class, id);
-        Thread.sleep(5);
+        Thread.sleep(150);
 
         // stale write attempt: v2 is cached, v1 should be rejected
         beanCache.put(id, staleV1);
@@ -324,7 +324,7 @@ class IntegrationTest {
 
         // prime cache at version 0 (no @Version field)
         DB.find(TestOne.class, "zvw-test");
-        Thread.sleep(5);
+        Thread.sleep(150);
         Object staleV0 = beanCache.get("zvw-test");
         assertThat(staleV0).isNotNull();
 
@@ -332,7 +332,7 @@ class IntegrationTest {
         t1.setOtherUnique("unique-b");
         DB.save(t1);
         DB.find(TestOne.class, "zvw-test");
-        Thread.sleep(5);
+        Thread.sleep(150);
 
         // stale write: v0 in cache, incoming v0 — must NOT be blocked (0 > 0 is false)
         beanCache.put("zvw-test", staleV0);
