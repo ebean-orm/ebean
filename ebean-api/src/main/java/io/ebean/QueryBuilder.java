@@ -608,6 +608,21 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   int delete();
 
   /**
+   * Execute as a delete query permanently deleting the 'root level' beans that match the
+   * predicates in the query without soft delete.
+   * <p>
+   * This is the same as {@link #delete()} except that when the bean type uses soft delete
+   * (e.g. {@code @SoftDelete}) the matching rows are permanently (hard) deleted rather than
+   * being marked as deleted.
+   * <p>
+   * Note that if the query includes joins then the generated delete statement may not be
+   * optimal depending on the database platform.
+   *
+   * @return the number of beans/rows that were permanently deleted.
+   */
+  int deletePermanent();
+
+  /**
    * Execute the query returning true if a row is found.
    * <p>
    * The query is executed using max rows of 1 and will only select the id property.

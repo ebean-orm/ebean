@@ -206,6 +206,22 @@ public interface ExpressionList<T> {
   int delete();
 
   /**
+   * Execute as a delete query permanently deleting the 'root level' beans that match the
+   * predicates in the query without soft delete.
+   * <p>
+   * This is the same as {@link #delete()} except that when the bean type uses soft delete
+   * (e.g. {@code @SoftDelete}) the matching rows are permanently (hard) deleted rather than
+   * being marked as deleted.
+   * <p>
+   * Note that if the query includes joins then the generated delete statement may not be
+   * optimal depending on the database platform.
+   * </p>
+   *
+   * @return the number of rows that were permanently deleted.
+   */
+  int deletePermanent();
+
+  /**
    * Execute as a update query.
    *
    * @return the number of rows that were updated.

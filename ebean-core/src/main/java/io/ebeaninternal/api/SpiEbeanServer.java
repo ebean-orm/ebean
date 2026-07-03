@@ -374,6 +374,8 @@ public interface SpiEbeanServer extends SpiServer, BeanCollectionLoader {
 
   <T> int delete(SpiQuery<T> query);
 
+  <T> int deletePermanent(SpiQuery<T> query);
+
   <T> int update(SpiQuery<T> query);
 
   List<SqlRow> findList(SpiSqlQuery query);

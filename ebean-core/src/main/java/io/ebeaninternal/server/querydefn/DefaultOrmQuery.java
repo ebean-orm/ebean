@@ -1528,6 +1528,11 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final int deletePermanent() {
+    return server.deletePermanent(this);
+  }
+
+  @Override
   public final int update() {
     return server.update(this);
   }
