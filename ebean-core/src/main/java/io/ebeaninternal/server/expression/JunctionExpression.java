@@ -343,6 +343,11 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public int deletePermanent() {
+    return exprList.deletePermanent();
+  }
+
+  @Override
   public int update() {
     return exprList.update();
   }

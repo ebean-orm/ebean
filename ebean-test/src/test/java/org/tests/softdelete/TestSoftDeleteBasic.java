@@ -542,4 +542,49 @@ public class TestSoftDeleteBasic extends BaseTestCase {
       assertThat(top.get(0).getChildren()).hasSize(2);
     }
   }
+
+  @Test
+  public void queryDeletePermanent_hardDeletesRow() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("queryDeletePermanentSimple");
+    DB.save(bean);
+
+    int rows = DB.find(EBasicSoftDelete.class)
+      .where().idEq(bean.getId())
+      .deletePermanent();
+
+    assertThat(rows).isEqualTo(1);
+
+    int count = DB.find(EBasicSoftDelete.class)
+      .setIncludeSoftDeletes()
+      .where().idEq(bean.getId())
+      .findCount();
+
+    assertThat(count).isEqualTo(0);
+  }
+
+  @Test
+  public void queryDeletePermanent_hardDeletesEvenWithCascadingChildren() {
+
+    EBasicSoftDelete bean = new EBasicSoftDelete();
+    bean.setName("queryDeletePermanentCascade");
+    bean.addChild("child1", 10);
+    bean.addChild("child2", 20);
+    DB.save(bean);
+
+    int rows = DB.find(EBasicSoftDelete.class)
+      .where().idEq(bean.getId())
+      .deletePermanent();
+
+    assertThat(rows).isEqualTo(1);
+
+    // the parent row is fully removed rather than just marked as deleted
+    int count = DB.find(EBasicSoftDelete.class)
+      .setIncludeSoftDeletes()
+      .where().idEq(bean.getId())
+      .findCount();
+
+    assertThat(count).isEqualTo(0);
+  }
 }

@@ -1233,6 +1233,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public <T> int delete(SpiQuery<T> query) {
+    return delete(query, false);
+  }
+
+  @Override
+  public <T> int deletePermanent(SpiQuery<T> query) {
+    return delete(query, true);
+  }
+
+  private <T> int delete(SpiQuery<T> query, boolean permanent) {
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.DELETE, query);
     try {
       request.initTransIfRequired();
@@ -1246,7 +1255,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
         if (ids.isEmpty()) {
           return 0;
         } else {
-          return persister.deleteByIds(request.descriptor(), ids, request.transaction(), false);
+          return persister.deleteByIds(request.descriptor(), ids, request.transaction(), permanent);
         }
       }
     } finally {
