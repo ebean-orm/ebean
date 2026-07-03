@@ -3,6 +3,10 @@ package io.ebeaninternal.server.rawsql;
 import io.ebeaninternal.server.querydefn.SimpleTextParser;
 import io.ebeaninternal.server.rawsql.SpiRawSql.Sql;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 /**
  * Parses sql-select queries to try and determine the location where WHERE and
  * HAVING clauses can be added dynamically to the sql.
@@ -13,6 +17,12 @@ final class DRawSqlParser {
   private static final String $_HAVING = "${having}";
   private static final String $_AND_WHERE = "${andWhere}";
   private static final String $_WHERE = "${where}";
+  private static final String $_AND_ORDER_BY = "${andOrderBy}";
+  private static final String $_ORDER_BY = "${orderBy}";
+
+  private static final int KIND_WHERE = 0;
+  private static final int KIND_HAVING = 1;
+  private static final int KIND_ORDER_BY = 2;
 
   private final SimpleTextParser textParser;
   private String sql;
@@ -20,6 +30,8 @@ final class DRawSqlParser {
   private int placeHolderAndWhere;
   private int placeHolderHaving;
   private int placeHolderAndHaving;
+  private int placeHolderOrderBy;
+  private int placeHolderAndOrderBy;
   private final boolean hasPlaceHolders;
 
   private int selectPos = -1;
@@ -35,9 +47,22 @@ final class DRawSqlParser {
   private int whereExprPos = -1;
   private boolean havingExprAnd;
   private int havingExprPos = -1;
+  private boolean orderByExprAnd;
+  private int orderByExprPos = -1;
 
   public static Sql parse(String sql) {
     return new DRawSqlParser(sql).parse();
+  }
+
+  /**
+   * Parse for template mode: finds ${where} / ${having} placeholder positions without
+   * attempting SELECT/FROM keyword parsing. This supports complex SQL (CTEs, window functions,
+   * subqueries) where keyword-based parsing would fail.
+   * <p>
+   * The caller is expected to provide manual column mappings (like unparsed mode).
+   */
+  public static Sql parseAsTemplate(String sql) {
+    return new DRawSqlParser(sql).parseTemplate();
   }
 
   private DRawSqlParser(String sqlString) {
@@ -74,6 +99,8 @@ final class DRawSqlParser {
     placeHolderAndWhere = removePlaceHolder($_AND_WHERE);
     placeHolderHaving = removePlaceHolder($_HAVING);
     placeHolderAndHaving = removePlaceHolder($_AND_HAVING);
+    placeHolderOrderBy = removePlaceHolder($_ORDER_BY);
+    placeHolderAndOrderBy = removePlaceHolder($_AND_ORDER_BY);
     return hasPlaceHolders();
   }
 
@@ -91,7 +118,8 @@ final class DRawSqlParser {
   }
 
   private boolean hasPlaceHolders() {
-    return placeHolderWhere > -1 || placeHolderAndWhere > -1 || placeHolderHaving > -1 || placeHolderAndHaving > -1;
+    return placeHolderWhere > -1 || placeHolderAndWhere > -1 || placeHolderHaving > -1 || placeHolderAndHaving > -1
+      || placeHolderOrderBy > -1 || placeHolderAndOrderBy > -1;
   }
 
   /**
@@ -244,6 +272,73 @@ final class DRawSqlParser {
       return orderByPos;
     }
     return -1;
+  }
+
+  /**
+   * Find the ${orderBy}/${andOrderBy} placeholder position (template mode only).
+   * Returns -1 if neither placeholder is present in the SQL.
+   */
+  private int findOrderByExprPosition() {
+    if (placeHolderOrderBy > -1) {
+      return placeHolderOrderBy;
+    }
+    if (placeHolderAndOrderBy > -1) {
+      orderByExprAnd = true;
+      return placeHolderAndOrderBy;
+    }
+    return -1;
+  }
+
+  private Sql parseTemplate() {
+    if (!hasPlaceHolders) {
+      throw new IllegalArgumentException("withPlaceholders() requires at least one of "
+        + "${where}, ${andWhere}, ${having}, ${andHaving}, ${orderBy}, ${andOrderBy} in the SQL");
+    }
+    whereExprPos = findWhereExprPosition();
+    havingExprPos = findHavingExprPosition();
+    orderByExprPos = findOrderByExprPosition();
+
+    // Order the placeholder positions found (where/having/orderBy may each be absent) and slice the
+    // placeholder-stripped SQL into the static text segments that sit between them. Each segment is the
+    // static SQL that must be emitted immediately after the *previous* placeholder's dynamic expression
+    // (or as the query prefix, for the very first segment).
+    List<int[]> markers = new ArrayList<>(3);
+    if (whereExprPos > -1) markers.add(new int[]{whereExprPos, KIND_WHERE});
+    if (havingExprPos > -1) markers.add(new int[]{havingExprPos, KIND_HAVING});
+    if (orderByExprPos > -1) markers.add(new int[]{orderByExprPos, KIND_ORDER_BY});
+    markers.sort(Comparator.comparingInt(m -> m[0]));
+
+    String preWhere;
+    String preHaving = null;
+    String preOrderBy = null;
+    String postOrderBy = null;
+    if (markers.isEmpty()) {
+      preWhere = sql.trim();
+    } else {
+      preWhere = sql.substring(0, markers.get(0)[0]).trim();
+      for (int i = 0; i < markers.size(); i++) {
+        int kind = markers.get(i)[1];
+        int startPos = markers.get(i)[0];
+        int endPos = (i + 1 < markers.size()) ? markers.get(i + 1)[0] : sql.length();
+        String segment = sql.substring(startPos, endPos).trim();
+        if (kind == KIND_WHERE) {
+          preHaving = segment;
+        } else if (kind == KIND_HAVING) {
+          preOrderBy = segment;
+        } else {
+          postOrderBy = segment;
+        }
+      }
+    }
+
+    boolean orderByPlaceholder = orderByExprPos > -1;
+    // preFrom is empty — signals template mode to CQueryBuilderRawSql (no "select" prefix handling).
+    // For the dynamic order-by prefix/value: only set when a ${orderBy}/${andOrderBy} placeholder was
+    // actually found - there is no static default order-by value at that placeholder (the placeholder
+    // is purely a dynamic injection point), so orderBySql is left null.
+    String orderByPrefix = orderByPlaceholder ? (orderByExprAnd ? "," : "order by") : null;
+    return new Sql(sql, "", preWhere, whereExprAnd, preHaving, havingExprAnd, orderByPrefix, null, false,
+      preOrderBy, postOrderBy, orderByPlaceholder);
   }
 
   private String removeWhitespace(String sql) {

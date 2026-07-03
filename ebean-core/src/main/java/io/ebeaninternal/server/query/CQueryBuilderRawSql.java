@@ -48,9 +48,12 @@ final class CQueryBuilderRawSql {
       // wrap with a limit offset or ROW_NUMBER() etc
       return sqlLimiter.limit(new OrmQueryLimitRequest(sql, orderBy, query, dbPlatform, rsql.isDistinct() || query.isDistinct()));
     } else {
-      // add back select keyword (it was removed to support sqlQueryLimiter)
-      String prefix = "select " + (rsql.isDistinct() ? "distinct " : "");
-      sql = prefix + sql;
+      if (hasValue(rsql.getPreFrom())) {
+        // add back select keyword (it was removed to support sqlQueryLimiter)
+        String prefix = "select " + (rsql.isDistinct() ? "distinct " : "");
+        sql = prefix + sql;
+      }
+      // else: template mode — SQL is already complete (no keyword stripping was done)
       return new SqlLimitResponse(sql);
     }
   }
@@ -67,10 +70,12 @@ final class CQueryBuilderRawSql {
         sb.append(selectProperty);
         first = false;
       }
-    } else {
-      sb.append(sql.getPreFrom());
+      sb.append(' ');
+    } else if (hasValue(sql.getPreFrom())) {
+      // standard parsed mode: column list with "select" prefix added in buildSql()
+      sb.append(sql.getPreFrom()).append(' ');
     }
-    sb.append(' ');
+    // else: template mode (preFrom empty) — the full SQL is in preWhere/preHaving, no prefix needed
 
     String s = sql.getPreWhere();
     BindParams bindParams = request.query().bindParams();
@@ -126,8 +131,17 @@ final class CQueryBuilderRawSql {
       }
       sb.append(dbHaving).append(' ');
     }
+
+    String preOrderBy = sql.getPreOrderBy();
+    if (hasValue(preOrderBy)) {
+      sb.append(preOrderBy).append(' ');
+    }
     if (hasValue(orderBy)) {
       sb.append(' ').append(sql.getOrderByPrefix()).append(' ').append(orderBy);
+    }
+    String postOrderBy = sql.getPostOrderBy();
+    if (hasValue(postOrderBy)) {
+      sb.append(' ').append(postOrderBy);
     }
     return sb.toString().trim();
   }
@@ -137,6 +151,12 @@ final class CQueryBuilderRawSql {
   }
 
   private String orderBy(CQueryPredicates predicates, SpiRawSql.Sql sql) {
+    if (!hasValue(sql.getPreFrom()) && !sql.isOrderByPlaceholder()) {
+      // template mode (withPlaceholders()) without an explicit ${orderBy}/${andOrderBy} placeholder -
+      // there is no defined injection point for a dynamic order by, so ignore any caller-supplied
+      // order by rather than risk emitting it at an undefined (and likely invalid) position.
+      return sql.getOrderBy();
+    }
     String orderBy = predicates.dbOrderBy();
     if (orderBy != null) {
       return orderBy;

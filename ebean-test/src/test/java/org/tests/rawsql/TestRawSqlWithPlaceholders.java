@@ -1,0 +1,394 @@
+package org.tests.rawsql;
+
+import io.ebean.DB;
+import io.ebean.RawSql;
+import io.ebean.RawSqlBuilder;
+import io.ebean.test.LoggedSql;
+import io.ebean.xtest.BaseTestCase;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.tests.model.basic.OrderAggregate;
+import org.tests.model.basic.ResetBasicData;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+/**
+ * Integration tests for RawSqlBuilder.withPlaceholders() — complex SQL (CTEs,
+ * window functions) with ${where} / ${andWhere} / ${having} / ${andHaving}
+ * placeholders for dynamic WHERE and HAVING injection.
+ */
+class TestRawSqlWithPlaceholders extends BaseTestCase {
+
+  /** CTE with ${where} in the outer SELECT — column names match the CTE output aliases. */
+  private static final String CTE_SQL =
+    "with order_totals as (" +
+    "  select o.id as order_id," +
+    "         sum(d.order_qty * d.unit_price) as total_amount" +
+    "  from o_order o" +
+    "  join o_order_detail d on d.order_id = o.id" +
+    "  group by o.id" +
+    ")" +
+    " select order_id, total_amount" +
+    " from order_totals" +
+    " ${where}" +
+    " order by order_id";
+
+  /** Same CTE with ${andWhere} — a static WHERE clause is already present. */
+  private static final String CTE_AND_WHERE_SQL =
+    "with order_totals as (" +
+    "  select o.id as order_id," +
+    "         sum(d.order_qty * d.unit_price) as total_amount" +
+    "  from o_order o" +
+    "  join o_order_detail d on d.order_id = o.id" +
+    "  group by o.id" +
+    ")" +
+    " select order_id, total_amount" +
+    " from order_totals" +
+    " where total_amount > 0 ${andWhere}" +
+    " order by order_id";
+
+  /** Direct aggregate (no CTE) with only a ${having} placeholder, and static ORDER BY after it. */
+  private static final String HAVING_ONLY_SQL =
+    "select o.id as order_id," +
+    "       sum(d.order_qty * d.unit_price) as total_amount" +
+    " from o_order o" +
+    " join o_order_detail d on d.order_id = o.id" +
+    " group by o.id" +
+    " ${having}" +
+    " order by order_id";
+
+  /** Both ${where} and ${having} placeholders present, with static ORDER BY after the having. */
+  private static final String WHERE_AND_HAVING_SQL =
+    "select o.id as order_id," +
+    "       sum(d.order_qty * d.unit_price) as total_amount" +
+    " from o_order o" +
+    " join o_order_detail d on d.order_id = o.id" +
+    " ${where}" +
+    " group by o.id" +
+    " ${having}" +
+    " order by order_id";
+
+  /** ${where} plus ${orderBy} — no static ORDER BY, ordering is entirely dynamic. */
+  private static final String WHERE_AND_ORDER_BY_SQL =
+    "with order_totals as (" +
+    "  select o.id as order_id," +
+    "         sum(d.order_qty * d.unit_price) as total_amount" +
+    "  from o_order o" +
+    "  join o_order_detail d on d.order_id = o.id" +
+    "  group by o.id" +
+    ")" +
+    " select order_id, total_amount" +
+    " from order_totals" +
+    " ${where}" +
+    " ${orderBy}";
+
+  /** Static ORDER BY already present, with ${andOrderBy} to append additional dynamic sort columns. */
+  private static final String AND_ORDER_BY_SQL =
+    "with order_totals as (" +
+    "  select o.id as order_id," +
+    "         sum(d.order_qty * d.unit_price) as total_amount" +
+    "  from o_order o" +
+    "  join o_order_detail d on d.order_id = o.id" +
+    "  group by o.id" +
+    ")" +
+    " select order_id, total_amount" +
+    " from order_totals" +
+    " ${where}" +
+    " order by total_amount desc ${andOrderBy}";
+
+  private static RawSql cteSql;
+  private static RawSql cteAndWhereSql;
+  private static RawSql havingOnlySql;
+  private static RawSql whereAndHavingSql;
+  private static RawSql whereAndOrderBySql;
+  private static RawSql andOrderBySql;
+
+  @BeforeAll
+  static void setup() {
+    ResetBasicData.reset();
+
+    cteSql = RawSqlBuilder.withPlaceholders(CTE_SQL)
+      .columnMapping("order_id", "order.id")
+      .columnMapping("total_amount", "totalAmount")
+      .create();
+
+    cteAndWhereSql = RawSqlBuilder.withPlaceholders(CTE_AND_WHERE_SQL)
+      .columnMapping("order_id", "order.id")
+      .columnMapping("total_amount", "totalAmount")
+      .create();
+
+    havingOnlySql = RawSqlBuilder.withPlaceholders(HAVING_ONLY_SQL)
+      .columnMapping("order_id", "order.id")
+      .columnMapping("total_amount", "totalAmount")
+      .create();
+
+    whereAndHavingSql = RawSqlBuilder.withPlaceholders(WHERE_AND_HAVING_SQL)
+      .columnMapping("order_id", "order.id")
+      .columnMapping("total_amount", "totalAmount")
+      .create();
+
+    whereAndOrderBySql = RawSqlBuilder.withPlaceholders(WHERE_AND_ORDER_BY_SQL)
+      .columnMapping("order_id", "order.id")
+      .columnMapping("total_amount", "totalAmount")
+      .create();
+
+    andOrderBySql = RawSqlBuilder.withPlaceholders(AND_ORDER_BY_SQL)
+      .columnMapping("order_id", "order.id")
+      .columnMapping("total_amount", "totalAmount")
+      .create();
+  }
+
+  @Test
+  void withPlaceholders_noFilter_returnsAllRowsWithDetails() {
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(cteSql)
+      .findList();
+
+    // orders 1, 2, 3 have details; orders 4 and 5 do not
+    assertThat(list).hasSize(3);
+    assertThat(list).extracting(OrderAggregate::getTotalAmount).doesNotContainNull();
+  }
+
+  @Test
+  void withPlaceholders_withWhereFilter_returnsFilteredRows() {
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(cteSql)
+      .where().gt("totalAmount", 50)
+      .findList();
+
+    // order 1 ≈ 57.80, order 3 ≈ 165.50; order 2 = 42.00 is filtered out
+    assertThat(list).hasSize(2);
+    assertThat(list).extracting(OrderAggregate::getTotalAmount)
+      .allMatch(amount -> amount > 50.0);
+  }
+
+  @Test
+  void withPlaceholders_withStrongWhereFilter_returnsSingleRow() {
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(cteSql)
+      .where().gt("totalAmount", 100)
+      .findList();
+
+    // only order 3 has total > 100 (≈ 165.50)
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getTotalAmount()).isGreaterThan(100.0);
+  }
+
+  @Test
+  void withPlaceholders_andWhere_appendsToExistingWhereClause() {
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(cteAndWhereSql)
+      .where().gt("totalAmount", 100)
+      .findList();
+
+    // ${andWhere} appends "and total_amount > 100" to the existing "where total_amount > 0"
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getTotalAmount()).isGreaterThan(100.0);
+  }
+
+  @Test
+  void withPlaceholders_verifySqlStructure() {
+    LoggedSql.start();
+    DB.find(OrderAggregate.class)
+      .setRawSql(cteSql)
+      .where().gt("totalAmount", 50)
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(1);
+    String executed = sql.get(0);
+    // SQL starts with the CTE — no spurious "select" prefix prepended
+    assertThat(executed).containsIgnoringCase("with order_totals as");
+    // WHERE is injected at the ${where} position (in the outer SELECT, before ORDER BY)
+    assertThat(executed).containsIgnoringCase("where total_amount > ?");
+    assertThat(executed).containsIgnoringCase("order by order_id");
+    // WHERE appears after the CTE body
+    int wherePos = executed.toLowerCase().lastIndexOf("where total_amount");
+    int orderByPos = executed.toLowerCase().indexOf("order by order_id");
+    assertThat(wherePos).isLessThan(orderByPos);
+  }
+
+  @Test
+  void withPlaceholders_findCount() {
+    int count = DB.find(OrderAggregate.class)
+      .setRawSql(cteSql)
+      .where().gt("totalAmount", 50)
+      .findCount();
+
+    assertThat(count).isEqualTo(2);
+  }
+
+  @Test
+  void withPlaceholders_fetchQuery_loadsAssociatedGraphViaSecondaryQuery() {
+    // the RawSql query is the root query; fetchQuery() adds secondary ORM queries
+    // to build out more of the object graph rather than hand-writing it into the
+    // raw SQL itself. Because the raw SQL only maps "order.id" (a partial "order"
+    // reference), we explicitly fetchQuery("order") as well as fetchQuery("order.details") -
+    // fetchQuery("order.details") alone would leave "details" as a deferred/lazy
+    // collection since the intermediate "order" fetch node isn't otherwise requested.
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(cteSql)
+      .fetchQuery("order")
+      .fetchQuery("order.details")
+      .where().gt("totalAmount", 50)
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    // one query for the raw-sql root, plus one secondary (ORM) query per fetchQuery() path
+    assertThat(sql).hasSize(3);
+    assertThat(sql.get(0)).containsIgnoringCase("with order_totals as");
+    assertThat(sql.get(1)).containsIgnoringCase("from o_order ");
+    assertThat(sql.get(2)).containsIgnoringCase("from o_order_detail");
+
+    assertThat(list).hasSize(2);
+    for (OrderAggregate orderAggregate : list) {
+      // order.details was populated by the secondary query - no further lazy loading needed
+      assertThat(orderAggregate.getOrder().getDetails()).isNotEmpty();
+    }
+  }
+
+  @Test
+  void parse_failsOnCteSql() {
+    // Demonstrates why withPlaceholders() is needed — parse() cannot handle CTEs
+    assertThatThrownBy(() -> RawSqlBuilder.parse(CTE_SQL).create())
+      .isInstanceOf(RuntimeException.class);
+  }
+
+  @Test
+  void withPlaceholders_havingOnly_appliesBeforeStaticOrderBy() {
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(havingOnlySql)
+      .having().gt("totalAmount", 100)
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    // only order 3 has aggregate total > 100 (≈ 165.50)
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getTotalAmount()).isGreaterThan(100.0);
+
+    // the dynamically injected HAVING must appear before the static trailing ORDER BY,
+    // otherwise the generated SQL would be invalid
+    String executed = sql.get(0).toLowerCase();
+    int havingPos = executed.indexOf("having");
+    int orderByPos = executed.indexOf("order by");
+    assertThat(havingPos).isGreaterThan(-1);
+    assertThat(orderByPos).isGreaterThan(havingPos);
+  }
+
+  @Test
+  void withPlaceholders_whereAndHaving_orderByTailNotLost() {
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(whereAndHavingSql)
+      .where().gt("order.id", 0)
+      .having().gt("totalAmount", 50)
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    // orders 1 (≈57.80) and 3 (≈165.50) pass the having filter; order 2 (=42.00) does not
+    assertThat(list).hasSize(2);
+
+    // both dynamic where and having are injected, and the static "order by order_id" tail
+    // (positioned after ${having} in the template) is preserved rather than dropped
+    String executed = sql.get(0).toLowerCase();
+    assertThat(executed).contains("where");
+    assertThat(executed).contains("having");
+    assertThat(executed).contains("order by order_id");
+    int havingPos = executed.indexOf("having");
+    int orderByPos = executed.indexOf("order by");
+    assertThat(orderByPos).isGreaterThan(havingPos);
+  }
+
+  @Test
+  void withPlaceholders_orderBy_appliesDynamicOrdering() {
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(whereAndOrderBySql)
+      .where().gt("totalAmount", 0)
+      .orderBy("totalAmount desc")
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(list).hasSize(3);
+    // order 3 (≈165.50) first, then order 1 (≈57.80), then order 2 (=42.00)
+    assertThat(list).extracting(OrderAggregate::getTotalAmount)
+      .isSortedAccordingTo((a, b) -> Double.compare(b, a));
+
+    String executed = sql.get(0).toLowerCase();
+    assertThat(executed).contains("order by total_amount desc");
+  }
+
+  @Test
+  void withPlaceholders_orderBy_noExplicitOrderBy_noOrderByClauseEmitted() {
+    LoggedSql.start();
+    DB.find(OrderAggregate.class)
+      .setRawSql(whereAndOrderBySql)
+      .where().gt("totalAmount", 0)
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    // ${orderBy} placeholder present but caller supplied no .orderBy() - nothing injected
+    assertThat(sql.get(0).toLowerCase()).doesNotContain("order by");
+  }
+
+  @Test
+  void withPlaceholders_andOrderBy_appendsToStaticOrderBy() {
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(andOrderBySql)
+      .where().gt("totalAmount", 0)
+      .orderBy("order.id")
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(list).hasSize(3);
+    String executed = sql.get(0).toLowerCase().replaceAll("\\s+", " ");
+    // static "order by total_amount desc" is kept, and the dynamic order by is appended after a comma
+    assertThat(executed).contains("order by total_amount desc , order_id");
+  }
+
+  @Test
+  void withPlaceholders_explicitOrderBy_ignoredWhenNoOrderByPlaceholder_havingOnly() {
+    // regression test: before ${orderBy}/${andOrderBy} placeholder support was added, calling
+    // .orderBy() on a template whose static "order by order_id" tail followed a ${having}
+    // placeholder (with no dedicated order-by placeholder) produced invalid SQL missing the
+    // "order by" keyword entirely. Now the explicit ordering is safely ignored instead.
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(havingOnlySql)
+      .having().gt("totalAmount", 0)
+      .orderBy("totalAmount desc")
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(list).hasSize(3);
+    String executed = sql.get(0).toLowerCase();
+    assertThat(executed).contains("order by order_id");
+    assertThat(executed).doesNotContain("totalamount desc");
+  }
+
+  @Test
+  void withPlaceholders_explicitOrderBy_ignoredWhenNoOrderByPlaceholder_whereOnly() {
+    // regression test: before ${orderBy}/${andOrderBy} placeholder support was added, calling
+    // .orderBy() on a where-only template with a static trailing "order by order_id" produced a
+    // duplicate "order by ... order by ..." clause (a SQL syntax error). Now it is safely ignored.
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(cteSql)
+      .where().gt("totalAmount", 0)
+      .orderBy("totalAmount desc")
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(list).hasSize(3);
+    String executed = sql.get(0).toLowerCase();
+    long orderByCount = executed.split("order by", -1).length - 1;
+    assertThat(orderByCount).isEqualTo(1);
+    assertThat(executed).contains("order by order_id");
+  }
+}
