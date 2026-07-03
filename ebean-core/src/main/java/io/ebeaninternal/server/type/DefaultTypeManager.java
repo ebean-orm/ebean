@@ -17,6 +17,8 @@ import io.ebeaninternal.api.GeoTypeProvider;
 import io.ebeaninternal.server.core.ServiceUtil;
 import io.ebeaninternal.server.core.bootup.BootupClasses;
 import io.ebeaninternal.server.deploy.meta.DeployProperty;
+import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
+import io.ebeaninternal.server.deploy.meta.DeployProperty;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.EnumType;
