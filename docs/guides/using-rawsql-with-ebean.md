@@ -58,11 +58,11 @@ mapping just needs to line up with that entity's properties.
 `RawSqlBuilder` has three ways to construct a `RawSql`, depending on how much of
 the SQL Ebean needs to understand:
 
-| Method | SELECT columns parsed? | Dynamic WHERE/HAVING? | Use for |
+| Method | SELECT columns parsed? | Dynamic WHERE/HAVING/ORDER BY? | Use for |
 |--------|------------------------|------------------------|---------|
 | `RawSqlBuilder.parse(sql)` | Yes | Yes | Ordinary `SELECT ... FROM ... WHERE ...` statements |
 | `RawSqlBuilder.unparsed(sql)` | No | No | Fixed SQL that never needs additional predicates |
-| `RawSqlBuilder.withPlaceholders(sql)` | No (explicit `columnMapping()` required) | Yes, via `${where}` / `${andWhere}` / `${having}` / `${andHaving}` | CTEs, window functions, subqueries - SQL that keyword-based parsing can't handle |
+| `RawSqlBuilder.withPlaceholders(sql)` | No (explicit `columnMapping()` required) | Yes, via `${where}` / `${andWhere}` / `${having}` / `${andHaving}` / `${orderBy}` / `${andOrderBy}` | CTEs, window functions, subqueries - SQL that keyword-based parsing can't handle |
 
 ### `parse(sql)` - the common case
 
@@ -118,8 +118,8 @@ the columns appear in the SQL, since there's no parsing to match them by name.
 ### `withPlaceholders(sql)` - complex SQL (CTEs, window functions, subqueries)
 
 `withPlaceholders(sql)` avoids keyword scanning entirely. You mark exactly where
-a dynamic `WHERE`/`HAVING` expression should be injected using placeholder
-tokens, and column mappings are always explicit (as with `unparsed`).
+a dynamic `WHERE`/`HAVING`/`ORDER BY` expression should be injected using
+placeholder tokens, and column mappings are always explicit (as with `unparsed`).
 
 #### Placeholder reference
 
@@ -129,21 +129,30 @@ tokens, and column mappings are always explicit (as with `unparsed`).
 | `${andWhere}` | Insert `AND <expr>` here | A static `WHERE ...` clause already exists in the SQL and you want to append to it |
 | `${having}` | Insert a new `HAVING <expr>` clause here | No static `HAVING` clause exists yet at this point in the SQL |
 | `${andHaving}` | Insert `AND <expr>` here | A static `HAVING ...` clause already exists in the SQL and you want to append to it |
+| `${orderBy}` | Insert a new `ORDER BY <expr>` clause here | No static `ORDER BY` clause exists yet at this point in the SQL, and callers may supply `.orderBy(...)` |
+| `${andOrderBy}` | Insert `, <expr>` here | A static `ORDER BY ...` clause already exists in the SQL and you want callers to be able to append extra sort columns to it |
 
 Rules:
 
 - At least one placeholder is required - `withPlaceholders(sql)` throws
-  `IllegalArgumentException` if none of the four tokens are present.
+  `IllegalArgumentException` if none of the six tokens are present.
 - Use only the placeholders you need. Omit `${where}`/`${andWhere}` entirely if
   the query never needs a dynamic `WHERE` (e.g. only a dynamic `HAVING` on an
   aggregate). Omit `${having}`/`${andHaving}` if there's no dynamic `HAVING`.
+  Omit `${orderBy}`/`${andOrderBy}` if the ordering is always fixed.
 - Explicit `columnMapping()` is required for every returned column - there is no
   column-list parsing to infer names from.
-- Any static SQL that follows a placeholder (e.g. a trailing `ORDER BY`) is
-  preserved and correctly positioned **after** whatever dynamic expression gets
-  injected at that placeholder - this holds for `${having}`-only templates too.
-  If the caller also calls `.orderBy()`/`.order()` on the query, that explicit
-  call overrides the static trailing text, the same as with `parse()` mode.
+- **A caller-supplied `.orderBy(...)`/`.order(...)` is only applied if the SQL
+  contains an `${orderBy}` or `${andOrderBy}` placeholder.** Without one of
+  those placeholders there is no defined injection point for dynamic ordering,
+  so any `.orderBy(...)` call on the query is safely ignored rather than risk
+  producing invalid SQL - even if the template has a static trailing
+  `ORDER BY ...` of its own. If you need callers to be able to influence
+  ordering, add `${orderBy}` (no existing static order by) or `${andOrderBy}`
+  (append after an existing static order by).
+- Any other static SQL that follows a `${where}`/`${having}` placeholder (e.g.
+  a trailing `GROUP BY`) is preserved and correctly positioned **after**
+  whatever dynamic expression gets injected at that placeholder.
 
 #### Example - CTE with `${where}`
 
@@ -217,7 +226,9 @@ List<OrderAggregate> list = DB.find(OrderAggregate.class)
 ```
 
 The dynamic `HAVING` clause is injected before the static trailing `ORDER BY`,
-even though `${having}` is the only placeholder present.
+even though `${having}` is the only placeholder present. Because there's no
+`${orderBy}`/`${andOrderBy}` placeholder here, a caller-supplied `.orderBy(...)`
+would be ignored - the ordering stays fixed as `order by order_id`.
 
 #### Example - both `${where}` and `${having}`
 
@@ -245,6 +256,62 @@ List<OrderAggregate> list = DB.find(OrderAggregate.class)
 Both the dynamic `WHERE` and dynamic `HAVING` are injected at their respective
 placeholders, and the trailing `order by order_id` is preserved after the
 `HAVING` clause.
+
+#### Example - `${orderBy}`, fully dynamic ordering
+
+Use `${orderBy}` when there's no static default ordering and you want the
+caller's `.orderBy(...)` to control it entirely:
+
+```java
+String sql =
+  "with order_totals as (" +
+  "  select o.id as order_id, sum(d.qty * d.unit_price) as total_amount" +
+  "  from o_order o join o_order_detail d on d.order_id = o.id" +
+  "  group by o.id" +
+  ")" +
+  " select order_id, total_amount from order_totals" +
+  " ${where}" +
+  " ${orderBy}";
+
+RawSql rawSql = RawSqlBuilder.withPlaceholders(sql)
+  .columnMapping("order_id", "order.id")
+  .columnMapping("total_amount", "totalAmount")
+  .create();
+
+// executed SQL: ... where total_amount > ? order by total_amount desc
+List<OrderAggregate> list = DB.find(OrderAggregate.class)
+  .setRawSql(rawSql)
+  .where().gt("totalAmount", 0)
+  .orderBy("totalAmount desc")
+  .findList();
+```
+
+If the caller doesn't call `.orderBy(...)`, nothing is injected at `${orderBy}`
+and no `ORDER BY` clause is emitted at all.
+
+#### Example - `${andOrderBy}`, appending to a static default ordering
+
+Use `${andOrderBy}` when there's a sensible static default ordering but you
+want callers to be able to add extra tie-breaker sort columns:
+
+```java
+String sql =
+  "... from order_totals" +
+  " ${where}" +
+  " order by total_amount desc ${andOrderBy}";
+
+RawSql rawSql = RawSqlBuilder.withPlaceholders(sql)
+  .columnMapping("order_id", "order.id")
+  .columnMapping("total_amount", "totalAmount")
+  .create();
+
+// executed SQL: ... order by total_amount desc , order_id
+List<OrderAggregate> list = DB.find(OrderAggregate.class)
+  .setRawSql(rawSql)
+  .where().gt("totalAmount", 0)
+  .orderBy("order.id")
+  .findList();
+```
 
 ---
 
@@ -381,9 +448,10 @@ column to be explicitly mapped (or explicitly ignored via
 | Symptom | Likely cause | Fix |
 |---------|--------------|-----|
 | `RuntimeException: Error parsing sql, can not find ... keyword` | `parse(sql)` used on SQL with a CTE, window function, or subquery in `FROM` | Use `RawSqlBuilder.withPlaceholders(sql)` instead |
-| `IllegalArgumentException: withPlaceholders() requires at least ${where} or ${andWhere}...` | No `${where}` / `${andWhere}` / `${having}` / `${andHaving}` token found in the SQL | Add the appropriate placeholder token at the injection point |
+| `IllegalArgumentException: withPlaceholders() requires at least one of ${where}, ${andWhere}, ${having}, ${andHaving}, ${orderBy}, ${andOrderBy}...` | None of the six placeholder tokens were found in the SQL | Add the appropriate placeholder token at the injection point |
 | Dynamic `WHERE`/`HAVING` predicate silently has no effect, or query throws | Used `unparsed(sql)` and then tried to add a predicate | `unparsed(sql)` queries cannot be modified - switch to `parse(sql)` or `withPlaceholders(sql)` |
 | Generated SQL is invalid / clauses appear in the wrong order | Predicates added via `.where()`/`.having()` don't match the placeholders actually present in the SQL | Make sure `${where}`/`${having}` (or the `and` variants) exist at the point you expect predicates to be injected |
+| `.orderBy(...)`/`.order(...)` on the query silently has no effect | The SQL has no `${orderBy}`/`${andOrderBy}` placeholder | This is by design - without one of those placeholders there's no defined injection point, so the ordering is ignored rather than corrupting the SQL. Add `${orderBy}` or `${andOrderBy}` if you need caller-controlled ordering |
 | `Unknown column` / unmapped property error | Missing `columnMapping()` for a selected column | Add a `columnMapping(...)` or `columnMappingIgnore(...)` for every SQL column |
 | `fetchQuery("a.b")` collection stays deferred/lazy | `a` is a partial reference from the raw SQL column mapping (e.g. only `a.id` mapped), and there's no fetch node for `a` itself | Add `fetchQuery("a")` (or `fetch("a")`) alongside `fetchQuery("a.b")` |
 

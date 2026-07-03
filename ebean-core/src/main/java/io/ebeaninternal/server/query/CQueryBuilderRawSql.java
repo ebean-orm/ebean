@@ -131,8 +131,17 @@ final class CQueryBuilderRawSql {
       }
       sb.append(dbHaving).append(' ');
     }
+
+    String preOrderBy = sql.getPreOrderBy();
+    if (hasValue(preOrderBy)) {
+      sb.append(preOrderBy).append(' ');
+    }
     if (hasValue(orderBy)) {
       sb.append(' ').append(sql.getOrderByPrefix()).append(' ').append(orderBy);
+    }
+    String postOrderBy = sql.getPostOrderBy();
+    if (hasValue(postOrderBy)) {
+      sb.append(' ').append(postOrderBy);
     }
     return sb.toString().trim();
   }
@@ -142,6 +151,12 @@ final class CQueryBuilderRawSql {
   }
 
   private String orderBy(CQueryPredicates predicates, SpiRawSql.Sql sql) {
+    if (!hasValue(sql.getPreFrom()) && !sql.isOrderByPlaceholder()) {
+      // template mode (withPlaceholders()) without an explicit ${orderBy}/${andOrderBy} placeholder -
+      // there is no defined injection point for a dynamic order by, so ignore any caller-supplied
+      // order by rather than risk emitting it at an undefined (and likely invalid) position.
+      return sql.getOrderBy();
+    }
     String orderBy = predicates.dbOrderBy();
     if (orderBy != null) {
       return orderBy;

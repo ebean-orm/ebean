@@ -71,10 +71,40 @@ class TestRawSqlWithPlaceholders extends BaseTestCase {
     " ${having}" +
     " order by order_id";
 
+  /** ${where} plus ${orderBy} — no static ORDER BY, ordering is entirely dynamic. */
+  private static final String WHERE_AND_ORDER_BY_SQL =
+    "with order_totals as (" +
+    "  select o.id as order_id," +
+    "         sum(d.order_qty * d.unit_price) as total_amount" +
+    "  from o_order o" +
+    "  join o_order_detail d on d.order_id = o.id" +
+    "  group by o.id" +
+    ")" +
+    " select order_id, total_amount" +
+    " from order_totals" +
+    " ${where}" +
+    " ${orderBy}";
+
+  /** Static ORDER BY already present, with ${andOrderBy} to append additional dynamic sort columns. */
+  private static final String AND_ORDER_BY_SQL =
+    "with order_totals as (" +
+    "  select o.id as order_id," +
+    "         sum(d.order_qty * d.unit_price) as total_amount" +
+    "  from o_order o" +
+    "  join o_order_detail d on d.order_id = o.id" +
+    "  group by o.id" +
+    ")" +
+    " select order_id, total_amount" +
+    " from order_totals" +
+    " ${where}" +
+    " order by total_amount desc ${andOrderBy}";
+
   private static RawSql cteSql;
   private static RawSql cteAndWhereSql;
   private static RawSql havingOnlySql;
   private static RawSql whereAndHavingSql;
+  private static RawSql whereAndOrderBySql;
+  private static RawSql andOrderBySql;
 
   @BeforeAll
   static void setup() {
@@ -96,6 +126,16 @@ class TestRawSqlWithPlaceholders extends BaseTestCase {
       .create();
 
     whereAndHavingSql = RawSqlBuilder.withPlaceholders(WHERE_AND_HAVING_SQL)
+      .columnMapping("order_id", "order.id")
+      .columnMapping("total_amount", "totalAmount")
+      .create();
+
+    whereAndOrderBySql = RawSqlBuilder.withPlaceholders(WHERE_AND_ORDER_BY_SQL)
+      .columnMapping("order_id", "order.id")
+      .columnMapping("total_amount", "totalAmount")
+      .create();
+
+    andOrderBySql = RawSqlBuilder.withPlaceholders(AND_ORDER_BY_SQL)
       .columnMapping("order_id", "order.id")
       .columnMapping("total_amount", "totalAmount")
       .create();
@@ -262,5 +302,93 @@ class TestRawSqlWithPlaceholders extends BaseTestCase {
     int havingPos = executed.indexOf("having");
     int orderByPos = executed.indexOf("order by");
     assertThat(orderByPos).isGreaterThan(havingPos);
+  }
+
+  @Test
+  void withPlaceholders_orderBy_appliesDynamicOrdering() {
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(whereAndOrderBySql)
+      .where().gt("totalAmount", 0)
+      .orderBy("totalAmount desc")
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(list).hasSize(3);
+    // order 3 (≈165.50) first, then order 1 (≈57.80), then order 2 (=42.00)
+    assertThat(list).extracting(OrderAggregate::getTotalAmount)
+      .isSortedAccordingTo((a, b) -> Double.compare(b, a));
+
+    String executed = sql.get(0).toLowerCase();
+    assertThat(executed).contains("order by total_amount desc");
+  }
+
+  @Test
+  void withPlaceholders_orderBy_noExplicitOrderBy_noOrderByClauseEmitted() {
+    LoggedSql.start();
+    DB.find(OrderAggregate.class)
+      .setRawSql(whereAndOrderBySql)
+      .where().gt("totalAmount", 0)
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    // ${orderBy} placeholder present but caller supplied no .orderBy() - nothing injected
+    assertThat(sql.get(0).toLowerCase()).doesNotContain("order by");
+  }
+
+  @Test
+  void withPlaceholders_andOrderBy_appendsToStaticOrderBy() {
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(andOrderBySql)
+      .where().gt("totalAmount", 0)
+      .orderBy("order.id")
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(list).hasSize(3);
+    String executed = sql.get(0).toLowerCase().replaceAll("\\s+", " ");
+    // static "order by total_amount desc" is kept, and the dynamic order by is appended after a comma
+    assertThat(executed).contains("order by total_amount desc , order_id");
+  }
+
+  @Test
+  void withPlaceholders_explicitOrderBy_ignoredWhenNoOrderByPlaceholder_havingOnly() {
+    // regression test: before ${orderBy}/${andOrderBy} placeholder support was added, calling
+    // .orderBy() on a template whose static "order by order_id" tail followed a ${having}
+    // placeholder (with no dedicated order-by placeholder) produced invalid SQL missing the
+    // "order by" keyword entirely. Now the explicit ordering is safely ignored instead.
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(havingOnlySql)
+      .having().gt("totalAmount", 0)
+      .orderBy("totalAmount desc")
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(list).hasSize(3);
+    String executed = sql.get(0).toLowerCase();
+    assertThat(executed).contains("order by order_id");
+    assertThat(executed).doesNotContain("totalamount desc");
+  }
+
+  @Test
+  void withPlaceholders_explicitOrderBy_ignoredWhenNoOrderByPlaceholder_whereOnly() {
+    // regression test: before ${orderBy}/${andOrderBy} placeholder support was added, calling
+    // .orderBy() on a where-only template with a static trailing "order by order_id" produced a
+    // duplicate "order by ... order by ..." clause (a SQL syntax error). Now it is safely ignored.
+    LoggedSql.start();
+    List<OrderAggregate> list = DB.find(OrderAggregate.class)
+      .setRawSql(cteSql)
+      .where().gt("totalAmount", 0)
+      .orderBy("totalAmount desc")
+      .findList();
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(list).hasSize(3);
+    String executed = sql.get(0).toLowerCase();
+    long orderByCount = executed.split("order by", -1).length - 1;
+    assertThat(orderByCount).isEqualTo(1);
+    assertThat(executed).contains("order by order_id");
   }
 }

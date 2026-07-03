@@ -37,24 +37,18 @@ public interface SpiRawSql extends RawSql {
     private static final long serialVersionUID = 1L;
 
     private final boolean parsed;
-
     private final String unparsedSql;
-
     private final String preFrom;
-
     private final String preWhere;
-
     private final boolean andWhereExpr;
-
     private final String preHaving;
-
     private final boolean andHavingExpr;
-
     private final String orderByPrefix;
-
     private final String orderBy;
-
     private final boolean distinct;
+    private final String preOrderBy;
+    private final String postOrderBy;
+    private final boolean orderByPlaceholder;
 
     /**
      * Construct for unparsed SQL.
@@ -70,13 +64,26 @@ public interface SpiRawSql extends RawSql {
       this.orderByPrefix = null;
       this.orderBy = null;
       this.distinct = false;
+      this.preOrderBy = null;
+      this.postOrderBy = null;
+      this.orderByPlaceholder = false;
     }
 
     /**
-     * Construct for parsed SQL.
+     * Construct for parsed SQL (normal keyword-parsed mode - no ${orderBy}/${andOrderBy} placeholder support).
      */
     Sql(String unparsedSql, String preFrom, String preWhere, boolean andWhereExpr,
                   String preHaving, boolean andHavingExpr, String orderByPrefix, String orderBy, boolean distinct) {
+      this(unparsedSql, preFrom, preWhere, andWhereExpr, preHaving, andHavingExpr, orderByPrefix, orderBy, distinct,
+        null, null, false);
+    }
+
+    /**
+     * Construct for parsed SQL, including template mode's ${orderBy}/${andOrderBy} placeholder support.
+     */
+    Sql(String unparsedSql, String preFrom, String preWhere, boolean andWhereExpr,
+                  String preHaving, boolean andHavingExpr, String orderByPrefix, String orderBy, boolean distinct,
+                  String preOrderBy, String postOrderBy, boolean orderByPlaceholder) {
 
       this.unparsedSql = unparsedSql;
       this.parsed = true;
@@ -88,6 +95,9 @@ public interface SpiRawSql extends RawSql {
       this.orderByPrefix = orderByPrefix;
       this.orderBy = orderBy;
       this.distinct = distinct;
+      this.preOrderBy = preOrderBy;
+      this.postOrderBy = postOrderBy;
+      this.orderByPlaceholder = orderByPlaceholder;
     }
 
     @Override
@@ -170,6 +180,32 @@ public interface SpiRawSql extends RawSql {
      */
     public String getOrderBy() {
       return orderBy;
+    }
+
+    /**
+     * Return the static SQL to emit immediately before the dynamic order-by injection point
+     * (template / withPlaceholders() mode only, e.g. static SQL between a ${having} and ${orderBy}
+     * placeholder).
+     */
+    public String getPreOrderBy() {
+      return preOrderBy;
+    }
+
+    /**
+     * Return the static SQL to emit after the dynamic order-by injection point
+     * (template / withPlaceholders() mode only - typically empty since ORDER BY is usually last).
+     */
+    public String getPostOrderBy() {
+      return postOrderBy;
+    }
+
+    /**
+     * Return true if a ${orderBy}/${andOrderBy} placeholder was found (template / withPlaceholders()
+     * mode only). When false, any dynamic order by set on the query is ignored rather than risk
+     * producing invalid SQL by injecting it at an undefined position.
+     */
+    public boolean isOrderByPlaceholder() {
+      return orderByPlaceholder;
     }
 
   }
