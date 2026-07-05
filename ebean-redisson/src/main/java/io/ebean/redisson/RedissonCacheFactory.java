@@ -241,7 +241,10 @@ public class RedissonCacheFactory implements ServerCacheFactory {
             // ignore this message as we are the server that sent it
             return;
         }
-
+        if (listener == null) {
+            log.log(DEBUG, "Ignoring tableMod, listener not registered yet");
+            return;
+        }
         long nanos = System.nanoTime();
         try {
             listener.notify(new ServerCacheNotification(message.getTables()));
@@ -391,7 +394,6 @@ public class RedissonCacheFactory implements ServerCacheFactory {
         public void notify(ServerCacheNotification tableModifications) {
             Set<String> dependentTables = tableModifications.getDependentTables();
             if (dependentTables != null && !dependentTables.isEmpty()) {
-                listener.notify(new ServerCacheNotification(dependentTables));
                 sendTableMod(dependentTables);
             }
         }

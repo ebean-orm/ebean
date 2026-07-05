@@ -25,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import static java.lang.System.Logger.Level.ERROR;
 import static java.lang.System.Logger.Level.WARNING;
@@ -161,8 +160,7 @@ public class RedissonCache implements ServerCache {
   }
 
   private void errorOnWrite(Exception e) {
-    log.log(ERROR, "Error writing redis cache [" + mapName + "]", e);
-    throw new RuntimeException(e);
+    log.log(ERROR, "Error writing redis cache [" + mapName + "] - treating as miss", e);
   }
 
   @Override
@@ -172,13 +170,16 @@ public class RedissonCache implements ServerCache {
         return Collections.emptyMap();
       }
       long start = System.nanoTime();
-      List<String> keyList = keys.stream().map(Object::toString).collect(Collectors.toList());
+      Map<String, Object> strToOrigKey = new LinkedHashMap<>();
+      for (Object key : keys) {
+        strToOrigKey.put(key.toString(), key);
+      }
       Map<Object, Object> map = new LinkedHashMap<>();
-      Map<String, Object> values = cacheMap.getAll(new HashSet<>(keyList));
-      for (String key : keyList) {
-        Object value = values.get(key);
+      Map<String, Object> values = cacheMap.getAll(strToOrigKey.keySet());
+      for (Map.Entry<String, Object> strEntry : strToOrigKey.entrySet()) {
+        Object value = values.get(strEntry.getKey());
         if (value != null) {
-          map.put(key, value);
+          map.put(strEntry.getValue(), value);
         }
       }
       if (slideIdle && !values.isEmpty()) {

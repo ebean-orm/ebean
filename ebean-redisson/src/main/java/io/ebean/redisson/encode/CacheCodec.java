@@ -28,16 +28,10 @@ public abstract class CacheCodec extends BaseCodec {
     @Override
     public Decoder<Object> getMapKeyDecoder() {
         return (buf, state) -> {
-
             try {
                 byte[] bytes = new byte[buf.readableBytes()];
                 buf.readBytes(bytes);
-                String key = new String(bytes, StandardCharsets.UTF_8);
-                int pos = key.indexOf(':');
-                if (pos >= 0) {
-                    return key.substring(pos + 1);
-                }
-                return key;
+                return new String(bytes, StandardCharsets.UTF_8);
             } catch (Exception e) {
                 throw new RuntimeException("Failed to decode cache key", e);
             }
