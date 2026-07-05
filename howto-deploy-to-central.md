@@ -15,22 +15,22 @@ mvn -T 4 clean package
 mvn -T 4 deploy -pl '!composites,!platforms' -Pcentral -DskipTests
 
 ## git commit, git tag, git push --tags
-git commit -am 'Version 18.0.0'
-git tag 18.0.0
+git commit -am 'Version 18.2.0'
+git tag 18.2.0
 git push --tags
 
-## convert to javax
-./jakarta-to-javax.sh
-
-## set javax version
-mvs
-
-## deploy javax
-mvn -T 4 clean package
-mvn -T 4 deploy -pl '!composites,!platforms' -Pcentral -DskipTests
-
-## checkout / cleanup
-git checkout .
+### convert to javax
+#./jakarta-to-javax.sh
+#
+### set javax version
+#mvs
+#
+### deploy javax
+#mvn -T 4 clean package
+#mvn -T 4 deploy -pl '!composites,!platforms' -Pcentral -DskipTests
+#
+### checkout / cleanup
+#git checkout .
 
 ## goto ebean-15x branch
 git checkout ebean-15x
