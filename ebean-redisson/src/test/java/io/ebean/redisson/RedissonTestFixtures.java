@@ -1,13 +1,13 @@
 package io.ebean.redisson;
 
 import io.ebean.BackgroundExecutor;
-import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.DatabaseBuilder;
 import io.ebean.cache.ServerCacheConfig;
 import io.ebean.cache.ServerCacheOptions;
 import io.ebean.cache.ServerCacheType;
 import io.ebean.redisson.encode.SerializableCodec;
+import io.ebean.test.containers.RedisContainer;
 import org.jspecify.annotations.NonNull;
 import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
@@ -98,18 +98,50 @@ final class RedissonTestFixtures {
       .settings();
   }
 
+  /**
+   * Starts the Redis test container if it is not already running.
+   * Idempotent: safe to call from multiple test classes; the container
+   * library detects an already-running instance and skips startup.
+   */
+  static void startRedis() {
+    RedisContainer.builder("latest").start();
+  }
+
+  /**
+   * Returns true when Redis is reachable on the configured address.
+   * Uses a 500ms / zero-retry probe so CI skips fast instead of waiting
+   * through the full connectTimeout + retryAttempts in redisson-config.yaml.
+   */
+  static boolean isReachable() {
+    try {
+      Config probe = loadConfig();
+      probe.useSingleServer()
+        .setConnectTimeout(500)
+        .setTimeout(500)
+        .setRetryAttempts(0)
+        .setConnectionMinimumIdleSize(1)
+        .setConnectionPoolSize(1);
+      RedissonClient c = Redisson.create(probe);
+      c.shutdown();
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
   static RedissonClient createClient() {
-    DB.getDefault();
-    Config cfg;
-    InputStream is = Thread.currentThread().getContextClassLoader()
+    return Redisson.create(loadConfig());
+  }
+
+  private static Config loadConfig() {
+    InputStream is = RedissonTestFixtures.class.getClassLoader()
       .getResourceAsStream("redisson-config.yaml");
     if (is != null) {
-      cfg = Config.fromYAML(is);
-    } else {
-      cfg = new Config();
-      cfg.useSingleServer().setAddress("redis://localhost:6379");
+      return Config.fromYAML(is);
     }
-    return Redisson.create(cfg);
+    Config cfg = new Config();
+    cfg.useSingleServer().setAddress("redis://localhost:6379");
+    return cfg;
   }
 
   static BackgroundExecutor backgroundExecutor() {

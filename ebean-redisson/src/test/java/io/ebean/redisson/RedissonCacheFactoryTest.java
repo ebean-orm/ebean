@@ -8,6 +8,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import org.redisson.api.RedissonClient;
 
 import java.util.Set;
@@ -22,7 +24,9 @@ class RedissonCacheFactoryTest {
   private static RedissonCacheFactory factory;
 
   @BeforeAll
-  static void connect() throws Exception {
+  static void connect() {
+    RedissonTestFixtures.startRedis();
+    assumeTrue(RedissonTestFixtures.isReachable(), "Skip: Redis not reachable");
     client = RedissonTestFixtures.createClient();
     DatabaseBuilder.Settings settings = RedissonTestFixtures.databaseSettings(client);
     factory = new RedissonCacheFactory(settings, RedissonTestFixtures.backgroundExecutor());
