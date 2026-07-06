@@ -672,28 +672,30 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
-   * By default, getIntercept and setIntercept will check, if the passed bean is an instance of descriptor type.
+   * By default, getIntercept and setIntercept will check if the passed bean is an instance of the descriptor type.
    * <p>
-   * If the property is not part of the type hierarchy (i.e. is this property from this descriptor)
-   * an UnsuppoertedOperation is thrown.
+   * If the property is not part of the type hierarchy (i.e. is not this property from this descriptor) an
+   * IllegalArgumentException is thrown.
    * <p>
-   * If inheritance is involved, this method returns false instead of an exception, if the property might exist in
-   * one of the child beans. This is necessary for getIntercept, as it returns <code>null</code> in this case.
-   * @return true if property can be
+   * If inheritance is involved, this method returns false instead of throwing an exception, if the property might
+   * exist on one of the sibling child beans. This is necessary for getIntercept, as it returns <code>null</code>
+   * in this case.
+   *
+   * @return true if the property can be accessed on the given bean, false if it should be treated as unloaded.
    */
   private boolean checkPropertyAccess(EntityBean bean) {
-    if (bean == null || descriptor.type().isInstance(bean)) { // null = fall through - NPE is catched later.
+    if (bean == null || descriptor.type().isInstance(bean)) { // null = fall through - NPE is caught later.
       return true;
     }
     InheritInfo inheritInfo = descriptor.inheritInfo();
     if (inheritInfo == null || inheritInfo.isRoot() || !inheritInfo.getRoot().getType().isInstance(bean)) {
-      throw new IllegalArgumentException(propertyIncomatibleMsg(bean));
+      throw new IllegalArgumentException(propertyIncompatibleMsg(bean));
     } else {
       return false;
     }
   }
 
-  private String propertyIncomatibleMsg(EntityBean bean) {
+  private String propertyIncompatibleMsg(EntityBean bean) {
     String beanType = bean == null ? "null" : bean.getClass().getName();
     return "Property " + name + " on [" + descriptor + "] is incompatible with type[" + beanType + "]";
   }
@@ -715,7 +717,7 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    */
   public void setValueIntercept(EntityBean bean, Object value) {
     if (!checkPropertyAccess(bean)) {
-      throw new IllegalArgumentException(propertyIncomatibleMsg(bean));
+      throw new IllegalArgumentException(propertyIncompatibleMsg(bean));
     }
     try {
       setter.setIntercept(bean, value);
