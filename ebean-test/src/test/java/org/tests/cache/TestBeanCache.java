@@ -58,6 +58,24 @@ public class TestBeanCache extends BaseTestCase {
   }
 
   @Test
+  public void findList_withInIdAsString_when_idTypeConverted_expect_noDuplicates() {
+    OCachedBean bean = new OCachedBean();
+    bean.setName("findList_withInIdAsString");
+    DB.save(bean);
+
+    // warm the bean cache
+    DB.find(OCachedBean.class, bean.getId());
+
+    // id passed as String rather than the bean's actual Long id type
+    List<OCachedBean> list = DB.find(OCachedBean.class)
+      .where().in("id", String.valueOf(bean.getId()))
+      .findList();
+
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getId()).isEqualTo(bean.getId());
+  }
+
+  @Test
   public void idsInFindMap() {
 
     List<OCachedBean> beans = createBeans(Arrays.asList("m0", "m1", "m2", "m3", "m4", "m5", "m6"));
