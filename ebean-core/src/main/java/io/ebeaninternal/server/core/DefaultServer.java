@@ -1242,6 +1242,9 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   private <T> int delete(SpiQuery<T> query, boolean permanent) {
+    if (query.getId() != null && query.whereExpressions() == null && query.descriptor().isSoftDelete()) {
+      return executeInTrans((txn) -> persister.delete(query.getBeanType(), query.getId(), txn, permanent), query.transaction());
+    }
     SpiOrmQueryRequest<T> request = createQueryRequest(Type.DELETE, query);
     try {
       request.initTransIfRequired();
