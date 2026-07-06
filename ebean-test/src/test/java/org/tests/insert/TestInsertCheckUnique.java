@@ -112,7 +112,7 @@ public class TestInsertCheckUnique extends BaseTestCase {
       assertThat(DB.checkUniqueness(doc2).toString()).contains("title");
       List<String> sql = LoggedSql.stop();
       assertThat(sql).hasSize(1);
-      assertThat(sql.get(0)).contains("select t0.id from document t0 where t0.title = ?");
+      assertThat(sql.get(0)).contains("select exists(select 1 from document t0 where t0.title = ?)");
 
 
     }
@@ -132,11 +132,11 @@ public class TestInsertCheckUnique extends BaseTestCase {
 
     // create a new bean
     LoggedSql.start();
-    assertThat(DB.checkUniqueness(basic, null, true, false)).isEmpty();
+    assertThat(DB.getDefault().checkUniqueness(basic, null, true, false)).isEmpty();
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.id from e_basicverucon t0 where t0.name = ?");
-    assertThat(sql.get(1)).contains("select t0.id from e_basicverucon t0 where t0.other = ? and t0.other_one = ?");
+    assertThat(sql.get(0)).contains("select exists(select 1 from e_basicverucon t0 where t0.name = ?)");
+    assertThat(sql.get(1)).contains("select exists(select 1 from e_basicverucon t0 where t0.other = ? and t0.other_one = ?)");
     DB.save(basic);
     try {
       // reload from database
@@ -144,22 +144,22 @@ public class TestInsertCheckUnique extends BaseTestCase {
 
       // and check again
       LoggedSql.start();
-      assertThat(DB.checkUniqueness(basic, null, true, false)).isEmpty();
+      assertThat(DB.getDefault().checkUniqueness(basic, null, true, false)).isEmpty();
       sql = LoggedSql.stop();
       assertThat(sql).hasSize(2);
-      assertThat(sql.get(0)).contains("select t0.id from e_basicverucon t0 where t0.id <> ? and t0.name = ?");
-      assertThat(sql.get(1)).contains("select t0.id from e_basicverucon t0 where t0.id <> ? and t0.other = ? and t0.other_one = ?");
+      assertThat(sql.get(0)).contains("select exists(select 1 from e_basicverucon t0 where t0.id <> ? and t0.name = ?)");
+      assertThat(sql.get(1)).contains("select exists(select 1 from e_basicverucon t0 where t0.id <> ? and t0.other = ? and t0.other_one = ?)");
 
       // and check again - expect to hit query cache
       LoggedSql.start();
-      assertThat(DB.checkUniqueness(basic, null, true, false)).isEmpty();
+      assertThat(DB.getDefault().checkUniqueness(basic, null, true, false)).isEmpty();
       sql = LoggedSql.stop();
       assertThat(sql).as("Expected to hit query cache").hasSize(0);
 
       // and check again, where only one value is changed
       basic.setOther("fooo");
       LoggedSql.start();
-      assertThat(DB.checkUniqueness(basic, null, true, false)).isEmpty();
+      assertThat(DB.getDefault().checkUniqueness(basic, null, true, false)).isEmpty();
       sql = LoggedSql.stop();
       assertThat(sql).hasSize(1);
       assertThat(sql.get(0)).contains("fooo,baz)");
@@ -184,11 +184,11 @@ public class TestInsertCheckUnique extends BaseTestCase {
 
     // create a new bean
     LoggedSql.start();
-    assertThat(DB.checkUniqueness(basic, null, false, true)).isEmpty();
+    assertThat(DB.getDefault().checkUniqueness(basic, null, false, true)).isEmpty();
     List<String> sql = LoggedSql.stop();
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(0)).contains("select t0.id from e_basicverucon t0 where t0.name = ?");
-    assertThat(sql.get(1)).contains("select t0.id from e_basicverucon t0 where t0.other = ? and t0.other_one = ?");
+    assertThat(sql.get(0)).contains("select exists(select 1 from e_basicverucon t0 where t0.name = ?)");
+    assertThat(sql.get(1)).contains("select exists(select 1 from e_basicverucon t0 where t0.other = ? and t0.other_one = ?)");
     DB.save(basic);
     try (Transaction txn = DB.beginTransaction()) {
       // reload from database
@@ -196,28 +196,28 @@ public class TestInsertCheckUnique extends BaseTestCase {
 
       // and check again. We do not check unmodified properties
       LoggedSql.start();
-      assertThat(DB.checkUniqueness(basic, txn, false, true)).isEmpty();
+      assertThat(DB.getDefault().checkUniqueness(basic, txn, false, true)).isEmpty();
       sql = LoggedSql.stop();
       assertThat(sql).hasSize(0);
 
       // and check again, where only one value is changed
       basic.setOther("fooo");
       LoggedSql.start();
-      assertThat(DB.checkUniqueness(basic, txn, false, true)).isEmpty();
+      assertThat(DB.getDefault().checkUniqueness(basic, txn, false, true)).isEmpty();
       sql = LoggedSql.stop();
       assertThat(sql).hasSize(1);
       assertThat(sql.get(0)).contains("fooo,baz)");
 
       // multiple checks will hit DB
       LoggedSql.start();
-      assertThat(DB.checkUniqueness(basic, txn, false, true)).isEmpty();
+      assertThat(DB.getDefault().checkUniqueness(basic, txn, false, true)).isEmpty();
       sql = LoggedSql.stop();
       assertThat(sql).hasSize(1);
 
       // enable also query cache
-      assertThat(DB.checkUniqueness(basic, txn, true, true)).isEmpty();
+      assertThat(DB.getDefault().checkUniqueness(basic, txn, true, true)).isEmpty();
       LoggedSql.start();
-      assertThat(DB.checkUniqueness(basic, txn, true, true)).isEmpty();
+      assertThat(DB.getDefault().checkUniqueness(basic, txn, true, true)).isEmpty();
       sql = LoggedSql.stop();
       assertThat(sql).isEmpty();
     } finally {
