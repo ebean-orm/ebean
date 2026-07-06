@@ -907,6 +907,11 @@ public final class DefaultPersister implements Persister {
    * </p>
    */
   private int delete(PersistRequestBean<?> request) {
+    // fire preDelete now, before cascading to children/many's so that the
+    // BeanPersistController/Adapter still sees the bean's collections and
+    // relationships as they are prior to the cascade delete
+    request.controllerPreDelete();
+
     DeleteUnloadedForeignKeys unloadedForeignKeys = null;
     if (request.isPersistCascade()) {
       // delete children first ... register the
