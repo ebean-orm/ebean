@@ -120,14 +120,17 @@ class TestRawSqlWithPlaceholders extends BaseTestCase {
       .columnMapping("total_amount", "totalAmount")
       .create();
 
+    // HAVING is evaluated before SELECT-list aliases exist, so on some platforms (e.g. Postgres)
+    // a HAVING clause cannot reference the "total_amount" output alias - it must reference the
+    // underlying aggregate expression instead.
     havingOnlySql = RawSqlBuilder.withPlaceholders(HAVING_ONLY_SQL)
       .columnMapping("order_id", "order.id")
-      .columnMapping("total_amount", "totalAmount")
+      .columnMapping("sum(d.order_qty * d.unit_price)", "totalAmount")
       .create();
 
     whereAndHavingSql = RawSqlBuilder.withPlaceholders(WHERE_AND_HAVING_SQL)
       .columnMapping("order_id", "order.id")
-      .columnMapping("total_amount", "totalAmount")
+      .columnMapping("sum(d.order_qty * d.unit_price)", "totalAmount")
       .create();
 
     whereAndOrderBySql = RawSqlBuilder.withPlaceholders(WHERE_AND_ORDER_BY_SQL)
