@@ -33,6 +33,13 @@ import static java.lang.System.Logger.Level.WARNING;
  */
 public final class CQueryPredicates {
 
+  /**
+   * Default lower bound used for findVersions() (no explicit start/end) on sql2011
+   * standards based platforms that require actual bind values for the root table's
+   * 'for system_time between ? and ?' clause.
+   */
+  private static final Timestamp EPOCH = Timestamp.valueOf("1970-01-01 00:00:00");
+
   private final Binder binder;
   private final OrmQueryRequest<?> request;
   private final SpiQuery<?> query;
@@ -84,10 +91,16 @@ public final class CQueryPredicates {
       // bind the update set clause
       updateProperties.bind(binder, dataBind);
     }
-    if (query.isVersionsBetween() && binder.isAsOfStandardsBased()) {
+    if (binder.isAsOfStandardsBased() && query.temporalMode() == SpiQuery.TemporalMode.VERSIONS) {
       // sql2011 based versions between timestamp syntax
       Timestamp start = query.versionStart();
       Timestamp end = query.versionEnd();
+      if (start == null) {
+        start = EPOCH;
+      }
+      if (end == null) {
+        end = new Timestamp(System.currentTimeMillis());
+      }
       dataBind.append("between ").append(start).append(" and ").append(end);
       binder.bindObject(dataBind, start);
       binder.bindObject(dataBind, end);
