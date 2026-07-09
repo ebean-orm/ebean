@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.annotation.MutationDetection;
 import io.ebean.core.type.DataBinder;
 import io.ebean.core.type.DataReader;
 import io.ebean.core.type.DocPropertyType;
@@ -20,11 +21,18 @@ import java.sql.SQLException;
  *       backed {@code EJson} facade)</li>
  * </ul>
  * This removes the previous explosion of per-storage and per-platform subclasses.
+ * <p>
+ * Mutation detection: {@code DEFAULT} uses the legacy ModifyAware wrapper based dirty
+ * checking. {@code NONE} disables dirty checking entirely (mutable() is false and the
+ * property is only included in an update when explicitly set). {@code HASH} and
+ * {@code SOURCE} are handled via {@code BeanPropertyJsonMapper} (json content is kept
+ * for the read/bind round trip so that a checksum or the source content can be compared).
  */
 abstract class ScalarTypeJsonValue<T> extends ScalarTypeBase<T> {
 
   protected final JsonStorage storage;
   protected final boolean keepSource;
+  private final boolean mutable;
   private final boolean nullable;
   private final String emptyJson;
   private final DocPropertyType docType;
@@ -33,11 +41,12 @@ abstract class ScalarTypeJsonValue<T> extends ScalarTypeBase<T> {
    * @param emptyJson JSON bound when the value is null and the property is not nullable
    *                  (e.g. {@code "[]"} for collections), or null to always bind SQL null.
    */
-  ScalarTypeJsonValue(Class<T> type, int jdbcType, JsonStorage storage, boolean keepSource,
+  ScalarTypeJsonValue(Class<T> type, int jdbcType, JsonStorage storage, MutationDetection mutationDetection,
                       boolean nullable, String emptyJson, DocPropertyType docType) {
     super(type, false, jdbcType);
     this.storage = storage;
-    this.keepSource = keepSource;
+    this.keepSource = mutationDetection == MutationDetection.HASH || mutationDetection == MutationDetection.SOURCE;
+    this.mutable = mutationDetection != MutationDetection.NONE;
     this.nullable = nullable;
     this.emptyJson = emptyJson;
     this.docType = docType;
@@ -51,7 +60,7 @@ abstract class ScalarTypeJsonValue<T> extends ScalarTypeBase<T> {
 
   @Override
   public final boolean mutable() {
-    return true;
+    return mutable;
   }
 
   @Override

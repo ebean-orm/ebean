@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.avaje.json.JsonReader;
 import io.avaje.json.JsonWriter;
+import io.ebean.annotation.MutationDetection;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.PostgresHelper;
@@ -25,20 +26,20 @@ class ScalarTypeJsonSet extends ScalarTypeJsonCollectionValue<Set> {
   /**
    * Return the appropriate ScalarType for the requested dbType and platform.
    */
-  static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docType, boolean nullable, boolean keepSource) {
+  static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docType, boolean nullable, MutationDetection mutationDetection) {
     if (postgres) {
       switch (dbType) {
         case DbPlatformType.JSONB:
-          return new ScalarTypeJsonSet(DbPlatformType.JSONB, JsonStorage.postgres(PostgresHelper.JSONB_TYPE), docType, nullable, keepSource);
+          return new ScalarTypeJsonSet(DbPlatformType.JSONB, JsonStorage.postgres(PostgresHelper.JSONB_TYPE), docType, nullable, mutationDetection);
         case DbPlatformType.JSON:
-          return new ScalarTypeJsonSet(DbPlatformType.JSON, JsonStorage.postgres(PostgresHelper.JSON_TYPE), docType, nullable, keepSource);
+          return new ScalarTypeJsonSet(DbPlatformType.JSON, JsonStorage.postgres(PostgresHelper.JSON_TYPE), docType, nullable, mutationDetection);
       }
     }
-    return new ScalarTypeJsonSet(Types.VARCHAR, JsonStorage.VARCHAR, docType, nullable, keepSource);
+    return new ScalarTypeJsonSet(Types.VARCHAR, JsonStorage.VARCHAR, docType, nullable, mutationDetection);
   }
 
-  ScalarTypeJsonSet(int jdbcType, JsonStorage storage, DocPropertyType docType, boolean nullable, boolean keepSource) {
-    super(Set.class, jdbcType, storage, keepSource, nullable, docType);
+  ScalarTypeJsonSet(int jdbcType, JsonStorage storage, DocPropertyType docType, boolean nullable, MutationDetection mutationDetection) {
+    super(Set.class, jdbcType, storage, mutationDetection, nullable, docType);
   }
 
   @Override
@@ -89,8 +90,8 @@ class ScalarTypeJsonSet extends ScalarTypeJsonCollectionValue<Set> {
 
     private final ArrayElementConverter converter;
 
-    VarcharWithConverter(DocPropertyType docType, boolean nullable, boolean keepSource, ArrayElementConverter converter) {
-      super(Types.VARCHAR, JsonStorage.VARCHAR, docType, nullable, keepSource);
+    VarcharWithConverter(DocPropertyType docType, boolean nullable, ArrayElementConverter converter) {
+      super(Types.VARCHAR, JsonStorage.VARCHAR, docType, nullable, MutationDetection.DEFAULT);
       this.converter = converter;
     }
 

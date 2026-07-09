@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.type;
 
+import io.ebean.annotation.MutationDetection;
 import io.ebean.core.type.DocPropertyType;
 
 /**
@@ -10,9 +11,9 @@ import io.ebean.core.type.DocPropertyType;
  */
 abstract class ScalarTypeJsonCollectionValue<T> extends ScalarTypeJsonValue<T> implements ScalarTypeArray {
 
-  ScalarTypeJsonCollectionValue(Class<T> type, int jdbcType, JsonStorage storage, boolean keepSource,
+  ScalarTypeJsonCollectionValue(Class<T> type, int jdbcType, JsonStorage storage, MutationDetection mutationDetection,
                                 boolean nullable, DocPropertyType docType) {
-    super(type, jdbcType, storage, keepSource, nullable, "[]", docType);
+    super(type, jdbcType, storage, mutationDetection, nullable, "[]", docType);
   }
 
   @Override

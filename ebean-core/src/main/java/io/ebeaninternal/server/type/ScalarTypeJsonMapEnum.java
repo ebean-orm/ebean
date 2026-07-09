@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.avaje.json.JsonReader;
 import io.avaje.json.JsonWriter;
+import io.ebean.annotation.MutationDetection;
 import io.ebean.core.type.ScalarType;
 import io.ebean.text.TextException;
 import io.ebean.text.json.EJson;
@@ -23,13 +24,13 @@ final class ScalarTypeJsonMapEnum<T extends Enum<T>> extends ScalarTypeJsonMap {
 
   private final ScalarType<T> enumType;
 
-  static ScalarType<?> typeFor(boolean postgres, int dbType, ScalarType<? extends Enum<?>> enumType, boolean keepSource) {
-    return new ScalarTypeJsonMapEnum<>(storageFor(postgres, dbType), enumType, keepSource);
+  static ScalarType<?> typeFor(boolean postgres, int dbType, ScalarType<? extends Enum<?>> enumType, MutationDetection mutationDetection) {
+    return new ScalarTypeJsonMapEnum<>(storageFor(postgres, dbType), enumType, mutationDetection);
   }
 
   @SuppressWarnings("unchecked")
-  private ScalarTypeJsonMapEnum(JsonStorage storage, ScalarType<? extends Enum> enumType, boolean keepSource) {
-    super(storage, keepSource);
+  private ScalarTypeJsonMapEnum(JsonStorage storage, ScalarType<? extends Enum> enumType, MutationDetection mutationDetection) {
+    super(storage, mutationDetection);
     this.enumType = (ScalarType<T>) enumType;
   }
 
