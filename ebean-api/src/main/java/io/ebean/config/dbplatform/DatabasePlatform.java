@@ -163,6 +163,18 @@ public class DatabasePlatform {
   protected boolean selectCountWithColumnAlias;
 
   /**
+   * Set true for platforms where {@code exists(...)} can only be used as a predicate
+   * and not as a directly selectable scalar boolean expression (e.g. SQL Server, Oracle).
+   */
+  protected boolean existsWithCaseWhen;
+
+  /**
+   * Clause appended after the {@code case when exists(...) then 1 else 0 end} exists query
+   * for platforms that require a FROM clause on every select (e.g. {@code from dual} on Oracle).
+   */
+  protected String existsFromClause = "";
+
+  /**
    * If set then use the FORWARD ONLY hint when creating ResultSets for
    * findIterate() and findVisit().
    */
@@ -658,6 +670,21 @@ public class DatabasePlatform {
    */
   public boolean selectCountWithColumnAlias() {
     return selectCountWithColumnAlias;
+  }
+
+  /**
+   * Return true if a scalar boolean {@code exists(...)} expression is not supported
+   * as a select expression and needs to be wrapped as {@code case when exists(...) then 1 else 0 end}.
+   */
+  public boolean existsWithCaseWhen() {
+    return existsWithCaseWhen;
+  }
+
+  /**
+   * Return the clause to append after the exists case-when wrapping (e.g. {@code from dual} on Oracle).
+   */
+  public String existsFromClause() {
+    return existsFromClause;
   }
 
 

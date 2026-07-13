@@ -118,6 +118,31 @@ class CQueryBuilderTest {
   }
 
   @Test
+  void wrapSelectExists_default_usesScalarExists() {
+    String sql = CQueryBuilder.wrapSelectExists("select 1 from o_order t0 where t0.id > ?", false, "");
+    assertThat(sql).isEqualTo("select exists(select 1 from o_order t0 where t0.id > ?)");
+  }
+
+  /**
+   * SQL Server does not support exists(...) as a directly selectable scalar
+   * boolean expression - see https://github.com/ebean-orm/ebean/issues/3848
+   */
+  @Test
+  void wrapSelectExists_existsWithCaseWhen_wrapsAsCaseWhen() {
+    String sql = CQueryBuilder.wrapSelectExists("select 1 from o_order t0 where t0.id > ?", true, "");
+    assertThat(sql).isEqualTo("select case when exists(select 1 from o_order t0 where t0.id > ?) then 1 else 0 end");
+  }
+
+  /**
+   * Oracle also requires a FROM clause on every select (from dual) - see https://github.com/ebean-orm/ebean/issues/3848
+   */
+  @Test
+  void wrapSelectExists_existsWithCaseWhenAndFromClause_appendsFromClause() {
+    String sql = CQueryBuilder.wrapSelectExists("select 1 from o_order t0 where t0.id > ?", true, " from dual");
+    assertThat(sql).isEqualTo("select case when exists(select 1 from o_order t0 where t0.id > ?) then 1 else 0 end from dual");
+  }
+
+  @Test
   void inlineSqlCommentLabel_rootExplicitLabel_prefixesBeanType() {
     String label = CQueryBuilder.inlineSqlCommentLabel("fetchMachineFleets", null, false, "COrganisationMachine");
     assertThat(label).isEqualTo("COrganisationMachine.fetchMachineFleets");

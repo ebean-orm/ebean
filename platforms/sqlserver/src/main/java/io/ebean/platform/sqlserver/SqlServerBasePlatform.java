@@ -26,6 +26,7 @@ abstract class SqlServerBasePlatform extends DatabasePlatform {
     this.idInExpandedForm = true;
     this.selectCountWithAlias = true;
     this.selectCountWithColumnAlias = true;
+    this.existsWithCaseWhen = true;
     this.sqlLimiter = new SqlServerSqlLimiter();
     this.basicSqlLimiter = new SqlServerBasicSqlLimiter();
     this.historySupport = new SqlServerHistorySupport();

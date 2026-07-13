@@ -336,7 +336,10 @@ final class CQueryBuilder {
     return sql;
   }
 
-  private String wrapSelectExists(String sql) {
+  static String wrapSelectExists(String sql, boolean existsWithCaseWhen, String existsFromClause) {
+    if (existsWithCaseWhen) {
+      return "select case when exists(" + sql + ") then 1 else 0 end" + existsFromClause;
+    }
     return "select exists(" + sql + ")";
   }
 
@@ -366,7 +369,7 @@ final class CQueryBuilder {
     }
 
     SqlLimitResponse s = buildSql("select 1", request, predicates, sqlTree);
-    String sql = wrapSelectExists(s.getSql());
+    String sql = wrapSelectExists(s.getSql(), dbPlatform.existsWithCaseWhen(), dbPlatform.existsFromClause());
 
     queryPlan = new CQueryPlan(request, sql, sqlTree.plan(), predicates.logWhereSql());
     request.putQueryPlan(queryPlan);

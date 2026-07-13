@@ -41,6 +41,12 @@ class SqlServerPlatformTest {
   }
 
   @Test
+  public void existsWithCaseWhen_trueForSqlServer() {
+    SqlServer17Platform dbPlatform = new SqlServer17Platform();
+    assertEquals(dbPlatform.existsWithCaseWhen(), true);
+  }
+
+  @Test
   public void defaultTypesForDecimalAndVarchar() {
     DatabasePlatform dbPlatform = new DatabasePlatform();
     assertEquals(defaultDecimalDefn(dbPlatform), "decimal(16,3)");
