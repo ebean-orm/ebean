@@ -4,7 +4,6 @@ import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.datasource.DataSourceConfigurationException;
 
 import jakarta.persistence.PersistenceException;
-import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,9 +76,8 @@ final class DbContext {
     return defaultDatabase;
   }
 
-  @Nullable
-  Database getRegistered(String name) {
-    return concMap.get(name);
+  boolean contains(String name) {
+    return concMap.containsKey(name);
   }
 
   /**

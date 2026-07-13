@@ -7,8 +7,6 @@ import jakarta.persistence.PersistenceException;
 
 import java.util.concurrent.locks.ReentrantLock;
 
-import static java.lang.System.Logger.Level.WARNING;
-
 /**
  * Low-level factory for creating {@link Database} instances.
  * <p>
@@ -81,10 +79,10 @@ public final class DatabaseFactory {
         // We're explicitly creating a database to be registered, so avoid
         // triggering DbContext static initialisation to auto-create a default one.
         DbPrimary.setSkip(true);
-        Database existing = DbContext.getInstance().getRegistered(name);
-        if (existing != null) {
-          EbeanVersion.log.log(WARNING, "Using existing database with name:{0}", name);
-          return existing;
+        if (DbContext.getInstance().contains(name)) {
+          throw new IllegalStateException("A Database with name [" + name + "] is already registered."
+            + " Use a unique DatabaseConfig name, or set DatabaseConfig.setRegister(false)"
+            + " if this Database instance is not intended to be registered/looked up by name.");
         }
       }
       Database server = createInternal(config);
