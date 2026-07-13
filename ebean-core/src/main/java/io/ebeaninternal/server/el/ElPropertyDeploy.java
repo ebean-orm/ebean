@@ -91,4 +91,16 @@ public interface ElPropertyDeploy extends SpiQueryManyJoin {
   default String fetchOrderBy() {
     return beanProperty().fetchOrderBy();
   }
+
+  @Override
+  default boolean hasIntersectionOrderColumn() {
+    BeanProperty prop = beanProperty();
+    return prop instanceof io.ebeaninternal.server.deploy.BeanPropertyAssocMany
+      && prop.hasIntersectionOrderColumn();
+  }
+
+  @Override
+  default String intersectionOrderColumn() {
+    return beanProperty().intersectionOrderColumn();
+  }
 }

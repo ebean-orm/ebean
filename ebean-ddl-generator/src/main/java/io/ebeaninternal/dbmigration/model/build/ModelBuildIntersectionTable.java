@@ -2,11 +2,14 @@ package io.ebeaninternal.dbmigration.model.build;
 
 import io.ebeaninternal.dbmigration.model.MColumn;
 import io.ebeaninternal.dbmigration.model.MTable;
+import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebeaninternal.server.deploy.BeanPropertyAssocMany;
 import io.ebeaninternal.server.deploy.TableJoin;
 import io.ebeaninternal.server.deploy.TableJoinColumn;
+
+import java.sql.Types;
 
 /**
  * Add the intersection table to the model.
@@ -79,8 +82,21 @@ class ModelBuildIntersectionTable {
     for (TableJoinColumn otherColumn : otherColumns) {
       addColumn(table, targetDesc, otherColumn.getLocalDbColumn(), otherColumn.getForeignDbColumn());
     }
-
+    if (manyProp.hasIntersectionOrderColumn()) {
+      addOrderColumn(table);
+    }
     return table;
+  }
+
+  /**
+   * Add the extra (non PK) order column used to persist {@code @OrderColumn} position
+   * for a ManyToMany relationship.
+   */
+  private void addOrderColumn(MTable table) {
+    DbPlatformType dbType = ctx.getDbTypeMap().get(Types.INTEGER);
+    MColumn col = new MColumn(manyProp.intersectionOrderColumn(), dbType.renderType(0, 0));
+    col.setNotnull(!manyProp.isIntersectionOrderColumnNullable());
+    table.addColumn(col);
   }
 
   private void addColumn(MTable table, BeanDescriptor<?> desc, String column, String findPropColumn) {

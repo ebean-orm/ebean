@@ -68,6 +68,12 @@ public final class CQueryPredicates {
   private String dbDistinctOn;
   private String dbUpdateClause;
   /**
+   * Set when the many join is a ManyToMany with an intersection table order column - used to
+   * resolve the literal "${path}dbColumn" marker appended to dbOrderBy in parseTableAlias().
+   */
+  private String intersectionOrderPath;
+  private String intersectionOrderColumn;
+  /**
    * Includes from where and order by clauses.
    */
   private Set<String> predicateIncludes;
@@ -252,6 +258,14 @@ public final class CQueryPredicates {
       dbHaving = alias.parseWhere(dbHaving);
     }
     if (dbOrderBy != null) {
+      if (intersectionOrderColumn != null) {
+        // resolve the ManyToMany intersection table order column BEFORE the generic
+        // alias substitution runs, as it needs the "z_" suffixed intersection alias
+        // rather than the plain target table alias.
+        String marker = "${" + intersectionOrderPath + "}" + intersectionOrderColumn;
+        String targetAlias = alias.tableAlias(intersectionOrderPath);
+        dbOrderBy = dbOrderBy.replace(marker, targetAlias + "z_." + intersectionOrderColumn);
+      }
       dbOrderBy = alias.parse(dbOrderBy);
     }
     if (dbDistinctOn != null) {
@@ -281,9 +295,18 @@ public final class CQueryPredicates {
     }
     // check for default ordering on the many property...
     SpiQueryManyJoin manyProp = request.manyJoin();
-    String manyOrderBy = manyProp.fetchOrderBy();
-    if (manyOrderBy != null) {
-      orderBy = orderBy + ", " + parser.parse(CQueryBuilder.prefixOrderByFields(manyProp.path(), manyOrderBy));
+    if (manyProp.hasIntersectionOrderColumn()) {
+      // ManyToMany with @OrderColumn on the intersection table - the column lives on the
+      // intersection table (alias "<targetAlias>z_") rather than a normal property path,
+      // so we append a literal marker that parseTableAlias() resolves directly.
+      intersectionOrderPath = manyProp.path();
+      intersectionOrderColumn = manyProp.intersectionOrderColumn();
+      orderBy = orderBy + ", ${" + intersectionOrderPath + "}" + intersectionOrderColumn;
+    } else {
+      String manyOrderBy = manyProp.fetchOrderBy();
+      if (manyOrderBy != null) {
+        orderBy = orderBy + ", " + parser.parse(CQueryBuilder.prefixOrderByFields(manyProp.path(), manyOrderBy));
+      }
     }
     if (request.isFindById()) {
       // only one master bean so should be fine...

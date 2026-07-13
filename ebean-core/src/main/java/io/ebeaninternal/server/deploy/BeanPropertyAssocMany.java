@@ -58,6 +58,12 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
    */
   private final boolean hasOrderColumn;
   /**
+   * For ManyToMany, the db column name of the order column stored on the intersection
+   * table (null for OneToMany/ElementCollection which use a target descriptor property instead).
+   */
+  private final String intersectionOrderColumn;
+  private final boolean intersectionOrderColumnNullable;
+  /**
    * Flag to indicate manyToMany relationship.
    */
   private final boolean manyToMany;
@@ -95,6 +101,8 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
     this.o2mJoinTable = deploy.isO2mJoinTable();
     this.hasOrderColumn = deploy.hasOrderColumn();
     this.manyToMany = deploy.isManyToMany();
+    this.intersectionOrderColumn = (manyToMany && hasOrderColumn) ? deploy.getOrderColumn().getName() : null;
+    this.intersectionOrderColumnNullable = (manyToMany && hasOrderColumn) && deploy.getOrderColumn().isNullable();
     this.elementCollection = deploy.isElementCollection();
     this.elementDescriptor = deploy.getElementDescriptor();
     this.manyType = deploy.getManyType();
@@ -154,6 +162,9 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
         embeddedExportedProperties = exportedProperties[0].isEmbedded();
         if (fetchOrderBy != null) {
           lazyFetchOrderBy = sqlHelp.lazyFetchOrderBy(fetchOrderBy);
+        } else if (intersectionOrderColumn != null) {
+          // ManyToMany @OrderColumn - the intersection table is always aliased "int_"
+          lazyFetchOrderBy = sqlHelp.lazyFetchOrderBy("int_." + intersectionOrderColumn);
         }
       }
     }
@@ -509,6 +520,29 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
 
   public boolean hasOrderColumn() {
     return hasOrderColumn;
+  }
+
+  /**
+   * Return true if this is a ManyToMany with an order column stored on the intersection table.
+   */
+  @Override
+  public boolean hasIntersectionOrderColumn() {
+    return intersectionOrderColumn != null;
+  }
+
+  /**
+   * Return the db column name of the ManyToMany intersection table order column (or null).
+   */
+  @Override
+  public String intersectionOrderColumn() {
+    return intersectionOrderColumn;
+  }
+
+  /**
+   * Return true if the intersection table order column is nullable.
+   */
+  public boolean isIntersectionOrderColumnNullable() {
+    return intersectionOrderColumnNullable;
   }
 
   public boolean isOrphanRemoval() {

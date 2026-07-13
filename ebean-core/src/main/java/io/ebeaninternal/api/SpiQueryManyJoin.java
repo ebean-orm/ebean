@@ -15,4 +15,19 @@ public interface SpiQueryManyJoin {
    */
   String fetchOrderBy();
 
+  /**
+   * Return true if this many relationship has an order column stored on the
+   * ManyToMany intersection table (rather than a target descriptor property).
+   */
+  default boolean hasIntersectionOrderColumn() {
+    return false;
+  }
+
+  /**
+   * Return the db column name of the ManyToMany intersection table order column (or null).
+   */
+  default String intersectionOrderColumn() {
+    return null;
+  }
+
 }
