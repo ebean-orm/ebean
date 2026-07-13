@@ -175,6 +175,53 @@ class MColumnTest {
   }
 
   @Test
+  void diffComment_add() {
+    ModelDiff diff = diff();
+    MColumn newCol = basic();
+    newCol.setComment("a comment");
+    basic().compare(diff, table, newCol);
+
+    assertChanges(diff);
+    AlterColumn alterColumn = getAlterColumn(diff);
+    assertThat(alterColumn.getComment()).isEqualTo("a comment");
+    // no pre-existing base attribute changed, current type/notnull/comment carried
+    // through anyway so platforms that must restate the whole column (e.g. mysql)
+    // have what they need to rebuild the statement
+    assertThat(alterColumn.getCurrentType()).isEqualTo("integer");
+    assertThat(alterColumn.getCurrentComment()).isNull();
+  }
+
+  @Test
+  void diffComment_remove() {
+    ModelDiff diff = diff();
+    MColumn newCol = basic();
+    MColumn oldCol = basic();
+    oldCol.setComment("a comment");
+    oldCol.compare(diff, table, newCol);
+
+    assertChanges(diff);
+    assertThat(getAlterColumn(diff).getComment()).isEqualTo("DROP COMMENT");
+  }
+
+  @Test
+  void diffType_preservesCurrentComment() {
+    ModelDiff diff = diff();
+    MColumn oldCol = basic();
+    oldCol.setComment("existing comment");
+    MColumn newCol = new MColumn("col", "integer(8)");
+    newCol.setComment("existing comment");
+    oldCol.compare(diff, table, newCol);
+
+    assertChanges(diff);
+    AlterColumn alterColumn = getAlterColumn(diff);
+    assertThat(alterColumn.getType()).isEqualTo("integer(8)");
+    assertThat(alterColumn.getComment()).isNull();
+    // current comment recorded so mysql can restate it when rebuilding the full
+    // column definition for the type change
+    assertThat(alterColumn.getCurrentComment()).isEqualTo("existing comment");
+  }
+
+  @Test
   void diffReferencesAdd() {
     ModelDiff diff = diff();
     MColumn newCol = basic();

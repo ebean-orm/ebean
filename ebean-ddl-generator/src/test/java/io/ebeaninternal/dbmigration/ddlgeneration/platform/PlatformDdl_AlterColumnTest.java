@@ -181,6 +181,60 @@ public class PlatformDdl_AlterColumnTest {
   }
 
   @Test
+  public void mysql_alterColumn_commentOnly_rebuildsWithType() {
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName("mytab");
+    alter.setColumnName("acol");
+    alter.setCurrentType("varchar(50)");
+    alter.setCurrentNotnull(Boolean.TRUE);
+    alter.setComment("new comment");
+
+    String sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol varchar(50) not null comment 'new comment';\n");
+  }
+
+  @Test
+  public void mysql_alterColumn_typeChange_preservesExistingComment() {
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName("mytab");
+    alter.setColumnName("acol");
+    alter.setCurrentType("varchar(20)");
+    alter.setType("varchar(50)");
+    alter.setCurrentComment("existing comment");
+
+    String sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol varchar(50) comment 'existing comment';\n");
+  }
+
+  @Test
+  public void mysql_alterColumn_dropComment() {
+    AlterColumn alter = new AlterColumn();
+    alter.setTableName("mytab");
+    alter.setColumnName("acol");
+    alter.setCurrentType("varchar(50)");
+    alter.setComment("DROP COMMENT");
+    alter.setCurrentComment("existing comment");
+
+    String sql = alterColumn(mysqlDdl, alter);
+    softly.assertThat(sql).isEqualTo("-- apply alter tables\n"
+      + "alter table mytab modify acol varchar(50);\n");
+  }
+
+  @Test
+  public void mysql_alterTableAddColumn_withComment() {
+    Column column = simpleColumn();
+    column.setComment("a comment");
+
+    DdlWrite writer = new DdlWrite();
+    mysqlDdl.alterTableAddColumn(writer, "my_table", column, false, "1");
+    softly.assertThat(writer.toString())
+      .isEqualTo("-- apply alter tables\n"
+        + "alter table my_table add column my_column int default 1 not null comment 'a comment';\n");
+  }
+
+  @Test
   public void testAlterColumnType() {
 
     AlterColumn alter = new AlterColumn();

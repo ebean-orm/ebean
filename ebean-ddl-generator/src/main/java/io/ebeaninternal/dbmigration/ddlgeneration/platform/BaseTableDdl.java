@@ -686,7 +686,8 @@ public class BaseTableDdl implements TableDdl {
     if (hasValue(alterColumn.getUniqueOneToOne())) {
       alterColumnAddUniqueOneToOneConstraint(writer, alterColumn);
     }
-    if (hasValue(alterColumn.getComment())) {
+    if (hasValue(alterColumn.getComment()) && !platformDdl.isInlineComments()) {
+      // platform supports comments as a separate statement (e.g. postgres)
       alterColumnComment(writer, alterColumn);
     }
     if (hasValue(alterColumn.getDropCheckConstraint())) {
@@ -700,7 +701,10 @@ public class BaseTableDdl implements TableDdl {
     }
     if (typeChange(alterColumn)
       || hasValue(alterColumn.getDefaultValue())
-      || alterColumn.isNotnull() != null) {
+      || alterColumn.isNotnull() != null
+      || (hasValue(alterColumn.getComment()) && platformDdl.isInlineComments())) {
+      // platforms with inline comments (e.g. mysql) must restate the whole column
+      // definition (including comment) even when only the comment is changing
       alterColumn(writer, alterColumn);
     }
     if (alterCheckConstraint) {
@@ -824,7 +828,9 @@ public class BaseTableDdl implements TableDdl {
 
     platformDdl.alterTableAddColumn(writer, tableName, column, onHistoryTable, help.getDefaultValue());
     final String comment = column.getComment();
-    if (comment != null && !comment.isEmpty()) {
+    if (comment != null && !comment.isEmpty() && !platformDdl.isInlineComments()) {
+      // platforms with inline comments (e.g. mysql) embed the comment directly into the
+      // "add column" statement itself rather than as a separate statement
       platformDdl.addColumnComment(writer.applyPostAlter(), tableName, column.getName(), comment);
     }
 

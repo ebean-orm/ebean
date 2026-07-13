@@ -94,9 +94,10 @@ public class MySqlDdl extends PlatformDdl {
   public void alterColumn(DdlWrite writer, AlterColumn alter) {
     String tableName = alter.getTableName();
     String columnName = alter.getColumnName();
+    boolean commentChange = hasValue(alter.getComment());
 
-    if (alter.getType() == null && alter.isNotnull() == null) {
-      // No type change or notNull change -> handle default value change
+    if (alter.getType() == null && alter.isNotnull() == null && !commentChange) {
+      // No type change, notNull change or comment change -> handle default value change
       if (hasValue(alter.getDefaultValue())) {
         alterColumnDefault(writer, alter);
       }
@@ -115,13 +116,50 @@ public class MySqlDdl extends PlatformDdl {
       if (hasValue(defaultValue) && !DdlHelp.isDropDefault(defaultValue)) {
         buffer.append(" default ").append(convertDefaultValue(defaultValue));
       }
+      // restate the comment (new, existing, or none) as mysql requires the whole column
+      // definition to be repeated - otherwise a comment could be silently dropped
+      String comment = alter.getComment() != null ? alter.getComment() : alter.getCurrentComment();
+      if (DdlHelp.isDropComment(comment)) {
+        comment = null;
+      }
+      appendColumnComment(buffer, comment);
+    }
+  }
+
+  @Override
+  public void alterTableAddColumn(DdlWrite writer, String tableName, Column column, boolean onHistoryTable, String defaultValue) {
+    String convertedType = convert(column.getType());
+    DdlBuffer buffer = alterTable(writer, tableName).append(addColumn, column.getName());
+    buffer.append(convertedType);
+
+    // Add default value also to history table if it is not excluded
+    if (defaultValue != null) {
+      if (!onHistoryTable || !isTrue(column.isHistoryExclude())) {
+        buffer.append(" default ");
+        buffer.append(defaultValue);
+      }
+    }
+    if (!onHistoryTable) {
+      if (isTrue(column.isNotnull())) {
+        buffer.appendWithSpace(columnNotNull);
+      }
+      // check constraints cannot be added in one statement for h2
+      if (!StringHelper.isNull(column.getCheckConstraint())) {
+        String ddl = alterTableAddCheckConstraint(tableName, column.getCheckConstraintName(), column.getCheckConstraint());
+        writer.applyPostAlter().appendStatement(ddl);
+      }
+      // comment must be inline as part of the column definition for mysql
+      appendColumnComment(buffer, column.getComment());
     }
   }
 
   @Override
   protected void writeColumnDefinition(DdlBuffer buffer, Column column, DdlIdentity identity) {
     super.writeColumnDefinition(buffer, column, identity);
-    String comment = column.getComment();
+    appendColumnComment(buffer, column.getComment());
+  }
+
+  private void appendColumnComment(DdlBuffer buffer, String comment) {
     if (!StringHelper.isNull(comment)) {
       // in mysql 5.5 column comment save in information_schema.COLUMNS.COLUMN_COMMENT(VARCHAR 1024)
       if (comment.length() > 500) {
