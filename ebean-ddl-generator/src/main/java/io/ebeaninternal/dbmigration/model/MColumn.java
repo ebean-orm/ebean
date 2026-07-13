@@ -374,6 +374,7 @@ public class MColumn {
     this.alterColumn = null;
 
     boolean changeBaseAttribute = false;
+    boolean changeComment = false;
 
     if (historyExclude != newColumn.historyExclude) {
       getAlterColumn(tableName, tableWithHistory).setHistoryExclude(newColumn.historyExclude);
@@ -396,6 +397,7 @@ public class MColumn {
       }
     }
     if (different(comment, newColumn.comment)) {
+      changeComment = true;
       AlterColumn alter = getAlterColumn(tableName, tableWithHistory);
       if (newColumn.comment == null) {
         alter.setComment(DdlHelp.DROP_COMMENT);
@@ -459,10 +461,14 @@ public class MColumn {
 
     if (alterColumn != null) {
       modelDiff.addAlterColumn(alterColumn);
-      if (changeBaseAttribute) {
-        // support reverting these changes
+      if (changeBaseAttribute || changeComment) {
+        // Support reverting these changes and let platforms that must restate the whole
+        // column definition on any change (e.g. mysql) preserve unchanged attributes -
+        // don't lose the existing comment when altering type/notnull, and have the
+        // current type/notnull available to restate when only the comment is changing.
         alterColumn.setCurrentType(type);
         alterColumn.setCurrentNotnull(notnull);
+        alterColumn.setCurrentComment(comment);
       }
     }
   }

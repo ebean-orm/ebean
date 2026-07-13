@@ -28,6 +28,7 @@ import java.util.List;
  *       &lt;attribute name="notnull" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="currentNotnull" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="comment" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="currentComment" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="historyExclude" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="checkConstraint" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="checkConstraintName" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
@@ -77,6 +78,8 @@ public class AlterColumn {
   protected Boolean currentNotnull;
   @XmlAttribute(name = "comment")
   protected String comment;
+  @XmlAttribute(name = "currentComment")
+  protected String currentComment;
   @XmlAttribute(name = "historyExclude")
   protected Boolean historyExclude;
   @XmlAttribute(name = "checkConstraint")
@@ -358,6 +361,30 @@ public class AlterColumn {
    */
   public void setComment(String value) {
     this.comment = value;
+  }
+
+  /**
+   * Gets the value of the currentComment property.
+   * <p>
+   * This is the pre-existing comment value on the column, only populated when a platform
+   * needs to fully restate the column definition (e.g. mysql) so that the existing comment
+   * is not lost when another attribute (type, notnull, or the comment itself) changes.
+   *
+   * @return possible object is
+   * {@link String }
+   */
+  public String getCurrentComment() {
+    return currentComment;
+  }
+
+  /**
+   * Sets the value of the currentComment property.
+   *
+   * @param value allowed object is
+   *              {@link String }
+   */
+  public void setCurrentComment(String value) {
+    this.currentComment = value;
   }
 
   /**
