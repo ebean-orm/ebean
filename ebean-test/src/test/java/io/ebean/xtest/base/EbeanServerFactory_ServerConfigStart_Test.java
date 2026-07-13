@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class EbeanServerFactory_ServerConfigStart_Test {
 
@@ -83,7 +84,7 @@ public class EbeanServerFactory_ServerConfigStart_Test {
   }
 
   @Test
-  public void create_registeredDatabase_twice_returnsExistingInstance() {
+  public void create_registeredDatabase_twice_throwsException() {
 
     DatabaseBuilder config = new DatabaseConfig();
     config.setName("h2");
@@ -100,12 +101,15 @@ public class EbeanServerFactory_ServerConfigStart_Test {
     config.addServerConfigStartup(serverConfig -> startupCount.incrementAndGet());
 
     Database db = DatabaseFactory.create(config);
-    Database existing = DatabaseFactory.create(config);
+    try {
+      assertThatThrownBy(() -> DatabaseFactory.create(config))
+        .isInstanceOf(IllegalStateException.class)
+        .hasMessageContaining("already registered");
 
-    assertThat(existing).isSameAs(db);
-    assertThat(startupCount.get()).isEqualTo(1);
-
-    db.shutdown(true, false);
+      assertThat(startupCount.get()).isEqualTo(1);
+    } finally {
+      db.shutdown(true, false);
+    }
   }
 
   @Test

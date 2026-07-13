@@ -1,6 +1,7 @@
 package io.ebean.event;
 
 import io.ebean.Database;
+import io.ebean.DatabaseFactory;
 import io.ebean.EbeanVersion;
 import io.ebean.service.SpiContainer;
 
@@ -188,6 +189,7 @@ public final class ShutdownManager {
    */
   public static void unregisterDatabase(Database server) {
     databases.remove(server);
+    DatabaseFactory.unregister(server);
   }
 
   private static class ShutdownHook extends Thread {

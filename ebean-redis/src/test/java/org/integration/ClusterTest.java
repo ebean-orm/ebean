@@ -5,17 +5,23 @@ import io.ebean.Database;
 import io.ebean.redis.DuelCache;
 import org.domain.Person;
 import org.domain.query.QPerson;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-
-import javax.sql.DataSource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ClusterTest {
 
-  private Database createOther(DataSource dataSource) {
-    return Database.builder()
-      .dataSource(dataSource)
+  private static Database db;
+  private static Database other;
+
+  @BeforeAll
+  static void setup() {
+    // ensure the default server exists first
+    db = DB.getDefault();
+    other = Database.builder()
+      .dataSource(db.pluginApi().dataSource())
       .loadFromProperties()
       .defaultDatabase(false)
       .name("other")
@@ -24,12 +30,13 @@ class ClusterTest {
       .build();
   }
 
+  @AfterAll
+  static void tearDown() {
+    other.shutdown(false, false);
+  }
+
   @Test
   void testBothNear() throws InterruptedException {
-    // ensure the default server exists first
-    final Database db = DB.getDefault();
-    Database other = createOther(db.pluginApi().dataSource());
-
     new QPerson()
       .name.eq("Someone")
       .delete();
@@ -59,10 +66,6 @@ class ClusterTest {
 
   @Test
   void test() throws InterruptedException {
-    // ensure the default server exists first
-    final Database db = DB.getDefault();
-    Database other = createOther(db.pluginApi().dataSource());
-
     for (int i = 0; i < 10; i++) {
       Person foo = new Person("name " + i);
       foo.save();
