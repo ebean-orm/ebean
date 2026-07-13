@@ -33,6 +33,8 @@ public class OraclePlatform extends DatabasePlatform {
     this.dbDefaultValue.setTrue("1");
     this.dbDefaultValue.setNow("current_timestamp");
     this.likeClauseRaw = "like ?";
+    this.existsWithCaseWhen = true;
+    this.existsFromClause = " from dual";
 
     this.exceptionTranslator =
       new SqlErrorCodes()
