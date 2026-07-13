@@ -61,6 +61,7 @@ drop view migtest_e_history6_with_history;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number2 = 7 where test_number2 is null;
 -- apply alter tables
+alter table `table` modify `index` varchar(255) comment 'this is a comment';
 alter table migtest_e_basic modify status varchar(1);
 alter table migtest_e_basic modify status2 varchar(1) not null default 'N';
 alter table migtest_e_basic modify a_lob varchar(255) not null default 'X';
@@ -69,6 +70,7 @@ alter table migtest_e_basic add column description_file longblob;
 alter table migtest_e_basic add column old_boolean tinyint(1) default 0 not null;
 alter table migtest_e_basic add column old_boolean2 tinyint(1);
 alter table migtest_e_basic add column eref_id integer;
+alter table migtest_e_history modify test_string bigint;
 alter table migtest_e_history2 modify test_string varchar(255);
 alter table migtest_e_history2 add column obsolete_string1 varchar(255);
 alter table migtest_e_history2 add column obsolete_string2 varchar(255);

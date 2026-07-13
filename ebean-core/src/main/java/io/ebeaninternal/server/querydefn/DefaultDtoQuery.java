@@ -2,6 +2,7 @@ package io.ebeaninternal.server.querydefn;
 
 import org.jspecify.annotations.NullMarked;
 import io.ebean.DtoQuery;
+import io.ebean.PagedList;
 import io.ebean.ProfileLocation;
 import io.ebean.QueryIterator;
 import io.ebean.Transaction;
@@ -11,6 +12,7 @@ import io.ebeaninternal.server.dto.DtoMappingRequest;
 import io.ebeaninternal.server.dto.DtoQueryPlan;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 
+import jakarta.persistence.PersistenceException;
 import javax.annotation.Nullable;
 import java.sql.Connection;
 import java.util.Collection;
@@ -50,6 +52,8 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
     this.useMaster = ormQuery.isUseMaster();
     this.label = ormQuery.label();
     this.profileLocation = ormQuery.profileLocation();
+    this.firstRow = ormQuery.getFirstRow();
+    this.maxRows = ormQuery.getMaxRows();
   }
 
   /**
@@ -133,6 +137,24 @@ public final class DefaultDtoQuery<T> extends AbstractQuery implements SpiDtoQue
   @Override
   public List<T> findList() {
     return server.findDtoList(this);
+  }
+
+  @Override
+  public PagedList<T> findPagedList() {
+    if (ormQuery == null) {
+      throw new PersistenceException("findPagedList() is only supported for a DtoQuery derived from an ORM query");
+    }
+    if (maxRows == 0) {
+      throw new PersistenceException("maxRows must be specified for findPagedList()");
+    }
+    // Use an independent copy for the row count query. The ormQuery instance is mutated with
+    // a (potentially since ended/inactive) implicit transaction when the DTO list is executed,
+    // so the count query must not share that transaction reference - instead it uses the
+    // transaction explicitly bound to this DtoQuery (if any), consistent with a plain
+    // Query.findPagedList().
+    SpiQuery<?> countQuery = ormQuery.copy();
+    countQuery.usingTransaction(transaction);
+    return new DtoPagedList<>(server, this, countQuery);
   }
 
   @Nullable
