@@ -44,10 +44,15 @@ final class SaveManyElementCollection extends SaveManyBase {
   private void saveCollection() {
     SpiSqlUpdate proto = many.insertElementCollection();
     Object parentId = request.beanId();
+    boolean hasOrderColumn = many.hasOrderColumn();
+    int position = 0;
     for (Object value : collection) {
       final SpiSqlUpdate sqlInsert = proto.copy();
       sqlInsert.setParameter(parentId);
       many.bindElementValue(sqlInsert, value);
+      if (hasOrderColumn) {
+        sqlInsert.setParameter(position++);
+      }
       persister.addToFlushQueue(sqlInsert, transaction, BatchControl.INSERT_QUEUE);
     }
     resetModifyState();

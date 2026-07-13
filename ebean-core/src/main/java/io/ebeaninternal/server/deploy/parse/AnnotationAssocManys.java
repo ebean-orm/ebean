@@ -177,6 +177,11 @@ final class AnnotationAssocManys extends AnnotationAssoc {
     if (!elementCollection.targetClass().equals(void.class)) {
       prop.setTargetType(elementCollection.targetClass());
     }
+    OrderColumn orderColumn = get(prop, OrderColumn.class);
+    if (orderColumn != null) {
+      prop.setOrderColumn(new DeployOrderColumn(orderColumn));
+      prop.setFetchOrderBy(DeployOrderColumn.LOGICAL_NAME);
+    }
     Column column = prop.getMetaAnnotation(Column.class);
     if (column != null) {
       prop.setDbColumn(column.name());
@@ -268,6 +273,11 @@ final class AnnotationAssocManys extends AnnotationAssoc {
 
     elementDescriptor.setName(prop.toString());
     factory.createUnidirectional(elementDescriptor, prop.getOwningType(), beanTable, prop.getTableJoin());
+    if (prop.hasOrderColumn()) {
+      // create the synthetic order property on the element descriptor - the element descriptor
+      // is not registered in deployInfoMap so this can't go through the usual OneToMany path
+      factory.makeOrderColumn(prop, elementDescriptor);
+    }
     prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor, prop.getManyType(), scalar));
   }
 
