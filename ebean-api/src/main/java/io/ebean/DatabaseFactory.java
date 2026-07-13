@@ -122,6 +122,24 @@ public final class DatabaseFactory {
   }
 
   /**
+   * Remove the registration of this Database.
+   * <p>
+   * This is invoked when a Database is shutdown so that its registered name
+   * becomes available again for a subsequently created Database with the same name.
+   */
+  public static void unregister(Database server) {
+    lock.lock();
+    try {
+      DbContext.getInstance().deregister(server);
+      if (server.name().equals(defaultServerName)) {
+        defaultServerName = null;
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
+
+  /**
    * Shutdown gracefully all Database instances cleaning up any resources as required.
    * <p>
    * This is typically invoked via JVM shutdown hook and not explicitly called.

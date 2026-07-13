@@ -120,6 +120,27 @@ final class DbContext {
     registerWithName(server.name(), server, isDefault);
   }
 
+  /**
+   * Remove the registration for this Database (typically on shutdown) so that
+   * its name becomes available again for a subsequently created Database.
+   * <p>
+   * Only removes the registration if it currently maps to this exact instance
+   * (avoids removing a different Database subsequently registered with the same name).
+   */
+  void deregister(Database server) {
+    lock.lock();
+    try {
+      String name = server.name();
+      concMap.remove(name, server);
+      syncMap.remove(name, server);
+      if (defaultDatabase == server) {
+        defaultDatabase = null;
+      }
+    } finally {
+      lock.unlock();
+    }
+  }
+
   private void registerWithName(String name, Database server, boolean isDefault) {
     lock.lock();
     try {
