@@ -256,6 +256,12 @@ final class SaveManyBeans extends SaveManyBase {
   }
 
   private void saveAssocManyIntersection(boolean queue) {
+    if (many.hasIntersectionOrderColumn()) {
+      // With @OrderColumn the position of every row can change on any add/remove/reorder so
+      // we always delete all intersection rows and reinsert them in the current list order.
+      saveAssocManyIntersectionOrdered(queue);
+      return;
+    }
     final boolean vanillaCollection = !(value instanceof BeanCollection<?>);
     if (vanillaCollection || forcedUpdate) {
       // delete all intersection rows and then treat all
@@ -337,6 +343,53 @@ final class SaveManyBeans extends SaveManyBase {
       }
     }
     // decrease the depth back to what it was
+    transaction.depth(-1);
+  }
+
+  /**
+   * Save the ManyToMany intersection rows for a property with an {@code @OrderColumn}.
+   * <p>
+   * Unlike the standard diff based save (additions/removals), this always deletes all existing
+   * intersection rows for the parent and reinserts every current entry in list order, binding
+   * the sequential order index. This is required because a pure reorder (no add/remove) would
+   * not otherwise be detected/persisted, and there is no per-row place (unlike OneToMany/
+   * ElementCollection) to compare an existing 'loaded' order against - the order value lives on
+   * the intersection row, not on the target bean.
+   */
+  private void saveAssocManyIntersectionOrdered(boolean queue) {
+    if (value == null) {
+      return;
+    }
+    Collection<?> current;
+    if (value instanceof Map<?, ?>) {
+      current = ((Map<?, ?>) value).values();
+    } else if (value instanceof Collection<?>) {
+      current = (Collection<?>) value;
+    } else {
+      throw new PersistenceException("Unhandled ManyToMany type " + value.getClass().getName() + " for " + many.fullName());
+    }
+    if (value instanceof BeanCollection<?>) {
+      BeanCollection<?> manyValue = (BeanCollection<?>) value;
+      setListenMode(manyValue, many);
+      manyValue.modifyReset();
+    }
+    if (!insertedParent) {
+      request.preManyToManyUpdate();
+      persister.deleteManyIntersection(parentBean, many, transaction, publish, queue);
+    }
+    String orderColumn = many.intersectionOrderColumn();
+    transaction.depth(+1);
+    int position = 0;
+    for (Object other : current) {
+      EntityBean otherBean = (EntityBean) other;
+      if (!many.hasImportedId(otherBean)) {
+        throw new PersistenceException("ManyToMany bean does not have an Id value? " + otherBean);
+      }
+      IntersectionRow intRow = many.buildManyToManyMapBean(parentBean, otherBean, publish);
+      intRow.put(orderColumn, position++);
+      SpiSqlUpdate sqlInsert = intRow.createInsert(server);
+      persister.executeOrQueue(sqlInsert, transaction, queue, BatchControl.INSERT_QUEUE);
+    }
     transaction.depth(-1);
   }
 

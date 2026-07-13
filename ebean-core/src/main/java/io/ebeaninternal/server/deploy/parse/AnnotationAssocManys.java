@@ -89,6 +89,11 @@ final class AnnotationAssocManys extends AnnotationAssoc {
     ManyToMany manyToMany = get(prop, ManyToMany.class);
     if (manyToMany != null) {
       readToMany(manyToMany, prop);
+      OrderColumn orderColumn = get(prop, OrderColumn.class);
+      if (orderColumn != null) {
+        // ManyToMany order value is stored on the intersection table (not the target bean)
+        prop.setOrderColumn(new DeployOrderColumn(orderColumn));
+      }
     }
     ElementCollection elementCollection = get(prop, ElementCollection.class);
     if (elementCollection != null) {
