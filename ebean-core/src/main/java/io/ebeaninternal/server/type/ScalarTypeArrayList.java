@@ -45,31 +45,31 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
       try {
         String key = valueType + ":" + nullable;
         if (valueType.equals(UUID.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "uuid", DocPropertyType.UUID, ArrayElementConverter.UUID));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "uuid", DocPropertyType.UUID, ArrayElementConverter.UUID, UUID.class));
         }
         if (valueType.equals(Long.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "bigint", DocPropertyType.LONG, ArrayElementConverter.LONG));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "bigint", DocPropertyType.LONG, ArrayElementConverter.LONG, Long.class));
         }
         if (valueType.equals(Integer.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER, Integer.class));
         }
         if (valueType.equals(Float.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "float4", DocPropertyType.DOUBLE, ArrayElementConverter.FLOAT));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "float4", DocPropertyType.DOUBLE, ArrayElementConverter.FLOAT, Float.class));
         }
         if (valueType.equals(Double.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE, Double.class));
         }
         if (valueType.equals(BigDecimal.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "decimal", DocPropertyType.DOUBLE, ArrayElementConverter.BIG_DECIMAL));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "decimal", DocPropertyType.DOUBLE, ArrayElementConverter.BIG_DECIMAL, BigDecimal.class));
         }
         if (valueType.equals(String.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING, String.class));
         }
         if (valueType.equals(Instant.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "timestamptz", DocPropertyType.TEXT, ArrayElementConverter.INSTANT));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "timestamptz", DocPropertyType.TEXT, ArrayElementConverter.INSTANT, Instant.class));
         }
         if (valueType.equals(LocalDate.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "date", DocPropertyType.TEXT, ArrayElementConverter.LOCAL_DATE));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArrayList(nullable, "date", DocPropertyType.TEXT, ArrayElementConverter.LOCAL_DATE, LocalDate.class));
         }
         throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
       } finally {
@@ -79,18 +79,24 @@ class ScalarTypeArrayList extends ScalarTypeArrayBase<List> implements ScalarTyp
 
     @Override
     public ScalarTypeArrayList typeForEnum(ScalarType<?> scalarType, boolean nullable) {
-      return new ScalarTypeArrayList(nullable, arrayTypeFor(scalarType), scalarType.docType(), new ArrayElementConverter.EnumConverter(scalarType));
+      return new ScalarTypeArrayList(nullable, arrayTypeFor(scalarType), scalarType.docType(), new ArrayElementConverter.EnumConverter(scalarType), scalarType.type());
     }
   }
 
   private final String arrayType;
-
   private final ArrayElementConverter converter;
+  private final Class<?> elementType;
 
-  public ScalarTypeArrayList(boolean nullable, String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
+  public ScalarTypeArrayList(boolean nullable, String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter, Class<?> elementType) {
     super(List.class, Types.ARRAY, docPropertyType, nullable);
     this.arrayType = arrayType;
     this.converter = converter;
+    this.elementType = elementType;
+  }
+
+  @Override
+  public Class<?> elementType() {
+    return elementType;
   }
 
   @Override

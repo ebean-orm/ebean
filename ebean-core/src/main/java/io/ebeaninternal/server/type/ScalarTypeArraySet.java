@@ -42,19 +42,19 @@ class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeA
       try {
         String key = valueType + ":" + nullable;
         if (valueType.equals(UUID.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "uuid", DocPropertyType.UUID, ArrayElementConverter.UUID));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "uuid", DocPropertyType.UUID, ArrayElementConverter.UUID, UUID.class));
         }
         if (valueType.equals(Long.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "bigint", DocPropertyType.LONG, ArrayElementConverter.LONG));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "bigint", DocPropertyType.LONG, ArrayElementConverter.LONG, Long.class));
         }
         if (valueType.equals(Integer.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER, Integer.class));
         }
         if (valueType.equals(Double.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE, Double.class));
         }
         if (valueType.equals(String.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySet(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING, String.class));
         }
         throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
       } finally {
@@ -64,18 +64,24 @@ class ScalarTypeArraySet extends ScalarTypeArrayBase<Set> implements ScalarTypeA
 
     @Override
     public ScalarType<?> typeForEnum(ScalarType<?> scalarType, boolean nullable) {
-      return new ScalarTypeArraySet(nullable, arrayTypeFor(scalarType), scalarType.docType(), new ArrayElementConverter.EnumConverter(scalarType));
+      return new ScalarTypeArraySet(nullable, arrayTypeFor(scalarType), scalarType.docType(), new ArrayElementConverter.EnumConverter(scalarType), scalarType.type());
     }
   }
 
   private final String arrayType;
-
   private final ArrayElementConverter converter;
+  private final Class<?> elementType;
 
-  public ScalarTypeArraySet(boolean nullable, String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
+  public ScalarTypeArraySet(boolean nullable, String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter, Class<?> elementType) {
     super(Set.class, Types.ARRAY, docPropertyType, nullable);
     this.arrayType = arrayType;
     this.converter = converter;
+    this.elementType = elementType;
+  }
+
+  @Override
+  public Class<?> elementType() {
+    return elementType;
   }
 
   @Override

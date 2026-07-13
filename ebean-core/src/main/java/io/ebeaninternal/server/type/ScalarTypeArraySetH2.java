@@ -37,19 +37,19 @@ final class ScalarTypeArraySetH2 extends ScalarTypeArraySet {
       try {
         String key = valueType + ":" + nullable;
         if (valueType.equals(UUID.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySetH2(nullable, "uuid", DocPropertyType.UUID, ArrayElementConverter.UUID));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySetH2(nullable, "uuid", DocPropertyType.UUID, ArrayElementConverter.UUID, UUID.class));
         }
         if (valueType.equals(Long.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySetH2(nullable, "bigint", DocPropertyType.LONG, ArrayElementConverter.LONG));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySetH2(nullable, "bigint", DocPropertyType.LONG, ArrayElementConverter.LONG, Long.class));
         }
         if (valueType.equals(Integer.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySetH2(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySetH2(nullable, "integer", DocPropertyType.INTEGER, ArrayElementConverter.INTEGER, Integer.class));
         }
         if (valueType.equals(Double.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySetH2(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySetH2(nullable, "float", DocPropertyType.DOUBLE, ArrayElementConverter.DOUBLE, Double.class));
         }
         if (valueType.equals(String.class)) {
-          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySetH2(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING));
+          return cache.computeIfAbsent(key, s -> new ScalarTypeArraySetH2(nullable, "varchar", DocPropertyType.TEXT, ArrayElementConverter.STRING, String.class));
         }
         throw new IllegalArgumentException("Type [" + valueType + "] not supported for @DbArray mapping");
       } finally {
@@ -59,13 +59,13 @@ final class ScalarTypeArraySetH2 extends ScalarTypeArraySet {
 
     @Override
     public ScalarType<?> typeForEnum(ScalarType<?> scalarType, boolean nullable) {
-      return new ScalarTypeArraySetH2(nullable, "varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType));
+      return new ScalarTypeArraySetH2(nullable, "varchar", DocPropertyType.TEXT, new ArrayElementConverter.EnumConverter(scalarType), scalarType.type());
     }
   }
 
   @SuppressWarnings("rawtypes")
-  private ScalarTypeArraySetH2(boolean nullable, String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter) {
-    super(nullable, arrayType, docPropertyType, converter);
+  private ScalarTypeArraySetH2(boolean nullable, String arrayType, DocPropertyType docPropertyType, ArrayElementConverter converter, Class<?> elementType) {
+    super(nullable, arrayType, docPropertyType, converter, elementType);
   }
 
   @Override
