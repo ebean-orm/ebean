@@ -186,6 +186,7 @@ drop trigger table_history_upd;
 drop trigger table_history_del;
 drop view table_with_history;
 -- apply alter tables
+alter table `table` modify `index` varchar(255) comment 'this is an other comment';
 alter table `table` modify textfield varchar(255);
 alter table `table` add column `select` varchar(255);
 alter table `table` add column textfield2 varchar(255);
@@ -203,7 +204,7 @@ alter table migtest_e_basic add column progress integer default 0 not null;
 alter table migtest_e_basic add column new_integer integer default 42 not null;
 alter table migtest_e_history add column sys_period_start datetime(6) default now(6);
 alter table migtest_e_history add column sys_period_end datetime(6);
-alter table migtest_e_history modify test_string bigint;
+alter table migtest_e_history modify test_string bigint comment 'Column altered to long now';
 alter table migtest_e_history2 modify test_string varchar(255) not null default 'unknown';
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;

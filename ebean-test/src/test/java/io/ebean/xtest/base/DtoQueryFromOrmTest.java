@@ -3,6 +3,7 @@ package io.ebean.xtest.base;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.DB;
 import io.ebean.DtoQuery;
+import io.ebean.PagedList;
 import io.ebean.ProfileLocation;
 import io.ebean.xtest.ForPlatform;
 import io.ebean.annotation.Platform;
@@ -10,6 +11,7 @@ import io.ebean.meta.MetaQueryMetric;
 import io.ebean.meta.MetaTimedMetric;
 import io.ebean.meta.ServerMetrics;
 import io.ebean.test.LoggedSql;
+import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -20,6 +22,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class DtoQueryFromOrmTest extends BaseTestCase {
 
@@ -409,6 +412,63 @@ public class DtoQueryFromOrmTest extends BaseTestCase {
       .isNotNull("lastName").asDto(ContactTotals.class).findList();
 
     assertThat(contactDtos).isNotEmpty();
+  }
+
+  @Test
+  public void findPagedList_fromOrmQuery() {
+
+    ResetBasicData.reset();
+
+    PagedList<ContactDto> pagedList = DB.find(Contact.class)
+      .select("id, email, " + concat("lastName", ", ", "firstName") + " as fullName")
+      .where().isNotNull("email")
+      .orderBy().asc("id")
+      .setFirstRow(0)
+      .setMaxRows(2)
+      .asDto(ContactDto.class)
+      .findPagedList();
+
+    List<ContactDto> dtos = pagedList.getList();
+    assertThat(dtos).hasSizeLessThanOrEqualTo(2);
+
+    int totalRowCount = pagedList.getTotalCount();
+    List<ContactDto> allDtos = DB.find(Contact.class)
+      .select("id, email, " + concat("lastName", ", ", "firstName") + " as fullName")
+      .where().isNotNull("email")
+      .orderBy().asc("id")
+      .asDto(ContactDto.class)
+      .findList();
+
+    assertThat(totalRowCount).isEqualTo(allDtos.size());
+    assertThat(pagedList.getPageSize()).isEqualTo(2);
+    assertThat(pagedList.getPageIndex()).isEqualTo(0);
+  }
+
+  @Test
+  public void findPagedList_noMaxRows_throws() {
+
+    ResetBasicData.reset();
+
+    DtoQuery<ContactDto> query = DB.find(Contact.class)
+      .select("id, email")
+      .where().isNotNull("email")
+      .asDto(ContactDto.class);
+
+    assertThatThrownBy(query::findPagedList)
+      .isInstanceOf(PersistenceException.class)
+      .hasMessageContaining("maxRows must be specified");
+  }
+
+  @Test
+  public void findPagedList_rawSql_throws() {
+
+    DtoQuery<ContactDto> query = DB.findDto(ContactDto.class,
+      "select id, email from contact where email is not null")
+      .setMaxRows(10);
+
+    assertThatThrownBy(query::findPagedList)
+      .isInstanceOf(PersistenceException.class)
+      .hasMessageContaining("only supported for a DtoQuery derived");
   }
 
   public static class ContactTotals {

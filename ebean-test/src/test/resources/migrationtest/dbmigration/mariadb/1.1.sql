@@ -169,6 +169,7 @@ SET @@system_versioning_alter_history = 1;
 -- NOTE: table has @History - special migration may be necessary
 update migtest_e_history6 set test_number1 = 42 where test_number1 is null;
 -- apply alter tables
+alter table `table` modify `index` varchar(255) comment 'this is an other comment';
 alter table `table` modify textfield varchar(255);
 alter table `table` add column `select` varchar(255);
 alter table `table` add column textfield2 varchar(255);
@@ -185,7 +186,7 @@ alter table migtest_e_basic add column new_boolean_field2 tinyint(1) default 1 n
 alter table migtest_e_basic add column progress integer default 0 not null;
 alter table migtest_e_basic add column new_integer integer default 42 not null;
 alter table migtest_e_history add system versioning;
-alter table migtest_e_history modify test_string bigint;
+alter table migtest_e_history modify test_string bigint comment 'Column altered to long now';
 alter table migtest_e_history2 modify test_string varchar(255) not null default 'unknown';
 alter table migtest_e_history2 add column test_string2 varchar(255);
 alter table migtest_e_history2 add column test_string3 varchar(255) default 'unknown' not null;

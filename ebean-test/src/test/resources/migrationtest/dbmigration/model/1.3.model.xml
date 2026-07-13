@@ -25,7 +25,7 @@
         <addUniqueConstraint constraintName="uq_migtest_e_basic_indextest6" tableName="migtest_e_basic" columnNames="indextest6" oneToOne="false" nullableColumns="indextest6"/>
         <alterTable name="migtest_e_basic" tablespace="db2;TSTABLES;" indexTablespace="db2;INDEXTS;" lobTablespace="db2;TSTABLES;"/>
         <alterColumn columnName="test_status" tableName="migtest_e_enum" checkConstraint="check ( test_status in ('N','A','I'))" checkConstraintName="ck_migtest_e_enum_test_status"/>
-        <alterColumn columnName="test_string" tableName="migtest_e_history" withHistory="true" comment="DROP COMMENT"/>
+        <alterColumn columnName="test_string" tableName="migtest_e_history" withHistory="true" currentType="bigint" currentNotnull="false" comment="DROP COMMENT" currentComment="Column altered to long now"/>
         <addTableComment name="migtest_e_history" comment="DROP COMMENT"/>
         <alterColumn columnName="test_string" tableName="migtest_e_history2" withHistory="true" currentType="varchar" defaultValue="DROP DEFAULT" notnull="false" currentNotnull="true"/>
         <addColumn tableName="migtest_e_history2" withHistory="true">
@@ -47,7 +47,7 @@
             <column name="name" type="varchar(127)" notnull="true"/>
             <uniqueConstraint name="uq_migtest_e_ref_name" columnNames="name" oneToOne="false" nullableColumns=""/>
         </createTable>
-        <alterColumn columnName="&quot;index&quot;" tableName="&quot;table&quot;" withHistory="true" comment="this is a comment"/>
+        <alterColumn columnName="&quot;index&quot;" tableName="&quot;table&quot;" withHistory="true" currentType="varchar" currentNotnull="false" comment="this is a comment" currentComment="this is an other comment"/>
         <alterTable name="migtest_mtm_c" tablespace="$TABLESPACE_DEFAULT" indexTablespace="$TABLESPACE_DEFAULT" lobTablespace="$TABLESPACE_DEFAULT"/>
         <alterTable name="migtest_mtm_m" tablespace="$TABLESPACE_DEFAULT" indexTablespace="$TABLESPACE_DEFAULT" lobTablespace="$TABLESPACE_DEFAULT"/>
         <addUniqueConstraint constraintName="uq_m12_otoc72" tableName="migtest_oto_child" columnNames="name" oneToOne="false" nullableColumns="name" platforms="MYSQL"/>
