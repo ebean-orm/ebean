@@ -41,10 +41,6 @@ final class SqlTreeNodeManyRoot extends SqlTreeNodeBean {
 
   /**
    * Force outer join for everything after the many property.
-   * <p>
-   * The filterMany predicate (when it stays as a JOIN, i.e. references only the many-root's own
-   * direct properties) is included generically right after this node's own join clause - see
-   * {@link SqlTreeNodeBean#appendFromBaseTable}.
    */
   @Override
   public void appendFrom(DbSqlContext ctx, SqlJoinType joinType) {

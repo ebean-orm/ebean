@@ -79,9 +79,8 @@ public final class CQueryPredicates {
   private Set<String> predicateIncludes;
   private Set<String> orderByIncludes;
   /**
-   * The deepest fetch path (relative to the query root) that the filterMany expression itself
-   * references - e.g. for {@code filterMany("contacts").eq("group.name", ...)} this is
-   * {@code "contacts.group"} rather than just {@code "contacts"}.
+   * The fetch path (relative to the query root) of the many-root whose own join clause the
+   * filterMany-in-JOIN predicate is attached to
    */
   private String filterManyAttachPath;
 
