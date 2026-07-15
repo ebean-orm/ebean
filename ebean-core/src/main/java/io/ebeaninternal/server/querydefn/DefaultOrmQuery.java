@@ -185,6 +185,16 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   }
 
   @Override
+  public final <D> MappedQuery<D> mapTo(Class<D> dtoType) {
+    return new DefaultMappedQuery<>(server, this, dtoType);
+  }
+
+  @Override
+  public final <D> MappedQuery<D> mapTo(Class<D> dtoType, DtoMapper<T, D> mapper) {
+    return new DefaultMappedQuery<>(server, this, dtoType, mapper);
+  }
+
+  @Override
   public final UpdateQuery<T> asUpdate() {
     return new DefaultUpdateQuery<>(this);
   }

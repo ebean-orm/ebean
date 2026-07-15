@@ -78,6 +78,32 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   <D> DtoQuery<D> asDto(Class<D> dtoClass);
 
   /**
+   * Map the query result to a nested DTO graph, automatically deriving the select()/fetch() spec
+   * from the target DTO's declared shape and forcing {@code setUnmodifiable(true)}.
+   * <p>
+   * Distinct from {@link #asDto(Class)} (the flat, single-row SQL pipeline) - this supports
+   * nested ToOne/ToMany DTO graphs, mapped from the normal ORM entity query result.
+   *
+   * @throws jakarta.persistence.PersistenceException if no generated {@link DtoMapper} is
+   *     registered for this (entity, dto) pair.
+   */
+  <D> MappedQuery<D> mapTo(Class<D> dtoType);
+
+  /**
+   * Map the query result to a nested DTO graph using an already-resolved {@link DtoMapper}
+   * instance, rather than looking one up by (entity, dtoType). Bypasses {@link DtoMapperManager}
+   * entirely, so it's the way to select a named variant mapper (see {@code @DtoMapping(name =
+   * "...", exclude = "...")}) - e.g. {@code query.mapTo(User.class, userMapper.noFleets())}.
+   * <p>
+   * Also forces {@code setUnmodifiable(true)} and derives the select()/fetch() spec from
+   * {@code mapper.fetchGroup()}, same as {@link #mapTo(Class)}.
+   *
+   * @param dtoType the DTO type mapped to (must match {@code mapper}'s target type)
+   * @param mapper the mapper instance to use, e.g. a named variant accessor on a generated mapper
+   */
+  <D> MappedQuery<D> mapTo(Class<D> dtoType, DtoMapper<T, D> mapper);
+
+  /**
    * Convert the query to a UpdateQuery.
    * <p>
    * Typically this is used with query beans to covert a query bean

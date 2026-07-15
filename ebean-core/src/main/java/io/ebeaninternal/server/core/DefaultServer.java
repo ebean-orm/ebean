@@ -90,6 +90,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final DtoQueryEngine dtoQueryEngine;
   private final ServerCacheManager serverCacheManager;
   private final DtoBeanManager dtoBeanManager;
+  private final DtoMapperManager dtoMapperManager;
   private final BeanDescriptorManager descriptorManager;
   private final AutoTuneService autoTuneService;
   private final ReadAuditPrepare readAuditPrepare;
@@ -122,6 +123,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
     this.logManager = config.getLogManager();
     this.dtoBeanManager = config.getDtoBeanManager();
+    this.dtoMapperManager = config.getDtoMapperManager();
     this.config = config.getConfig();
     this.disableL2Cache = this.config.isDisableL2Cache();
     this.serverCacheManager = cache;
@@ -897,6 +899,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> DtoQuery<T> findDto(Class<T> dtoType, SpiQuery<?> ormQuery) {
     DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
     return new DefaultDtoQuery<>(this, descriptor, ormQuery);
+  }
+
+  @Override
+  public <S, D> DtoMapper<S, D> dtoMapper(Class<S> sourceType, Class<D> dtoType) {
+    return dtoMapperManager.mapperFor(sourceType, dtoType);
   }
 
   @Override

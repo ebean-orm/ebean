@@ -254,17 +254,27 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
 
   @Override
   public Query<T> asOf(Timestamp asOf) {
-    return query.asOf(asOf);
+    return query().asOf(asOf);
   }
 
   @Override
   public Query<T> asDraft() {
-    return query.asDraft();
+    return query().asDraft();
   }
 
   @Override
   public <D> DtoQuery<D> asDto(Class<D> dtoClass) {
-    return query.asDto(dtoClass);
+    return query().asDto(dtoClass);
+  }
+
+  @Override
+  public <D> MappedQuery<D> mapTo(Class<D> dtoType) {
+    return query().mapTo(dtoType);
+  }
+
+  @Override
+  public <D> MappedQuery<D> mapTo(Class<D> dtoType, DtoMapper<T, D> mapper) {
+    return query().mapTo(dtoType, mapper);
   }
 
   @Override

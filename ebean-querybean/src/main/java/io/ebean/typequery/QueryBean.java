@@ -436,6 +436,16 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   }
 
   @Override
+  public final <D> MappedQuery<D> mapTo(Class<D> dtoType) {
+    return query.mapTo(dtoType);
+  }
+
+  @Override
+  public final <D> MappedQuery<D> mapTo(Class<D> dtoType, DtoMapper<T, D> mapper) {
+    return query.mapTo(dtoType, mapper);
+  }
+
+  @Override
   public final R setId(Object id) {
     query.setId(id);
     return root;
