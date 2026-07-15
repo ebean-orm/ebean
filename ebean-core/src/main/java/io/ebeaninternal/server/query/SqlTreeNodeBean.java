@@ -342,6 +342,13 @@ class SqlTreeNodeBean implements SqlTreeNode {
     if (desc.isSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
       ctx.append(" and ").append(desc.softDeletePredicate(ctx.tableAlias(prefix)));
     }
+    if (prefix != null && ctx.isFilterManyAttachPoint(prefix)) {
+      // this node's own join is the deepest one the pending filterMany predicate references -
+      // include it now (right after this join, before any further nested/child joins beneath
+      // it are appended) so it correctly narrows this join's own rows rather than an unrelated
+      // deeper join's rows.
+      ctx.includeFilterMany();
+    }
     return sqlJoinType;
   }
 
