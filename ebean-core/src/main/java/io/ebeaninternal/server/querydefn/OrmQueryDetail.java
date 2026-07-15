@@ -4,7 +4,6 @@ import io.ebean.FetchConfig;
 import io.ebean.event.BeanQueryRequest;
 import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpressionList;
-import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.api.SpiQueryManyJoin;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
@@ -385,7 +384,8 @@ public final class OrmQueryDetail implements Serializable {
         OrmQueryProperties chunk = pair.getProperties();
         if (isQueryJoinCandidate(lazyLoadManyPath, chunk)) {
           // this is a 'fetch join' (included in main query)
-          if (fetchJoinFirstMany && !chunk.filterManyHasNestedProperty(new SpiExpressionValidation(beanDescriptor))) {
+          BeanDescriptor<?> targetDescriptor = ((BeanPropertyAssoc<?>) elProp.beanProperty()).targetDescriptor();
+          if (fetchJoinFirstMany && !chunk.filterManyHasNestedProperty(targetDescriptor)) {
             // letting the first one remain a 'fetch join'
             fetchJoinFirstMany = false;
             manyFetchProperty = pair.getPath();
@@ -393,8 +393,9 @@ public final class OrmQueryDetail implements Serializable {
             many = elProp;
           } else {
             // convert this one over to a 'query join' - either because another many has already claimed the
-            // 'fetch join' slot, or because its filterMany references a nested property that can't safely be
-            // included as a JOIN predicate (see OrmQueryProperties.filterManyHasNestedProperty)
+            // 'fetch join' slot, or because its filterMany references a property that requires crossing into
+            // an associated bean and can't safely be included as a JOIN predicate (see
+            // OrmQueryProperties.filterManyHasNestedProperty)
             chunk.markForQueryJoin();
           }
         }

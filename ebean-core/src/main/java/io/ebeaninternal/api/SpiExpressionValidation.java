@@ -12,7 +12,7 @@ public final class SpiExpressionValidation {
 
   private final BeanType<?> desc;
   private final LinkedHashSet<String> unknown = new LinkedHashSet<>();
-  private boolean nestedProperty;
+  private final LinkedHashSet<String> all = new LinkedHashSet<>();
 
   public SpiExpressionValidation(BeanType<?> desc) {
     this.desc = desc;
@@ -22,9 +22,7 @@ public final class SpiExpressionValidation {
    * Validate that the property expression (path) is valid.
    */
   public void validate(String propertyName) {
-    if (!nestedProperty && propertyName.indexOf('.') > -1) {
-      nestedProperty = true;
-    }
+    all.add(propertyName);
     if (!desc.isValidExpression(propertyName)) {
       unknown.add(propertyName);
     }
@@ -38,12 +36,13 @@ public final class SpiExpressionValidation {
   }
 
   /**
-   * Return true if any property visited during this validation referenced a nested/associated
-   * path (i.e. contained a '.'). Used to inspect the shape of an expression without needing a
-   * correctly-typed bean descriptor.
+   * Return the set of all property names visited during this validation, regardless of
+   * whether they were considered valid against the bean type. Used to inspect the shape of
+   * an expression (for example, to check whether it references any associated/joined path)
+   * without needing a correctly-typed bean descriptor.
    */
-  public boolean hasNestedProperty() {
-    return nestedProperty;
+  public Set<String> allProperties() {
+    return all;
   }
 
 }
