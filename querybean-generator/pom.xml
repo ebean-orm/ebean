@@ -36,6 +36,18 @@
       <version>${ebean-persistence-api.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <!--
+      Test-only - lets DtoMapperRecordSourceTest fully compile a generated DTO mapper source
+      in-process (references io.ebean.DtoMapper/FetchGroup/etc.). Safe as a real dependency here
+      (unlike ebean-querybean) since ebean-api does not depend back on querybean-generator.
+    -->
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-api</artifactId>
+      <version>18.2.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

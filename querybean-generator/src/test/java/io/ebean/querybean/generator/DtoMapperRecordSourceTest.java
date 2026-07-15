@@ -8,7 +8,6 @@ import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.StandardJavaFileManager;
 import javax.tools.ToolProvider;
-import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
@@ -17,7 +16,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -81,6 +79,7 @@ class DtoMapperRecordSourceTest {
         + "package org.tests.recordsrc;\n"
         + "\n"
         + "import io.ebean.annotation.DtoMapping;\n");
+    writeTypequeryGeneratedStub(sourceDir);
 
     DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -95,7 +94,6 @@ class DtoMapperRecordSourceTest {
       List<String> options = List.of(
         "-d", outDir.toString(),
         "-s", genSourceDir.toString(),
-        "-classpath", classpathWithEbeanApiAndQuerybean(),
         "-processor", Processor.class.getName());
 
       JavaCompiler.CompilationTask task = compiler.getTask(
@@ -176,6 +174,7 @@ class DtoMapperRecordSourceTest {
         + "package org.tests.baresrc;\n"
         + "\n"
         + "import io.ebean.annotation.DtoMapping;\n");
+    writeTypequeryGeneratedStub(sourceDir);
 
     DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
     JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
@@ -190,7 +189,6 @@ class DtoMapperRecordSourceTest {
       List<String> options = List.of(
         "-d", outDir.toString(),
         "-s", genSourceDir.toString(),
-        "-classpath", classpathWithEbeanApiAndQuerybean(),
         "-processor", Processor.class.getName());
 
       JavaCompiler.CompilationTask task = compiler.getTask(
@@ -223,25 +221,19 @@ class DtoMapperRecordSourceTest {
   }
 
   /**
-   * The generated mapper source references {@code io.ebean.DtoMapper}/{@code FetchGroup}/etc.
-   * ({@code ebean-api}) and {@code io.ebean.typequery.Generated} ({@code ebean-querybean}) -
-   * neither is a compile dependency of {@code querybean-generator} itself (it only needs to
-   * process annotations, not compile against the runtime API it emits references to, and adding
-   * either as a real dependency here would create a circular reactor module dependency since
-   * {@code ebean-querybean} depends on {@code querybean-generator}). Locate their already-built
-   * {@code target/classes} directories on disk (built earlier in the same reactor) and append
-   * them to the classpath just for this in-process compile, purely to let the generated mapper
-   * source fully resolve for this assertion - not needed by the generator itself.
+   * The generated mapper source references {@code io.ebean.typequery.Generated} ({@code
+   * ebean-querybean}) - that can't be a real dependency here (it would create a circular reactor
+   * module dependency since {@code ebean-querybean} depends on {@code querybean-generator}).
+   * Write a self-contained stub of just that one annotation alongside the test sources so the
+   * generated mapper source fully compiles without needing the real module.
    */
-  private String classpathWithEbeanApiAndQuerybean() {
-    Path reactorRoot = Path.of("").toAbsolutePath().getParent();
-    String extra = Stream.of("ebean-api", "ebean-querybean")
-      .map(module -> reactorRoot.resolve(module).resolve("target/classes"))
-      .filter(Files::isDirectory)
-      .map(Path::toString)
-      .collect(Collectors.joining(File.pathSeparator));
-    String base = System.getProperty("java.class.path");
-    return extra.isEmpty() ? base : base + File.pathSeparator + extra;
+  private void writeTypequeryGeneratedStub(Path sourceDir) {
+    writeSource(sourceDir, "io.ebean.typequery.Generated",
+      "package io.ebean.typequery;\n"
+        + "\n"
+        + "public @interface Generated {\n"
+        + "  String value();\n"
+        + "}\n");
   }
 
   private void writeSource(Path sourceDir, String fqn, String content) {
