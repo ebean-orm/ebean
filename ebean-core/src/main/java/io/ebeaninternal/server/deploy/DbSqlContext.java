@@ -181,4 +181,11 @@ public interface DbSqlContext {
    * Include the filter many predicates if specified into the JOIN clause.
    */
   void includeFilterMany();
+
+  /**
+   * Return true if the given fetch path (relative to the query root) is the exact join clause
+   * that the pending filterMany predicate must be attached to - i.e. the deepest path the
+   * filterMany expression itself references.
+   */
+  boolean isFilterManyAttachPoint(String prefix);
 }

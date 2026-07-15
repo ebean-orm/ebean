@@ -23,6 +23,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
   private final ArrayStack<String> prefixStack = new ArrayStack<>();
   private final String fromForUpdate;
   private final String dbFilterManyJoin;
+  private final String filterManyAttachPath;
   private boolean useColumnAlias;
   private int columnIndex;
   private int asOfTableCount;
@@ -42,7 +43,8 @@ final class DefaultDbSqlContext implements DbSqlContext {
   private boolean joinSuppressed;
 
   DefaultDbSqlContext(SqlTreeAlias alias, String columnAliasPrefix, CQueryHistorySupport historySupport,
-                      CQueryDraftSupport draftSupport, String fromForUpdate, String dbFilterManyJoin) {
+                      CQueryDraftSupport draftSupport, String fromForUpdate, String dbFilterManyJoin,
+                      String filterManyAttachPath) {
     this.alias = alias;
     this.columnAliasPrefix = columnAliasPrefix;
     this.useColumnAlias = columnAliasPrefix != null;
@@ -51,6 +53,12 @@ final class DefaultDbSqlContext implements DbSqlContext {
     this.historyQuery = (historySupport != null);
     this.fromForUpdate = fromForUpdate;
     this.dbFilterManyJoin = dbFilterManyJoin;
+    this.filterManyAttachPath = filterManyAttachPath;
+  }
+
+  @Override
+  public boolean isFilterManyAttachPoint(String prefix) {
+    return dbFilterManyJoin != null && filterManyAttachPath != null && filterManyAttachPath.equals(prefix);
   }
 
   @Override

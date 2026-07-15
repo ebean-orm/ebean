@@ -78,6 +78,11 @@ public final class CQueryPredicates {
    */
   private Set<String> predicateIncludes;
   private Set<String> orderByIncludes;
+  /**
+   * The fetch path (relative to the query root) of the many-root whose own join clause the
+   * filterMany-in-JOIN predicate is attached to
+   */
+  private String filterManyAttachPath;
 
   CQueryPredicates(Binder binder, OrmQueryRequest<?> request) {
     this.binder = binder;
@@ -222,6 +227,8 @@ public final class CQueryPredicates {
           filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
           if (buildSql) {
             dbFilterMany = filterMany.buildSql();
+            // safe as filterManyJoin only holds when the expression is root-property only -
+            filterManyAttachPath = manyProperty.path();
           }
         }
       }
@@ -397,6 +404,14 @@ public final class CQueryPredicates {
    */
   String dbFilterManyJoin() {
     return filterManyJoin ? dbFilterMany : null;
+  }
+
+  /**
+   * Return the fetch path of the filterMany-in-JOIN predicate - the path whose own join clause
+   * the predicate must be appended to (or null if there is no filterMany-in-JOIN predicate at all).
+   */
+  String filterManyAttachPath() {
+    return filterManyJoin ? filterManyAttachPath : null;
   }
 
   /**

@@ -9,7 +9,10 @@ import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiExpressionList;
+import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.expression.FilterExprPath;
 import io.ebeaninternal.server.expression.FilterExpressionList;
 
@@ -232,6 +235,26 @@ public final class OrmQueryProperties implements Serializable {
    */
   public boolean isFilterManyJoin() {
     return filterMany != null && !markForQueryJoin;
+  }
+
+  /**
+   * Return true if the filterMany expression (if any) references a property that requires
+   * crossing into an associated bean/join - e.g. {@code "group.name"} - rather than only
+   * plain/embedded properties resolving to columns on the many bean's own base table.
+   */
+  boolean filterManyHasNestedProperty(BeanDescriptor<?> targetDescriptor) {
+    if (filterMany == null) {
+      return false;
+    }
+    SpiExpressionValidation validation = new SpiExpressionValidation(targetDescriptor);
+    filterMany.validate(validation);
+    for (String property : validation.allProperties()) {
+      ElPropertyValue elProp = targetDescriptor.elGetValue(property);
+      if (elProp != null && elProp.isAssocProperty()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**

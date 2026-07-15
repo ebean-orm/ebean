@@ -384,14 +384,18 @@ public final class OrmQueryDetail implements Serializable {
         OrmQueryProperties chunk = pair.getProperties();
         if (isQueryJoinCandidate(lazyLoadManyPath, chunk)) {
           // this is a 'fetch join' (included in main query)
-          if (fetchJoinFirstMany) {
+          BeanDescriptor<?> targetDescriptor = ((BeanPropertyAssoc<?>) elProp.beanProperty()).targetDescriptor();
+          if (fetchJoinFirstMany && !chunk.filterManyHasNestedProperty(targetDescriptor)) {
             // letting the first one remain a 'fetch join'
             fetchJoinFirstMany = false;
             manyFetchProperty = pair.getPath();
             chunk.filterManyInline();
             many = elProp;
           } else {
-            // convert this one over to a 'query join'
+            // convert this one over to a 'query join' - either because another many has already claimed the
+            // 'fetch join' slot, or because its filterMany references a property that requires crossing into
+            // an associated bean and can't safely be included as a JOIN predicate (see
+            // OrmQueryProperties.filterManyHasNestedProperty)
             chunk.markForQueryJoin();
           }
         }
