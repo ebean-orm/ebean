@@ -4,4 +4,6 @@ module io.ebean.querybean.generator {
 
   requires java.compiler;
   requires java.sql;
+  requires static io.avaje.prism;
+  requires static io.ebean.annotation;
 }

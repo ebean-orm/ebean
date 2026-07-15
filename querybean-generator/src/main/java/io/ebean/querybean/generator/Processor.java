@@ -17,8 +17,8 @@ import java.util.Set;
 public class Processor extends AbstractProcessor implements Constants {
 
   private ProcessingContext processingContext;
-  private SimpleModuleInfoWriter moduleWriter;
-  private boolean initModuleWriter;
+  private DtoMappingReader dtoMappingReader;
+  private boolean wroteDtoMappers;
 
   private boolean wroteLookup;
 
@@ -26,6 +26,7 @@ public class Processor extends AbstractProcessor implements Constants {
   public synchronized void init(ProcessingEnvironment processingEnv) {
     super.init(processingEnv);
     this.processingContext = new ProcessingContext(processingEnv);
+    this.dtoMappingReader = new DtoMappingReader(processingContext);
   }
 
   @Override
@@ -38,6 +39,9 @@ public class Processor extends AbstractProcessor implements Constants {
     annotations.add(MODULEINFO);
     annotations.add(TYPEQUERYBEAN);
     annotations.add(GENERATED);
+    annotations.add(DTO_MAPPING);
+    annotations.add(DTO_MAPPING_LIST);
+    annotations.add(DTO_MIXIN);
     return annotations;
   }
 
@@ -52,7 +56,10 @@ public class Processor extends AbstractProcessor implements Constants {
     int count = processEntities(roundEnv);
     processOthers(roundEnv);
     final int loaded = processingContext.complete();
-    initModuleInfoBean();
+    dtoMappingReader.collect(roundEnv);
+    if (!roundEnv.processingOver()) {
+      writeDtoMappers();
+    }
     if (roundEnv.processingOver()) {
       writeModuleInfoBean();
     }
@@ -101,29 +108,56 @@ public class Processor extends AbstractProcessor implements Constants {
     }
   }
 
-  private void initModuleInfoBean() {
+  /**
+   * Write the {@code EbeanEntityRegister} at the end of processing - deferred until there is
+   * something to actually register (rather than eagerly reserving/creating the source file up
+   * front), since a compilation unit with no {@code @Entity}/{@code @Embeddable}/{@code @Converter}
+   * /other classes at all - e.g. a test-source-only module that only declares
+   * {@code @DtoMapping} - has nothing meaningful to write and no factory package to derive a
+   * sensible location from.
+   */
+  private void writeModuleInfoBean() {
+    if (!processingContext.hasAnyEntitiesOrOther()) {
+      processingContext.logNote("EbeanEntityRegister skipped - no entities or other classes found");
+      return;
+    }
     try {
-      if (!initModuleWriter) {
-        moduleWriter = new SimpleModuleInfoWriter(processingContext);
-      }
+      SimpleModuleInfoWriter moduleWriter = new SimpleModuleInfoWriter(processingContext);
+      moduleWriter.write();
     } catch (FilerException e) {
       processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
     } catch (Throwable e) {
-      processingContext.logError(null, "Failed to initialise EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
-    } finally {
-      initModuleWriter = true;
+      processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
   }
 
-  private void writeModuleInfoBean() {
+  /**
+   * Generate the dto mappers as soon as all {@code @DtoMapping} pairs collected so far are
+   * available - i.e. as early as possible, not deferred to {@code roundEnv.processingOver()}.
+   * Generated types (unlike the {@code EbeanEntityRegister}/module-info registrations) are
+   * directly referenced by hand-written source code, so they must be written in a round prior
+   * to the final one or javac will not compile them at all (only a warning, no error, is
+   * produced for files created in the very last round - see "will not be subject to annotation
+   * processing").
+   */
+  private void writeDtoMappers() {
+    if (wroteDtoMappers) {
+      return;
+    }
     try {
-      if (moduleWriter == null) {
-        processingContext.logNote(null, "EntityClassRegister skipped");
-      } else {
-        moduleWriter.write();
+      var metas = dtoMappingReader.resolveAndValidate();
+      if (metas.isEmpty()) {
+        return;
       }
+      wroteDtoMappers = true;
+      for (DtoBeanMeta meta : metas) {
+        new DtoMapperWriter(processingContext, meta).write();
+      }
+      new DtoMapperRegisterWriter(processingContext, metas).write();
+      processingContext.logNote("Ebean APT generated %s dto mappers", metas.size());
     } catch (Throwable e) {
-      processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
+      wroteDtoMappers = true;
+      processingContext.logError(null, "Failed to generate dto mappers error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
   }
 

@@ -462,6 +462,11 @@ List<CustomerSummary> summaries = new QCustomer()
 - the result is not going to be updated and saved back as an entity
 - the query contains formulas or aggregation intended for a read model
 
+`asDto(...)` maps a **flat**, single-row result. If the target DTO itself needs nested
+DTO fields (ToOne/ToMany) mirroring part of the entity graph, use
+`mapTo(Dto.class)` instead — see
+[Mapping entity graphs to DTOs](mapping-entity-graphs-to-dtos.md).
+
 ---
 
 ## Step 9 - Only fall back to raw SQL when the ORM query is not a good fit

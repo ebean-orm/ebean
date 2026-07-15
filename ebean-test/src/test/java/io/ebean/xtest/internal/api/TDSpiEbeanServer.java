@@ -455,6 +455,11 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
+  public <S, D> DtoMapper<S, D> dtoMapper(Class<S> sourceType, Class<D> dtoType) {
+    return null;
+  }
+
+  @Override
   public SpiResultSet findResultSet(SpiQuery<?> ormQuery) {
     return null;
   }
