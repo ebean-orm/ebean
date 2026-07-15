@@ -24,7 +24,6 @@ final class DefaultDbSqlContext implements DbSqlContext {
   private final String fromForUpdate;
   private final String dbFilterManyJoin;
   private final String filterManyAttachPath;
-  private boolean filterManyIncluded;
   private boolean useColumnAlias;
   private int columnIndex;
   private int asOfTableCount;
@@ -64,11 +63,7 @@ final class DefaultDbSqlContext implements DbSqlContext {
 
   @Override
   public void includeFilterMany() {
-    if (dbFilterManyJoin != null && !filterManyIncluded) {
-      // idempotent - the predicate may be attached either at its designated node (generic path
-      // matching in SqlTreeNodeBean) or, as a fallback, at the end of the many-root's subtree
-      // (SqlTreeNodeManyRoot) - never both.
-      filterManyIncluded = true;
+    if (dbFilterManyJoin != null) {
       sb.append(" and ").append(dbFilterManyJoin);
     }
   }

@@ -459,7 +459,10 @@ public class TestQueryFilterMany extends BaseTestCase {
 
     List<String> sql = LoggedSql.stop();
 
-    assertThat(sql).hasSize(1);
-    assertSql(sql.get(0)).contains(" from o_customer t0 left join contact t1 on t1.customer_id = t0.id left join contact_group t2 on t2.id = t1.group_id and t2.name = ? and t1.cretime is not null order by t0.id");
+    // nested "group.name" reference forces this to a query join so the filter is applied
+    // as a genuine WHERE clause (not misapplied to a LEFT JOIN's ON clause)
+    assertThat(sql).hasSize(2);
+    assertSql(sql.get(1)).contains(" from contact t0 left join contact_group t1 on t1.id = t0.group_id where (t0.customer_id) in (");
+    assertSql(sql.get(1)).contains(" and t1.name = ? and t0.cretime is not null");
   }
 }

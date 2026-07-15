@@ -227,9 +227,9 @@ public final class CQueryPredicates {
           filterManyJoin = chunk.isFilterManyJoin();
           filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
           if (buildSql) {
-            Set<String> beforeIncludes = new HashSet<>(deployParser.includes());
             dbFilterMany = filterMany.buildSql();
-            filterManyAttachPath = deepestFilterManyPath(manyProperty.path(), beforeIncludes, deployParser.includes());
+            // safe as filterManyJoin only holds when the expression is root-property only -
+            filterManyAttachPath = manyProperty.path();
           }
         }
       }
@@ -248,21 +248,6 @@ public final class CQueryPredicates {
       }
       predicateIncludes = deployParser.includes();
     }
-  }
-
-  /**
-   * Determine the specific fetch-path node (relative to the query root) that the filterMany
-   * predicate should be attached to, given the set of includes before and after building its SQL.
-   */
-  private String deepestFilterManyPath(String manyPath, Set<String> beforeIncludes, Set<String> afterIncludes) {
-    for (String include : afterIncludes) {
-      if (!beforeIncludes.contains(include) && include.startsWith(manyPath) && include.length() > manyPath.length()) {
-        // the filterMany expression needed a deeper/nested include - not safe to attach at the
-        // many-root's own join, fall back to the default (end of subtree) behaviour.
-        return null;
-      }
-    }
-    return manyPath;
   }
 
   /**
@@ -423,9 +408,8 @@ public final class CQueryPredicates {
   }
 
   /**
-   * Return the deepest fetch path that the filterMany-in-JOIN predicate references - the path
-   * whose own join clause the predicate must be appended to (or null if there is no
-   * filterMany-in-JOIN predicate at all).
+   * Return the fetch path of the filterMany-in-JOIN predicate - the path whose own join clause
+   * the predicate must be appended to (or null if there is no filterMany-in-JOIN predicate at all).
    */
   String filterManyAttachPath() {
     return filterManyJoin ? filterManyAttachPath : null;
