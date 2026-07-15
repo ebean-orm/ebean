@@ -245,12 +245,7 @@ public final class OrmQueryProperties implements Serializable {
       return false;
     }
     filterMany.validate(validation);
-    for (String property : validation.allProperties()) {
-      if (property.indexOf('.') > -1) {
-        return true;
-      }
-    }
-    return false;
+    return validation.hasNestedProperty();
   }
 
   /**
