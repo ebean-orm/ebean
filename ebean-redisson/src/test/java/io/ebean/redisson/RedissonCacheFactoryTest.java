@@ -132,9 +132,20 @@ class RedissonCacheFactoryTest {
     ServerCacheNotify notify = factory.createCacheNotify(n -> {});
     notify.notify(new ServerCacheNotification(Set.of("orders", "items")));
 
-    Thread.sleep(500);
-    assertThat(received).isNotEmpty();
-    assertThat(received.get(0).getDependentTables()).contains("orders", "items");
+    // Wait (with polling rather than a single fixed sleep) for the expected notification to
+    // arrive. The shared "ebean.l2cache" topic is global/unscoped so other factories/tests in
+    // the same JVM (e.g. real entity saves elsewhere) can publish unrelated notifications on it
+    // around the same time - assert on content rather than position/count to stay robust to that.
+    long deadline = System.currentTimeMillis() + 2000;
+    boolean found = false;
+    while (System.currentTimeMillis() < deadline) {
+      found = received.stream().anyMatch(n -> n.getDependentTables().containsAll(Set.of("orders", "items")));
+      if (found) break;
+      Thread.sleep(50);
+    }
+    assertThat(found)
+      .as("Expected a notification with dependent tables [orders, items] in %s", received)
+      .isTrue();
   }
 
   @Test
