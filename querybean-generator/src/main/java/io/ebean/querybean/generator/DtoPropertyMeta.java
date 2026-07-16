@@ -27,23 +27,47 @@ class DtoPropertyMeta {
   private final DtoConverterMeta converter;
   private final boolean primitiveTarget;
   private final boolean failOnNull;
+  private final boolean computedSegment;
+  private final List<String> requiredFetchPaths;
 
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath, DtoBeanMeta nested) {
     this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, null);
+  }
+
+  /**
+   * {@code NESTED_ONE}/{@code NESTED_MANY} constructor variant for a single-hop {@code @DtoPath}
+   * rename that traverses a computed/derived getter segment (no backing field) - see
+   * {@link #hasComputedSegment()}. Just as unfetchable via {@code FetchGroup.fetch(path, ...)} as
+   * the analogous {@link Kind#SCALAR} case, so it carries the same
+   * {@code computedSegment}/{@code requiredFetchPaths} through to {@code DtoMapperWriter}.
+   */
+  DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
+                  DtoBeanMeta nested, boolean computedSegment, List<String> requiredFetchPaths) {
+    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, null, false, false, computedSegment, requiredFetchPaths);
   }
 
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath, DtoBeanMeta nested, DtoConverterMeta converter) {
     this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, converter, false, false);
   }
 
+  DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
+                  DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull) {
+    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, converter, primitiveTarget, failOnNull, false, List.of());
+  }
+
   /**
    * Full constructor - {@code primitiveTarget}/{@code failOnNull} only matter for a multi-hop
    * ({@code sourceGetterPath.size() > 1}) {@link Kind#SCALAR}/{@link Kind#REF} property whose DTO
    * field type is a Java primitive, per {@code @DtoPath#failOnNull()} - see
-   * {@link #sourceValueExpression(String)}.
+   * {@link #sourceValueExpression(String)}. {@code computedSegment} is {@code true} only for a
+   * {@code @DtoPath} that traverses a computed/derived getter segment (no backing field) - see
+   * {@link #hasComputedSegment()}; kept separate from whether {@code requiredFetchPaths} happens
+   * to be empty, since {@code @DtoPath(requires = {})} legitimately declares "nothing extra
+   * needed" for a computed segment.
    */
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
-                  DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull) {
+                  DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull,
+                  boolean computedSegment, List<String> requiredFetchPaths) {
     this.dtoFieldName = dtoFieldName;
     this.kind = kind;
     this.sourceGetterPath = sourceGetterPath;
@@ -52,6 +76,8 @@ class DtoPropertyMeta {
     this.converter = converter;
     this.primitiveTarget = primitiveTarget;
     this.failOnNull = failOnNull;
+    this.computedSegment = computedSegment;
+    this.requiredFetchPaths = requiredFetchPaths;
   }
 
   String dtoFieldName() {
@@ -92,6 +118,29 @@ class DtoPropertyMeta {
    */
   DtoConverterMeta converter() {
     return converter;
+  }
+
+  /**
+   * {@code true} if this {@code @DtoPath} traverses a segment with no backing field (a computed/
+   * derived getter rather than a real, fetchable Ebean property) - in which case
+   * {@link #sourcePropertyPath()} must NOT be used to derive a {@code .fetch(path, "props")}
+   * ({@link Kind#SCALAR}) or {@code .fetch(path, mapper.fetchGroup())} ({@link Kind#NESTED_ONE}/
+   * {@link Kind#NESTED_MANY}) call (the path isn't a real Ebean fetch path), and
+   * {@link #requiredFetchPaths()} should be used instead (see {@code @DtoPath#requires()}).
+   */
+  boolean hasComputedSegment() {
+    return computedSegment;
+  }
+
+  /**
+   * Real entity paths that must be added to the {@code FetchGroup} to support this property's
+   * computed/derived getter segment - the real prefix path (if any) followed by the declared
+   * {@code @DtoPath#requires()} paths. Empty by default when {@link #hasComputedSegment()} is
+   * {@code false}; can also legitimately be empty when it's {@code true} (an explicit
+   * {@code @DtoPath(requires = {})} confirming nothing extra is needed).
+   */
+  List<String> requiredFetchPaths() {
+    return requiredFetchPaths;
   }
 
   /**
@@ -142,3 +191,4 @@ class DtoPropertyMeta {
     sb.append(')');
   }
 }
+

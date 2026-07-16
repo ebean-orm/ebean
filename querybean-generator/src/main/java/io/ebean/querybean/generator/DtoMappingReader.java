@@ -135,7 +135,14 @@ class DtoMappingReader {
         ctx.logError(element, "@DtoMixin value() must be a class type");
         continue;
       }
-      mixinsByTarget.put(target.getQualifiedName().toString(), (TypeElement) element);
+      String targetFqn = target.getQualifiedName().toString();
+      TypeElement existing = mixinsByTarget.get(targetFqn);
+      if (existing != null) {
+        ctx.logError(element, "Duplicate @DtoMixin for target %s - %s already declares a mixin for"
+          + " it, only one @DtoMixin is allowed per target", targetFqn, existing.getQualifiedName());
+        continue;
+      }
+      mixinsByTarget.put(targetFqn, (TypeElement) element);
     }
   }
 
@@ -444,45 +451,134 @@ class DtoMappingReader {
     String name = field.getSimpleName().toString();
     DtoConverterMeta converter = resolveConverter(field, meta);
     DtoRefPrism refPrism = prismOn(field, meta, DtoRefPrism::getInstanceOn);
+    DtoPathPrism pathPrism = prismOn(field, meta, DtoPathPrism::getInstanceOn);
+    if (refPrism != null && pathPrism != null) {
+      ctx.logError(field, "%s.%s carries both @DtoRef and @DtoPath - these are mutually exclusive"
+        + " (@DtoRef always wins silently otherwise), remove whichever doesn't apply",
+        meta.targetFullName(), name);
+    }
     if (refPrism != null) {
       String assocName = (name.endsWith("Id") && name.length() > 2) ? name.substring(0, name.length() - 2) : name;
       String assocGetter = getterName(meta.source(), assocName);
       TypeElement assocType = getterReturnType(meta.source(), assocGetter);
       String idGetter = getterName(assocType, "id");
+      boolean computedSegment = meta.source() == null || !hasField(meta.source(), assocName);
+      List<String> requiredFetchPaths = List.of();
+      if (computedSegment) {
+        // the association has no backing field on the source - a computed/derived getter (e.g.
+        // picking one entry out of a collection) rather than a real, fetchable Ebean relation, so
+        // its data dependencies can't be inferred automatically - same problem class, and same
+        // requires() escape hatch, as the analogous @DtoPath handling above. Unlike @DtoPath there's
+        // no "real prefix" to combine with, since @DtoRef only ever derives a single association
+        // name directly off the source (no dotted value() of its own).
+        if (refPrism.values.requires() == null) {
+          ctx.logError(field,
+            "@DtoRef on %s traverses '%s' which has no backing field on %s - it looks like a"
+              + " computed/derived getter rather than a real, fetchable Ebean relation, so its data"
+              + " dependencies can't be inferred automatically. Specify @DtoRef(requires = {...})"
+              + " naming the real entity paths that must be fetched for it to execute safely, or"
+              + " requires = {} if it genuinely needs nothing extra fetched, or remove @DtoRef and"
+              + " compute this value another way (e.g. @DtoConvert).",
+            meta.targetFullName(), assocName, meta.source() != null ? meta.source().getSimpleName() : "?");
+        }
+        requiredFetchPaths = refPrism.requires();
+        String annotationDisplay = String.format("@DtoRef(requires = ...) on %s.%s", meta.targetFullName(), name);
+        for (String requiresPath : requiredFetchPaths) {
+          validateRequiresPath(field, meta.source(), requiresPath, annotationDisplay);
+        }
+      }
       // @DtoRef has no failOnNull escape hatch - always default to the primitive's zero-equivalent
       // rather than let a null-guarded getter chain auto-unbox to a NullPointerException.
       return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.REF, List.of(assocGetter, idGetter), List.of(assocName, "id"),
-        null, converter, field.asType().getKind().isPrimitive(), false);
+        null, converter, field.asType().getKind().isPrimitive(), false, computedSegment, requiredFetchPaths);
     }
-    DtoPathPrism pathPrism = prismOn(field, meta, DtoPathPrism::getInstanceOn);
     if (pathPrism != null) {
       List<String> getters = new ArrayList<>();
       List<String> properties = new ArrayList<>();
       TypeElement currentType = meta.source();
+      TypeElement computedDeclaringType = null;
+      int computedFrom = -1;
       for (String segment : pathPrism.value().split("\\.")) {
         String getter = getterName(currentType, segment);
         getters.add(getter);
         properties.add(segment);
+        if (computedFrom < 0 && (currentType == null || !hasField(currentType, segment))) {
+          computedFrom = properties.size() - 1;
+          computedDeclaringType = currentType;
+        }
         currentType = currentType != null ? getterReturnType(currentType, getter) : null;
+      }
+      List<String> requiredFetchPaths = List.of();
+      if (computedFrom >= 0) {
+        // a segment with no backing field is a computed/derived getter, not a real, fetchable
+        // Ebean property - its own data dependencies (what it touches internally) can't be
+        // inferred from the path alone, so require the developer to spell them out explicitly
+        // via @DtoPath(requires = {...}) rather than silently generating a FetchGroup.fetch(...)
+        // call for a path segment Ebean doesn't actually recognise (which only fails at runtime).
+        // Computed here regardless of whether the path ultimately resolves to a plain SCALAR or a
+        // single-hop NESTED_ONE/MANY rename below - both cases share the exact same problem: a
+        // fake path segment that can't be handed to FetchGroup as a real fetch/select target.
+        String realPrefix = computedFrom == 0 ? null : String.join(".", properties.subList(0, computedFrom));
+        // pathPrism.requires() always returns List.of() whether the attribute was explicitly
+        // written as an empty array or omitted entirely - only pathPrism.values.requires() (which
+        // returns null for a defaulted/omitted member) can tell the two apart. That distinction
+        // matters here: an explicit requires = {} is the developer's way of confirming the
+        // computed getter genuinely needs nothing extra fetched, whereas omitting requires
+        // entirely means they haven't considered it yet - only the latter should fail the build.
+        if (pathPrism.values.requires() == null) {
+          String hint = realPrefix != null
+            ? String.format(" (e.g. requires = \"%s\", or a deeper path under it your getter actually needs)", realPrefix)
+            : "";
+          ctx.logError(field,
+            "@DtoPath(\"%s\") on %s traverses '%s' which has no backing field on %s - it looks like"
+              + " a computed/derived getter rather than a real, fetchable Ebean property, so its data"
+              + " dependencies can't be inferred automatically. Specify @DtoPath(requires = {...})"
+              + " naming the real entity paths that must be fetched for it to execute safely%s, or"
+              + " requires = {} if it genuinely needs nothing extra fetched, or remove @DtoPath and"
+              + " compute this value another way (e.g. @DtoConvert).",
+            pathPrism.value(), meta.targetFullName(), properties.get(computedFrom),
+            computedDeclaringType != null ? computedDeclaringType.getSimpleName() : "?", hint);
+        }
+        List<String> combined = new ArrayList<>();
+        if (realPrefix != null) {
+          combined.add(realPrefix);
+        }
+        combined.addAll(pathPrism.requires());
+        requiredFetchPaths = combined;
+        // realPrefix is already known-good (each of its segments was hasField-checked while
+        // walking value() above) - only the developer-declared requires() values themselves are
+        // unchecked and need validating here.
+        String annotationDisplay = String.format("@DtoPath(\"%s\").requires()", pathPrism.value());
+        for (String requiresPath : pathPrism.requires()) {
+          validateRequiresPath(field, meta.source(), requiresPath, annotationDisplay);
+        }
       }
       // a single-hop @DtoPath rename (e.g. @DtoPath("eboxStatus") on a field named "status")
       // can still target a type with its own registered @DtoMapping - detect that the same way
       // the plain (non-@DtoPath) branches below do, rather than always falling back to a raw
       // scalar getter call that would fail to compile with a type mismatch against the nested
       // DTO type. Multi-hop paths keep the existing scalar/flattening behaviour since fetch spec
-      // derivation for NESTED_ONE/MANY only supports a single association name.
+      // derivation for NESTED_ONE/MANY only supports a single association name. A computed
+      // segment here (the single segment has no backing field - e.g. @DtoPath("primaryContact")
+      // where getPrimaryContact() is a derived getter) is just as unfetchable as the SCALAR case
+      // above, so it carries the same computedFrom/requiredFetchPaths validation through - see
+      // DtoMapperWriter's NESTED_ONE/NESTED_MANY handling of DtoPropertyMeta#hasComputedSegment().
       if (properties.size() == 1) {
         TypeMirror fieldType = field.asType();
         TypeMirror listElementType = listElementType(fieldType);
         if (listElementType != null) {
           DtoBeanMeta nested = lookupByTarget(listElementType);
           if (nested != null) {
-            return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_MANY, getters, properties, nested);
+            rejectConverterOnNested(field, converter, name, meta);
+            return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_MANY, getters, properties, nested,
+              computedFrom >= 0, requiredFetchPaths);
           }
         } else {
           DtoBeanMeta nested = lookupByTarget(fieldType);
           if (nested != null) {
-            return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_ONE, getters, properties, nested);
+            rejectConverterOnNested(field, converter, name, meta);
+            return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_ONE, getters, properties, nested,
+              computedFrom >= 0, requiredFetchPaths);
           }
         }
       }
@@ -490,23 +586,41 @@ class DtoMappingReader {
       // primitive, the generated null-guarded getter chain would otherwise auto-unbox a null
       // straight into a NullPointerException. Default to the primitive's zero-equivalent value,
       // or fail fast with a clear message instead when @DtoPath(failOnNull = true).
-      return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties,
-        null, converter, field.asType().getKind().isPrimitive(), pathPrism.failOnNull());
+      return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties, null, converter,
+        field.asType().getKind().isPrimitive(), pathPrism.failOnNull(), computedFrom >= 0, requiredFetchPaths);
     }
     TypeMirror fieldType = field.asType();
     TypeMirror listElementType = listElementType(fieldType);
     if (listElementType != null) {
       DtoBeanMeta nested = lookupByTarget(listElementType);
       if (nested != null) {
+        rejectConverterOnNested(field, converter, name, meta);
         return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_MANY, List.of(getterName(meta.source(), name)), List.of(name), nested);
       }
     } else {
       DtoBeanMeta nested = lookupByTarget(fieldType);
       if (nested != null) {
+        rejectConverterOnNested(field, converter, name, meta);
         return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_ONE, List.of(getterName(meta.source(), name)), List.of(name), nested);
       }
     }
     return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, List.of(getterName(meta.source(), name)), List.of(name), null, converter);
+  }
+
+  /**
+   * {@code @DtoConvert} only applies to {@code SCALAR}/{@code REF} value expressions
+   * ({@link DtoMapperWriter#propertyValueExpression}) - a {@code NESTED_ONE}/{@code NESTED_MANY}
+   * property's value comes entirely from its own nested mapper's {@code map(...)}/{@code
+   * mapList(...)} call, so a converter resolved for it would silently have no effect at all.
+   * Raise a compile error instead of letting the annotation quietly do nothing.
+   */
+  private void rejectConverterOnNested(VariableElement field, DtoConverterMeta converter, String name, DtoBeanMeta meta) {
+    if (converter != null) {
+      ctx.logError(field, "@DtoConvert on %s.%s has no effect - it isn't supported on a nested DTO"
+        + " graph property (NESTED_ONE/NESTED_MANY), only on SCALAR/REF properties. Remove"
+        + " @DtoConvert, or perform the conversion inside the nested DTO's own mapper instead.",
+        meta.targetFullName(), name);
+    }
   }
 
   /**
@@ -552,13 +666,52 @@ class DtoMappingReader {
       return null;
     }
     String methodName = prism.method();
-    ExecutableElement method = findMethod(converterType, methodName);
+    ExecutableElement method = findConverterMethod(field, converterType, methodName);
     if (method == null) {
-      ctx.logError(field, "@DtoConvert method \"%s\" not found on %s", methodName, converterType.getQualifiedName());
       return null;
     }
     boolean isStatic = method.getModifiers().contains(Modifier.STATIC);
     return new DtoConverterMeta(converterType.getQualifiedName().toString(), methodName, isStatic);
+  }
+
+  /**
+   * Resolve {@code @DtoConvert}'s {@code method()} on {@code converterType} - unlike
+   * {@link #findMethod}, this requires exactly one candidate taking a single parameter (the
+   * documented {@code @DtoConvert} contract: "taking the source property value and returning the
+   * converted DTO property value"). {@code findMethod} alone matches by simple name only, so a
+   * converter type with two same-named overloads (a very plausible shape for a shared conversion
+   * utility class, e.g. {@code format(Instant)} and {@code format(LocalDate)}) would silently bind
+   * to whichever one {@code ElementFilter.methodsIn} happens to return first, regardless of which
+   * one the developer actually intended - generating either a confusing compile error in the
+   * generated mapper (arity/type mismatch) or, worse, silently generating a call to the wrong
+   * overload if both happen to be call-compatible.
+   */
+  private ExecutableElement findConverterMethod(VariableElement field, TypeElement converterType, String methodName) {
+    List<ExecutableElement> oneArgCandidates = new ArrayList<>();
+    boolean anyNameMatch = false;
+    for (ExecutableElement candidate : ElementFilter.methodsIn(converterType.getEnclosedElements())) {
+      if (!candidate.getSimpleName().contentEquals(methodName)) {
+        continue;
+      }
+      anyNameMatch = true;
+      if (candidate.getParameters().size() == 1) {
+        oneArgCandidates.add(candidate);
+      }
+    }
+    if (oneArgCandidates.size() == 1) {
+      return oneArgCandidates.get(0);
+    }
+    if (oneArgCandidates.isEmpty()) {
+      ctx.logError(field, "@DtoConvert method \"%s\" not found on %s taking exactly one parameter%s",
+        methodName, converterType.getQualifiedName(),
+        anyNameMatch ? " (a method with that name exists but doesn't take exactly one parameter)" : "");
+      return null;
+    }
+    ctx.logError(field, "@DtoConvert method \"%s\" on %s is ambiguous - %d overloads take exactly one"
+      + " parameter, and @DtoConvert can't disambiguate by parameter type. Rename one of the"
+      + " overloads so the reference is unambiguous.",
+      methodName, converterType.getQualifiedName(), oneArgCandidates.size());
+    return null;
   }
 
   private ExecutableElement findMethod(TypeElement type, String methodName) {
@@ -624,6 +777,29 @@ class DtoMappingReader {
   }
 
   /**
+   * Whether {@code type} (searching {@code type} and its superclass chain) declares a field
+   * named {@code propertyName} - used to distinguish a real, fetchable Ebean bean property (which
+   * always has a backing field once enhanced) from a computed/derived getter with no backing
+   * storage at all (e.g. a hand-written method that filters/derives a value from other
+   * properties). {@code type == null} (unresolvable) conservatively returns {@code true} so an
+   * already-unresolvable segment doesn't also get flagged as "computed" - it'll already have
+   * fallen back to a guessed getter name via {@link #getterName}.
+   */
+  private boolean hasField(TypeElement type, String propertyName) {
+    if (type == null) {
+      return true;
+    }
+    for (TypeElement current = type; current != null; current = superclassOf(current)) {
+      for (VariableElement f : ElementFilter.fieldsIn(current.getEnclosedElements())) {
+        if (f.getSimpleName().contentEquals(propertyName)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
    * Whether a no-arg method named {@code methodName} exists on {@code type} (searching
    * {@code type} and its superclass chain), optionally constrained to a specific return
    * {@code TypeKind} (e.g. {@code TypeKind.BOOLEAN} for a primitive boolean accessor) - pass
@@ -650,14 +826,59 @@ class DtoMappingReader {
    * which case later segments fall back to the guessed {@code getXxx()} name.
    */
   private TypeElement getterReturnType(TypeElement type, String getterMethodName) {
+    TypeMirror mirror = getterReturnTypeMirror(type, getterMethodName);
+    return mirror != null ? asTypeElement(mirror) : null;
+  }
+
+  /**
+   * As {@link #getterReturnType(TypeElement, String)}, but returns the raw {@link TypeMirror}
+   * rather than converting it to a {@link TypeElement} - needed by {@link #validateRequiresPath}
+   * to detect a {@code java.util.List}-typed return (via {@link #listElementType(TypeMirror)}),
+   * which {@link #getterReturnType(TypeElement, String)}'s {@code asTypeElement} conversion can't
+   * distinguish from any other declared type.
+   */
+  private TypeMirror getterReturnTypeMirror(TypeElement type, String getterMethodName) {
     for (TypeElement current = type; current != null; current = superclassOf(current)) {
       for (ExecutableElement method : ElementFilter.methodsIn(current.getEnclosedElements())) {
         if (method.getParameters().isEmpty() && method.getSimpleName().contentEquals(getterMethodName)) {
-          return asTypeElement(method.getReturnType());
+          return method.getReturnType();
         }
       }
     }
     return null;
+  }
+
+  /**
+   * Validate that every dot-notation segment of a declared {@code @DtoPath(requires = ...)}/
+   * {@code @DtoRef(requires = ...)} path value names a real, fetchable Ebean property (one with a
+   * backing field) on {@code source} - these are meant to be real entity fetch paths handed
+   * straight through to {@code FetchGroup.fetch(...)}, so a typo here would otherwise silently
+   * reintroduce the exact "compiles cleanly, fails at runtime with {@code PersistenceException}"
+   * problem the {@code requires()} escape hatch itself exists to prevent - it just wouldn't be
+   * caught until much later, since {@code requires()} paths are trusted verbatim rather than
+   * walked/checked like {@code @DtoPath#value()}'s own segments are. Handles a {@code List}-typed
+   * intermediate hop (e.g. {@code "currentMachine.organisationMachines"}) by unwrapping to the
+   * element type via {@link #listElementType(TypeMirror)}, mirroring how a real fetch path can
+   * traverse a collection.
+   */
+  private void validateRequiresPath(Element field, TypeElement source, String requiresPath, String annotationDisplay) {
+    TypeElement currentType = source;
+    for (String segment : requiresPath.split("\\.")) {
+      if (currentType == null) {
+        return; // already unresolvable upstream - don't cascade a confusing secondary error
+      }
+      if (!hasField(currentType, segment)) {
+        ctx.logError(field,
+          "%s names '%s' (in \"%s\") which has no backing field on %s - check for a typo, every"
+            + " requires() path segment must be a real, fetchable Ebean property.",
+          annotationDisplay, segment, requiresPath, currentType.getSimpleName());
+        return;
+      }
+      String getter = getterName(currentType, segment);
+      TypeMirror returnMirror = getterReturnTypeMirror(currentType, getter);
+      TypeMirror elementType = returnMirror != null ? listElementType(returnMirror) : null;
+      currentType = asTypeElement(elementType != null ? elementType : returnMirror);
+    }
   }
 
   private TypeElement superclassOf(TypeElement type) {

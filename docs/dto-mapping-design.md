@@ -724,19 +724,264 @@ callers must consume it via try-with-resources to ensure the underlying resource
     `DtoConverterManager`) are all constructed eagerly during `Database` startup, which can be
     triggered by whichever test class in the module happens to run first.
 
-- **Known limitation (validation phase, found via `central-access`): `@DtoPath` through a computed/
-  derived getter fails at runtime, not compile time.** `@DtoPath` assumes every dotted segment names a
-  real, fetchable Ebean bean property - so a path like `@DtoPath("currentMachine.organisationMachine
-  .registrationPlate")`, where `getOrganisationMachine()` is a hand-written derived getter (not a real
-  relation/column), **compiles cleanly** (the codegen has no way to tell it apart from a real property
-  from source alone) but **fails at runtime** with a `PersistenceException: No property found for
-  [organisationMachine] in expression ...`, because the generated `FetchGroup` builder tries to
-  `fetch`/`select` it as if it were a real Ebean property. Not yet fixed - candidate remedies: (a)
-  validate each path segment against the source type's actual persistent properties at codegen time
-  and fail fast with a clear compile error instead of a cryptic runtime one (safer, consistent with the
-  primitive-unboxing fix above and the project's general fail-fast philosophy), or (b) genuinely support
-  computed-getter path segments (closer to the original `@Formula2`-style ask in issue #2540, but a much
-  larger feature). Option (a) is the more likely near-term fix given its lower cost/risk.
+- **Fixed (validation phase, found via `central-access`): `@DtoPath` through a computed/derived
+  getter now fails at compile time, with an explicit `requires()` escape hatch.** `@DtoPath`
+  assumes every dotted segment names a real, fetchable Ebean bean property - so a path like
+  `@DtoPath("currentMachine.organisationMachine.registrationPlate")`, where `getOrganisationMachine()`
+  is a hand-written derived getter (not a real relation/column), used to **compile cleanly** (the
+  codegen had no way to tell it apart from a real property from source alone) but **fail at
+  runtime** with a `PersistenceException: No property found for [organisationMachine] in
+  expression ...`, because the generated `FetchGroup` builder tried to `fetch`/`select` it as if it
+  were a real Ebean property.
+  - Two genuinely separate sub-problems: (1) *detecting* that a path segment isn't a real,
+    fetchable property - solvable at compile time, since a real persistent property always has a
+    backing field (Ebean requires one to enhance), checked via `javax.lang.model`
+    (`ElementFilter.fieldsIn(...)` over the type + superclass chain, see `DtoMappingReader.hasField(...)`);
+    versus (2) *knowing what the computed getter needs fetched* to execute safely - not solvable at
+    compile time without full static/bytecode analysis of the getter's method body, out of scope.
+  - Resolution: don't attempt to infer (2) automatically. When `DtoMappingReader` detects a `@DtoPath`
+    segment with no backing field, it now fails fast at compile time (`ctx.logError(...)`) unless the
+    developer explicitly declares the real entity paths that must be fetched via
+    `@DtoPath(requires = {...})` (dot-notation, same convention as `@DtoPath`'s own `value()`) - e.g.
+    `@DtoPath(value = "primaryContact.lastName", requires = "contacts")` where `getPrimaryContact()`
+    picks the first entry out of the `contacts` collection. The real prefix before the computed
+    segment (if any) is automatically combined with the declared `requires()` paths, so the developer
+    doesn't need to redundantly repeat it. Declared paths are emitted as bare `.fetch(path)` calls in
+    the generated `FetchGroup` (distinct from the `.fetch(path, "props")` shape used for ordinary
+    scalar `@DtoPath` properties, since there's no specific target property list to narrow to here).
+  - **The zero-extra-fetch case is also supported, via an explicit `requires = {}`** - e.g.
+    `@DtoPath(value = "idBadge", requires = {})` where `getIdBadge()` derives purely from `id`
+    (always fetched regardless). An explicit empty array confirms "nothing extra needed", distinct
+    from omitting `requires()` entirely ("not yet considered", still a compile error) - `requires()`
+    itself can't tell the two cases apart (both read back as an empty `List`), so `DtoMappingReader`
+    checks the avaje-prism-generated `DtoPathPrism.values.requires()` instead, which returns `null`
+    only when the member was left at its default (i.e. omitted from source). `DtoPropertyMeta`
+    correspondingly carries `hasComputedSegment()` as its own boolean flag (set whenever a computed
+    segment was detected at all), independent of whether `requiredFetchPaths()` happens to be empty -
+    an earlier version conflated the two (inferring "has a computed segment" from "has a non-empty
+    requiredFetchPaths list"), which broke exactly this explicit-empty case by falling through to the
+    ordinary scalar `.select(...)` path and failing at runtime with `PersistenceException: Property
+    not found - idBadge` (`idBadge` isn't a real Ebean property, so it can't be selected).
+  - Implemented in `ebean-annotation` (`DtoPath.requires()`), and `querybean-generator`
+    (`DtoMappingReader` computed-segment detection/validation, `DtoPropertyMeta.requiredFetchPaths()`/
+    `hasComputedSegment()`, `DtoMapperWriter.fetchGroupChainCalls()` bare-fetch emission). Test
+    coverage: `tests/test-dto-mapping` `ComputedPathDto`/`TestComputedPath` (happy path, `requires`
+    correctly fetches the dependency and the mapped value is correct), `ComputedPathNoFetchDto`/
+    `TestComputedPathNoFetch` (explicit `requires = {}`, genuinely nothing extra needed), and
+    `querybean-generator`'s `DtoMapperComputedPathTest` (negative case - omitting `requires` on a
+    computed segment is a compile-time `ERROR` diagnostic, verified via direct `javax.tools.JavaCompiler`
+    compilation, mirroring `DtoMapperFetchPathCollisionTest`).
+  - Known gap: the dedup between the computed segment's required fetch paths and existing
+    `pathSelect`/`nestedAssocPaths` keys in `DtoMapperWriter` is a simplified exact-path-string check
+    (skip emitting a duplicate `.fetch(path)`), not full collision detection like the existing
+    NESTED_ONE/MANY vs `@DtoPath` check - a bare `fetch(path)` and an existing `fetch(path,
+    "specific,props")` for the same path string are not merged/reconciled, just left as two separate
+    calls if that edge case arises.
+
+- **Fixed: a single-hop `@DtoPath` rename through a computed/derived getter whose return type is
+  itself a registered nested DTO (`NESTED_ONE`/`NESTED_MANY`, not `SCALAR`) bypassed the
+  computed-segment validation above entirely.** E.g. `@DtoPath("primaryContact")` where the DTO
+  field's declared type is `ContactDto` (a type with its own `@DtoMapping(source = Contact.class,
+  target = ContactDto.class)`) and `getPrimaryContact()` is a computed getter with no backing
+  field on `Customer`. This resolves to a single-segment path, so `DtoMappingReader.resolveProperty()`
+  took its `properties.size() == 1` nested-lookup shortcut and returned early - before the
+  `computedFrom`/`requires()` validation block (added for the `SCALAR` case above) ever ran. The
+  generated `FetchGroup` then emitted a broken `fetch("primaryContact",
+  contactMapper.fetchGroup())` call (`"primaryContact"` isn't a real Ebean fetch path), failing at
+  runtime rather than compile time - the exact class of bug the `SCALAR` fix was meant to close off
+  entirely.
+  - Resolution: restructured `resolveProperty()` so the computed-segment detection/validation block
+    runs *before* the `properties.size() == 1` nested-lookup branch, so both `SCALAR` and
+    `NESTED_ONE`/`NESTED_MANY` paths share the same detection/validation. `DtoPropertyMeta` gained a
+    matching constructor overload for `NESTED_ONE`/`NESTED_MANY` carrying `computedSegment`/
+    `requiredFetchPaths`. In `DtoMapperWriter.fetchGroupChainCalls()`, a `NESTED_ONE`/`NESTED_MANY`
+    property with `hasComputedSegment()` true is routed into `extraFetchPaths` (the same bare
+    `.fetch(path)` mechanism as the `SCALAR` case) instead of emitting `fetch(path,
+    mapper.fetchGroup())` - since the nested mapper's own `FetchGroup` requirements can't be
+    meaningfully attached under a path name that doesn't exist on the source entity.
+  - Note the nested mapper's *own* fetch requirements (e.g. if `ContactDto` itself needed
+    `customer.billingAddress`) are **not** automatically propagated up through a computed segment -
+    only whatever the computed getter itself needs (via `requires()`) is fetched. The nested
+    mapper's `map(...)` call still works via plain Java method invocation regardless (Ebean
+    transparent lazy loading covers any gap), but relying on that silently reintroduces N+1 queries,
+    so the nested DTO used through a computed segment should ideally be a "leaf" shape needing
+    nothing beyond what `requires()` already declares.
+  - Implemented in `querybean-generator` (`DtoMappingReader.resolveProperty()` restructuring,
+    `DtoPropertyMeta`'s new constructor overload, `DtoMapperWriter.fetchGroupChainCalls()`). Test
+    coverage: `tests/test-dto-mapping` `ContactLeafDto`/`ComputedNestedDto`/`TestComputedNestedPath`
+    (happy path - generated `FetchGroup` is `.select("id").fetch("contacts")`, no broken
+    `fetch("primaryContact", ...)` call, and the mapped value is correct end-to-end), and
+    `querybean-generator`'s `DtoMapperComputedPathTest#dtoPathThroughComputedGetter_targetingNestedDto_withoutRequires_expectCompileError`
+    (negative case, mirroring the `SCALAR` one). The `NESTED_MANY` variant (a computed getter
+    returning a `List` of a type with its own registered nested DTO mapping) shares the identical
+    code path but had no dedicated regression test until later confirmed via `Customer
+    .getRecentContacts()` / `ComputedNestedListDto` / `TestComputedNestedListPath` (coverage only,
+    not a bug fix - passed cleanly first try, confirming the shared code path does work end-to-end
+    for both `NESTED_ONE` and `NESTED_MANY`).
+
+- **Fixed: `@DtoRef` never checked for a computed/derived association getter at all.** Unlike
+  `@DtoPath`, `@DtoRef`'s association name (derived by stripping the `Id` suffix off the field
+  name, e.g. `primaryContactId` -> `primaryContact`) was never checked against `hasField(...)` -
+  so `@DtoRef` on a computed getter (e.g. `getPrimaryContact()` picking the first entry out of a
+  `contacts` collection) compiled cleanly and generated a broken `FetchGroup.select("primaryContact")`
+  call (`"primaryContact"` isn't a real Ebean property), failing at runtime rather than compile
+  time - the same class of bug as the original `@DtoPath` fix, just entirely unaddressed for
+  `@DtoRef`'s separate code path.
+  - Resolution: `@DtoRef` gained its own `requires()` attribute (dot-notation, same convention and
+    explicit-empty semantics as `@DtoPath#requires()`, using the same `DtoRefPrism.values.requires()
+    == null` omitted-vs-explicit-empty technique). `DtoMappingReader`'s `@DtoRef` branch now checks
+    `hasField(meta.source(), assocName)` and fails fast at compile time (`ctx.logError(...)`) when
+    the association has no backing field and `requires()` wasn't specified. `DtoPropertyMeta`'s
+    `REF` properties now carry `computedSegment`/`requiredFetchPaths` through the existing fields
+    (no new constructor needed - the full constructor already had the right shape).
+    `DtoMapperWriter.fetchGroupChainCalls()`'s `REF` case now checks `hasComputedSegment()` and
+    routes into `extraFetchPaths` (bare `.fetch(path)`) instead of `rootSelect.add(assoc)` when
+    true - the value expression itself (`source.getPrimaryContact().getId()`, null-guarded) is
+    unaffected, since it's plain Java method invocation regardless of whether the association name
+    is a real Ebean property.
+  - Implemented in `ebean-annotation` (`DtoRef.requires()`), and `querybean-generator`
+    (`DtoMappingReader`'s `@DtoRef` branch, `DtoMapperWriter.fetchGroupChainCalls()`'s `REF` case).
+    Test coverage: `tests/test-dto-mapping` `ComputedRefDto`/`TestComputedRefPath` (happy path -
+    generated `FetchGroup` is `.select("id").fetch("contacts")`, no broken `select("primaryContact")`
+    call, and the mapped id is correct end-to-end), and `querybean-generator`'s
+    `DtoMapperComputedPathTest#dtoRefThroughComputedGetter_withoutRequires_expectCompileError`
+    (negative case, mirroring the `@DtoPath` ones).
+
+- **Fixed: `requires()` path values themselves were never validated against the source type's
+  real property graph.** `@DtoPath(requires = {...})`/`@DtoRef(requires = {...})` values are
+  handed straight through to `FetchGroup.fetch(...)` unmodified - a typo (e.g. `requires =
+  "contactz"` for the real `contacts` property) compiled cleanly, since only the *computed
+  segment itself* was checked against `hasField(...)`, not the developer-declared dependency
+  paths meant to fix it. That silently reintroduced the exact runtime `PersistenceException` the
+  whole `requires()` escape hatch exists to prevent, just one step removed and harder to spot.
+  - Resolution: added `DtoMappingReader.validateRequiresPath(...)`, which walks each dot-notation
+    segment of a declared `requires()` value from the source root (`meta.source()`), checking
+    `hasField(...)` at every hop exactly like `@DtoPath#value()`'s own segments are checked, and
+    unwrapping a `java.util.List`-typed intermediate hop to its element type (via
+    `listElementType(TypeMirror)`) so a collection segment followed by a further hop resolves
+    correctly - needed a new `getterReturnTypeMirror(...)` helper (returning the raw `TypeMirror`
+    rather than converting straight to `TypeElement`, which can't distinguish a `List` from any
+    other declared type) alongside the existing `getterReturnType(...)`. Called for every entry in
+    `pathPrism.requires()`/`refPrism.requires()` right after they're read, for both the `@DtoPath`
+    and `@DtoRef` branches. The already-validated real prefix (segments before the computed one in
+    a `@DtoPath#value()`) is intentionally *not* re-validated, since it was already checked while
+    walking `value()` itself.
+  - Implemented in `querybean-generator` (`DtoMappingReader.validateRequiresPath(...)`,
+    `getterReturnTypeMirror(...)`, called from both the `@DtoPath` and `@DtoRef` branches). Test
+    coverage: `querybean-generator`'s
+    `DtoMapperComputedPathTest#dtoPathRequires_withTypoInPathValue_expectCompileError` (negative
+    case - a typo'd `requires()` segment is a compile-time `ERROR` diagnostic); existing
+    `tests/test-dto-mapping`/`central-access` suites (real multi-segment `requires()` values like
+    `"currentMachine.organisationMachines"`) continue to pass unchanged, confirming the validation
+    doesn't false-positive on legitimate paths.
+
+- **Fixed: a bare, full `requires()` fetch and a sibling property's narrowed `@DtoPath` fetch of
+  the exact same path silently conflicted, with the narrow one always (incorrectly) winning.**
+  `DtoMapperWriter.fetchGroupChainCalls()`'s dedup logic used to skip emitting a computed
+  segment's bare `fetch(path)` call whenever another property's `@DtoPath` already had a narrowed
+  `fetch(path, "specific,props")` entry for that exact path string - on the assumption the two
+  were interchangeable/redundant. They aren't: `FetchGroup`'s builder (`OrmQueryDetail.fetch(...)`)
+  keys fetch calls by path in a plain `Map` and **replaces** rather than merges same-path entries,
+  so whichever call format was emitted meant the *other* was silently discarded. Since the narrow
+  entry was always emitted first and the bare one skipped whenever it existed, the narrow selection
+  always won - meaning a computed getter's `requires()` declaration could be completely ignored
+  whenever an unrelated sibling `@DtoPath` happened to narrow-select the exact same path, leaving
+  whatever extra properties the computed getter actually touches unfetched (a silent lazy load, or
+  a hard `LazyInitialisationException` outside a persistence context).
+  - Resolution: reversed the priority - `fetchGroupChainCalls()` now skips a narrowed `pathSelect`
+    entry when `extraFetchPaths` (the computed segment's `requires()`) declares the exact same
+    path, letting the bare, full `fetch(path)` call win instead. This is always safe since a full
+    fetch is a superset of any narrower property selection - the narrow entry's own properties are
+    included within it regardless. The existing `nestedAssocPaths` priority (a `NESTED_ONE`/
+    `NESTED_MANY` property's full `fetch(path, mapper.fetchGroup())` always wins over a bare
+    `fetch(path)`) was correct already and left unchanged - a nested mapper's own `FetchGroup` is
+    strictly richer than either form and must not be replaced by either.
+  - Implemented in `querybean-generator` (`DtoMapperWriter.fetchGroupChainCalls()`). Test coverage:
+    `tests/test-dto-mapping` `FetchCollisionDto`/`TestFetchCollisionPath`, plus a new computed
+    getter `Customer.getBillingSummary()` (reads `billingAddress.getLine1()`, deliberately a
+    different `Address` property to the `city` narrowly selected by a sibling `@DtoPath` on the
+    same DTO) - confirmed to reproduce `LazyInitialisationException: Property not loaded: line1`
+    when the fix is reverted, and pass cleanly (correct `line1`-derived value, generated
+    `FetchGroup` is `.select("id").fetch("billingAddress")` with no narrowed variant at all) with
+    it in place.
+
+- **Fixed: two `@DtoMixin` companion types targeting the same DTO class silently conflicted, with
+  the second-processed one winning.** `DtoMappingReader.collectMixins()` keyed a single
+  `mixinsByTarget` map by the target DTO's FQN, and `Map.put(...)` unconditionally overwrote any
+  existing entry - so if two mixin interfaces (e.g. a legitimate one plus an accidental duplicate,
+  or two independently-added mixins that both happened to target the same generated/unowned DTO)
+  both declared `@DtoMixin(SameDto.class)`, whichever was visited last by
+  `roundEnv.getElementsAnnotatedWith(...)` silently won, and *all* of the other mixin's
+  `@DtoPath`/`@DtoRef`/`@DtoConvert` overlays were discarded with no diagnostic at all.
+  - Resolution: `collectMixins()` now checks for an existing registration before storing a new one
+    and raises a compile `ERROR` naming both the target and the already-registered mixin's
+    qualified name, rather than silently overwriting it.
+  - Implemented in `querybean-generator` (`DtoMappingReader.collectMixins()`). Test coverage: new
+    negative compile-error test `DtoMapperComputedPathTest#duplicateDtoMixin_forSameTarget_expectCompileError`
+    (two minimal `@DtoMixin(FooDto.class)` interfaces both declaring a `bar()` method, compiled
+    together, asserting the `Duplicate @DtoMixin` diagnostic is raised); existing
+    `tests/test-dto-mapping` `TestDtoMixin` (single, legitimate mixin usage) continues to pass
+    unchanged.
+
+- **Fixed: `@DtoRef` and `@DtoPath` both present on the same field silently conflicted, with
+  `@DtoRef` always (invisibly) winning.** `resolveProperty()` checked `refPrism != null` first and
+  returned immediately whenever present, so a field carrying both annotations at once - whether by
+  copy/paste mistake, a half-finished rename from one style to the other, or simple confusion
+  between the two escape hatches - had its `@DtoPath` completely ignored with no diagnostic at all.
+  - Resolution: `resolveProperty()` now resolves both prisms upfront and raises a compile `ERROR`
+    naming the field when both are present, rather than silently picking `@DtoRef` and discarding
+    `@DtoPath`.
+  - Implemented in `querybean-generator` (`DtoMappingReader.resolveProperty()`). Test coverage: new
+    negative compile-error test `DtoMapperComputedPathTest#dtoRefAndDtoPath_onSameField_expectCompileError`
+    (a field carrying both `@DtoRef` and `@DtoPath("bar.id")` over a real, non-computed association,
+    isolating the conflict diagnostic from the separate computed-getter `requires()` diagnostics).
+
+- **Fixed: `@DtoConvert` on a `NESTED_ONE`/`NESTED_MANY` property was silently ignored.**
+  `resolveProperty()` resolves the property's `DtoConverterMeta` unconditionally up front (before
+  it's known whether the property will resolve to `SCALAR`/`REF`/`NESTED_ONE`/`NESTED_MANY`), but
+  only the `SCALAR`/`REF` `DtoPropertyMeta` constructors actually accept/store a converter - the
+  `NESTED_ONE`/`NESTED_MANY` constructor calls never took one, so a resolved converter was simply
+  dropped on the floor with no diagnostic. A developer adding `@DtoConvert` to a nested-DTO field
+  (e.g. hoping to post-process the nested mapper's result) would see it silently do nothing -
+  `DtoMapperWriter.propertyValueExpression()`'s `NESTED_ONE`/`NESTED_MANY` cases call straight into
+  `mapperFieldName(property) + ".map(...)"`/`".mapList(...)"` with no converter wrapping at all.
+  - Resolution: added `rejectConverterOnNested(...)`, called at each of the four call sites that
+    construct a `NESTED_ONE`/`NESTED_MANY` `DtoPropertyMeta` (the single-hop `@DtoPath`-rename
+    branch's two cases, and the plain non-`@DtoPath` branch's two cases) - raises a compile `ERROR`
+    naming the field whenever a converter was resolved for it, rather than silently discarding it.
+  - Implemented in `querybean-generator` (`DtoMappingReader.resolveProperty()`,
+    `rejectConverterOnNested()`). Test coverage: new negative compile-error test
+    `DtoMapperComputedPathTest#dtoConvertOnNestedOne_expectCompileError` (a `NESTED_ONE` field
+    carrying `@DtoConvert` over a legitimately nested, separately-`@DtoMapping`-registered type);
+    existing `tests/test-dto-mapping` suite (no nested property currently combines `@DtoConvert`
+    with `NESTED_ONE`/`NESTED_MANY`) continues to pass unchanged, confirming no false positives on
+    plain nested properties.
+
+- **Fixed: `@DtoConvert(method = ...)` resolution ignored parameter arity/overloads.** The shared
+  `findMethod(type, name)` helper (also used for the builder's `build()` lookup and `@DtoMixin`
+  companion-method lookup) matches purely by simple name - the first `ExecutableElement` found -
+  with no arity or parameter-type check at all. For `@DtoConvert` specifically this is a real risk:
+  its documented contract is a method "taking the source property value and returning the
+  converted DTO property value" (i.e. exactly one parameter), but a shared/reusable conversion
+  utility class is a very plausible place to have multiple same-named overloads (e.g. `format
+  (Instant)` and `format(LocalDate)`) - `findMethod` would silently bind to whichever one
+  `ElementFilter.methodsIn` happened to return first, independent of which one the developer
+  actually meant, generating either a confusing arity/type-mismatch compile error in the generated
+  mapper or, if both overloads happened to be call-compatible, silently invoking the wrong one.
+  - Resolution: added a dedicated `findConverterMethod(...)` (used only by `resolveConverter()`,
+    leaving the shared `findMethod()` untouched for the builder/mixin call sites which have their
+    own, different arity expectations) that filters same-named candidates down to those taking
+    exactly one parameter. Zero matches raises a clear "not found ... taking exactly one
+    parameter" error; more than one match (multiple 1-arg overloads sharing the name) raises an
+    "ambiguous - N overloads take exactly one parameter" error, since `@DtoConvert` has no
+    parameter-type-based way to disambiguate and the developer must rename one of the overloads.
+  - Implemented in `querybean-generator` (`DtoMappingReader.resolveConverter()`,
+    `findConverterMethod()`). Test coverage: new negative compile-error tests
+    `DtoMapperComputedPathTest#dtoConvertMethod_withAmbiguousOverloads_expectCompileError` (two
+    same-named 1-arg overloads) and `#dtoConvertMethod_withWrongArity_expectCompileError` (a
+    same-named 0-arg method, no 1-arg candidate at all); existing `tests/test-dto-mapping`
+    converter usage (a single, unambiguous 1-arg method per converter type) continues to resolve
+    and pass unchanged.
 
 ## References
 
