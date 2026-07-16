@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.avaje.json.JsonReader;
 import io.avaje.json.JsonWriter;
+import io.ebean.annotation.MutationDetection;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.PostgresHelper;
@@ -25,20 +26,20 @@ class ScalarTypeJsonList extends ScalarTypeJsonCollectionValue<List> {
   /**
    * Return the appropriate ScalarType for the requested dbType and platform.
    */
-  static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docType, boolean nullable, boolean keepSource) {
+  static ScalarType<?> typeFor(boolean postgres, int dbType, DocPropertyType docType, boolean nullable, MutationDetection mutationDetection) {
     if (postgres) {
       switch (dbType) {
         case DbPlatformType.JSONB:
-          return new ScalarTypeJsonList(DbPlatformType.JSONB, JsonStorage.postgres(PostgresHelper.JSONB_TYPE), docType, nullable, keepSource);
+          return new ScalarTypeJsonList(DbPlatformType.JSONB, JsonStorage.postgres(PostgresHelper.JSONB_TYPE), docType, nullable, mutationDetection);
         case DbPlatformType.JSON:
-          return new ScalarTypeJsonList(DbPlatformType.JSON, JsonStorage.postgres(PostgresHelper.JSON_TYPE), docType, nullable, keepSource);
+          return new ScalarTypeJsonList(DbPlatformType.JSON, JsonStorage.postgres(PostgresHelper.JSON_TYPE), docType, nullable, mutationDetection);
       }
     }
-    return new ScalarTypeJsonList(Types.VARCHAR, JsonStorage.VARCHAR, docType, nullable, keepSource);
+    return new ScalarTypeJsonList(Types.VARCHAR, JsonStorage.VARCHAR, docType, nullable, mutationDetection);
   }
 
-  ScalarTypeJsonList(int jdbcType, JsonStorage storage, DocPropertyType docType, boolean nullable, boolean keepSource) {
-    super(List.class, jdbcType, storage, keepSource, nullable, docType);
+  ScalarTypeJsonList(int jdbcType, JsonStorage storage, DocPropertyType docType, boolean nullable, MutationDetection mutationDetection) {
+    super(List.class, jdbcType, storage, mutationDetection, nullable, docType);
   }
 
   @Override
@@ -87,8 +88,8 @@ class ScalarTypeJsonList extends ScalarTypeJsonCollectionValue<List> {
 
     private final ArrayElementConverter converter;
 
-    VarcharWithConverter(DocPropertyType docType, boolean nullable, boolean keepSource, ArrayElementConverter converter) {
-      super(Types.VARCHAR, JsonStorage.VARCHAR, docType, nullable, keepSource);
+    VarcharWithConverter(DocPropertyType docType, boolean nullable, ArrayElementConverter converter) {
+      super(Types.VARCHAR, JsonStorage.VARCHAR, docType, nullable, MutationDetection.DEFAULT);
       this.converter = converter;
     }
 

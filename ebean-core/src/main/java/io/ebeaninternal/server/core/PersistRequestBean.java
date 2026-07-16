@@ -124,6 +124,13 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
    * Cascade to children must be suppressed to avoid FK violations.
    */
   private boolean insertConflictSkipped;
+  /**
+   * Set true once controller.preDelete() has been invoked so that it is
+   * only ever fired once (as it is fired early, prior to cascading the
+   * delete to children/many's rather than as part of executing the delete).
+   */
+  private boolean preDeleteCalled;
+  private boolean preDeleteResult = true;
 
   public PersistRequestBean(SpiEbeanServer server, T bean, Object parentBean, BeanManager<T> mgr, SpiTransaction t,
                             PersistExecute persistExecute, PersistRequest.Type type, int flags) {
@@ -1124,12 +1131,27 @@ public final class PersistRequestBean<T> extends PersistRequest implements BeanP
   }
 
   private int executeDelete() {
-    setTenantId();
-    if (controller == null || controller.preDelete(this)) {
+    if (controllerPreDelete()) {
       return beanManager.getBeanPersister().delete(this);
     }
     // delete handled by the BeanController so return 0
     return 0;
+  }
+
+  /**
+   * Invoke controller.preDelete() if not already invoked.
+   * <p>
+   * This is called prior to cascading the delete to children (assoc many's /
+   * many-to-many intersection rows) so that the persist controller can still
+   * see those collections/relationships as they were before the cascade delete.
+   */
+  public boolean controllerPreDelete() {
+    if (!preDeleteCalled) {
+      preDeleteCalled = true;
+      setTenantId();
+      preDeleteResult = controller == null || controller.preDelete(this);
+    }
+    return preDeleteResult;
   }
 
   /**

@@ -3,6 +3,7 @@ package io.ebean;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import jakarta.persistence.EntityNotFoundException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.util.Collection;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -108,6 +110,22 @@ public interface DtoQuery<T> extends CancelableQuery {
    * Execute the query returning an optional bean.
    */
   Optional<T> findOneOrEmpty();
+
+  /**
+   * Execute the query returning a single bean or throwing a
+   * {@link jakarta.persistence.EntityNotFoundException} if there is no matching row.
+   */
+  default T findOneOrThrow() {
+    return findOneOrEmpty().orElseThrow(() -> new EntityNotFoundException("Not found"));
+  }
+
+  /**
+   * Execute the query returning a single bean or throwing the exception produced
+   * by the given supplier if there is no matching row.
+   */
+  default T findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
+    return findOneOrEmpty().orElseThrow(exceptionSupplier);
+  }
 
   /**
    * Bind all the parameters using index positions.
@@ -245,5 +263,42 @@ public interface DtoQuery<T> extends CancelableQuery {
    * @see #usingMaster()
    */
   DtoQuery<T> usingMaster(boolean useMaster);
+
+  /**
+   * Return a PagedList for this query using firstRow and maxRows.
+   * <p>
+   * The benefit of using this over findList() is that it provides functionality to get the
+   * total row count etc.
+   * <p>
+   * If maxRows is not set on the query prior to calling findPagedList() then a
+   * PersistenceException is thrown.
+   * <p>
+   * This is only supported for a DtoQuery that is derived from an ORM query via
+   * {@link Query#asDto(Class)} / {@link ExpressionList#asDto(Class)}. It is not supported
+   * for a DtoQuery based on raw SQL (e.g. via {@link Database#findDto(Class, String)}) as
+   * there is no query structure available from which to derive a matching row count query -
+   * a PersistenceException is thrown in that case.
+   * <pre>{@code
+   *
+   *  PagedList<OrderDto> pagedList =
+   *    DB.find(Order.class)
+   *       .where().eq("status", Order.Status.NEW)
+   *       .orderBy().asc("id")
+   *       .setFirstRow(50)
+   *       .setMaxRows(20)
+   *       .asDto(OrderDto.class)
+   *       .findPagedList();
+   *
+   *       // fetch the total row count in the background
+   *       pagedList.loadCount();
+   *
+   *       List<OrderDto> orders = pagedList.getList();
+   *       int totalRowCount = pagedList.getTotalCount();
+   *
+   * }</pre>
+   *
+   * @return The PagedList
+   */
+  PagedList<T> findPagedList();
 
 }

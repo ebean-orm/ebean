@@ -8,3 +8,10 @@ ebean:
     platform: h2 # h2, postgres, mysql, oracle, sqlserver, sqlite
     ddlMode: dropCreate # none | dropCreate | create | migration | createOnly | migrationDropCreate
     dbName: myapp
+
+# Keep the shared "ut_redis" test container running rather than removing it on JVM exit.
+# ebean-redis and ebean-redisson both reuse this fixed-name/fixed-port container - with a
+# parallel reactor build (mvn -T 1C) the module that finishes first would otherwise remove
+# the container while the other module's tests are still using it.
+redis:
+  shutdownMode: none

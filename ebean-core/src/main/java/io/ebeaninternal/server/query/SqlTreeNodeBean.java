@@ -318,6 +318,10 @@ class SqlTreeNodeBean implements SqlTreeNode {
     if (desc.isSoftDelete() && temporalMode != SpiQuery.TemporalMode.SOFT_DELETED) {
       ctx.append(" and ").append(desc.softDeletePredicate(ctx.tableAlias(prefix)));
     }
+    if (prefix != null && ctx.isFilterManyAttachPoint(prefix)) {
+      // this node is where we inline the filterMany predicate
+      ctx.includeFilterMany();
+    }
     return sqlJoinType;
   }
 

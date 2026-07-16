@@ -47,6 +47,7 @@ existing Maven project. Complete the steps in order.
 | Guide | Description |
 |-------|-------------|
 | [Write Ebean queries with query beans](writing-ebean-query-beans.md) | Step-by-step guidance for AI agents to write type-safe Ebean queries; choose the right terminal method; tune `select()` / `fetch()` / `fetchQuery()`; and project to DTOs when entity beans are not the right output |
+| [Mapping entity graphs to DTOs (`mapTo`)](mapping-entity-graphs-to-dtos.md) | Map a nested entity graph query result to a nested DTO graph via `query.mapTo(Dto.class)`; `@DtoPath`/`@DtoRef` for renamed/flattened/id-only properties; identity-aware de-dup via `DtoMapContext`; computed/aggregate DTO values via `@Entity @View` + `@Formula2`/`@Sum`/`@Aggregation`; comparison with the flat `asDto()` pipeline |
 | [Immutable bean cache for read-only references](immutable-bean-cache.md) | Use `ImmutableBeanCache` and `ImmutableBeanCaches.loading(...)` to resolve assoc-one references in read-only/unmodifiable queries, including secondary `fetchQuery`/`fetchLazy` loads |
 | [Using `RawSql` with Ebean](using-rawsql-with-ebean.md) | Choose between `RawSqlBuilder.parse()`, `unparsed()`, and `withPlaceholders()`; the `${where}`/`${andWhere}`/`${having}`/`${andHaving}` placeholder reference for CTEs, window functions, and subqueries; column mapping; and using `RawSql` with query beans |
 
@@ -153,6 +154,7 @@ Key guides (fetch and follow these when performing the relevant task):
 - Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
 - Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
+- Mapping entity graphs to DTOs (`mapTo`): https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/mapping-entity-graphs-to-dtos.md
 - Immutable bean cache for read-only references: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/immutable-bean-cache.md
 - Ebean OpenTelemetry tracing: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-opentelemetry.md
 - Query metrics and naming: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/ebean-query-metrics.md
@@ -182,6 +184,7 @@ Key guides (fetch and follow these when performing the relevant task):
 - Database configuration: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-database-config.md
 - Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
+- Mapping entity graphs to DTOs (`mapTo`): https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/mapping-entity-graphs-to-dtos.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Test container setup: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-postgres-test-container.md
 - DB migration generation: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/add-ebean-db-migration-generation.md

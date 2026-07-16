@@ -22,6 +22,7 @@ import io.ebeaninternal.server.query.NativeSqlQueryPlanKey;
 import io.ebeaninternal.server.rawsql.SpiRawSql;
 import io.ebeaninternal.server.transaction.ExternalJdbcTransaction;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceException;
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -173,6 +174,16 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final <D> DtoQuery<D> asDto(Class<D> dtoClass) {
     return server.findDto(dtoClass, this);
+  }
+
+  @Override
+  public final <D> MappedQuery<D> mapTo(Class<D> dtoType) {
+    return new DefaultMappedQuery<>(server, this, dtoType);
+  }
+
+  @Override
+  public final <D> MappedQuery<D> mapTo(Class<D> dtoType, DtoMapper<T, D> mapper) {
+    return new DefaultMappedQuery<>(server, this, dtoType, mapper);
   }
 
   @Override
@@ -1575,6 +1586,30 @@ public class DefaultOrmQuery<T> extends AbstractQuery implements SpiQuery<T> {
   @Override
   public final Optional<T> findOneOrEmpty() {
     return server.findOneOrEmpty(this);
+  }
+
+  @Override
+  public final T findOneOrThrow() {
+    return findOneOrEmpty().orElseThrow(() -> new EntityNotFoundException(notFoundMessage()));
+  }
+
+  /**
+   * Build a decent default "not found" message using the id (if this is effectively a
+   * find-by-id query) or, failing that, a single simple equality predicate (a likely
+   * natural/unique key). Falls back to a generic message for anything more complex.
+   */
+  private String notFoundMessage() {
+    String type = beanDescriptor.type().getSimpleName();
+    if (isFindById()) {
+      return type + " not found for id: " + id;
+    }
+    if (whereExpressions != null) {
+      String desc = whereExpressions.singleEqDescription();
+      if (desc != null) {
+        return type + " not found for " + desc;
+      }
+    }
+    return type + " not found";
   }
 
   @Override

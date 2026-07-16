@@ -2,6 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.avaje.json.stream.JsonStream;
 import io.ebean.DatabaseBuilder;
+import io.ebean.DtoMapperManager;
 import io.ebean.ExpressionFactory;
 import io.ebean.annotation.Platform;
 import io.ebean.cache.*;
@@ -64,6 +65,7 @@ public final class InternalConfiguration {
   private final DatabasePlatform databasePlatform;
   private final TypeManager typeManager;
   private final DtoBeanManager dtoBeanManager;
+  private final DtoMapperManager dtoMapperManager;
   private final Clock clock;
   private final DataTimeZone dataTimeZone;
   private final Binder binder;
@@ -109,6 +111,7 @@ public final class InternalConfiguration {
     this.cacheManager = initCacheManager();
 
     this.dtoBeanManager = new DtoBeanManager(typeManager);
+    this.dtoMapperManager = initDtoMapperManager();
     this.dataSourceSupplier = createDataSourceSupplier();
     this.beanDescriptorManager = new BeanDescriptorManager(this);
     Map<String, String> asOfTableMapping = beanDescriptorManager.deploy();
@@ -129,6 +132,17 @@ public final class InternalConfiguration {
     } else {
       return ServiceUtil.service(cls);
     }
+  }
+
+  /**
+   * Use an application-provided {@link DtoMapperManager} (registered via {@code
+   * config.putServiceObject(DtoMapperManager.class, ...)} before building the Database) if
+   * present, so the exact same instance (and hence the same underlying mapper instances) can be
+   * shared between {@code query.mapTo(...)} and application code, otherwise construct a default.
+   */
+  private DtoMapperManager initDtoMapperManager() {
+    DtoMapperManager manager = config.getServiceObject(DtoMapperManager.class);
+    return manager != null ? manager : new DtoMapperManager();
   }
 
   private SpiLogManager initLogManager() {
@@ -447,6 +461,10 @@ public final class InternalConfiguration {
 
   DtoBeanManager getDtoBeanManager() {
     return dtoBeanManager;
+  }
+
+  DtoMapperManager getDtoMapperManager() {
+    return dtoMapperManager;
   }
 
   SpiLogManager getLogManager() {

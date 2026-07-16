@@ -10,4 +10,12 @@ public interface ScalarTypeArray {
    */
   String getDbColumnDefn();
 
+  /**
+   * Return the Java type of the individual array elements.
+   * <p>
+   * Used to bind the array correctly when the collection value is empty
+   * and so the element type can't be determined from the collection content.
+   */
+  Class<?> elementType();
+
 }

@@ -311,6 +311,46 @@ final class CQueryBuilder {
     return lastFound;
   }
 
+  /**
+   * Find the index of the top-level (non-nested) "select" keyword in sql. Used to detect if sql
+   * starts with a WITH clause (CTE) header - SQL Server does not support a WITH clause nested
+   * inside a subquery/derived table, so it must be hoisted in front of a wrapping SELECT
+   * (count/exists) rather than wrapped along with the rest of the query.
+   * <p>
+   * Returns 0 if there is no leading WITH clause (sql starts directly with SELECT), or -1 if no
+   * top-level SELECT is found at all.
+   */
+  static int topLevelSelectStart(String sql) {
+    int depth = 0;
+    int len = sql.length();
+    for (int i = 0; i < len; i++) {
+      char c = sql.charAt(i);
+      if (c == '(') {
+        depth++;
+      } else if (c == ')') {
+        depth--;
+      } else if (depth == 0 && sql.regionMatches(true, i, "select", 0, 6)
+        && (i == 0 || !Character.isLetterOrDigit(sql.charAt(i - 1)))
+        && (i + 6 == len || !Character.isLetterOrDigit(sql.charAt(i + 6)))) {
+        return i;
+      }
+    }
+    return -1;
+  }
+
+  /**
+   * Split off a leading WITH clause (CTE header) from sql, returning {@code {header, body}} so the
+   * header can be hoisted in front of a wrapping SELECT. Returns an empty header (unchanged sql as
+   * the body) when there is no leading WITH clause.
+   */
+  static String[] splitCteHeader(String sql) {
+    int pos = topLevelSelectStart(sql);
+    if (pos <= 0) {
+      return new String[]{"", sql};
+    }
+    return new String[]{sql.substring(0, pos), sql.substring(pos)};
+  }
+
   static String inlineSqlCommentLabel(String label, ProfileLocation profileLocation, boolean secondary, String simpleName) {
     if (label != null) {
       return secondary ? label : CQueryPlan.planLabelWithType(label, simpleName);
@@ -319,15 +359,22 @@ final class CQueryBuilder {
   }
 
   private String wrapSelectCount(String sql) {
-    sql = "select count(*) from ( " + sql + ")";
+    String[] parts = splitCteHeader(sql);
+    sql = parts[0] + "select count(*) from ( " + parts[1] + ")";
     if (selectCountWithAlias) {
       sql += " as c";
     }
     return sql;
   }
 
-  private String wrapSelectExists(String sql) {
-    return "select exists(" + sql + ")";
+  static String wrapSelectExists(String sql, boolean existsWithCaseWhen, String existsFromClause) {
+    String[] parts = splitCteHeader(sql);
+    String header = parts[0];
+    String body = parts[1];
+    if (existsWithCaseWhen) {
+      return header + "select case when exists(" + body + ") then 1 else 0 end" + existsFromClause;
+    }
+    return header + "select exists(" + body + ")";
   }
 
   /**
@@ -356,7 +403,7 @@ final class CQueryBuilder {
     }
 
     SqlLimitResponse s = buildSql("select 1", request, predicates, sqlTree);
-    String sql = wrapSelectExists(s.getSql());
+    String sql = wrapSelectExists(s.getSql(), dbPlatform.existsWithCaseWhen(), dbPlatform.existsFromClause());
 
     queryPlan = new CQueryPlan(request, sql, sqlTree.plan(), predicates.logWhereSql());
     request.putQueryPlan(queryPlan);

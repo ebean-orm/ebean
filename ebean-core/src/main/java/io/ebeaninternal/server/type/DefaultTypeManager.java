@@ -267,7 +267,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   @Override
   public ScalarType<?> dbMapType() {
-    return hstoreSupport() ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR, false);
+    return hstoreSupport() ? hstoreType : ScalarTypeJsonMap.typeFor(false, Types.VARCHAR, MutationDetection.DEFAULT);
   }
 
   @Override
@@ -324,17 +324,17 @@ public final class DefaultTypeManager implements TypeManager {
     }
     Type genericType = prop.genericType();
     if (type.equals(List.class) && isValueTypeSimple(genericType)) {
-      return ScalarTypeJsonList.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), keepSource(prop));
+      return ScalarTypeJsonList.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), collectionMutationDetection(prop));
     }
     if (type.equals(Set.class) && isValueTypeSimple(genericType)) {
-      return ScalarTypeJsonSet.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), keepSource(prop));
+      return ScalarTypeJsonSet.typeFor(postgres, dbType, docType(genericType), prop.isNullable(), collectionMutationDetection(prop));
     }
     if (type.equals(Map.class) && isBuiltinJsonMap(genericType)) {
       Type keyType = TypeReflectHelper.getMapKeyTypeRaw(genericType);
       if (isEnumType(keyType)) {
-        return enumJsonMapType(postgres, dbType, keyType, keepSource(prop));
+        return enumJsonMapType(postgres, dbType, keyType, collectionMutationDetection(prop));
       }
-      return ScalarTypeJsonMap.typeFor(postgres, dbType, keepSource(prop));
+      return ScalarTypeJsonMap.typeFor(postgres, dbType, collectionMutationDetection(prop));
     }
     if (objectMapperPresent && prop.mutationDetection() == MutationDetection.DEFAULT) {
       ScalarTypeSet<?> typeSet = typeSets.get(type);
@@ -345,18 +345,25 @@ public final class DefaultTypeManager implements TypeManager {
     return createJsonObjectMapperType(prop, dbType, DocPropertyType.OBJECT);
   }
 
-  private boolean keepSource(DeployProperty prop) {
-    if (prop.mutationDetection() == MutationDetection.DEFAULT) {
-      prop.setMutationDetection(jsonManager != null ? jsonManager.mutationDetection() : MutationDetection.NONE);
-    }
-    return prop.mutationDetection() == MutationDetection.SOURCE;
+  /**
+   * Return the mutation detection mode to use for the built-in JSON collection types
+   * (Map, List, Set).
+   * <p>
+   * Unlike {@code @DbJson} properties handled via the Jackson ObjectMapper, {@code DEFAULT}
+   * on these collection types is <em>not</em> resolved against the DatabaseConfig wide
+   * default - it always uses the legacy ModifyAware wrapper based dirty checking. Only an
+   * explicit {@code NONE}, {@code HASH} or {@code SOURCE} on the property itself switches
+   * these types away from ModifyAware based checking.
+   */
+  private MutationDetection collectionMutationDetection(DeployProperty prop) {
+    return prop.mutationDetection();
   }
 
   @SuppressWarnings("unchecked")
-  private ScalarType<?> enumJsonMapType(boolean postgres, int dbType, Type keyType, boolean keepSource) {
+  private ScalarType<?> enumJsonMapType(boolean postgres, int dbType, Type keyType, MutationDetection mutationDetection) {
     Class<? extends Enum<?>> enumClass = asEnumClass(keyType);
     ScalarType<? extends Enum<?>> enumScalarType = (ScalarType<? extends Enum<?>>) enumType(enumClass, null);
-    return ScalarTypeJsonMapEnum.typeFor(postgres, dbType, enumScalarType, keepSource);
+    return ScalarTypeJsonMapEnum.typeFor(postgres, dbType, enumScalarType, mutationDetection);
   }
 
   private DocPropertyType docPropertyType(DeployProperty prop, Class<?> type) {

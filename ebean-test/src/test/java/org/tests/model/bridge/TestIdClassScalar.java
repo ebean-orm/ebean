@@ -219,4 +219,36 @@ class TestIdClassScalar extends BaseTestCase {
     DB.deleteAll(Arrays.asList(user, site));
   }
 
+  /**
+   * Test for #3275 - update/delete on a fresh bean instance that has not been read
+   * from the database or previously inserted via this same bean instance (e.g. built
+   * directly from external data) used to throw a NullPointerException as the IdClass
+   * id had not yet been derived/cached on the bean.
+   */
+  @Test
+  void update_freshBeanInstance_notPreviouslyLoaded() {
+    UUID siteId = UUID.randomUUID();
+    UUID userId = UUID.randomUUID();
+
+    BSiteUserD access = new BSiteUserD(BAccessLevel.ONE, siteId, userId);
+    DB.save(access);
+
+    // a fresh bean instance - never read from the db or saved via this instance
+    BSiteUserD freshUpdate = new BSiteUserD(BAccessLevel.TWO, siteId, userId);
+    freshUpdate.setVersion(access.getVersion());
+    DB.update(freshUpdate);
+
+    BEmbId id = new BEmbId(siteId, userId);
+    BSiteUserD found = DB.find(BSiteUserD.class, id);
+    assertThat(found).isNotNull();
+    assertThat(found.getAccessLevel()).isEqualTo(BAccessLevel.TWO);
+
+    // a fresh bean instance used for delete
+    BSiteUserD freshDelete = new BSiteUserD(BAccessLevel.TWO, siteId, userId);
+    freshDelete.setVersion(found.getVersion());
+    DB.delete(freshDelete);
+
+    assertThat(DB.find(BSiteUserD.class, id)).isNull();
+  }
+
 }

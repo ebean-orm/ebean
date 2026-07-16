@@ -60,9 +60,10 @@ public interface DatabaseBuilder {
   /**
    * Build and return the Database instance.
    * <p>
-   * When {@link #setRegister(boolean)} is set to true, and a database with the same
-   * name is already registered, this may return the existing registered database
-   * rather than creating a new one.
+   * When {@link #setRegister(boolean)} is set to true (the default), and a database
+   * with the same name is already registered, this throws an {@link IllegalStateException}.
+   * Use a unique name, or use {@link #setRegister(boolean)} with {@code false} if the
+   * Database instance is not intended to be registered/looked up by name.
    */
   Database build();
 

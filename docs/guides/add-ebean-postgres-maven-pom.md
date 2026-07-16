@@ -101,7 +101,7 @@ Inside the `<dependencies>` block, add the PostgreSQL JDBC driver:
 <dependency>
     <groupId>org.postgresql</groupId>
     <artifactId>postgresql</artifactId>
-    <version>42.7.8</version>
+    <version>42.7.11</version>
 </dependency>
 ```
 

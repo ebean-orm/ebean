@@ -33,6 +33,13 @@ import static java.lang.System.Logger.Level.WARNING;
  */
 public final class CQueryPredicates {
 
+  /**
+   * Default lower bound used for findVersions() (no explicit start/end) on sql2011
+   * standards based platforms that require actual bind values for the root table's
+   * 'for system_time between ? and ?' clause.
+   */
+  private static final Timestamp EPOCH = Timestamp.valueOf("1970-01-01 00:00:00");
+
   private final Binder binder;
   private final OrmQueryRequest<?> request;
   private final SpiQuery<?> query;
@@ -61,10 +68,21 @@ public final class CQueryPredicates {
   private String dbDistinctOn;
   private String dbUpdateClause;
   /**
+   * Set when the many join is a ManyToMany with an intersection table order column - used to
+   * resolve the literal "${path}dbColumn" marker appended to dbOrderBy in parseTableAlias().
+   */
+  private String intersectionOrderPath;
+  private String intersectionOrderColumn;
+  /**
    * Includes from where and order by clauses.
    */
   private Set<String> predicateIncludes;
   private Set<String> orderByIncludes;
+  /**
+   * The fetch path (relative to the query root) of the many-root whose own join clause the
+   * filterMany-in-JOIN predicate is attached to
+   */
+  private String filterManyAttachPath;
 
   CQueryPredicates(Binder binder, OrmQueryRequest<?> request) {
     this.binder = binder;
@@ -84,10 +102,16 @@ public final class CQueryPredicates {
       // bind the update set clause
       updateProperties.bind(binder, dataBind);
     }
-    if (query.isVersionsBetween() && binder.isAsOfStandardsBased()) {
+    if (binder.isAsOfStandardsBased() && query.temporalMode() == SpiQuery.TemporalMode.VERSIONS) {
       // sql2011 based versions between timestamp syntax
       Timestamp start = query.versionStart();
       Timestamp end = query.versionEnd();
+      if (start == null) {
+        start = EPOCH;
+      }
+      if (end == null) {
+        end = new Timestamp(System.currentTimeMillis());
+      }
       dataBind.append("between ").append(start).append(" and ").append(end);
       binder.bindObject(dataBind, start);
       binder.bindObject(dataBind, end);
@@ -203,6 +227,8 @@ public final class CQueryPredicates {
           filterMany = new DefaultExpressionRequest(request, deployParser, binder, filterManyExpr);
           if (buildSql) {
             dbFilterMany = filterMany.buildSql();
+            // safe as filterManyJoin only holds when the expression is root-property only -
+            filterManyAttachPath = manyProperty.path();
           }
         }
       }
@@ -239,6 +265,14 @@ public final class CQueryPredicates {
       dbHaving = alias.parseWhere(dbHaving);
     }
     if (dbOrderBy != null) {
+      if (intersectionOrderColumn != null) {
+        // resolve the ManyToMany intersection table order column BEFORE the generic
+        // alias substitution runs, as it needs the "z_" suffixed intersection alias
+        // rather than the plain target table alias.
+        String marker = "${" + intersectionOrderPath + "}" + intersectionOrderColumn;
+        String targetAlias = alias.tableAlias(intersectionOrderPath);
+        dbOrderBy = dbOrderBy.replace(marker, targetAlias + "z_." + intersectionOrderColumn);
+      }
       dbOrderBy = alias.parse(dbOrderBy);
     }
     if (dbDistinctOn != null) {
@@ -268,9 +302,18 @@ public final class CQueryPredicates {
     }
     // check for default ordering on the many property...
     SpiQueryManyJoin manyProp = request.manyJoin();
-    String manyOrderBy = manyProp.fetchOrderBy();
-    if (manyOrderBy != null) {
-      orderBy = orderBy + ", " + parser.parse(CQueryBuilder.prefixOrderByFields(manyProp.path(), manyOrderBy));
+    if (manyProp.hasIntersectionOrderColumn()) {
+      // ManyToMany with @OrderColumn on the intersection table - the column lives on the
+      // intersection table (alias "<targetAlias>z_") rather than a normal property path,
+      // so we append a literal marker that parseTableAlias() resolves directly.
+      intersectionOrderPath = manyProp.path();
+      intersectionOrderColumn = manyProp.intersectionOrderColumn();
+      orderBy = orderBy + ", ${" + intersectionOrderPath + "}" + intersectionOrderColumn;
+    } else {
+      String manyOrderBy = manyProp.fetchOrderBy();
+      if (manyOrderBy != null) {
+        orderBy = orderBy + ", " + parser.parse(CQueryBuilder.prefixOrderByFields(manyProp.path(), manyOrderBy));
+      }
     }
     if (request.isFindById()) {
       // only one master bean so should be fine...
@@ -361,6 +404,14 @@ public final class CQueryPredicates {
    */
   String dbFilterManyJoin() {
     return filterManyJoin ? dbFilterMany : null;
+  }
+
+  /**
+   * Return the fetch path of the filterMany-in-JOIN predicate - the path whose own join clause
+   * the predicate must be appended to (or null if there is no filterMany-in-JOIN predicate at all).
+   */
+  String filterManyAttachPath() {
+    return filterManyJoin ? filterManyAttachPath : null;
   }
 
   /**

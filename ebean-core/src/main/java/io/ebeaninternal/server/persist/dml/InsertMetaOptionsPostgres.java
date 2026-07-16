@@ -4,11 +4,9 @@ import io.ebean.InsertOptions;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * Postgres specific generation of insert on conflict.
@@ -18,12 +16,14 @@ final class InsertMetaOptionsPostgres implements InsertMetaOptions {
   private final InsertMeta meta;
   private final BeanDescriptor<?> desc;
   private final String baseTable;
+  private final List<String> nonUpdatableColumns;
   private final Map<String, String> sqlCache = new ConcurrentHashMap<>();
 
   InsertMetaOptionsPostgres(InsertMeta meta, BeanDescriptor<?> desc) {
     this.meta = meta;
     this.desc = desc;
     this.baseTable = desc.baseTable();
+    this.nonUpdatableColumns = InsertMetaOptionsSupport.nonUpdatableColumns(desc);
   }
 
   @Override
@@ -49,10 +49,7 @@ final class InsertMetaOptionsPostgres implements InsertMetaOptions {
     meta.sql(request, !withId, baseTable);
     request.append(" on conflict ");
 
-    List<String> uniqueColumns = desc.uniqueProps().stream()
-      .flatMap(Arrays::stream)
-      .map(BeanProperty::dbColumn)
-      .collect(Collectors.toList());
+    List<String> uniqueColumns = InsertMetaOptionsSupport.uniqueColumns(desc, withId);
 
     String constraintName = options.constraint();
     if (constraintName != null) {
@@ -84,6 +81,7 @@ final class InsertMetaOptionsPostgres implements InsertMetaOptions {
   private void setColumns(boolean withId, GenerateDmlRequest request, List<String> uniqueColumns) {
     List<String> columns = request.columns();
     columns.removeAll(uniqueColumns);
+    columns.removeAll(nonUpdatableColumns);
     if (withId) {
       BeanProperty idProperty = desc.idProperty();
       if (idProperty != null && !idProperty.isEmbedded()) {

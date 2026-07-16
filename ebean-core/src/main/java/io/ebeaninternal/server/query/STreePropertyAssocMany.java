@@ -44,6 +44,16 @@ public interface STreePropertyAssocMany extends STreePropertyAssoc {
   boolean hasJoinTable();
 
   /**
+   * Return true if this is a ManyToMany with an order column stored on the intersection table.
+   */
+  boolean hasIntersectionOrderColumn();
+
+  /**
+   * Return the db column name of the ManyToMany intersection table order column (or null).
+   */
+  String intersectionOrderColumn();
+
+  /**
    * Return the intersection table join.
    */
   TableJoin intersectionTableJoin();

@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * List of Expressions that make up a where or having clause.
@@ -96,6 +97,29 @@ public interface ExpressionList<T> {
    * and map it into DTO beans.
    */
   <D> DtoQuery<D> asDto(Class<D> dtoClass);
+
+  /**
+   * Map the query result to a nested DTO graph, automatically deriving the select()/fetch() spec
+   * from the target DTO's declared shape and forcing {@code setUnmodifiable(true)}.
+   * <p>
+   * Distinct from {@link #asDto(Class)} (the flat, single-row SQL pipeline) - this supports
+   * nested ToOne/ToMany DTO graphs, mapped from the normal ORM entity query result.
+   *
+   * @throws jakarta.persistence.PersistenceException if no generated {@link DtoMapper} is
+   *     registered for this (entity, dto) pair.
+   */
+  <D> MappedQuery<D> mapTo(Class<D> dtoType);
+
+  /**
+   * Map the query result to a nested DTO graph using an already-resolved {@link DtoMapper}
+   * instance, rather than looking one up by (entity, dtoType) - e.g. to select a named variant
+   * mapper (see {@code @DtoMapping(name = "...", exclude = "...")}), such as
+   * {@code query.mapTo(User.class, userMapper.noFleets())}.
+   *
+   * @param dtoType the DTO type mapped to (must match {@code mapper}'s target type)
+   * @param mapper the mapper instance to use, e.g. a named variant accessor on a generated mapper
+   */
+  <D> MappedQuery<D> mapTo(Class<D> dtoType, DtoMapper<T, D> mapper);
 
   /**
    * Return the underlying query as an UpdateQuery.
@@ -391,6 +415,26 @@ public interface ExpressionList<T> {
    * Execute the query returning an optional bean.
    */
   Optional<T> findOneOrEmpty();
+
+  /**
+   * Execute the query returning a single bean or throwing a {@link jakarta.persistence.EntityNotFoundException}
+   * if there is no matching bean.
+   *
+   * @see Query#findOneOrThrow()
+   */
+  default T findOneOrThrow() {
+    return query().findOneOrThrow();
+  }
+
+  /**
+   * Execute the query returning a single bean or throwing the exception produced by the
+   * given supplier if there is no matching bean.
+   *
+   * @see Query#findOneOrThrow(Supplier)
+   */
+  default T findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
+    return query().findOneOrThrow(exceptionSupplier);
+  }
 
   /**
    * Execute find row count query in a background thread.

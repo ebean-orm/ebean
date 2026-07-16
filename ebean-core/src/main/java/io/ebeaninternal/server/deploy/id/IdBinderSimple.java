@@ -234,6 +234,10 @@ public final class IdBinderSimple implements IdBinder {
   @Override
   public Object convertId(Object idValue) {
     if (!idValue.getClass().equals(expectedType)) {
+      if (idValue instanceof String) {
+        // for cacheKey() formatted values
+        return scalarType.parse((String) idValue);
+      }
       return scalarType.toBeanType(idValue);
     }
     return idValue;

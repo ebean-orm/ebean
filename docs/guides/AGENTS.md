@@ -14,6 +14,7 @@ Key guides (fetch and follow when performing the relevant task):
 - Migrate to `Database.builder()`: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-to-database-builder.md
 - Migrate JSON APIs from Jackson core to avaje-json-core: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/migrating-json-jackson-core-to-avaje-json-core.md
 - Write queries with query beans: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/writing-ebean-query-beans.md
+- Mapping entity graphs to DTOs (`mapTo`): https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/mapping-entity-graphs-to-dtos.md
 - Derived / formula properties (`@Formula`, `@Formula2`): https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/derived-formula-properties.md
 - Persisting and transactions: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/persisting-and-transactions-with-ebean.md
 - Query metrics and naming: https://raw.githubusercontent.com/ebean-orm/ebean/HEAD/docs/guides/ebean-query-metrics.md

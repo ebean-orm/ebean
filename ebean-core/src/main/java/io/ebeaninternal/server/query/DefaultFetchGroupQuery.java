@@ -145,6 +145,16 @@ final class DefaultFetchGroupQuery<T> implements SpiFetchGroupQuery<T>, SpiQuery
   }
 
   @Override
+  public <D> MappedQuery<D> mapTo(Class<D> dtoType) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
+  public <D> MappedQuery<D> mapTo(Class<D> dtoType, DtoMapper<T, D> mapper) {
+    throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
+  }
+
+  @Override
   public UpdateQuery<T> asUpdate() {
     throw new RuntimeException("EB102: Only select() and fetch() clause is allowed on FetchGroup");
   }

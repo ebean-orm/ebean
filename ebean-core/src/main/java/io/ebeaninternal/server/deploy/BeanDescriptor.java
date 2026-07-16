@@ -39,6 +39,8 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanDescriptor;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyLists;
 import io.ebeaninternal.server.el.*;
 import io.ebeaninternal.server.persist.DeleteMode;
+import io.ebeaninternal.server.persist.MultiValueWrapper;
+import io.ebeaninternal.server.type.ScalarTypeArray;
 import io.ebeaninternal.server.query.*;
 import io.ebeaninternal.server.querydefn.DefaultOrmQuery;
 import io.ebeaninternal.server.querydefn.OrmQueryDetail;
@@ -682,7 +684,16 @@ public class BeanDescriptor<T> implements BeanType<T>, STreeType, SpiBeanType {
   public void bindElementValue(SqlUpdate insert, Object value) {
     EntityBean bean = (EntityBean) value;
     for (BeanProperty property : propertiesBaseScalar) {
-      insert.setParameter(property.getValue(bean));
+      Object propertyValue = property.getValue(bean);
+      if (property.isArrayType() && propertyValue instanceof Collection) {
+        // Bind with the declared element type rather than relying on MultiValueWrapper's default
+        // constructor which infers the element type from the first value - this fails with a
+        // NoSuchElementException for an empty collection. See #2477.
+        Class<?> elementType = ((ScalarTypeArray) property.scalarType()).elementType();
+        insert.setParameter(new MultiValueWrapper((Collection<?>) propertyValue, elementType));
+      } else {
+        insert.setParameter(propertyValue);
+      }
     }
   }
 

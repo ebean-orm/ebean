@@ -776,8 +776,18 @@ public final class BeanDescriptorManager implements BeanDescriptorMap, SpiBeanTy
   }
 
   private void makeOrderColumn(DeployBeanPropertyAssocMany<?> oneToMany) {
-    DeployBeanDescriptor<?> targetDesc = targetDescriptor(oneToMany);
-    DeployOrderColumn orderColumn = oneToMany.getOrderColumn();
+    makeOrderColumn(oneToMany, targetDescriptor(oneToMany));
+  }
+
+  /**
+   * Create and assign the synthetic order column property onto the given target descriptor.
+   * <p>
+   * Used for both {@code @OneToMany} (targetDesc looked up via the target entity type) and
+   * {@code @ElementCollection} (targetDesc is the synthetic element descriptor which is not
+   * registered in {@code deployInfoMap} and so must be passed in directly).
+   */
+  public void makeOrderColumn(DeployBeanPropertyAssocMany<?> many, DeployBeanDescriptor<?> targetDesc) {
+    DeployOrderColumn orderColumn = many.getOrderColumn();
     final ScalarType<?> scalarType = typeManager.type(Integer.class);
     DeployBeanProperty orderProperty = new DeployBeanProperty(targetDesc, Integer.class, scalarType, null);
     orderProperty.setName(DeployOrderColumn.LOGICAL_NAME);

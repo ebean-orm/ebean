@@ -93,7 +93,7 @@
         <addColumn tableName="migtest_e_softdelete">
             <column name="deleted" type="boolean" defaultValue="false" notnull="true"/>
         </addColumn>
-        <alterColumn columnName="&quot;index&quot;" tableName="&quot;table&quot;" withHistory="true" comment="this is an other comment"/>
+        <alterColumn columnName="&quot;index&quot;" tableName="&quot;table&quot;" withHistory="true" currentType="varchar" currentNotnull="false" comment="this is an other comment" currentComment="this is a comment"/>
         <alterColumn columnName="textfield" tableName="&quot;table&quot;" withHistory="true" currentType="varchar" notnull="false" currentNotnull="true"/>
         <addColumn tableName="&quot;table&quot;" withHistory="true">
             <column name="&quot;select&quot;" type="varchar"/>

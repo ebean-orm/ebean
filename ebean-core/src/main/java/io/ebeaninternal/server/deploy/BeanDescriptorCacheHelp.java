@@ -372,14 +372,15 @@ abstract class BeanDescriptorCacheHelp<T> {
    * Hit the bean cache with the given ids returning the hits.
    */
   BeanCacheResult<T> cacheIdLookup(PersistenceContext context, boolean unmodifiable, Collection<?> ids) {
-    Set<Object> keys = new HashSet<>(ids.size());
-    for (Object id : ids) {
-      keys.add(desc.cacheKey(id));
-    }
     if (ids.isEmpty()) {
       return new BeanCacheResult<>();
     }
-    Map<Object, Object> beanDataMap = beanCache().getAll(keys);
+    // map cacheKey -> original id to support type coercion
+    Map<Object, Object> keyToOriginalId = new HashMap<>(ids.size());
+    for (Object id : ids) {
+      keyToOriginalId.put(desc.cacheKey(id), id);
+    }
+    Map<Object, Object> beanDataMap = beanCache().getAll(keyToOriginalId.keySet());
     if (beanLog.isLoggable(TRACE)) {
       beanLog.log(TRACE, "   MGET {0}({1}) - hits:{2}", cacheName, ids, beanDataMap.keySet());
     }
@@ -387,7 +388,8 @@ abstract class BeanDescriptorCacheHelp<T> {
     for (Map.Entry<Object, Object> entry : beanDataMap.entrySet()) {
       CachedBeanData cachedBeanData = (CachedBeanData) entry.getValue();
       T bean = convertToBean(entry.getKey(), unmodifiable, context, cachedBeanData);
-      result.add(bean, desc.id(bean));
+      Object originalId = keyToOriginalId.get(entry.getKey());
+      result.add(bean, originalId != null ? originalId : desc.id(bean));
     }
     return result;
   }

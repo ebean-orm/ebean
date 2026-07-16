@@ -457,6 +457,10 @@ public final class DB {
 
   /**
    * Same as {@link #checkUniqueness(Object)} but with given transaction.
+   * <p>
+   * For control over query cache use and whether to skip the check when the bean's unique
+   * properties are unchanged, use {@link Database#checkUniqueness(Object, Transaction, boolean, boolean)}
+   * via {@link #getDefault()} instead.
    */
   public static Set<Property> checkUniqueness(Object bean, Transaction transaction) {
     return getDefault().checkUniqueness(bean, transaction);

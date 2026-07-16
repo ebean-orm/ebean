@@ -417,6 +417,11 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
+  public <S, D> DtoMapper<S, D> dtoMapper(Class<S> sourceType, Class<D> dtoType) {
+    return null;
+  }
+
+  @Override
   public SpiResultSet findResultSet(SpiQuery<?> ormQuery) {
     return null;
   }
@@ -884,12 +889,7 @@ public class TDSpiEbeanServer extends TDSpiServer implements SpiEbeanServer {
   }
 
   @Override
-  public Set<Property> checkUniqueness(Object bean) {
-    return Collections.emptySet();
-  }
-
-  @Override
-  public Set<Property> checkUniqueness(Object bean, Transaction transaction) {
+  public Set<Property> checkUniqueness(Object bean, Transaction transaction, boolean useQueryCache, boolean skipClean) {
     return Collections.emptySet();
   }
 

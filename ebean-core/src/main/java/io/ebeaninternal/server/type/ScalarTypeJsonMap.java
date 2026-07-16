@@ -2,6 +2,7 @@ package io.ebeaninternal.server.type;
 
 import io.avaje.json.JsonReader;
 import io.avaje.json.JsonWriter;
+import io.ebean.annotation.MutationDetection;
 import io.ebean.config.dbplatform.DbPlatformType;
 import io.ebean.core.type.DocPropertyType;
 import io.ebean.core.type.PostgresHelper;
@@ -22,8 +23,8 @@ class ScalarTypeJsonMap extends ScalarTypeJsonValue<Map> {
   /**
    * Return the ScalarType for the requested dbType and platform.
    */
-  static ScalarTypeJsonMap typeFor(boolean postgres, int dbType, boolean keepSource) {
-    return new ScalarTypeJsonMap(storageFor(postgres, dbType), keepSource);
+  static ScalarTypeJsonMap typeFor(boolean postgres, int dbType, MutationDetection mutationDetection) {
+    return new ScalarTypeJsonMap(storageFor(postgres, dbType), mutationDetection);
   }
 
   /**
@@ -47,8 +48,8 @@ class ScalarTypeJsonMap extends ScalarTypeJsonValue<Map> {
     }
   }
 
-  ScalarTypeJsonMap(JsonStorage storage, boolean keepSource) {
-    super(Map.class, storage.jdbcType(), storage, keepSource, true, null, DocPropertyType.OBJECT);
+  ScalarTypeJsonMap(JsonStorage storage, MutationDetection mutationDetection) {
+    super(Map.class, storage.jdbcType(), storage, mutationDetection, true, null, DocPropertyType.OBJECT);
   }
 
   @Override

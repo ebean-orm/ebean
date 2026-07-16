@@ -147,6 +147,16 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
   }
 
   @Override
+  public <D> MappedQuery<D> mapTo(Class<D> dtoType) {
+    return query.mapTo(dtoType);
+  }
+
+  @Override
+  public <D> MappedQuery<D> mapTo(Class<D> dtoType, DtoMapper<T, D> mapper) {
+    return query.mapTo(dtoType, mapper);
+  }
+
+  @Override
   public UpdateQuery<T> asUpdate() {
     return query.asUpdate();
   }
@@ -1090,6 +1100,24 @@ public class DefaultExpressionList<T> implements SpiExpressionList<T> {
     }
     if (list.size() == 1) {
       return list.get(0).getIdEqualTo(idName);
+    }
+    return null;
+  }
+
+  /**
+   * Return a "propertyName: value" description when this expression list is a single
+   * simple equality predicate (a candidate natural/unique key), otherwise null.
+   * <p>
+   * Used to build a decent default message for {@code findOneOrThrow()} when the query
+   * isn't a simple find-by-id.
+   */
+  @Nullable
+  public String singleEqDescription() {
+    if (list.size() == 1 && list.get(0) instanceof SimpleExpression) {
+      SimpleExpression simple = (SimpleExpression) list.get(0);
+      if (simple.isOpEquals()) {
+        return simple.getPropName() + ": " + simple.getValue();
+      }
     }
     return null;
   }

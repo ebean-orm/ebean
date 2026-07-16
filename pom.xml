@@ -9,7 +9,7 @@
 
   <groupId>io.ebean</groupId>
   <artifactId>ebean-parent</artifactId>
-  <version>18.2.0</version>
+  <version>18.3.0</version>
   <packaging>pom</packaging>
 
   <name>ebean parent</name>
@@ -45,14 +45,14 @@
     <ebean-persistence-api.version>3.2</ebean-persistence-api.version>
     <ebean-types.version>3.0</ebean-types.version>
 
-    <ebean-annotation.version>8.5</ebean-annotation.version>
+    <ebean-annotation.version>8.11</ebean-annotation.version>
     <ebean-ddl-runner.version>2.3</ebean-ddl-runner.version>
     <ebean-migration-auto.version>1.2</ebean-migration-auto.version>
     <ebean-migration.version>14.3.0</ebean-migration.version>
     <ebean-test-containers.version>8.2</ebean-test-containers.version>
     <ebean-datasource.version>10.10</ebean-datasource.version>
-    <ebean-agent.version>18.1.0</ebean-agent.version>
-    <ebean-maven-plugin.version>18.1.0</ebean-maven-plugin.version>
+    <ebean-agent.version>18.3.0</ebean-agent.version>
+    <ebean-maven-plugin.version>18.3.0</ebean-maven-plugin.version>
     <surefire.useModulePath>false</surefire.useModulePath>
   </properties>
 
@@ -94,6 +94,7 @@
     <module>ebean-net-postgis-types</module>
     <module>ebean-pgvector-types</module>
     <module>ebean-redis</module>
+    <module>ebean-redisson</module>
     <module>platforms</module>
     <module>composites</module>
     <module>ebean-jackson-mapper</module>

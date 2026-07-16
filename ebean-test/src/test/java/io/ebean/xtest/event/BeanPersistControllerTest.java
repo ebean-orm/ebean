@@ -9,6 +9,9 @@ import io.ebean.event.BeanPersistRequest;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.tests.model.m2m.MnyA;
+import org.tests.model.m2m.MnyB;
+import org.tests.model.m2m.MnyC;
 import org.tests.model.m2m.MnyTopic;
 import org.tests.model.basic.EBasicVer;
 import org.tests.model.basic.UTDetail;
@@ -164,6 +167,56 @@ public class BeanPersistControllerTest {
     assertThat(continuePersistingAdapter.methodsCalled).containsExactly("preUpdate", "postUpdate");
 
     db.shutdown();
+  }
+
+  @Test
+  public void preDelete_seesManyToManyCollection_beforeCascadeDelete() {
+    List<List<MnyC>> capturedCs = new ArrayList<>();
+    BeanPersistAdapter mnyBAdapter = new BeanPersistAdapter() {
+      @Override
+      public boolean isRegisterFor(Class<?> cls) {
+        return MnyB.class.isAssignableFrom(cls);
+      }
+
+      @Override
+      public boolean preDelete(BeanPersistRequest<?> request) {
+        // the M2M collection should still be intact here, before the
+        // intersection table rows are cascade deleted
+        capturedCs.add(new ArrayList<>(((MnyB) request.bean()).getCs()));
+        return true;
+      }
+    };
+
+    DatabaseBuilder config = Database.builder();
+    config.setName("h2ebasicver");
+    config.setRegister(false);
+    config.setDefaultServer(false);
+    config.loadFromProperties();
+    config.setDdlGenerate(true);
+    config.setDdlRun(true);
+    config.setDdlExtra(false);
+    config.addClass(MnyA.class);
+    config.addClass(MnyB.class);
+    config.addClass(MnyC.class);
+    config.add(mnyBAdapter);
+    Database db = config.build();
+
+    try {
+      MnyB mnyB = new MnyB();
+      MnyC mnyC = new MnyC();
+      mnyB.setCs(new ArrayList<>());
+      mnyB.getCs().add(mnyC);
+      db.save(mnyC);
+      db.save(mnyB);
+
+      MnyB mnyBFromDB = db.find(MnyB.class, mnyB.getId());
+      db.delete(mnyBFromDB);
+
+      assertThat(capturedCs).hasSize(1);
+      assertThat(capturedCs.get(0)).extracting("id").containsExactly(mnyC.getId());
+    } finally {
+      db.shutdown();
+    }
   }
 
   private Database createDatabase(PersistAdapter persistAdapter) {

@@ -9,7 +9,10 @@ import io.ebean.util.SplitName;
 import io.ebeaninternal.api.SpiExpression;
 import io.ebeaninternal.api.SpiExpressionFactory;
 import io.ebeaninternal.api.SpiExpressionList;
+import io.ebeaninternal.api.SpiExpressionValidation;
 import io.ebeaninternal.api.SpiQuery;
+import io.ebeaninternal.server.deploy.BeanDescriptor;
+import io.ebeaninternal.server.el.ElPropertyValue;
 import io.ebeaninternal.server.expression.FilterExprPath;
 import io.ebeaninternal.server.expression.FilterExpressionList;
 
@@ -148,6 +151,22 @@ public final class OrmQueryProperties implements Serializable {
       : buildImmutableQueryPlanHashSuffix(sourceFetchConfig);
   }
 
+  /**
+   * Copy constructor with a replacement included set (used by {@link #withAddedInclude(String)}).
+   */
+  private OrmQueryProperties(OrmQueryProperties source, Set<String> replacementIncluded) {
+    this.fetchConfig = source.fetchConfig;
+    this.parentPath = source.parentPath;
+    this.path = source.path;
+    this.allProperties = source.allProperties;
+    this.cache = source.cache;
+    this.filterMany = source.filterMany;
+    this.markForQueryJoin = source.markForQueryJoin;
+    this.included = immutableIncluded(replacementIncluded);
+    this.immutableHashPrefix = buildImmutableQueryPlanHashPrefix(path, this.included);
+    this.immutableHashSuffix = source.immutableHashSuffix;
+  }
+
   private static Set<String> immutableIncluded(Set<String> included) {
     if (included == null) {
       return null;
@@ -232,6 +251,26 @@ public final class OrmQueryProperties implements Serializable {
    */
   public boolean isFilterManyJoin() {
     return filterMany != null && !markForQueryJoin;
+  }
+
+  /**
+   * Return true if the filterMany expression (if any) references a property that requires
+   * crossing into an associated bean/join - e.g. {@code "group.name"} - rather than only
+   * plain/embedded properties resolving to columns on the many bean's own base table.
+   */
+  boolean filterManyHasNestedProperty(BeanDescriptor<?> targetDescriptor) {
+    if (filterMany == null) {
+      return false;
+    }
+    SpiExpressionValidation validation = new SpiExpressionValidation(targetDescriptor);
+    filterMany.validate(validation);
+    for (String property : validation.allProperties()) {
+      ElPropertyValue elProp = targetDescriptor.elGetValue(property);
+      if (elProp != null && elProp.isAssocProperty()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   /**
@@ -387,6 +426,37 @@ public final class OrmQueryProperties implements Serializable {
       return false;
     }
     return included == null || included.contains(propName);
+  }
+
+  /**
+   * Return true if the included properties are exactly the single given property.
+   * <p>
+   * Used to detect a fetch/select of a *ToOne association that only includes the
+   * target's id property - a candidate for folding into the parent select as a plain
+   * foreign key property (avoiding an unnecessary join).
+   */
+  boolean includesExactly(String property) {
+    return included != null && included.size() == 1 && included.contains(property);
+  }
+
+  /**
+   * Return a new instance with the given property added to the included set.
+   * <p>
+   * Used to fold an id-only *ToOne fetch into this select as a plain foreign key
+   * property. A new instance is returned (rather than mutating {@link #included} in
+   * place) as this instance's included set is immutable and may be shared/cached
+   * (e.g. via FetchGroup reuse).
+   */
+  OrmQueryProperties withAddedInclude(String property) {
+    if (allProperties) {
+      return this;
+    }
+    Set<String> newIncluded = new LinkedHashSet<>();
+    if (included != null) {
+      newIncluded.addAll(included);
+    }
+    newIncluded.add(property);
+    return new OrmQueryProperties(this, newIncluded);
   }
 
   /**

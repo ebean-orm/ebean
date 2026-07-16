@@ -118,6 +118,88 @@ class CQueryBuilderTest {
   }
 
   @Test
+  void topLevelSelectStart_noLeadingCte_returnsZero() {
+    String sql = "select 1 from o_order t0 where t0.id > ?";
+    assertThat(CQueryBuilder.topLevelSelectStart(sql)).isEqualTo(0);
+  }
+
+  @Test
+  void topLevelSelectStart_leadingCte_findsOuterSelect() {
+    // The only depth-0 "select" is the outer query - the CTE body's "select" is nested in parens.
+    String sql = "with order_totals as (" +
+      "  select o.id as order_id," +
+      "         sum(d.order_qty * d.unit_price) as total_amount" +
+      "  from o_order o" +
+      "  join o_order_detail d on d.order_id = o.id" +
+      "  group by o.id" +
+      ")" +
+      " select order_id, total_amount" +
+      " from order_totals" +
+      " where total_amount > ?";
+
+    int pos = CQueryBuilder.topLevelSelectStart(sql);
+    assertThat(sql.substring(pos)).startsWith("select order_id, total_amount");
+  }
+
+  /**
+   * SQL Server does not support a WITH clause (CTE) nested inside a subquery/derived table - see
+   * https://github.com/ebean-orm/ebean/issues/3848 (findCount() wraps raw sql in "select count(*)
+   * from ( ... )" which breaks when the raw sql is a CTE). The CTE header must be hoisted in front
+   * of the wrapping SELECT.
+   */
+  @Test
+  void splitCteHeader_hoistsLeadingWithClause() {
+    String sql = "with order_totals as (" +
+      "  select o.id as order_id," +
+      "         sum(d.order_qty * d.unit_price) as total_amount" +
+      "  from o_order o" +
+      "  join o_order_detail d on d.order_id = o.id" +
+      "  group by o.id" +
+      ")" +
+      " select order_id, total_amount" +
+      " from order_totals" +
+      " where total_amount > ?";
+
+    String[] parts = CQueryBuilder.splitCteHeader(sql);
+    assertThat(parts[0] + parts[1]).isEqualTo(sql);
+    assertThat(parts[0]).startsWith("with order_totals as (").endsWith(") ");
+    assertThat(parts[1]).isEqualTo("select order_id, total_amount from order_totals where total_amount > ?");
+  }
+
+  @Test
+  void splitCteHeader_noCte_returnsEmptyHeader() {
+    String sql = "select 1 from o_order t0 where t0.id > ?";
+    String[] parts = CQueryBuilder.splitCteHeader(sql);
+    assertThat(parts[0]).isEmpty();
+    assertThat(parts[1]).isEqualTo(sql);
+  }
+
+  @Test
+  void wrapSelectExists_default_usesScalarExists() {
+    String sql = CQueryBuilder.wrapSelectExists("select 1 from o_order t0 where t0.id > ?", false, "");
+    assertThat(sql).isEqualTo("select exists(select 1 from o_order t0 where t0.id > ?)");
+  }
+
+  /**
+   * SQL Server does not support exists(...) as a directly selectable scalar
+   * boolean expression - see https://github.com/ebean-orm/ebean/issues/3848
+   */
+  @Test
+  void wrapSelectExists_existsWithCaseWhen_wrapsAsCaseWhen() {
+    String sql = CQueryBuilder.wrapSelectExists("select 1 from o_order t0 where t0.id > ?", true, "");
+    assertThat(sql).isEqualTo("select case when exists(select 1 from o_order t0 where t0.id > ?) then 1 else 0 end");
+  }
+
+  /**
+   * Oracle also requires a FROM clause on every select (from dual) - see https://github.com/ebean-orm/ebean/issues/3848
+   */
+  @Test
+  void wrapSelectExists_existsWithCaseWhenAndFromClause_appendsFromClause() {
+    String sql = CQueryBuilder.wrapSelectExists("select 1 from o_order t0 where t0.id > ?", true, " from dual");
+    assertThat(sql).isEqualTo("select case when exists(select 1 from o_order t0 where t0.id > ?) then 1 else 0 end from dual");
+  }
+
+  @Test
   void inlineSqlCommentLabel_rootExplicitLabel_prefixesBeanType() {
     String label = CQueryBuilder.inlineSqlCommentLabel("fetchMachineFleets", null, false, "COrganisationMachine");
     assertThat(label).isEqualTo("COrganisationMachine.fetchMachineFleets");

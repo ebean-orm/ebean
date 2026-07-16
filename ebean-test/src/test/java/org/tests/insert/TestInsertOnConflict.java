@@ -45,6 +45,34 @@ class TestInsertOnConflict extends BaseTestCase {
 
   @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
+  void insertOnConflictUpdate_fallsBackToPrimaryKey_whenNoUniqueColumnsMapped() {
+    Database db = DB.getDefault();
+    LoggedSql.start();
+
+    var entity1 = new EStrIdBean();
+    entity1.setId("fallback-1");
+    entity1.setName("Example");
+    // no uniqueColumns()/constraint() explicitly set - id is not mapped @Column(unique=true)
+    // or @Index(unique=true) so this should fall back to using the primary key (id) column
+    db.insert(entity1, ON_CONFLICT_UPDATE);
+
+    var entity2 = new EStrIdBean();
+    entity2.setId("fallback-1");
+    entity2.setName("Updated");
+    db.insert(entity2, ON_CONFLICT_UPDATE);
+
+    var sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("on conflict (id) do update set");
+    assertThat(sql.get(1)).contains("on conflict (id) do update set");
+
+    EStrIdBean found = db.find(EStrIdBean.class, "fallback-1");
+    assertThat(found).isNotNull();
+    assertThat(found.name()).isEqualTo("Updated");
+  }
+
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
+  @Test
   void insertOnConflictUpdateExplicitTransaction() {
     Database db = DB.getDefault();
     db.truncate(EPersonOnline.class);
@@ -305,6 +333,35 @@ class TestInsertOnConflict extends BaseTestCase {
 
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getWhenUpdated()).isEqualTo(bean.getWhenUpdated());
+  }
+
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
+  @Test
+  void insertOnConflictUpdate_excludesWhenCreatedFromUpdateSet() {
+    Database db = DB.getDefault();
+    db.truncate(EConflictWithCreated.class);
+    LoggedSql.start();
+
+    var bean = new EConflictWithCreated();
+    bean.setCode("abc");
+    db.insert(bean, ON_CONFLICT_UPDATE);
+
+    var bean2 = new EConflictWithCreated();
+    bean2.setCode("abc");
+    db.insert(bean2, ON_CONFLICT_UPDATE);
+
+    var sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    // when_created is not included in the "do update set" clause - it is insert only
+    assertThat(sql.get(0)).contains("on conflict (code) do update set when_updated=excluded.when_updated");
+    assertThat(sql.get(0)).doesNotContain("when_created=excluded.when_created");
+    assertThat(sql.get(1)).contains("on conflict (code) do update set when_updated=excluded.when_updated");
+    assertThat(sql.get(1)).doesNotContain("when_created=excluded.when_created");
+
+    List<EConflictWithCreated> list = db.find(EConflictWithCreated.class).findList();
+    assertThat(list).hasSize(1);
+    // original whenCreated value is preserved rather than being overwritten by the 2nd insert
+    assertThat(list.get(0).getWhenCreated()).isEqualTo(bean.getWhenCreated());
   }
 
   @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE})

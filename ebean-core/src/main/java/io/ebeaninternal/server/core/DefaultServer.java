@@ -85,6 +85,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   private final DtoQueryEngine dtoQueryEngine;
   private final ServerCacheManager serverCacheManager;
   private final DtoBeanManager dtoBeanManager;
+  private final DtoMapperManager dtoMapperManager;
   private final BeanDescriptorManager descriptorManager;
   private final AutoTuneService autoTuneService;
   private final CQueryEngine cqueryEngine;
@@ -114,6 +115,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public DefaultServer(InternalConfiguration config, ServerCacheManager cache) {
     this.logManager = config.getLogManager();
     this.dtoBeanManager = config.getDtoBeanManager();
+    this.dtoMapperManager = config.getDtoMapperManager();
     this.config = config.getConfig();
     this.disableL2Cache = this.config.isDisableL2Cache();
     this.serverCacheManager = cache;
@@ -822,6 +824,11 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   public <T> DtoQuery<T> findDto(Class<T> dtoType, SpiQuery<?> ormQuery) {
     DtoBeanDescriptor<T> descriptor = dtoBeanManager.descriptor(dtoType);
     return new DefaultDtoQuery<>(this, descriptor, ormQuery);
+  }
+
+  @Override
+  public <S, D> DtoMapper<S, D> dtoMapper(Class<S> sourceType, Class<D> dtoType) {
+    return dtoMapperManager.mapperFor(sourceType, dtoType);
   }
 
   @Override
@@ -2028,12 +2035,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   @Override
-  public Set<Property> checkUniqueness(Object bean) {
-    return checkUniqueness(bean, null);
-  }
-
-  @Override
-  public Set<Property> checkUniqueness(Object bean, @Nullable Transaction transaction) {
+  public Set<Property> checkUniqueness(Object bean, @Nullable Transaction transaction, boolean useQueryCache, boolean skipClean) {
     EntityBean entityBean = checkEntityBean(bean);
     BeanDescriptor<?> beanDesc = descriptor(entityBean.getClass());
     BeanProperty idProperty = beanDesc.idProperty();
@@ -2045,14 +2047,15 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
     if (entityBean._ebean_getIntercept().isNew() && id != null) {
       // Primary Key is changeable only on new models - so skip check if we are not new
       SpiQuery<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
+      query.setUseQueryCache(useQueryCache);
       query.usingTransaction(transaction);
       query.setId(id);
-      if (findCount(query) > 0) {
+      if (exists(query)) {
         return Collections.singleton(idProperty);
       }
     }
     for (BeanProperty[] props : beanDesc.uniqueProps()) {
-      Set<Property> ret = checkUniqueness(entityBean, beanDesc, props, transaction);
+      Set<Property> ret = checkUniqueness(entityBean, beanDesc, props, transaction, useQueryCache, skipClean);
       if (ret != null) {
         return ret;
       }
@@ -2061,12 +2064,33 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
   }
 
   /**
+   * Checks, if any property is dirty.
+   */
+  private boolean isAnyPropertyDirty(EntityBean entityBean, BeanProperty[] props) {
+    if (entityBean._ebean_getIntercept().isNew()) {
+      return true;
+    }
+    for (BeanProperty prop : props) {
+      if (entityBean._ebean_getIntercept().isDirtyProperty(prop.propertyIndex())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Returns a set of properties if saving the bean will violate the unique constraints (defined by given properties).
    */
   @Nullable
-  private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props, @Nullable Transaction transaction) {
+  private Set<Property> checkUniqueness(EntityBean entityBean, BeanDescriptor<?> beanDesc, BeanProperty[] props, @Nullable Transaction transaction,
+                                        boolean useQueryCache, boolean skipClean) {
+    if (skipClean && !isAnyPropertyDirty(entityBean, props)) {
+      return null;
+    }
+
     BeanProperty idProperty = beanDesc.idProperty();
     SpiQuery<?> query = new DefaultOrmQuery<>(beanDesc, this, expressionFactory);
+    query.setUseQueryCache(useQueryCache);
     query.usingTransaction(transaction);
     ExpressionList<?> exprList = query.where();
     if (!entityBean._ebean_getIntercept().isNew()) {
@@ -2080,7 +2104,7 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
       }
       exprList.eq(prop.name(), value);
     }
-    if (findCount(query) > 0) {
+    if (exists(query)) {
       Set<Property> ret = new LinkedHashSet<>();
       Collections.addAll(ret, props);
       return ret;

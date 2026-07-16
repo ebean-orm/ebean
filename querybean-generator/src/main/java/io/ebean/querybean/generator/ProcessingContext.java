@@ -105,6 +105,14 @@ class ProcessingContext implements Constants {
     this.readModuleInfo = new ReadModuleInfo(this);
   }
 
+  Elements elementUtils() {
+    return elementUtils;
+  }
+
+  Types typeUtils() {
+    return typeUtils;
+  }
+
   TypeElement entityAnnotation() {
     return elementUtils.getTypeElement(ENTITY);
   }
@@ -691,6 +699,17 @@ class ProcessingContext implements Constants {
 
   Set<String> getPrefixEntities() {
     return prefixEntities;
+  }
+
+  /**
+   * True if any entity, embeddable or other (converter/component) class has been registered in
+   * this compilation - i.e. there is actually something for an {@code EbeanEntityRegister} to
+   * report. Guards against writing an empty, meaningless registry (with no factory package to
+   * derive a sensible location from) for compilation units - such as a test-source-only module
+   * that only declares {@code @DtoMapping} - that never contain any {@code @Entity} classes.
+   */
+  boolean hasAnyEntitiesOrOther() {
+    return !prefixEntities.isEmpty() || !otherClasses.isEmpty();
   }
 
   Set<String> getDbEntities() {

@@ -55,6 +55,10 @@ final class BindableIdEmbedded implements BindableId {
   @Override
   public void dmlBind(BindableRequest request, EntityBean bean) throws SQLException {
     EntityBean idValue = (EntityBean) embId.getValue(bean);
+    if (idValue == null && matches != null) {
+      // The id (e.g. IdClass) hasn't been derived/cached on this bean yet
+      idValue = deriveId(bean);
+    }
     for (BeanProperty prop : props) {
       Object value = prop.getValue(idValue);
       request.bind(value, prop);
@@ -78,13 +82,21 @@ final class BindableIdEmbedded implements BindableId {
 
   @Override
   public boolean deriveConcatenatedId(PersistRequestBean<?> persist) {
+    deriveId(persist.entityBean());
+    return true;
+  }
+
+  /**
+   * Derive/build the concatenated id (e.g. IdClass) from the entity's own matching id
+   * properties, caching it on the bean (via setValueIntercept) for subsequent use.
+   */
+  private EntityBean deriveId(EntityBean bean) {
     if (matches == null) {
       String m = "No matches for " + embId.fullName() + " the concatenated key columns where not found?"
         + " I expect that the concatenated key was null, and this bean does"
         + " not have ManyToOne assoc beans matching the primary key columns?";
       throw new PersistenceException(m);
     }
-    EntityBean bean = persist.entityBean();
     // create the new id
     EntityBean newId = (EntityBean) embId.createEmbeddedId();
     // populate it from the assoc one id values...
@@ -92,7 +104,7 @@ final class BindableIdEmbedded implements BindableId {
       match.populate(bean, newId);
     }
     embId.setValueIntercept(bean, newId);
-    return true;
+    return newId;
   }
 
 }

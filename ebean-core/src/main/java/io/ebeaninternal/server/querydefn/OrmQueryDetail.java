@@ -7,6 +7,7 @@ import io.ebeaninternal.api.SpiExpressionList;
 import io.ebeaninternal.api.SpiQueryManyJoin;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanPropertyAssoc;
+import io.ebeaninternal.server.deploy.BeanPropertyAssocOne;
 import io.ebeaninternal.server.el.ElPropertyDeploy;
 import io.ebeaninternal.server.el.ElPropertyValue;
 
@@ -359,6 +360,54 @@ public final class OrmQueryDetail implements Serializable {
   }
 
   /**
+   * After sorting, fold any fetch path that only fetches a *ToOne association's id
+   * into a plain select of the parent path instead - the foreign key column is already
+   * present on the owning table so the join can be avoided entirely.
+   * <p>
+   * Iterates the fetch paths backwards (deepest first) so that a path already folded
+   * away does not stop a shallower ancestor also being folded, while a path that must
+   * remain a real join protects its own parent (added to {@code nonRemovable}) from
+   * being folded, as the parent's join is required to reach it.
+   */
+  private void convertIdFetches(BeanDescriptor<?> desc) {
+    Set<String> nonRemovable = new HashSet<>();
+    String[] paths = fetchPaths.keySet().toArray(new String[0]);
+    int i = paths.length;
+    while (i-- > 0) {
+      String path = paths[i];
+      ElPropertyDeploy el = desc.elPropertyDeploy(path);
+      OrmQueryProperties prop = fetchPaths.get(path);
+      if (nonRemovable.contains(path)) {
+        // a still-existing child fetch depends on this join, don't remove
+      } else if (el == null) {
+        throw new PersistenceException("Invalid fetch path " + path + " from " + desc.fullName());
+      } else if (el.beanProperty() instanceof BeanPropertyAssocOne) {
+        BeanPropertyAssocOne<?> assoc = (BeanPropertyAssocOne<?>) el.beanProperty();
+        // exported (mappedBy) one-to-one has no local foreign key column - it always needs the join
+        if (assoc.hasForeignKeyConstraint() && !assoc.isOneToOneExported()) {
+          if (prop.includesExactly(assoc.targetDescriptor().idName())) {
+            String parentPath = prop.getParentPath();
+            OrmQueryProperties parentProp = parentPath == null ? baseProps : fetchPaths.get(parentPath);
+            if (parentProp != null && parentProp.hasProperties()) {
+              OrmQueryProperties newParentProp = parentProp.withAddedInclude(assoc.name());
+              if (parentPath == null) {
+                baseProps = newParentProp;
+              } else {
+                fetchPaths.put(parentPath, newParentProp);
+              }
+              fetchPaths.remove(path);
+              prop = null;
+            }
+          }
+        }
+      }
+      if (prop != null && prop.getParentPath() != null) {
+        nonRemovable.add(prop.getParentPath());
+      }
+    }
+  }
+
+  /**
    * Mark 'fetch joins' to 'many' properties over to 'query joins' where needed.
    *
    * @return The fetch join many property or null
@@ -375,6 +424,7 @@ public final class OrmQueryDetail implements Serializable {
     boolean fetchJoinFirstMany = allowOne;
 
     sortFetchPaths(beanDescriptor, addIds);
+    convertIdFetches(beanDescriptor);
     List<FetchEntry> pairs = sortByFetchPreference(beanDescriptor);
 
     for (FetchEntry pair : pairs) {
@@ -384,14 +434,18 @@ public final class OrmQueryDetail implements Serializable {
         OrmQueryProperties chunk = pair.getProperties();
         if (isQueryJoinCandidate(lazyLoadManyPath, chunk)) {
           // this is a 'fetch join' (included in main query)
-          if (fetchJoinFirstMany) {
+          BeanDescriptor<?> targetDescriptor = ((BeanPropertyAssoc<?>) elProp.beanProperty()).targetDescriptor();
+          if (fetchJoinFirstMany && !chunk.filterManyHasNestedProperty(targetDescriptor)) {
             // letting the first one remain a 'fetch join'
             fetchJoinFirstMany = false;
             manyFetchProperty = pair.getPath();
             chunk.filterManyInline();
             many = elProp;
           } else {
-            // convert this one over to a 'query join'
+            // convert this one over to a 'query join' - either because another many has already claimed the
+            // 'fetch join' slot, or because its filterMany references a property that requires crossing into
+            // an associated bean and can't safely be included as a JOIN predicate (see
+            // OrmQueryProperties.filterManyHasNestedProperty)
             chunk.markForQueryJoin();
           }
         }

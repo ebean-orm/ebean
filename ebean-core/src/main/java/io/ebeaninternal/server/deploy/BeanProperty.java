@@ -641,6 +641,28 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   /**
+   * By default, getIntercept and setIntercept will check if the passed bean is an instance of the descriptor type.
+   * <p>
+   * If the property is not part of the type hierarchy (i.e. is not this property from this descriptor) an
+   * IllegalArgumentException is thrown.
+   * <p>
+   * If inheritance is involved, this method returns false instead of throwing an exception, if the property might
+   * exist on one of the sibling child beans. This is necessary for getIntercept, as it returns <code>null</code>
+   * in this case.
+   *
+   * @return true if the property can be accessed on the given bean, false if it should be treated as unloaded.
+   */
+  private boolean checkPropertyAccess(EntityBean bean) {
+    // null = fall through - NPE is caught later.
+    return bean == null || descriptor.type().isInstance(bean);
+  }
+
+  private String propertyIncompatibleMsg(EntityBean bean) {
+    String beanType = bean == null ? "null" : bean.getClass().getName();
+    return "Property " + name + " on [" + descriptor + "] is incompatible with type[" + beanType + "]";
+  }
+
+  /**
    * Set the value of the property without interception or
    * PropertyChangeSupport.
    */
@@ -656,6 +678,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
    * Set the value of the property.
    */
   public void setValueIntercept(EntityBean bean, Object value) {
+    if (!checkPropertyAccess(bean)) {
+      throw new IllegalArgumentException(propertyIncompatibleMsg(bean));
+    }
     try {
       setter.setIntercept(bean, value);
     } catch (Exception ex) {
@@ -767,6 +792,9 @@ public class BeanProperty implements ElPropertyValue, Property, STreeProperty {
   }
 
   public Object getValueIntercept(EntityBean bean) {
+    if (!checkPropertyAccess(bean)) {
+      return null;
+    }
     try {
       return getter.getIntercept(bean);
     } catch (Exception ex) {

@@ -4,7 +4,7 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>18.2.0</version>
+    <version>18.3.0</version>
   </parent>
 
   <name>ebean test</name>
@@ -33,20 +33,20 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-h2</artifactId>
-      <version>18.2.0</version>
+      <version>18.3.0</version>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-core</artifactId>
-      <version>18.2.0</version>
+      <version>18.3.0</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-ddl-generator</artifactId>
-      <version>18.2.0</version>
+      <version>18.3.0</version>
     </dependency>
 
     <dependency>
@@ -149,14 +149,14 @@
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-jackson-mapper</artifactId>
-      <version>18.2.0</version>
+      <version>18.3.0</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.ebean</groupId>
       <artifactId>ebean-platform-all</artifactId>
-      <version>18.2.0</version>
+      <version>18.3.0</version>
       <scope>test</scope>
     </dependency>
 
@@ -213,7 +213,7 @@
     <dependency>
       <groupId>org.postgresql</groupId>
       <artifactId>postgresql</artifactId>
-      <version>42.7.2</version>
+      <version>42.7.11</version>
       <exclusions>
         <exclusion>
           <groupId>org.checkerframework</groupId>
@@ -231,9 +231,9 @@
     </dependency>
 
     <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.28</version>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <version>9.7.0</version>
       <scope>test</scope>
     </dependency>
 

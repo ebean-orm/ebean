@@ -4,7 +4,6 @@ import io.ebean.config.BeanNotEnhancedException;
 import io.ebean.datasource.DataSourceConfigurationException;
 
 import jakarta.persistence.PersistenceException;
-import org.jspecify.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
@@ -77,9 +76,8 @@ final class DbContext {
     return defaultDatabase;
   }
 
-  @Nullable
-  Database getRegistered(String name) {
-    return concMap.get(name);
+  boolean contains(String name) {
+    return concMap.containsKey(name);
   }
 
   /**
@@ -120,6 +118,27 @@ final class DbContext {
    */
   void register(Database server, boolean isDefault) {
     registerWithName(server.name(), server, isDefault);
+  }
+
+  /**
+   * Remove the registration for this Database (typically on shutdown) so that
+   * its name becomes available again for a subsequently created Database.
+   * <p>
+   * Only removes the registration if it currently maps to this exact instance
+   * (avoids removing a different Database subsequently registered with the same name).
+   */
+  void deregister(Database server) {
+    lock.lock();
+    try {
+      String name = server.name();
+      concMap.remove(name, server);
+      syncMap.remove(name, server);
+      if (defaultDatabase == server) {
+        defaultDatabase = null;
+      }
+    } finally {
+      lock.unlock();
+    }
   }
 
   private void registerWithName(String name, Database server, boolean isDefault) {

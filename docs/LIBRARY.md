@@ -54,7 +54,8 @@ Ebean is an ORM library for Java and Kotlin focused on relational data access, t
 | `exists()` | Efficient existence checks | `new QCustomer().email.equalTo(email).exists();` |
 | `findOne()` | Unique/single-row retrieval | `new QCustomer().id.equalTo(id).findOne();` |
 | `findList()` | List retrieval | `new QCustomer().findList();` |
-| `asDto(...).findList()` | DTO projection reads | `new QOrder().asDto(OrderSummary.class).findList();` |
+| `asDto(...).findList()` | Flat DTO projection reads | `new QOrder().asDto(OrderSummary.class).findList();` |
+| `mapTo(...).findList()` | Nested DTO graph projection reads | `new QCustomer().mapTo(CustomerDto.class).findList();` |
 
 ### Entity mapping and lifecycle annotations
 
@@ -188,6 +189,7 @@ database.save(customer);
 | Model entity beans correctly | [entity-bean-creation.md](guides/entity-bean-creation.md) |
 | Use Lombok safely with entities | [lombok-with-ebean-entity-beans.md](guides/lombok-with-ebean-entity-beans.md) |
 | Write type-safe query bean queries | [writing-ebean-query-beans.md](guides/writing-ebean-query-beans.md) |
+| Map nested entity graphs to DTO graphs | [mapping-entity-graphs-to-dtos.md](guides/mapping-entity-graphs-to-dtos.md) |
 | Persist changes and manage transactions | [persisting-and-transactions-with-ebean.md](guides/persisting-and-transactions-with-ebean.md) |
 | Build test entities quickly | [testing-with-testentitybuilder.md](guides/testing-with-testentitybuilder.md) |
 

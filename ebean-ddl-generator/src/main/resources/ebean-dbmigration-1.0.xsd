@@ -288,6 +288,7 @@
       <xsd:attribute name="notnull" type="xsd:boolean"/>
       <xsd:attribute name="currentNotnull" type="xsd:boolean"/>
       <xsd:attribute name="comment" type="xsd:string"/>
+      <xsd:attribute name="currentComment" type="xsd:string"/>
       <xsd:attribute name="historyExclude" type="xsd:boolean"/>
       <xsd:attribute name="checkConstraint" type="xsd:string"/>
       <xsd:attribute name="checkConstraintName" type="xsd:string"/>

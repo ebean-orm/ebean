@@ -299,6 +299,16 @@ final class JunctionExpression<T> implements SpiJunction<T>, SpiExpression, Expr
   }
 
   @Override
+  public <D> MappedQuery<D> mapTo(Class<D> dtoType) {
+    return exprList.mapTo(dtoType);
+  }
+
+  @Override
+  public <D> MappedQuery<D> mapTo(Class<D> dtoType, DtoMapper<T, D> mapper) {
+    return exprList.mapTo(dtoType, mapper);
+  }
+
+  @Override
   public UpdateQuery<T> asUpdate() {
     return exprList.asUpdate();
   }

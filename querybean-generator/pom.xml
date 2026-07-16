@@ -4,12 +4,51 @@
   <parent>
     <artifactId>ebean-parent</artifactId>
     <groupId>io.ebean</groupId>
-    <version>18.2.0</version>
+    <version>18.3.0</version>
   </parent>
 
   <name>querybean generator</name>
   <artifactId>querybean-generator</artifactId>
   <description>Generates Ebean Query beans for type safe ORM query building and execution</description>
+
+  <properties>
+    <avaje.prisms.version>2.0</avaje.prisms.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>io.avaje</groupId>
+      <artifactId>avaje-prisms</artifactId>
+      <version>${avaje.prisms.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-annotation</artifactId>
+      <version>${ebean-annotation.version}</version>
+      <optional>true</optional>
+    </dependency>
+
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>jakarta-persistence-api</artifactId>
+      <version>${ebean-persistence-api.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!--
+      Test-only - lets DtoMapperRecordSourceTest fully compile a generated DTO mapper source
+      in-process (references io.ebean.DtoMapper/FetchGroup/etc.). Safe as a real dependency here
+      (unlike ebean-querybean) since ebean-api does not depend back on querybean-generator.
+    -->
+    <dependency>
+      <groupId>io.ebean</groupId>
+      <artifactId>ebean-api</artifactId>
+      <version>18.3.0</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
   <build>
     <plugins>
@@ -19,8 +58,13 @@
         <configuration>
           <source>11</source>
           <target>11</target>
-          <!-- Turn off annotation processing for building -->
-          <compilerArgs>-proc:none</compilerArgs>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>io.avaje</groupId>
+              <artifactId>avaje-prisms</artifactId>
+              <version>${avaje.prisms.version}</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
     </plugins>

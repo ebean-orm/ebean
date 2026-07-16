@@ -89,6 +89,11 @@ final class AnnotationAssocManys extends AnnotationAssoc {
     ManyToMany manyToMany = get(prop, ManyToMany.class);
     if (manyToMany != null) {
       readToMany(manyToMany, prop);
+      OrderColumn orderColumn = get(prop, OrderColumn.class);
+      if (orderColumn != null) {
+        // ManyToMany order value is stored on the intersection table (not the target bean)
+        prop.setOrderColumn(new DeployOrderColumn(orderColumn));
+      }
     }
     ElementCollection elementCollection = get(prop, ElementCollection.class);
     if (elementCollection != null) {
@@ -176,6 +181,11 @@ final class AnnotationAssocManys extends AnnotationAssoc {
     prop.setElementCollection();
     if (!elementCollection.targetClass().equals(void.class)) {
       prop.setTargetType(elementCollection.targetClass());
+    }
+    OrderColumn orderColumn = get(prop, OrderColumn.class);
+    if (orderColumn != null) {
+      prop.setOrderColumn(new DeployOrderColumn(orderColumn));
+      prop.setFetchOrderBy(DeployOrderColumn.LOGICAL_NAME);
     }
     Column column = prop.getMetaAnnotation(Column.class);
     if (column != null) {
@@ -268,6 +278,11 @@ final class AnnotationAssocManys extends AnnotationAssoc {
 
     elementDescriptor.setName(prop.toString());
     factory.createUnidirectional(elementDescriptor, prop.getOwningType(), beanTable, prop.getTableJoin());
+    if (prop.hasOrderColumn()) {
+      // create the synthetic order property on the element descriptor - the element descriptor
+      // is not registered in deployInfoMap so this can't go through the usual OneToMany path
+      factory.makeOrderColumn(prop, elementDescriptor);
+    }
     prop.setElementDescriptor(factory.createElementDescriptor(elementDescriptor, prop.getManyType(), scalar));
   }
 

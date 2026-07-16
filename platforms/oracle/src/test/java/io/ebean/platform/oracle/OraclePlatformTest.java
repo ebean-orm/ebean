@@ -45,4 +45,11 @@ class OraclePlatformTest {
     DbPlatformType dbType = platform.dbTypeMap().get(DbPlatformType.UUID);
     assertThat(dbType.renderType(0, 0)).isEqualTo("raw(16)");
   }
+
+  @Test
+  void existsWithCaseWhen_trueForOracle() {
+    OraclePlatform platform = new OraclePlatform();
+    assertThat(platform.existsWithCaseWhen()).isTrue();
+    assertThat(platform.existsFromClause()).isEqualTo(" from dual");
+  }
 }

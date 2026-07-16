@@ -1,7 +1,9 @@
 package io.ebean.querybean.generator;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.StringTokenizer;
@@ -52,6 +54,24 @@ class Split {
       }
     }
     return new SimpleEntry<>(simpleSignature.toString(), assocImports);
+  }
+
+  /**
+   * Returns the first pair of distinct full names in {@code fullNames} that share the same
+   * simple (unqualified) class name, or {@code null} if there's no such collision - used to fail
+   * fast, with a clear diagnostic, on an ambiguous set of imports (two different types sharing a
+   * simple name) rather than silently generating source with a duplicate-import/undefined-symbol
+   * compile error that's much harder to trace back to its cause.
+   */
+  static String[] findSimpleNameCollision(Set<String> fullNames) {
+    Map<String, String> seenBySimpleName = new HashMap<>();
+    for (String fullName : fullNames) {
+      String existing = seenBySimpleName.putIfAbsent(shortName(fullName), fullName);
+      if (existing != null && !existing.equals(fullName)) {
+        return new String[] {existing, fullName};
+      }
+    }
+    return null;
   }
 
 }
