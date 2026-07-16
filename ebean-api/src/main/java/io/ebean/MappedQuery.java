@@ -3,6 +3,7 @@ package io.ebean;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,4 +49,21 @@ public interface MappedQuery<D> {
    * Execute the query returning an optional mapped DTO.
    */
   Optional<D> findOneOrEmpty();
+
+  /**
+   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
+   * data source can be used if defined.
+   */
+  MappedQuery<D> usingMaster(boolean useMaster);
+
+  /**
+   * Use the explicit transaction to execute the query.
+   */
+  MappedQuery<D> usingTransaction(Transaction transaction);
+
+  /**
+   * Execute the query using the given connection.
+   */
+  MappedQuery<D> usingConnection(Connection connection);
+
 }

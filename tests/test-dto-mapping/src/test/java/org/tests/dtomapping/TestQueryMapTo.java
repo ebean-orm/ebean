@@ -3,6 +3,7 @@ package org.tests.dtomapping;
 import io.ebean.DB;
 import io.ebean.LazyInitialisationException;
 import io.ebean.PagedList;
+import io.ebean.Transaction;
 import io.ebean.test.LoggedSql;
 import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.Test;
@@ -139,6 +140,61 @@ class TestQueryMapTo {
     // only the manually selected properties were fetched - no join to address
     assertThat(sql).hasSize(1);
     assertThat(sql.get(0)).doesNotContain("o_address");
+  }
+
+  @Test
+  void mapTo_usingMaster_expectFluentReturnAndNoError() {
+    Customer customer = new Customer("MasterCo");
+    customer.save();
+
+    // usingMaster() can be called on the MappedQuery itself - e.g. on retry after a read-replica
+    // failure - without needing to rebuild the underlying query and call mapTo() again
+    var mapped = DB.find(Customer.class)
+      .where().idEq(customer.getId())
+      .mapTo(CustomerDto.class);
+
+    assertThat(mapped.usingMaster(false)).isSameAs(mapped);
+    assertThat(mapped.usingMaster(true)).isSameAs(mapped);
+
+    List<CustomerDto> dtos = mapped.findList();
+    assertThat(dtos).hasSize(1);
+    assertThat(dtos.get(0).getName()).isEqualTo("MasterCo");
+  }
+
+  @Test
+  void mapTo_usingTransaction_expectQueryRunsOnExplicitTransaction() {
+    Customer customer = new Customer("TxnCo");
+    customer.save();
+
+    try (Transaction txn = DB.beginTransaction()) {
+      List<CustomerDto> dtos = DB.find(Customer.class)
+        .where().idEq(customer.getId())
+        .mapTo(CustomerDto.class)
+        .usingTransaction(txn)
+        .findList();
+
+      assertThat(dtos).hasSize(1);
+      assertThat(dtos.get(0).getName()).isEqualTo("TxnCo");
+      txn.commit();
+    }
+  }
+
+  @Test
+  void mapTo_usingConnection_expectFluentReturn() {
+    Customer customer = new Customer("ConnCo");
+    customer.save();
+
+    try (Transaction txn = DB.beginTransaction()) {
+      var mapped = DB.find(Customer.class)
+        .where().idEq(customer.getId())
+        .mapTo(CustomerDto.class);
+
+      assertThat(mapped.usingConnection(txn.connection())).isSameAs(mapped);
+
+      List<CustomerDto> dtos = mapped.findList();
+      assertThat(dtos).hasSize(1);
+      assertThat(dtos.get(0).getName()).isEqualTo("ConnCo");
+    }
   }
 
   @Test

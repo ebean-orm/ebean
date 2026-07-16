@@ -3,9 +3,11 @@ package io.ebeaninternal.server.querydefn;
 import io.ebean.DtoMapper;
 import io.ebean.MappedQuery;
 import io.ebean.PagedList;
+import io.ebean.Transaction;
 import io.ebeaninternal.api.SpiEbeanServer;
 import io.ebeaninternal.api.SpiQuery;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,5 +92,23 @@ public final class DefaultMappedQuery<T, D> implements MappedQuery<D> {
   public PagedList<D> findPagedList() {
     DtoMapper<T, D> m = mapper();
     return new MappedPagedList<>(query.findPagedList(), m);
+  }
+
+  @Override
+  public MappedQuery<D> usingMaster(boolean useMaster) {
+    query.usingMaster(useMaster);
+    return this;
+  }
+
+  @Override
+  public MappedQuery<D> usingTransaction(Transaction transaction) {
+    query.usingTransaction(transaction);
+    return this;
+  }
+
+  @Override
+  public MappedQuery<D> usingConnection(Connection connection) {
+    query.usingConnection(connection);
+    return this;
   }
 }
