@@ -18,12 +18,14 @@ final class InsertMetaOptionsPostgres implements InsertMetaOptions {
   private final InsertMeta meta;
   private final BeanDescriptor<?> desc;
   private final String baseTable;
+  private final List<String> nonUpdatableColumns;
   private final Map<String, String> sqlCache = new ConcurrentHashMap<>();
 
   InsertMetaOptionsPostgres(InsertMeta meta, BeanDescriptor<?> desc) {
     this.meta = meta;
     this.desc = desc;
     this.baseTable = desc.baseTable();
+    this.nonUpdatableColumns = InsertMetaOptionsSupport.nonUpdatableColumns(desc);
   }
 
   @Override
@@ -84,6 +86,7 @@ final class InsertMetaOptionsPostgres implements InsertMetaOptions {
   private void setColumns(boolean withId, GenerateDmlRequest request, List<String> uniqueColumns) {
     List<String> columns = request.columns();
     columns.removeAll(uniqueColumns);
+    columns.removeAll(nonUpdatableColumns);
     if (withId) {
       BeanProperty idProperty = desc.idProperty();
       if (idProperty != null && !idProperty.isEmbedded()) {
