@@ -104,6 +104,9 @@ class DtoMapperWriter {
     if (!meta.converterDeps().isEmpty()) {
       imports.add("io.ebean.DtoConverterManager");
     }
+    if (meta.properties().stream().anyMatch(DtoPropertyMeta::usesMapperSupport)) {
+      imports.add("io.ebean.DtoMapperSupport");
+    }
     if (variableProperties().stream().anyMatch(p -> p.kind() == DtoPropertyMeta.Kind.NESTED_MANY)) {
       imports.add("java.util.List");
     }

@@ -50,6 +50,8 @@
 @DtoMapping(source = Contact.class, target = ContactConversionDto.class)
 @DtoMapping(source = Contact.class, target = ContactMixinDto.class)
 @DtoMapping(source = Contact.class, target = ContactBuilderDto.class, builder = DtoMapping.Builder.ALWAYS)
+@DtoMapping(source = Contact.class, target = PrimitiveNullPathDto.class)
+@DtoMapping(source = Contact.class, target = PrimitiveNullPathFailOnNullDto.class)
 package org.tests.dtomapping;
 
 import io.ebean.annotation.DtoMapping;

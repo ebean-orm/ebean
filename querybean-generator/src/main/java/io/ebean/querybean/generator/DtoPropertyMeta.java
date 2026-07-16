@@ -25,18 +25,33 @@ class DtoPropertyMeta {
   private final List<String> sourcePropertyPath;
   private final DtoBeanMeta nested;
   private final DtoConverterMeta converter;
+  private final boolean primitiveTarget;
+  private final boolean failOnNull;
 
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath, DtoBeanMeta nested) {
     this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, null);
   }
 
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath, DtoBeanMeta nested, DtoConverterMeta converter) {
+    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, converter, false, false);
+  }
+
+  /**
+   * Full constructor - {@code primitiveTarget}/{@code failOnNull} only matter for a multi-hop
+   * ({@code sourceGetterPath.size() > 1}) {@link Kind#SCALAR}/{@link Kind#REF} property whose DTO
+   * field type is a Java primitive, per {@code @DtoPath#failOnNull()} - see
+   * {@link #sourceValueExpression(String)}.
+   */
+  DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
+                  DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull) {
     this.dtoFieldName = dtoFieldName;
     this.kind = kind;
     this.sourceGetterPath = sourceGetterPath;
     this.sourcePropertyPath = sourcePropertyPath;
     this.nested = nested;
     this.converter = converter;
+    this.primitiveTarget = primitiveTarget;
+    this.failOnNull = failOnNull;
   }
 
   String dtoFieldName() {
@@ -84,6 +99,12 @@ class DtoPropertyMeta {
    * variable. A single getter is a plain call, e.g. {@code s.getName()}; a multi-hop chain (from
    * {@code @DtoPath} or {@code @DtoRef}) null-guards each intermediate hop, e.g.
    * {@code (s.getBillingAddress() == null ? null : s.getBillingAddress().getLine1())}.
+   * <p>
+   * That null-guarded chain always types as the boxed wrapper (one ternary branch is the
+   * {@code null} literal) - when {@link #primitiveTarget} is set (the DTO field is a Java
+   * primitive), the whole chain is additionally wrapped in a {@code DtoMapperSupport} call so it
+   * safely resolves to the primitive's zero-equivalent value (the default), or throws a clear
+   * exception instead, per {@code @DtoPath#failOnNull()} - see {@code DtoMapperSupport}.
    */
   String sourceValueExpression(String rootVariable) {
     if (sourceGetterPath.size() == 1) {
@@ -91,7 +112,23 @@ class DtoPropertyMeta {
     }
     StringBuilder sb = new StringBuilder();
     appendGuardedChain(sb, rootVariable, 0);
-    return sb.toString();
+    String chain = sb.toString();
+    if (!primitiveTarget) {
+      return chain;
+    }
+    return failOnNull
+      ? "DtoMapperSupport.require(" + chain + ", \"" + String.join(".", sourcePropertyPath) + "\")"
+      : "DtoMapperSupport.orZero(" + chain + ")";
+  }
+
+  /**
+   * {@code true} if {@link #sourceValueExpression(String)} wraps its chain in a
+   * {@code DtoMapperSupport} call - i.e. this is a multi-hop {@link Kind#SCALAR}/{@link Kind#REF}
+   * property whose DTO field type is primitive. Used to conditionally import
+   * {@code io.ebean.DtoMapperSupport} only when actually referenced.
+   */
+  boolean usesMapperSupport() {
+    return primitiveTarget && sourceGetterPath.size() > 1;
   }
 
   private void appendGuardedChain(StringBuilder sb, String prefix, int index) {
