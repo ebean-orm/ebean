@@ -724,19 +724,59 @@ callers must consume it via try-with-resources to ensure the underlying resource
     `DtoConverterManager`) are all constructed eagerly during `Database` startup, which can be
     triggered by whichever test class in the module happens to run first.
 
-- **Known limitation (validation phase, found via `central-access`): `@DtoPath` through a computed/
-  derived getter fails at runtime, not compile time.** `@DtoPath` assumes every dotted segment names a
-  real, fetchable Ebean bean property - so a path like `@DtoPath("currentMachine.organisationMachine
-  .registrationPlate")`, where `getOrganisationMachine()` is a hand-written derived getter (not a real
-  relation/column), **compiles cleanly** (the codegen has no way to tell it apart from a real property
-  from source alone) but **fails at runtime** with a `PersistenceException: No property found for
-  [organisationMachine] in expression ...`, because the generated `FetchGroup` builder tries to
-  `fetch`/`select` it as if it were a real Ebean property. Not yet fixed - candidate remedies: (a)
-  validate each path segment against the source type's actual persistent properties at codegen time
-  and fail fast with a clear compile error instead of a cryptic runtime one (safer, consistent with the
-  primitive-unboxing fix above and the project's general fail-fast philosophy), or (b) genuinely support
-  computed-getter path segments (closer to the original `@Formula2`-style ask in issue #2540, but a much
-  larger feature). Option (a) is the more likely near-term fix given its lower cost/risk.
+- **Fixed (validation phase, found via `central-access`): `@DtoPath` through a computed/derived
+  getter now fails at compile time, with an explicit `requires()` escape hatch.** `@DtoPath`
+  assumes every dotted segment names a real, fetchable Ebean bean property - so a path like
+  `@DtoPath("currentMachine.organisationMachine.registrationPlate")`, where `getOrganisationMachine()`
+  is a hand-written derived getter (not a real relation/column), used to **compile cleanly** (the
+  codegen had no way to tell it apart from a real property from source alone) but **fail at
+  runtime** with a `PersistenceException: No property found for [organisationMachine] in
+  expression ...`, because the generated `FetchGroup` builder tried to `fetch`/`select` it as if it
+  were a real Ebean property.
+  - Two genuinely separate sub-problems: (1) *detecting* that a path segment isn't a real,
+    fetchable property - solvable at compile time, since a real persistent property always has a
+    backing field (Ebean requires one to enhance), checked via `javax.lang.model`
+    (`ElementFilter.fieldsIn(...)` over the type + superclass chain, see `DtoMappingReader.hasField(...)`);
+    versus (2) *knowing what the computed getter needs fetched* to execute safely - not solvable at
+    compile time without full static/bytecode analysis of the getter's method body, out of scope.
+  - Resolution: don't attempt to infer (2) automatically. When `DtoMappingReader` detects a `@DtoPath`
+    segment with no backing field, it now fails fast at compile time (`ctx.logError(...)`) unless the
+    developer explicitly declares the real entity paths that must be fetched via
+    `@DtoPath(requires = {...})` (dot-notation, same convention as `@DtoPath`'s own `value()`) - e.g.
+    `@DtoPath(value = "primaryContact.lastName", requires = "contacts")` where `getPrimaryContact()`
+    picks the first entry out of the `contacts` collection. The real prefix before the computed
+    segment (if any) is automatically combined with the declared `requires()` paths, so the developer
+    doesn't need to redundantly repeat it. Declared paths are emitted as bare `.fetch(path)` calls in
+    the generated `FetchGroup` (distinct from the `.fetch(path, "props")` shape used for ordinary
+    scalar `@DtoPath` properties, since there's no specific target property list to narrow to here).
+  - **The zero-extra-fetch case is also supported, via an explicit `requires = {}`** - e.g.
+    `@DtoPath(value = "idBadge", requires = {})` where `getIdBadge()` derives purely from `id`
+    (always fetched regardless). An explicit empty array confirms "nothing extra needed", distinct
+    from omitting `requires()` entirely ("not yet considered", still a compile error) - `requires()`
+    itself can't tell the two cases apart (both read back as an empty `List`), so `DtoMappingReader`
+    checks the avaje-prism-generated `DtoPathPrism.values.requires()` instead, which returns `null`
+    only when the member was left at its default (i.e. omitted from source). `DtoPropertyMeta`
+    correspondingly carries `hasComputedSegment()` as its own boolean flag (set whenever a computed
+    segment was detected at all), independent of whether `requiredFetchPaths()` happens to be empty -
+    an earlier version conflated the two (inferring "has a computed segment" from "has a non-empty
+    requiredFetchPaths list"), which broke exactly this explicit-empty case by falling through to the
+    ordinary scalar `.select(...)` path and failing at runtime with `PersistenceException: Property
+    not found - idBadge` (`idBadge` isn't a real Ebean property, so it can't be selected).
+  - Implemented in `ebean-annotation` (`DtoPath.requires()`), and `querybean-generator`
+    (`DtoMappingReader` computed-segment detection/validation, `DtoPropertyMeta.requiredFetchPaths()`/
+    `hasComputedSegment()`, `DtoMapperWriter.fetchGroupChainCalls()` bare-fetch emission). Test
+    coverage: `tests/test-dto-mapping` `ComputedPathDto`/`TestComputedPath` (happy path, `requires`
+    correctly fetches the dependency and the mapped value is correct), `ComputedPathNoFetchDto`/
+    `TestComputedPathNoFetch` (explicit `requires = {}`, genuinely nothing extra needed), and
+    `querybean-generator`'s `DtoMapperComputedPathTest` (negative case - omitting `requires` on a
+    computed segment is a compile-time `ERROR` diagnostic, verified via direct `javax.tools.JavaCompiler`
+    compilation, mirroring `DtoMapperFetchPathCollisionTest`).
+  - Known gap: the dedup between the computed segment's required fetch paths and existing
+    `pathSelect`/`nestedAssocPaths` keys in `DtoMapperWriter` is a simplified exact-path-string check
+    (skip emitting a duplicate `.fetch(path)`), not full collision detection like the existing
+    NESTED_ONE/MANY vs `@DtoPath` check - a bare `fetch(path)` and an existing `fetch(path,
+    "specific,props")` for the same path string are not merged/reconciled, just left as two separate
+    calls if that edge case arises.
 
 ## References
 

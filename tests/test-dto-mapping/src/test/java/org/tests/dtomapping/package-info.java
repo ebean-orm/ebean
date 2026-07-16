@@ -52,6 +52,8 @@
 @DtoMapping(source = Contact.class, target = ContactBuilderDto.class, builder = DtoMapping.Builder.ALWAYS)
 @DtoMapping(source = Contact.class, target = PrimitiveNullPathDto.class)
 @DtoMapping(source = Contact.class, target = PrimitiveNullPathFailOnNullDto.class)
+@DtoMapping(source = Customer.class, target = ComputedPathDto.class)
+@DtoMapping(source = Customer.class, target = ComputedPathNoFetchDto.class)
 package org.tests.dtomapping;
 
 import io.ebean.annotation.DtoMapping;

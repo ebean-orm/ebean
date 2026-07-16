@@ -231,6 +231,7 @@ class DtoMapperWriter {
     }
     Set<String> rootSelect = new LinkedHashSet<>();
     Map<String, List<String>> pathSelect = new LinkedHashMap<>();
+    Set<String> extraFetchPaths = new LinkedHashSet<>();
     List<String> fetchCalls = new ArrayList<>();
     for (DtoPropertyMeta property : activeProperties) {
       switch (property.kind()) {
@@ -240,6 +241,14 @@ class DtoMapperWriter {
             property.sourcePropertyPath().get(0), mapperFieldName(property)));
           break;
         case SCALAR:
+          if (property.hasComputedSegment()) {
+            // the path traverses a computed/derived getter (no backing field) - its own segments
+            // past that point aren't real Ebean fetch paths, so don't add them to pathSelect/
+            // rootSelect at all; @DtoPath#requires() (plus the real prefix, if any) already names
+            // exactly what needs fetching instead - see DtoPropertyMeta#requiredFetchPaths().
+            extraFetchPaths.addAll(property.requiredFetchPaths());
+            break;
+          }
           List<String> path = property.sourcePropertyPath();
           if (path.size() == 1) {
             rootSelect.add(path.get(0));
@@ -266,6 +275,13 @@ class DtoMapperWriter {
     }
     for (var entry : pathSelect.entrySet()) {
       fetchCalls.add(String.format("fetch(\"%s\", \"%s\")", entry.getKey(), String.join(",", entry.getValue())));
+    }
+    for (String extraPath : extraFetchPaths) {
+      // already covered by another property's fetch of the exact same path - a full fetch(path)
+      // isn't needed on top of an existing fetch(path, mapper.fetchGroup())/fetch(path, "props").
+      if (!nestedAssocPaths.contains(extraPath) && !pathSelect.containsKey(extraPath)) {
+        fetchCalls.add(String.format("fetch(\"%s\")", extraPath));
+      }
     }
     List<String> calls = new ArrayList<>();
     if (!rootSelect.isEmpty()) {

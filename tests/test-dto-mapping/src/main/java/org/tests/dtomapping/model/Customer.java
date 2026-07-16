@@ -49,4 +49,25 @@ public class Customer extends Model {
   public List<Contact> getContacts() {
     return contacts;
   }
+
+  /**
+   * Computed/derived getter (no backing field) - not a real Ebean property. Exercises
+   * {@code @DtoPath#requires()}: a {@code @DtoPath} traversing this segment must explicitly name
+   * {@code "contacts"} as a required fetch, since this method's own data dependency (the
+   * {@code contacts} collection) can't be inferred from the path string alone.
+   */
+  public Contact getPrimaryContact() {
+    return contacts.isEmpty() ? null : contacts.get(0);
+  }
+
+  /**
+   * Computed/derived getter (no backing field) deriving purely from {@code id} - which is always
+   * fetched as a matter of course, so unlike {@link #getPrimaryContact()} this one genuinely needs
+   * nothing extra fetched. Exercises {@code @DtoPath(requires = {})} (explicit empty array,
+   * confirming "nothing extra needed") as distinct from omitting {@code requires} entirely (a
+   * compile error).
+   */
+  public String getIdBadge() {
+    return "CUST-" + id;
+  }
 }

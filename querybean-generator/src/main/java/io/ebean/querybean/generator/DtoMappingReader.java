@@ -459,10 +459,16 @@ class DtoMappingReader {
       List<String> getters = new ArrayList<>();
       List<String> properties = new ArrayList<>();
       TypeElement currentType = meta.source();
+      TypeElement computedDeclaringType = null;
+      int computedFrom = -1;
       for (String segment : pathPrism.value().split("\\.")) {
         String getter = getterName(currentType, segment);
         getters.add(getter);
         properties.add(segment);
+        if (computedFrom < 0 && (currentType == null || !hasField(currentType, segment))) {
+          computedFrom = properties.size() - 1;
+          computedDeclaringType = currentType;
+        }
         currentType = currentType != null ? getterReturnType(currentType, getter) : null;
       }
       // a single-hop @DtoPath rename (e.g. @DtoPath("eboxStatus") on a field named "status")
@@ -486,12 +492,47 @@ class DtoMappingReader {
           }
         }
       }
+      List<String> requiredFetchPaths = List.of();
+      if (computedFrom >= 0) {
+        // a segment with no backing field is a computed/derived getter, not a real, fetchable
+        // Ebean property - its own data dependencies (what it touches internally) can't be
+        // inferred from the path alone, so require the developer to spell them out explicitly
+        // via @DtoPath(requires = {...}) rather than silently generating a FetchGroup.fetch(...)
+        // call for a path segment Ebean doesn't actually recognise (which only fails at runtime).
+        String realPrefix = computedFrom == 0 ? null : String.join(".", properties.subList(0, computedFrom));
+        // pathPrism.requires() always returns List.of() whether the attribute was explicitly
+        // written as an empty array or omitted entirely - only pathPrism.values.requires() (which
+        // returns null for a defaulted/omitted member) can tell the two apart. That distinction
+        // matters here: an explicit requires = {} is the developer's way of confirming the
+        // computed getter genuinely needs nothing extra fetched, whereas omitting requires
+        // entirely means they haven't considered it yet - only the latter should fail the build.
+        if (pathPrism.values.requires() == null) {
+          String hint = realPrefix != null
+            ? String.format(" (e.g. requires = \"%s\", or a deeper path under it your getter actually needs)", realPrefix)
+            : "";
+          ctx.logError(field,
+            "@DtoPath(\"%s\") on %s traverses '%s' which has no backing field on %s - it looks like"
+              + " a computed/derived getter rather than a real, fetchable Ebean property, so its data"
+              + " dependencies can't be inferred automatically. Specify @DtoPath(requires = {...})"
+              + " naming the real entity paths that must be fetched for it to execute safely%s, or"
+              + " requires = {} if it genuinely needs nothing extra fetched, or remove @DtoPath and"
+              + " compute this value another way (e.g. @DtoConvert).",
+            pathPrism.value(), meta.targetFullName(), properties.get(computedFrom),
+            computedDeclaringType != null ? computedDeclaringType.getSimpleName() : "?", hint);
+        }
+        List<String> combined = new ArrayList<>();
+        if (realPrefix != null) {
+          combined.add(realPrefix);
+        }
+        combined.addAll(pathPrism.requires());
+        requiredFetchPaths = combined;
+      }
       // A multi-hop path can pass through a nullable intermediate relation - if the DTO field is
       // primitive, the generated null-guarded getter chain would otherwise auto-unbox a null
       // straight into a NullPointerException. Default to the primitive's zero-equivalent value,
       // or fail fast with a clear message instead when @DtoPath(failOnNull = true).
-      return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties,
-        null, converter, field.asType().getKind().isPrimitive(), pathPrism.failOnNull());
+      return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties, null, converter,
+        field.asType().getKind().isPrimitive(), pathPrism.failOnNull(), computedFrom >= 0, requiredFetchPaths);
     }
     TypeMirror fieldType = field.asType();
     TypeMirror listElementType = listElementType(fieldType);
@@ -621,6 +662,29 @@ class DtoMappingReader {
       return propertyName;
     }
     return getName;
+  }
+
+  /**
+   * Whether {@code type} (searching {@code type} and its superclass chain) declares a field
+   * named {@code propertyName} - used to distinguish a real, fetchable Ebean bean property (which
+   * always has a backing field once enhanced) from a computed/derived getter with no backing
+   * storage at all (e.g. a hand-written method that filters/derives a value from other
+   * properties). {@code type == null} (unresolvable) conservatively returns {@code true} so an
+   * already-unresolvable segment doesn't also get flagged as "computed" - it'll already have
+   * fallen back to a guessed getter name via {@link #getterName}.
+   */
+  private boolean hasField(TypeElement type, String propertyName) {
+    if (type == null) {
+      return true;
+    }
+    for (TypeElement current = type; current != null; current = superclassOf(current)) {
+      for (VariableElement f : ElementFilter.fieldsIn(current.getEnclosedElements())) {
+        if (f.getSimpleName().contentEquals(propertyName)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   /**
