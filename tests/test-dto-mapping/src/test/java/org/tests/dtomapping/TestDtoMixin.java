@@ -34,6 +34,10 @@ class TestDtoMixin {
     assertThat(dto.isActive()).isTrue();
     // instance @DtoConvert declared on the mixin method, resolved via DtoConverterManager
     assertThat(dto.getSecretCode()).isEqualTo("secret");
+    // @DtoPath("customer") rename on the mixin, resolving to the nested CustomerRefDto mapper
+    // rather than a raw (type-mismatched) scalar getter call
+    assertThat(dto.getOwner()).isNotNull();
+    assertThat(dto.getOwner().getName()).isEqualTo("Acme");
   }
 
   @Test
