@@ -13,12 +13,14 @@ public class ContactMixinDto {
   private final String firstName;
   private final boolean active;
   private final String secretCode;
+  private final CustomerRefDto owner;
 
-  public ContactMixinDto(long id, String firstName, boolean active, String secretCode) {
+  public ContactMixinDto(long id, String firstName, boolean active, String secretCode, CustomerRefDto owner) {
     this.id = id;
     this.firstName = firstName;
     this.active = active;
     this.secretCode = secretCode;
+    this.owner = owner;
   }
 
   public long getId() {
@@ -35,5 +37,9 @@ public class ContactMixinDto {
 
   public String getSecretCode() {
     return secretCode;
+  }
+
+  public CustomerRefDto getOwner() {
+    return owner;
   }
 }

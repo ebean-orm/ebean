@@ -462,6 +462,27 @@ class DtoMappingReader {
         properties.add(segment);
         currentType = currentType != null ? getterReturnType(currentType, getter) : null;
       }
+      // a single-hop @DtoPath rename (e.g. @DtoPath("eboxStatus") on a field named "status")
+      // can still target a type with its own registered @DtoMapping - detect that the same way
+      // the plain (non-@DtoPath) branches below do, rather than always falling back to a raw
+      // scalar getter call that would fail to compile with a type mismatch against the nested
+      // DTO type. Multi-hop paths keep the existing scalar/flattening behaviour since fetch spec
+      // derivation for NESTED_ONE/MANY only supports a single association name.
+      if (properties.size() == 1) {
+        TypeMirror fieldType = field.asType();
+        TypeMirror listElementType = listElementType(fieldType);
+        if (listElementType != null) {
+          DtoBeanMeta nested = lookupByTarget(listElementType);
+          if (nested != null) {
+            return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_MANY, getters, properties, nested);
+          }
+        } else {
+          DtoBeanMeta nested = lookupByTarget(fieldType);
+          if (nested != null) {
+            return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_ONE, getters, properties, nested);
+          }
+        }
+      }
       return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties, null, converter);
     }
     TypeMirror fieldType = field.asType();
