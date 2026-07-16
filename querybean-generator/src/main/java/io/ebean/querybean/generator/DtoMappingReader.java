@@ -449,7 +449,10 @@ class DtoMappingReader {
       String assocGetter = getterName(meta.source(), assocName);
       TypeElement assocType = getterReturnType(meta.source(), assocGetter);
       String idGetter = getterName(assocType, "id");
-      return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.REF, List.of(assocGetter, idGetter), List.of(assocName, "id"), null, converter);
+      // @DtoRef has no failOnNull escape hatch - always default to the primitive's zero-equivalent
+      // rather than let a null-guarded getter chain auto-unbox to a NullPointerException.
+      return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.REF, List.of(assocGetter, idGetter), List.of(assocName, "id"),
+        null, converter, field.asType().getKind().isPrimitive(), false);
     }
     DtoPathPrism pathPrism = prismOn(field, meta, DtoPathPrism::getInstanceOn);
     if (pathPrism != null) {
@@ -483,7 +486,12 @@ class DtoMappingReader {
           }
         }
       }
-      return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties, null, converter);
+      // A multi-hop path can pass through a nullable intermediate relation - if the DTO field is
+      // primitive, the generated null-guarded getter chain would otherwise auto-unbox a null
+      // straight into a NullPointerException. Default to the primitive's zero-equivalent value,
+      // or fail fast with a clear message instead when @DtoPath(failOnNull = true).
+      return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties,
+        null, converter, field.asType().getKind().isPrimitive(), pathPrism.failOnNull());
     }
     TypeMirror fieldType = field.asType();
     TypeMirror listElementType = listElementType(fieldType);

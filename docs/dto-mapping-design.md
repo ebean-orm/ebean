@@ -136,8 +136,31 @@ already recognise, which is worth spelling out explicitly so it's easy to "grok 
   or the query can't group correctly at all. Fixed so `REF` always contributes its association name to the
   root `select(...)` (deduped against any existing `NESTED_ONE`/`NESTED_MANY` fetch of the same path).
 
-### Read-only entity memory overhead: `InterceptReadOnly`
+**Bug found and fixed (validation phase, testing against `central-access`): primitive-typed field +
+nullable intermediate hop = unboxing `NullPointerException`.** A multi-hop `@DtoPath` (or `@DtoRef`,
+which is always 2-hop) null-guards each intermediate getter with a ternary, e.g.
+`(source.getOrganisation() == null ? null : source.getOrganisation().getId())`. That ternary's static
+type is always the boxed wrapper (`Long`), since one branch is the `null` literal - fine when the DTO
+field is itself a reference type (`Long organisationId`), but when the DTO field is a **primitive**
+(`long organisationId`), passing that boxed expression to the constructor auto-unboxes it, throwing an
+unhelpful `NullPointerException` at runtime whenever the relation really is `null`. This compiled clean
+and only failed at runtime with real (nullable) production data - exactly the kind of gap a hand-written
+mapper would defensively guard against (e.g. `cEbox.getOrganisation() == null ? 0 : ...getId()`) but
+generated code didn't.
 
+Fixed in the generator: when a multi-hop `SCALAR`/`REF` property's DTO field type is primitive, the
+whole null-guarded chain is now wrapped in a small runtime helper (`io.ebean.DtoMapperSupport`) that
+resolves it safely:
+- **Default** (`@DtoPath` with no `failOnNull`, or any `@DtoRef`): silently defaults to the primitive's
+  zero-equivalent value (`0`/`false`/etc.) - matches the old hand-written-mapper convention.
+- **`@DtoPath(failOnNull = true)`**: throws a clear `IllegalStateException` naming the offending property
+  path instead, for callers who'd rather fail fast than silently mask a null they don't expect.
+
+`@DtoRef` has no `failOnNull` attribute (it has no other attributes at all) - it always uses the
+default (silent zero) behaviour. See `PrimitiveNullPathDto`/`PrimitiveNullPathFailOnNullDto` /
+`TestPrimitiveNullPath` for regression coverage.
+
+### Read-only entity memory overhead: `InterceptReadOnly`
 `setUnmodifiable(true)` isn't just a behavioural fail-fast flag - it also swaps the per-bean intercept
 implementation to `InterceptReadOnly`, which is deliberately minimal: just a `boolean[] loaded` (one flag
 per property) and a `boolean frozen`, plus the inherited owner reference and `fullyLoadedBean` flag. Compare
@@ -701,6 +724,19 @@ callers must consume it via try-with-resources to ensure the underlying resource
     `DtoConverterManager`) are all constructed eagerly during `Database` startup, which can be
     triggered by whichever test class in the module happens to run first.
 
+- **Known limitation (validation phase, found via `central-access`): `@DtoPath` through a computed/
+  derived getter fails at runtime, not compile time.** `@DtoPath` assumes every dotted segment names a
+  real, fetchable Ebean bean property - so a path like `@DtoPath("currentMachine.organisationMachine
+  .registrationPlate")`, where `getOrganisationMachine()` is a hand-written derived getter (not a real
+  relation/column), **compiles cleanly** (the codegen has no way to tell it apart from a real property
+  from source alone) but **fails at runtime** with a `PersistenceException: No property found for
+  [organisationMachine] in expression ...`, because the generated `FetchGroup` builder tries to
+  `fetch`/`select` it as if it were a real Ebean property. Not yet fixed - candidate remedies: (a)
+  validate each path segment against the source type's actual persistent properties at codegen time
+  and fail fast with a clear compile error instead of a cryptic runtime one (safer, consistent with the
+  primitive-unboxing fix above and the project's general fail-fast philosophy), or (b) genuinely support
+  computed-getter path segments (closer to the original `@Formula2`-style ask in issue #2540, but a much
+  larger feature). Option (a) is the more likely near-term fix given its lower cost/risk.
 
 ## References
 
