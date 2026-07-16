@@ -578,7 +578,8 @@ the chain.
 ### mapTo(Dto.class) runtime wiring (implemented)
 
 `query.mapTo(dtoType)` returns a `MappedQuery<D>` (`findList()`/`findOne()`/`findOneOrEmpty()`/
-`findPagedList()`/`usingMaster(boolean)`/`usingTransaction(Transaction)`/`usingConnection(Connection)`).
+`findPagedList()`/`findStream()`/`usingMaster(boolean)`/`usingTransaction(Transaction)`/
+`usingConnection(Connection)`).
 On first use it resolves the generated `DtoMapper<S, D>` for the query's `(getBeanType(), dtoType)`
 pair via a `DtoMapperManager` (a `ServiceLoader`-backed aggregator over all generated
 `DtoMapperRegister`s, analogous to `DtoBeanManager`), then:
@@ -598,6 +599,14 @@ all delegate directly to the underlying entity query, mirroring `Query`/`QueryBu
 caller retry against the master data source after a read-replica failure by calling
 `usingMaster(true)` on the *same* `MappedQuery` instance and re-invoking a find method - there's no
 need to rebuild the query and call `.mapTo(...)` again.
+
+`MappedQuery<D>.findStream()` mirrors `QueryBuilder#findStream()` - the underlying entity query is
+streamed (supporting very large result sets, potentially using multiple persistence contexts
+internally) and each entity is mapped to its target DTO lazily as the stream is consumed. One
+`DtoMapContext` is shared across the whole stream (not per-element), so identity de-duplication of
+nested DTOs (e.g. several `Contact`s sharing the same `Customer`) still holds even when the source
+entities are never materialized into one `List` at all. As with the entity-level `findStream()`,
+callers must consume it via try-with-resources to ensure the underlying resources are closed.
 
 ## Still open / to revisit during implementation
 

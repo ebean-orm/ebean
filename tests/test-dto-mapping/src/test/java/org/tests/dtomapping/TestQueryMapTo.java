@@ -14,6 +14,7 @@ import org.tests.dtomapping.model.query.QCustomer;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -195,6 +196,47 @@ class TestQueryMapTo {
       assertThat(dtos).hasSize(1);
       assertThat(dtos.get(0).getName()).isEqualTo("ConnCo");
     }
+  }
+
+  @Test
+  void mapTo_findStream_expectLazilyMappedDtoStream() {
+    Customer customerA = new Customer("StreamCoA");
+    customerA.save();
+    Customer customerB = new Customer("StreamCoB");
+    customerB.save();
+
+    List<String> names;
+    try (var stream = DB.find(Customer.class)
+      .where().in("name", "StreamCoA", "StreamCoB")
+      .orderBy().asc("name")
+      .mapTo(CustomerDto.class)
+      .findStream()) {
+      names = stream.map(CustomerDto::getName).collect(Collectors.toList());
+    }
+
+    assertThat(names).containsExactly("StreamCoA", "StreamCoB");
+  }
+
+  @Test
+  void mapTo_findStream_expectIdentityDedupSharedAcrossStream() {
+    Customer customer = new Customer("StreamDedupCo");
+    customer.save();
+    new Contact("Jane", "Doe", customer).save();
+    new Contact("John", "Doe", customer).save();
+
+    // both contacts share the same underlying Customer instance - the shared DtoMapContext used
+    // across the whole findStream() call should still de-duplicate to the same nested DTO
+    List<ContactDto> dtos;
+    try (var stream = DB.find(Contact.class)
+      .where().eq("customer", customer)
+      .orderBy().asc("firstName")
+      .mapTo(ContactDto.class)
+      .findStream()) {
+      dtos = stream.collect(Collectors.toList());
+    }
+
+    assertThat(dtos).hasSize(2);
+    assertThat(dtos.get(0).getCustomer()).isSameAs(dtos.get(1).getCustomer());
   }
 
   @Test

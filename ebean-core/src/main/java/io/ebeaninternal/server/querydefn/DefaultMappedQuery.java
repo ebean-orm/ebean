@@ -1,5 +1,6 @@
 package io.ebeaninternal.server.querydefn;
 
+import io.ebean.DtoMapContext;
 import io.ebean.DtoMapper;
 import io.ebean.MappedQuery;
 import io.ebean.PagedList;
@@ -10,6 +11,7 @@ import io.ebeaninternal.api.SpiQuery;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Default implementation of {@link MappedQuery} backing {@code query.mapTo(dtoType)}.
@@ -92,6 +94,13 @@ public final class DefaultMappedQuery<T, D> implements MappedQuery<D> {
   public PagedList<D> findPagedList() {
     DtoMapper<T, D> m = mapper();
     return new MappedPagedList<>(query.findPagedList(), m);
+  }
+
+  @Override
+  public Stream<D> findStream() {
+    DtoMapper<T, D> m = mapper();
+    DtoMapContext context = new DtoMapContext();
+    return query.findStream().map(source -> m.map(source, context));
   }
 
   @Override

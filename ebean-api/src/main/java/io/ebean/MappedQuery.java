@@ -6,6 +6,7 @@ import org.jspecify.annotations.Nullable;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Query that maps an entity graph query result to a nested DTO graph, produced by
@@ -38,6 +39,28 @@ public interface MappedQuery<D> {
    * underlying entity query and is unaffected by the DTO mapping.
    */
   PagedList<D> findPagedList();
+
+  /**
+   * Execute the query returning the result as a Stream of mapped DTOs.
+   * <p>
+   * Mirrors {@link QueryBuilder#findStream()} - the underlying entity graph query is streamed
+   * (supporting very large queries iterating any number of results, potentially using multiple
+   * persistence contexts internally) and each entity is mapped to its target DTO lazily as the
+   * stream is consumed, sharing one {@link DtoMapContext} across the whole stream so that
+   * repeated references to the same source entity still de-duplicate to the same DTO instance.
+   * <pre>{@code
+   *
+   *  // use try with resources to ensure Stream is closed
+   *
+   *  try (Stream<CustomerDto> stream = query.mapTo(CustomerDto.class).findStream()) {
+   *    stream
+   *    .map(...)
+   *    .collect(...);
+   *  }
+   *
+   * }</pre>
+   */
+  Stream<D> findStream();
 
   /**
    * Execute the query returning a single mapped DTO, or {@code null} if there is no matching row.
