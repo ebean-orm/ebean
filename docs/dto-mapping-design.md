@@ -577,7 +577,8 @@ the chain.
 
 ### mapTo(Dto.class) runtime wiring (implemented)
 
-`query.mapTo(dtoType)` returns a `MappedQuery<D>` (`findList()`/`findOne()`/`findOneOrEmpty()`).
+`query.mapTo(dtoType)` returns a `MappedQuery<D>` (`findList()`/`findOne()`/`findOneOrEmpty()`/
+`findPagedList()`/`usingMaster(boolean)`/`usingTransaction(Transaction)`/`usingConnection(Connection)`).
 On first use it resolves the generated `DtoMapper<S, D>` for the query's `(getBeanType(), dtoType)`
 pair via a `DtoMapperManager` (a `ServiceLoader`-backed aggregator over all generated
 `DtoMapperRegister`s, analogous to `DtoBeanManager`), then:
@@ -591,6 +592,12 @@ pair via a `DtoMapperManager` (a `ServiceLoader`-backed aggregator over all gene
 
 An unregistered `(source, dtoType)` pair throws a `PersistenceException` with a suggested
 `@DtoMapping` fix, at first use (i.e. `findList()`/`findOne()`), not at `mapTo(dtoType)` call time.
+
+`MappedQuery<D>.usingMaster(boolean)`, `.usingTransaction(Transaction)`, and `.usingConnection(Connection)`
+all delegate directly to the underlying entity query, mirroring `Query`/`QueryBuilder`. This lets a
+caller retry against the master data source after a read-replica failure by calling
+`usingMaster(true)` on the *same* `MappedQuery` instance and re-invoking a find method - there's no
+need to rebuild the query and call `.mapTo(...)` again.
 
 ## Still open / to revisit during implementation
 
