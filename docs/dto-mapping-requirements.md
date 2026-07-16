@@ -139,6 +139,35 @@ while keeping DTOs as plain, framework-unattached classes.
   querybean-generator codegen support (static/instance dispatch, constructor wiring deduplicated by converter
   type). Test coverage: `tests/test-dto-mapping` `TestDtoConvert`.*
 
+- **Type-pair (package-level) custom scalar conversion**
+  Motivated by real hand-written mapper code (`EboxMapper`, central-access): the same conversion repeats
+  across many unrelated properties on one target - `DateUtils.toCalendar(...)` on ~9 fields,
+  `parseEnum(EnumType.class, value)` on ~3 - under today's `@DtoConvert` every one of those properties must
+  carry its own repeated annotation. MapStruct solves this by letting a conversion method be defined once
+  (in the mapper or a `uses = {...}` helper) and auto-applying it to *every* property whose source/target
+  types match that method's signature - no per-field wiring. Proposed: a package-level, repeatable
+  `@DtoConverters({ConverterType.class, ...})` (sibling to `@DtoMapping` in `package-info.java`) - the
+  generator indexes every public static/instance method on the referenced type(s) by `(paramType ->
+  returnType)`, then for any property whose source getter type doesn't already match the target field type
+  and which carries no explicit per-property `@DtoConvert`, looks up that type pair and wires it in
+  automatically (same static-vs-instance/`DtoConverterManager` dispatch rules as `@DtoConvert` today). An
+  explicit per-property `@DtoConvert` always overrides the type-level default. Deliberately no built-in
+  conversions shipped by Ebean itself (no implicit `Enum.valueOf`/`.name()`) - the app still owns
+  exception/null-handling semantics (e.g. `parseEnum`'s catch-and-null-on-bad-value), just declares it once
+  instead of per-field.
+  **Status: implemented.** `@DtoConverters(ConverterType.class, ...)` (a single non-repeatable annotation
+  taking a `Class<?>[]`, `@Target({PACKAGE, MODULE})`) is registered once per package/module alongside
+  `@DtoMapping`. The generator indexes every public, single-arg, non-void method on each referenced type by
+  exact `(paramType -> returnType)`; any SCALAR property (plain or `@DtoPath`-renamed) with no explicit
+  `@DtoConvert` and a source/target type mismatch is auto-wired to the matching method (a duplicate/ambiguous
+  type pair across the registered types is a compile-time processor error). List-element-wise conversion and
+  `@DtoRef` (FK-id) properties are out of scope. Test coverage:
+  `tests/test-dto-mapping/.../TestDtoConverters.java` (`UuidConverters`/`UuidShortCodeConverter`,
+  `ContactTypeConverterDto`) - covers same-name auto-dispatch, `@DtoPath`-renamed auto-dispatch, and explicit
+  `@DtoConvert` overriding the registered default.
+  *Inspiration: `EboxMapper` (central-access) hand-written pattern; MapStruct type-signature-matched
+  conversion methods.*
+
 - **`@DtoMixin` for DTOs that cannot be annotated directly**
   Some DTOs are generated (e.g. from an OpenAPI spec) and not editable/annotatable, so `@DtoPath`/
   `@DtoConvert`/`@DtoRef` cannot always be placed directly on the DTO. Introduce a `@DtoMixin(Target.class)`
@@ -228,6 +257,44 @@ instead (see "Recipe: adding extra caller-supplied fields after mapping" in
   `DtoMapperRegister`/`DtoMapperManager`.
   *Inspiration: `UserService`/`User` (central-access).*
   *Status: implemented.*
+
+- **Setter-based (mutable JavaBean) target construction**
+  Motivated by `EboxMapper` (central-access): its target types (`Ebox`, `MachineSummaryInfo`, from
+  `nz.co.eroad.schema.eroadtypes`, JAXB/XSD-generated legacy SOAP shapes) are plain mutable JavaBeans - a
+  public no-arg constructor plus a `void setXxx(...)` setter per property - neither a positional constructor
+  match nor a RecordBuilder-style fluent builder (see section G above). The generator currently only
+  recognizes those two construction strategies, so this common third shape (typical of JAXB/XSD-generated
+  and many hand-written mutable POJOs) can't be targeted by `@DtoMapping` at all today. Proposed: detect a
+  no-arg constructor plus a `void setXxx(propertyType)` setter per mapped property as a third construction
+  strategy, generating `Target target = new Target(); target.setX(...); ...; return target;` (mirroring the
+  existing `build = AUTO | ALWAYS | NEVER` override precedent from section G for explicit control over which
+  strategy applies). Would also unblock the `mapToBuilder()`-style "populate ignored/derived properties after
+  the generated mapping, before finishing construction" pattern for these targets (currently only available
+  for builder-shaped targets) - relevant to `EboxMapper`'s `machineSummaryInfo` (a genuinely composite,
+  multi-association derived value, out of reach of `@DtoConvert`/`@DtoPath` regardless of this gap, but a
+  natural fit for the same "map base fields via codegen, then set the derived one by hand" pattern already
+  used for `Fleet.assignedMachines`/`assignedDrivers`).
+  *Inspiration: `EboxMapper` (central-access); JAXB/XSD-generated SOAP DTO shapes generally.*
+  **Status: implemented.** `@DtoMapping(setter = AUTO | ALWAYS | NEVER)` mirrors `builder()`'s override
+  precedent. Detection requires a public no-arg constructor plus a public `setXxx(...)` setter for every
+  mapped property - either `void` or fluent-style (returning the target type itself, e.g. `public Target
+  setXxx(...) { ...; return this; }`); the generated code always calls the setter as a bare statement and
+  discards any return value, so either shape works identically. A builder, when selected, always takes
+  priority over setter-based construction. Under the default `AUTO`, setter-based construction is only
+  attempted when the target has no positional constructor matching the mapped properties (arity-based) and
+  no builder was selected - existing positional-constructor and builder-shaped targets are entirely
+  unaffected. `ALWAYS` requires the shape (codegen-time error otherwise); `NEVER` always uses a positional
+  constructor. Generated shape: `Target target = new Target(); target.setX(...); ...; return target;` (a
+  `computeIfAbsent(...)`-wrapped block-lambda variant when the target is nested elsewhere in the graph).
+  Deliberately **no** `mapToBuilder(...)`-style post-construction accessor is generated for this strategy -
+  the returned target is already the final, fully mutable instance (setters are required to be `public`), so
+  a caller can already call e.g. `dto.setExternalRef(...)` directly on the mapped result, exactly the pattern
+  `EboxMapper` already uses by hand; this is unlike the builder strategy, where the intermediate builder is
+  otherwise unreachable after its one-shot `build()` call. Test coverage:
+  `tests/test-dto-mapping/.../TestDtoSetterConstruction.java` (`ContactSetterDto`) - covers auto-detected
+  setter-chain construction plus post-construction population of two `@DtoIgnore` properties (a plain scalar
+  and a `List`) via their public setters; plus `ContactSetterFluentDto` - covers the fluent-setter-return-shape
+  variant.
 
 ### H. Record entity sources
 

@@ -52,6 +52,16 @@ class DtoMappingReader {
   /** {@code builder()} attribute value of each target's base (unnamed) registration. */
   private final Map<String, String> builderModeByTarget = new LinkedHashMap<>();
 
+  /** {@code setter()} attribute value of each target's base (unnamed) registration. */
+  private final Map<String, String> setterModeByTarget = new LinkedHashMap<>();
+
+  /**
+   * {@code @DtoConverters}-registered type-pair conversion methods, keyed by
+   * {@link #converterKey(TypeMirror, TypeMirror)} (exact parameter type -> exact return type) -
+   * see {@link #collectTypeConverters(RoundEnvironment)}/{@link #autoTypeConverter}.
+   */
+  private final Map<String, ExecutableElement> typeConverters = new LinkedHashMap<>();
+
   private static final class RawVariant {
     private final Element declaringElement;
     private final TypeElement source;
@@ -108,6 +118,7 @@ class DtoMappingReader {
       }
     }
     collectMixins(roundEnv);
+    collectTypeConverters(roundEnv);
   }
 
   /**
@@ -144,6 +155,89 @@ class DtoMappingReader {
       }
       mixinsByTarget.put(targetFqn, (TypeElement) element);
     }
+  }
+
+  /**
+   * Discover package/module-level {@code @DtoConverters({ConverterType.class, ...})}
+   * declarations (proactively, via {@code roundEnv.getElementsAnnotatedWith(...)} - same
+   * rationale as {@link #collectMixins}: a package-level annotation isn't tied to any specific
+   * field being resolved, so it can't be discovered lazily the way a per-property
+   * {@code @DtoConvert} is). Indexes every public, single-parameter, non-{@code void}-returning
+   * method declared directly on each referenced type by its exact (parameter type, return type)
+   * pair - see {@link #autoTypeConverter}.
+   */
+  private void collectTypeConverters(RoundEnvironment roundEnv) {
+    TypeElement annotationType = ctx.elementUtils().getTypeElement(Constants.DTO_CONVERTERS);
+    if (annotationType == null) {
+      return;
+    }
+    for (Element element : roundEnv.getElementsAnnotatedWith(annotationType)) {
+      DtoConvertersPrism prism = DtoConvertersPrism.getInstanceOn(element);
+      if (prism == null) {
+        continue;
+      }
+      for (TypeMirror converterTypeMirror : prism.value()) {
+        TypeElement converterType = asTypeElement(converterTypeMirror);
+        if (converterType == null) {
+          ctx.logError(element, "@DtoConverters value() must be class types");
+          continue;
+        }
+        registerTypeConverterMethods(converterType);
+      }
+    }
+  }
+
+  /**
+   * Index every public, single-parameter, non-{@code void}-returning method declared directly on
+   * {@code converterType} by its exact (parameter type, return type) pair, logging an error for
+   * any pair that would otherwise ambiguously match more than one registered method (across this
+   * or any other {@code @DtoConverters}-registered type).
+   */
+  private void registerTypeConverterMethods(TypeElement converterType) {
+    for (ExecutableElement method : ElementFilter.methodsIn(converterType.getEnclosedElements())) {
+      if (!method.getModifiers().contains(Modifier.PUBLIC) || method.getParameters().size() != 1
+        || method.getReturnType().getKind() == TypeKind.VOID) {
+        continue;
+      }
+      TypeMirror paramType = method.getParameters().get(0).asType();
+      TypeMirror returnType = method.getReturnType();
+      String key = converterKey(paramType, returnType);
+      ExecutableElement existing = typeConverters.get(key);
+      if (existing != null) {
+        ctx.logError(method, "@DtoConverters: ambiguous type-pair conversion (%s -> %s) - %s.%s and %s.%s"
+          + " both match this exact type pair; only one registered method per type pair is allowed",
+          paramType, returnType, ((TypeElement) existing.getEnclosingElement()).getQualifiedName(),
+          existing.getSimpleName(), converterType.getQualifiedName(), method.getSimpleName());
+        continue;
+      }
+      typeConverters.put(key, method);
+    }
+  }
+
+  /**
+   * Auto-apply a {@code @DtoConverters}-registered type-pair conversion when {@code explicit} is
+   * {@code null} (no per-property {@code @DtoConvert} present) and {@code sourceType} doesn't
+   * already exactly match {@code targetType}. Matched by exact type equality on both sides - no
+   * widening/supertype matching - so which method (if any) applies stays fully predictable. Never
+   * overrides an explicit per-property {@code @DtoConvert} - only ever consulted when
+   * {@code explicit} is already {@code null}.
+   */
+  private DtoConverterMeta autoTypeConverter(DtoConverterMeta explicit, TypeMirror sourceType, TypeMirror targetType) {
+    if (explicit != null || sourceType == null || typeConverters.isEmpty()
+      || ctx.typeUtils().isSameType(sourceType, targetType)) {
+      return explicit;
+    }
+    ExecutableElement method = typeConverters.get(converterKey(sourceType, targetType));
+    if (method == null) {
+      return null;
+    }
+    TypeElement converterType = (TypeElement) method.getEnclosingElement();
+    boolean isStatic = method.getModifiers().contains(Modifier.STATIC);
+    return new DtoConverterMeta(converterType.getQualifiedName().toString(), method.getSimpleName().toString(), isStatic);
+  }
+
+  private String converterKey(TypeMirror paramType, TypeMirror returnType) {
+    return paramType.toString() + "->" + returnType.toString();
   }
 
   private void addAnnotatedElements(RoundEnvironment roundEnv, String annotationTypeName, Set<Element> elements) {
@@ -194,6 +288,7 @@ class DtoMappingReader {
     resolveVariants();
     for (DtoBeanMeta meta : byTargetName.values()) {
       resolveBuilder(meta, builderModeByTarget.get(meta.targetFullName()));
+      resolveSetter(meta, setterModeByTarget.get(meta.targetFullName()));
     }
     List<DtoBeanMeta> result = excludeCycles();
     markNestedElsewhere(result);
@@ -204,7 +299,8 @@ class DtoMappingReader {
    * Attach each raw {@code @DtoMapping(name = ..., exclude = ...)} variant registration (see
    * {@link #register}) to its base mapping's {@link DtoBeanMeta}, validating that a base exists,
    * variant names are unique per target, the variant's source matches the base's source, and
-   * each excluded name resolves to a {@code NESTED_ONE}/{@code NESTED_MANY} property.
+   * each excluded name resolves to a {@code NESTED_ONE}/{@code NESTED_MANY} property, or a
+   * non-primitive {@code SCALAR} property.
    */
   private void resolveVariants() {
     for (var entry : variantsByTarget.entrySet()) {
@@ -239,9 +335,12 @@ class DtoMappingReader {
 
   /**
    * Validate and resolve one variant's {@code exclude()} property names against {@code meta}'s
-   * already-resolved properties - only {@code NESTED_ONE}/{@code NESTED_MANY} properties can be
-   * excluded (there's no type-safe "absent" value for an arbitrary scalar type). Returns
-   * {@code null} (with error(s) already logged) if anything doesn't resolve.
+   * already-resolved properties - a {@code NESTED_ONE}/{@code NESTED_MANY} property can always be
+   * excluded (falls back to {@code null}/{@code List.of()}); a plain {@link DtoPropertyMeta.Kind#SCALAR}
+   * property (e.g. a {@code @DtoConvert}-backed property with no registered nested DTO mapping of
+   * its own) can also be excluded as long as its DTO field type isn't a Java primitive - there's
+   * no type-safe "absent" value for those. Returns {@code null} (with error(s) already logged) if
+   * anything doesn't resolve.
    */
   private Set<String> resolveExcludedProperties(DtoBeanMeta meta, RawVariant raw) {
     if (raw.exclude().isEmpty()) {
@@ -257,16 +356,34 @@ class DtoMappingReader {
         ctx.logError(raw.declaringElement(), "@DtoMapping(name = \"%s\") exclude(\"%s\") does not match"
           + " any property on target %s", raw.name(), propName, meta.targetFullName());
         ok = false;
-      } else if (property.kind() != DtoPropertyMeta.Kind.NESTED_ONE && property.kind() != DtoPropertyMeta.Kind.NESTED_MANY) {
+      } else if (property.isIgnored()) {
         ctx.logError(raw.declaringElement(), "@DtoMapping(name = \"%s\") exclude(\"%s\") on target %s is"
-          + " not a nested ToOne/ToMany DTO property - only nested properties can be excluded (there's"
-          + " no type-safe \"absent\" value for an arbitrary scalar type)", raw.name(), propName, meta.targetFullName());
+          + " already @DtoIgnore - it's permanently excluded from every mapping already, remove it from"
+          + " this variant's exclude() list", raw.name(), propName, meta.targetFullName());
+        ok = false;
+      } else if (isExcludable(property)) {
+        result.add(propName);
+      } else if (property.kind() == DtoPropertyMeta.Kind.SCALAR) {
+        ctx.logError(raw.declaringElement(), "@DtoMapping(name = \"%s\") exclude(\"%s\") on target %s"
+          + " is a primitive property - there's no type-safe \"absent\" value for it, so it can't be"
+          + " excluded from a named variant", raw.name(), propName, meta.targetFullName());
         ok = false;
       } else {
-        result.add(propName);
+        ctx.logError(raw.declaringElement(), "@DtoMapping(name = \"%s\") exclude(\"%s\") on target %s is"
+          + " not a nested ToOne/ToMany DTO property or a non-primitive scalar - only those can be"
+          + " excluded (there's no type-safe \"absent\" value for an arbitrary scalar type)", raw.name(), propName, meta.targetFullName());
+        ok = false;
       }
     }
     return ok ? result : null;
+  }
+
+  /** {@code true} if {@code property} can be excluded from a named variant - see {@link #resolveExcludedProperties}. */
+  private boolean isExcludable(DtoPropertyMeta property) {
+    if (property.kind() == DtoPropertyMeta.Kind.NESTED_ONE || property.kind() == DtoPropertyMeta.Kind.NESTED_MANY) {
+      return true;
+    }
+    return property.kind() == DtoPropertyMeta.Kind.SCALAR && !property.isPrimitiveTarget();
   }
 
   private DtoPropertyMeta findProperty(DtoBeanMeta meta, String name) {
@@ -344,6 +461,111 @@ class DtoMappingReader {
     return new DtoBuilderMeta(builderType.getQualifiedName().toString());
   }
 
+  /**
+   * Decide (and, if applicable, detect) the setter-based construction path for {@code meta} - see
+   * {@code @DtoMapping(setter = ...)} and {@link DtoSetterMeta}. A no-op if a builder was already
+   * selected for {@code meta} (see {@link #resolveBuilder}) - a builder always takes priority.
+   * {@code NEVER} always uses a positional constructor. {@code ALWAYS} requires a matching
+   * no-arg-constructor-plus-setters shape to be found (a codegen error otherwise). {@code AUTO}
+   * (the default) only attempts detection when the target has no positional constructor matching
+   * the mapped properties (arity-based - see {@link #hasPositionalConstructor}), silently falling
+   * back to a positional constructor call if no matching setter shape is found either.
+   */
+  private void resolveSetter(DtoBeanMeta meta, String setterMode) {
+    if (meta.builderMeta() != null) {
+      return;
+    }
+    String mode = (setterMode == null || setterMode.isEmpty()) ? "AUTO" : setterMode;
+    if ("NEVER".equals(mode)) {
+      return;
+    }
+    boolean required = "ALWAYS".equals(mode);
+    if (!required && hasPositionalConstructor(meta.target(), meta.properties().size())) {
+      return;
+    }
+    DtoSetterMeta setter = detectSetter(meta, required);
+    if (setter != null) {
+      meta.setterMeta(setter);
+    }
+  }
+
+  /**
+   * Detect a plain mutable-JavaBean shape on {@code meta.target()}: a public no-arg constructor
+   * plus a void {@code setXxx(...)} setter for every one of {@code meta}'s properties. Returns
+   * {@code null} if any part of that shape is missing - logging a codegen error only when
+   * {@code required} (i.e. {@code setter = ALWAYS}); silent otherwise (i.e. {@code setter = AUTO},
+   * where a missing shape just means "use a positional constructor instead").
+   */
+  private DtoSetterMeta detectSetter(DtoBeanMeta meta, boolean required) {
+    TypeElement target = meta.target();
+    if (!hasPublicNoArgConstructor(target)) {
+      if (required) {
+        ctx.logError(target, "@DtoMapping(setter = ALWAYS) on target %s but no public no-arg"
+          + " constructor was found", meta.targetFullName());
+      }
+      return null;
+    }
+    for (DtoPropertyMeta property : meta.properties()) {
+      if (findSetter(target, property.dtoFieldName()) == null) {
+        if (required) {
+          ctx.logError(target, "@DtoMapping(setter = ALWAYS) on target %s but no public"
+            + " \"%s(...)\" setter method was found", meta.targetFullName(), setterName(property.dtoFieldName()));
+        }
+        return null;
+      }
+    }
+    return new DtoSetterMeta();
+  }
+
+  private boolean hasPublicNoArgConstructor(TypeElement type) {
+    for (ExecutableElement ctor : ElementFilter.constructorsIn(type.getEnclosedElements())) {
+      if (ctor.getParameters().isEmpty() && ctor.getModifiers().contains(Modifier.PUBLIC)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /** {@code true} if {@code type} has any declared constructor with exactly {@code arity} parameters - the shape a positional constructor call assumes. */
+  private boolean hasPositionalConstructor(TypeElement type, int arity) {
+    for (ExecutableElement ctor : ElementFilter.constructorsIn(type.getEnclosedElements())) {
+      if (ctor.getParameters().size() == arity) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Find a public single-arg {@code setXxx(...)} method on {@code type} - either {@code void}
+   * or fluent-style (returning {@code type} itself, e.g. {@code public Target setXxx(...) { ...;
+   * return this; }}). Either shape is accepted since the generated code always calls the setter
+   * as a bare statement and discards any return value.
+   */
+  private ExecutableElement findSetter(TypeElement type, String propertyName) {
+    String setterName = setterName(propertyName);
+    for (ExecutableElement method : ElementFilter.methodsIn(type.getEnclosedElements())) {
+      if (method.getSimpleName().contentEquals(setterName) && method.getParameters().size() == 1
+        && method.getModifiers().contains(Modifier.PUBLIC) && isVoidOrFluentReturn(method, type)) {
+        return method;
+      }
+    }
+    return null;
+  }
+
+  /** {@code true} if {@code method} returns {@code void}, or returns {@code declaringType} itself (fluent-style setter). */
+  private boolean isVoidOrFluentReturn(ExecutableElement method, TypeElement declaringType) {
+    TypeMirror returnType = method.getReturnType();
+    return returnType.getKind() == TypeKind.VOID
+      || (returnType.getKind() == TypeKind.DECLARED
+        && ctx.typeUtils().isSameType(ctx.typeUtils().erasure(returnType), ctx.typeUtils().erasure(declaringType.asType())));
+  }
+
+  /** {@code referenceCode} -> {@code setReferenceCode} (standard JavaBean setter naming convention). */
+  private String setterName(String propertyName) {
+    return "set" + Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
+  }
+
   private ExecutableElement findStaticNoArgMethod(TypeElement type, String name) {
     for (ExecutableElement method : ElementFilter.methodsIn(type.getEnclosedElements())) {
       if (method.getSimpleName().contentEquals(name) && method.getModifiers().contains(Modifier.STATIC)
@@ -400,8 +622,10 @@ class DtoMappingReader {
         return;
       }
       String mapperPackage = resolveMapperPackage(prism, targetType, declaringElement);
-      byTargetName.put(targetFqn, new DtoBeanMeta(sourceType, targetType, mapperPackage));
+      String mapperName = prism.mapperName() == null ? "" : prism.mapperName().trim();
+      byTargetName.put(targetFqn, new DtoBeanMeta(sourceType, targetType, mapperPackage, mapperName));
       builderModeByTarget.put(targetFqn, prism.builder());
+      setterModeByTarget.put(targetFqn, prism.setter());
     } else {
       variantsByTarget.computeIfAbsent(targetFqn, t -> new ArrayList<>())
         .add(new RawVariant(declaringElement, sourceType, name, prism.exclude()));
@@ -449,9 +673,13 @@ class DtoMappingReader {
 
   private DtoPropertyMeta resolveProperty(VariableElement field, DtoBeanMeta meta) {
     String name = field.getSimpleName().toString();
+    DtoIgnorePrism ignorePrism = prismOn(field, meta, DtoIgnorePrism::getInstanceOn);
     DtoConverterMeta converter = resolveConverter(field, meta);
     DtoRefPrism refPrism = prismOn(field, meta, DtoRefPrism::getInstanceOn);
     DtoPathPrism pathPrism = prismOn(field, meta, DtoPathPrism::getInstanceOn);
+    if (ignorePrism != null) {
+      return resolveIgnoredProperty(field, meta, name, converter, refPrism, pathPrism);
+    }
     if (refPrism != null && pathPrism != null) {
       ctx.logError(field, "%s.%s carries both @DtoRef and @DtoPath - these are mutually exclusive"
         + " (@DtoRef always wins silently otherwise), remove whichever doesn't apply",
@@ -490,13 +718,15 @@ class DtoMappingReader {
       // @DtoRef has no failOnNull escape hatch - always default to the primitive's zero-equivalent
       // rather than let a null-guarded getter chain auto-unbox to a NullPointerException.
       return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.REF, List.of(assocGetter, idGetter), List.of(assocName, "id"),
-        null, converter, field.asType().getKind().isPrimitive(), false, computedSegment, requiredFetchPaths);
+        null, converter, field.asType().getKind().isPrimitive(), false, computedSegment, requiredFetchPaths, false, false);
     }
     if (pathPrism != null) {
       List<String> getters = new ArrayList<>();
       List<String> properties = new ArrayList<>();
       TypeElement currentType = meta.source();
       TypeElement computedDeclaringType = null;
+      TypeElement lastOwnerType = null;
+      String lastGetter = null;
       int computedFrom = -1;
       for (String segment : pathPrism.value().split("\\.")) {
         String getter = getterName(currentType, segment);
@@ -506,6 +736,8 @@ class DtoMappingReader {
           computedFrom = properties.size() - 1;
           computedDeclaringType = currentType;
         }
+        lastOwnerType = currentType;
+        lastGetter = getter;
         currentType = currentType != null ? getterReturnType(currentType, getter) : null;
       }
       List<String> requiredFetchPaths = List.of();
@@ -586,8 +818,12 @@ class DtoMappingReader {
       // primitive, the generated null-guarded getter chain would otherwise auto-unbox a null
       // straight into a NullPointerException. Default to the primitive's zero-equivalent value,
       // or fail fast with a clear message instead when @DtoPath(failOnNull = true).
-      return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties, null, converter,
-        field.asType().getKind().isPrimitive(), pathPrism.failOnNull(), computedFrom >= 0, requiredFetchPaths);
+      boolean isListTarget = listElementType(field.asType()) != null;
+      DtoConverterMeta pathConverter = isListTarget ? converter
+        : autoTypeConverter(converter, lastOwnerType != null ? getterReturnTypeMirror(lastOwnerType, lastGetter) : null, field.asType());
+      return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties, null, pathConverter,
+        field.asType().getKind().isPrimitive(), pathPrism.failOnNull(), computedFrom >= 0, requiredFetchPaths,
+        isListTarget, false);
     }
     TypeMirror fieldType = field.asType();
     TypeMirror listElementType = listElementType(fieldType);
@@ -604,7 +840,34 @@ class DtoMappingReader {
         return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_ONE, List.of(getterName(meta.source(), name)), List.of(name), nested);
       }
     }
-    return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, List.of(getterName(meta.source(), name)), List.of(name), null, converter);
+    String getter = getterName(meta.source(), name);
+    DtoConverterMeta scalarConverter = listElementType != null ? converter
+      : autoTypeConverter(converter, getterReturnTypeMirror(meta.source(), getter), fieldType);
+    return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, List.of(getter), List.of(name), null, scalarConverter,
+      fieldType.getKind().isPrimitive(), listElementType != null);
+  }
+
+  /**
+   * Resolve a {@code @DtoIgnore} property - permanently excluded from every mapping (base and
+   * every named variant alike), always given its empty default rather than resolved from any
+   * source getter/path at all (see {@code DtoIgnore}'s javadoc). Validates it isn't combined with
+   * {@code @DtoRef}/{@code @DtoPath}/{@code @DtoConvert} (all pointless - there's no source
+   * expression to convert/redirect when nothing is ever read from the source) and isn't a
+   * primitive-typed field (no type-safe "absent" value for it).
+   */
+  private DtoPropertyMeta resolveIgnoredProperty(VariableElement field, DtoBeanMeta meta, String name,
+                                                  DtoConverterMeta converter, DtoRefPrism refPrism, DtoPathPrism pathPrism) {
+    if (converter != null || refPrism != null || pathPrism != null) {
+      ctx.logError(field, "@DtoIgnore on %s.%s cannot be combined with @DtoConvert/@DtoRef/@DtoPath -"
+        + " an @DtoIgnore property is never resolved from the source at all, so there's no source"
+        + " expression for those to act on. Remove @DtoIgnore or the other annotation(s).",
+        meta.targetFullName(), name);
+    }
+    if (field.asType().getKind().isPrimitive()) {
+      ctx.logError(field, "@DtoIgnore cannot be applied to primitive-typed property %s.%s - there's"
+        + " no type-safe \"absent\" value for it", meta.targetFullName(), name);
+    }
+    return DtoPropertyMeta.ignored(name, listElementType(field.asType()) != null);
   }
 
   /**

@@ -69,4 +69,45 @@ class TestDtoMapperVariants {
   void noContacts_whenSourceNull_expectNullDto() {
     assertThat(mapper.noContacts().map(null)).isNull();
   }
+
+  /**
+   * "Section G" follow-up - a named variant can also exclude a plain non-nested {@code SCALAR}
+   * property (here, a {@code @DtoConvert}-backed {@code List<String>} with no registered nested
+   * DTO mapping for its element type - the same shape as a real-world "fleet list populated from
+   * ad-hoc SQL" property), not just {@code NESTED_ONE}/{@code NESTED_MANY}.
+   */
+  @Test
+  void mapTo_withNoTagsVariant_expectTagsExcludedAndNoContactsFetch() {
+    CustomerTagsDtoMapper tagsMapper = new CustomerTagsDtoMapper();
+    Customer customer = new Customer("Acme");
+    customer.save();
+    new Contact("Jane", "Doe", customer).save();
+
+    CustomerTagsDto dto = DB.find(Customer.class)
+      .where().idEq(customer.getId())
+      .mapTo(CustomerTagsDto.class, tagsMapper.noTags())
+      .findOne();
+
+    assertThat(dto).isNotNull();
+    assertThat(dto.getName()).isEqualTo("Acme");
+    // tags IS excluded by this variant - empty, not null
+    assertThat(dto.getTags()).isEmpty();
+    // and its own fetchGroup is distinct from the base mapping's
+    assertThat(tagsMapper.noTags().fetchGroup()).isNotSameAs(tagsMapper.fetchGroup());
+  }
+
+  @Test
+  void mapTo_baseCustomerTagsMapping_expectTagsPopulated() {
+    CustomerTagsDtoMapper tagsMapper = new CustomerTagsDtoMapper();
+    Customer customer = new Customer("Acme");
+    customer.save();
+    new Contact("Jane", "Doe", customer).save();
+
+    CustomerTagsDto dto = DB.find(Customer.class)
+      .where().idEq(customer.getId())
+      .mapTo(CustomerTagsDto.class)
+      .findOne();
+
+    assertThat(dto.getTags()).containsExactly("Jane Doe");
+  }
 }

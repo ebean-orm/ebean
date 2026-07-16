@@ -36,7 +36,7 @@ final class DtoMapperVariant {
     return suffix;
   }
 
-  /** Dto field names (of {@code NESTED_ONE}/{@code NESTED_MANY} properties) this variant excludes. */
+  /** Dto field names ({@code NESTED_ONE}/{@code NESTED_MANY}, or non-primitive {@code SCALAR}) this variant excludes. */
   Set<String> excludedProperties() {
     return excludedProperties;
   }

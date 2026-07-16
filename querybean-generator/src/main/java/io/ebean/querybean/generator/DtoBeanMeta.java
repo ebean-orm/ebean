@@ -18,6 +18,7 @@ class DtoBeanMeta {
   private final List<DtoPropertyMeta> properties = new ArrayList<>();
   private final List<DtoMapperVariant> variants = new ArrayList<>();
   private DtoBuilderMeta builderMeta;
+  private DtoSetterMeta setterMeta;
 
   /** Cycle detection state - see {@link DtoMappingReader#checkForCycles()}. */
   enum Visit { WHITE, GRAY, BLACK }
@@ -32,11 +33,13 @@ class DtoBeanMeta {
    */
   private boolean nestedElsewhere;
 
-  DtoBeanMeta(TypeElement source, TypeElement target, String mapperPackage) {
+  DtoBeanMeta(TypeElement source, TypeElement target, String mapperPackage, String mapperName) {
     this.source = source;
     this.target = target;
     this.mapperPackage = mapperPackage;
-    this.mapperShortName = target.getSimpleName().toString() + "Mapper";
+    this.mapperShortName = mapperName != null && !mapperName.isEmpty()
+      ? mapperName
+      : target.getSimpleName() + "Mapper";
     this.mapperFullName = mapperPackage + "." + mapperShortName;
   }
 
@@ -95,6 +98,20 @@ class DtoBeanMeta {
 
   void builderMeta(DtoBuilderMeta builderMeta) {
     this.builderMeta = builderMeta;
+  }
+
+  /**
+   * The detected+selected setter-based construction path for this target, or {@code null} if not
+   * applicable - see {@link DtoMappingReader#resolveSetter(DtoBeanMeta, String)}. Mutually
+   * exclusive with {@link #builderMeta()} - a builder, when selected, always takes priority (see
+   * {@link DtoMappingReader#resolveAndValidate()}).
+   */
+  DtoSetterMeta setterMeta() {
+    return setterMeta;
+  }
+
+  void setterMeta(DtoSetterMeta setterMeta) {
+    this.setterMeta = setterMeta;
   }
 
   /**

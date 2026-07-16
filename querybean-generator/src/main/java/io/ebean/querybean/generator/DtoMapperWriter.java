@@ -41,6 +41,7 @@ class DtoMapperWriter {
     writeConstructors();
     writeFetchGroupMethod();
     writeMapMethod();
+    writeMapToBuilderMethod();
     if (!meta.variants().isEmpty()) {
       writeBuildMethod();
       writeVariantAccessors();
@@ -60,6 +61,9 @@ class DtoMapperWriter {
     Set<String> allReferenced = new LinkedHashSet<>();
     allReferenced.add(meta.sourceFullName());
     allReferenced.add(meta.targetFullName());
+    if (meta.builderMeta() != null) {
+      allReferenced.add(meta.builderMeta().builderTypeFullName());
+    }
     for (DtoPropertyMeta property : meta.properties()) {
       if (property.nested() != null) {
         allReferenced.add(property.nested().sourceFullName());
@@ -107,8 +111,12 @@ class DtoMapperWriter {
     if (meta.properties().stream().anyMatch(DtoPropertyMeta::usesMapperSupport)) {
       imports.add("io.ebean.DtoMapperSupport");
     }
-    if (variableProperties().stream().anyMatch(p -> p.kind() == DtoPropertyMeta.Kind.NESTED_MANY)) {
+    if (variableProperties().stream().anyMatch(DtoPropertyMeta::isListTarget)
+      || meta.properties().stream().anyMatch(p -> p.isIgnored() && p.isListTarget())) {
       imports.add("java.util.List");
+    }
+    if (meta.builderMeta() != null) {
+      addImportIfNeeded(imports, meta.builderMeta().builderTypeFullName());
     }
     for (String imp : imports) {
       writer.append("import %s;", imp).eol();
@@ -219,7 +227,7 @@ class DtoMapperWriter {
   private List<String> fetchGroupChainCalls(Set<String> excludedFieldNames) {
     List<DtoPropertyMeta> activeProperties = new ArrayList<>();
     for (DtoPropertyMeta property : meta.properties()) {
-      if (!excludedFieldNames.contains(property.dtoFieldName())) {
+      if (!excludedFieldNames.contains(property.dtoFieldName()) && !property.isIgnored()) {
         activeProperties.add(property);
       }
     }
@@ -227,6 +235,13 @@ class DtoMapperWriter {
     for (DtoPropertyMeta property : activeProperties) {
       if ((property.kind() == DtoPropertyMeta.Kind.NESTED_ONE || property.kind() == DtoPropertyMeta.Kind.NESTED_MANY)
         && !property.hasComputedSegment()) {
+        nestedAssocPaths.add(property.sourcePropertyPath().get(0));
+      } else if (property.kind() == DtoPropertyMeta.Kind.SCALAR && property.isListTarget()
+        && !property.hasComputedSegment() && property.sourcePropertyPath().size() == 1) {
+        // a single-segment SCALAR property whose DTO field is a List with no registered nested
+        // DTO mapping of its own (e.g. @DtoConvert reducing a ToMany association) - still fully
+        // fetches its association path via a bare fetch(path) call below, so any other property
+        // targeting a sub-path of the same association must not also try a narrower select.
         nestedAssocPaths.add(property.sourcePropertyPath().get(0));
       }
     }
@@ -262,7 +277,16 @@ class DtoMapperWriter {
           }
           List<String> path = property.sourcePropertyPath();
           if (path.size() == 1) {
-            rootSelect.add(path.get(0));
+            if (property.isListTarget()) {
+              // a single-segment path whose DTO field type is a List, but with no registered
+              // nested DTO mapping of its own (e.g. a @DtoConvert-backed property reducing a
+              // ToMany association to a simpler element type) - the source side is still a real
+              // ToMany association, which needs an actual fetch/join (like NESTED_MANY below),
+              // not a plain root select() (that only works for scalar columns on the base table).
+              fetchCalls.add(String.format("fetch(\"%s\")", path.get(0)));
+            } else {
+              rootSelect.add(path.get(0));
+            }
           } else {
             String fetchPath = String.join(".", path.subList(0, path.size() - 1));
             if (nestedAssocPaths.contains(fetchPath)) {
@@ -391,7 +415,18 @@ class DtoMapperWriter {
     writer.append("    if (source == null) {").eol();
     writer.append("      return null;").eol();
     writer.append("    }").eol();
-    if (!variableProps.isEmpty()) {
+    if (meta.builderMeta() != null) {
+      // the base (full) mapping is always exactly mapToBuilder(...).build() - shares that one
+      // chain rather than re-emitting a second copy of it here, whether or not named variants
+      // exist (build(...), below, is only ever needed for a named variant's own partial view)
+      if (meta.nestedElsewhere()) {
+        writer.append("    // dedup using DtoMapContext, same %s instance can be reached via more than one path in the graph", sourceShort).eol();
+        writer.append("    return context.computeIfAbsent(%s.class, source, s -> mapToBuilder(s, context).build());", targetShort).eol();
+      } else {
+        writer.append("    // DtoMapContext for nested mappers only").eol();
+        writer.append("    return mapToBuilder(source, context).build();").eol();
+      }
+    } else if (!variableProps.isEmpty()) {
       // named variants exist - route construction through the shared build(...) method, this
       // (base) mapping includes every variable property (each still evaluated inline, at its own
       // declared position, inside build() - see buildCallArgs())
@@ -405,43 +440,137 @@ class DtoMapperWriter {
       }
     } else if (meta.nestedElsewhere()) {
       writer.append("    // dedup using DtoMapContext, same %s instance can be reached via more than one path in the graph", sourceShort).eol();
-      writeConstructionExpression(
-        String.format("    return context.computeIfAbsent(%s.class, source, s -> ", targetShort),
-        "s", variableProps, ")");
+      writeConstructionExpression(true, variableProps);
     } else if (nestedProperties().isEmpty()) {
       writer.append("    // skip DtoMapContext, only ever a top-level mapping").eol();
-      writeConstructionExpression("    return ", "source", variableProps, "");
+      writeConstructionExpression(false, variableProps);
     } else {
       writer.append("    // DtoMapContext for nested mappers only").eol();
-      writeConstructionExpression("    return ", "source", variableProps, "");
+      writeConstructionExpression(false, variableProps);
     }
     writer.append("  }").eol();
   }
 
   /**
-   * Emit the target construction expression - either a positional constructor call or, when
-   * {@link DtoBeanMeta#builderMeta()} is present (see {@code @DtoMapping(builder = ...)}), a
-   * {@code Target.builder()....build()} fluent chain. {@code linePrefix} is written before the
-   * expression starts (e.g. {@code "    return "} or a {@code computeIfAbsent(...)} lambda
-   * opener); {@code wrapperClosing} is any additional closing needed for an enclosing call this
-   * expression is nested inside (e.g. {@code ")"} to close an enclosing
-   * {@code computeIfAbsent(...)} call, or {@code ""} for a plain {@code return}) - the trailing
-   * {@code ";"} is always added here. Every property - including ones in {@code variableProps} -
-   * is evaluated inline, in true {@link DtoBeanMeta#properties()} declared order; a variable
-   * property's expression is simply guarded by its {@code includeXxx} boolean parameter (see
-   * {@link #writeBuildMethod()}), so no property's evaluation is ever hoisted out of its declared
-   * position (only non-empty when named variants exist - see {@link #variableProperties()}).
+   * Additionally expose a {@code mapToBuilder(source)} accessor - returning the target's detected
+   * builder (see {@link DtoBeanMeta#builderMeta()}) one step before its final {@code build()}
+   * call - only when the target is constructed via a builder in the first place. Lets a caller set
+   * an {@code @DtoIgnore} property's real value (typically sourced from another query/service call
+   * entirely outside this mapper's own fetch graph) before finishing construction, e.g.
+   * {@code mapper.mapToBuilder(source).assignedMachines(loadMachines(source)).build()}.
+   * <p>
+   * When named variants exist, the actual guarded builder chain (each variable property behind
+   * its own {@code includeXxx} ternary) is written exactly once, in a private flagged overload -
+   * both this public (always-full) accessor and the shared {@link #writeBuildMethod()} (used by
+   * each variant's own partial view) delegate to it, rather than each keeping their own copy.
    */
-  private void writeConstructionExpression(String linePrefix, String rootVariable, Set<DtoPropertyMeta> variableProps, String wrapperClosing) {
-    String targetShort = Split.shortName(meta.targetFullName());
+  private void writeMapToBuilderMethod() {
     if (meta.builderMeta() == null) {
-      writer.append("%snew %s(", linePrefix, targetShort).eol();
-      writeConstructionArgs(rootVariable, variableProps, ")" + wrapperClosing + ";");
-    } else {
-      writer.append("%s%s.builder()", linePrefix, targetShort).eol();
-      writeBuilderChain(rootVariable, variableProps);
-      writer.append("      .build()%s;", wrapperClosing).eol();
+      return;
     }
+    String sourceShort = Split.shortName(meta.sourceFullName());
+    String targetShort = Split.shortName(meta.targetFullName());
+    String builderShort = meta.builderMeta().builderTypeShortName();
+    Set<DtoPropertyMeta> variableProps = variableProperties();
+    writer.append("  /**").eol();
+    writer.append("   * Map to the target's builder, one step before its final build() call - lets a caller").eol();
+    writer.append("   * set an @DtoIgnore property's real value before finishing construction.").eol();
+    writer.append("   */").eol();
+    writer.append("  public %s mapToBuilder(%s source) {", builderShort, sourceShort).eol();
+    writer.append("    return mapToBuilder(source, new DtoMapContext());").eol();
+    writer.append("  }").eol().eol();
+
+    writer.append("  public %s mapToBuilder(%s source, DtoMapContext context) {", builderShort, sourceShort).eol();
+    writer.append("    if (source == null) {").eol();
+    writer.append("      return null;").eol();
+    writer.append("    }").eol();
+    if (variableProps.isEmpty()) {
+      writer.append("    return %s.builder()", targetShort).eol();
+      writeBuilderChain("source", variableProps);
+      writer.append("      ;").eol();
+    } else {
+      // this (base) mapping always includes every variable property - delegate to the shared
+      // flagged overload below rather than re-emitting the chain here
+      writer.append("    return mapToBuilder(source, context%s);", buildCallArgs(variableProps)).eol();
+    }
+    writer.append("  }").eol().eol();
+
+    if (!variableProps.isEmpty()) {
+      writer.append("  private %s mapToBuilder(%s source, DtoMapContext context%s) {",
+        builderShort, sourceShort, buildMethodParams(variableProps)).eol();
+      writer.append("    return %s.builder()", targetShort).eol();
+      writeBuilderChain("source", variableProps);
+      writer.append("      ;").eol();
+      writer.append("  }").eol().eol();
+    }
+  }
+
+  /**
+   * Emit the target construction expression - a positional constructor call, a
+   * {@code Target.builder()....build()} fluent chain (when {@link DtoBeanMeta#builderMeta()} is
+   * present, see {@code @DtoMapping(builder = ...)}), or a setter-based
+   * {@code Target target = new Target(); target.setX(...); ...; return target;} statement block
+   * (when {@link DtoBeanMeta#setterMeta()} is present, see {@code @DtoMapping(setter = ...)}).
+   * <p>
+   * {@code computeIfAbsent} selects between a plain {@code return EXPR;} (the common case) and a
+   * {@code return context.computeIfAbsent(Target.class, source, s -> EXPR)} wrapper (only used
+   * when {@link DtoBeanMeta#nestedElsewhere()}, so the same source instance reached via more than
+   * one path in the graph maps to the same target instance) - the setter-based case needs its own
+   * block-lambda form (see {@link #writeSetterConstruction}) since, unlike the other two
+   * strategies, it's a multi-statement construction rather than a single expression. Every
+   * property - including ones in {@code variableProps} - is evaluated inline, in true
+   * {@link DtoBeanMeta#properties()} declared order; a variable property's expression is simply
+   * guarded by its {@code includeXxx} ternary (see {@link #writeBuildMethod()}), so no property's
+   * evaluation is ever hoisted out of its declared position (only non-empty when named variants
+   * exist - see {@link #variableProperties()}).
+   */
+  private void writeConstructionExpression(boolean computeIfAbsent, Set<DtoPropertyMeta> variableProps) {
+    String targetShort = Split.shortName(meta.targetFullName());
+    String rootVariable = computeIfAbsent ? "s" : "source";
+    if (meta.setterMeta() != null) {
+      writeSetterConstruction(computeIfAbsent, targetShort, rootVariable, variableProps);
+      return;
+    }
+    String returnPrefix = computeIfAbsent
+      ? String.format("    return context.computeIfAbsent(%s.class, source, s -> ", targetShort)
+      : "    return ";
+    String closing = computeIfAbsent ? ")" : "";
+    if (meta.builderMeta() == null) {
+      writer.append("%snew %s(", returnPrefix, targetShort).eol();
+      writeConstructionArgs(rootVariable, variableProps, ")" + closing + ";");
+    } else {
+      writer.append("%s%s.builder()", returnPrefix, targetShort).eol();
+      writeBuilderChain(rootVariable, variableProps);
+      writer.append("      .build()%s;", closing).eol();
+    }
+  }
+
+  /**
+   * Emit setter-based (mutable JavaBean) construction - see {@code @DtoMapping(setter = ...)},
+   * {@link DtoSetterMeta}. Unlike a positional constructor call or a builder chain (both single
+   * expressions), this is a multi-statement local-variable-then-setter-calls block, so the
+   * {@code computeIfAbsent(...)}-wrapped (nested-elsewhere) case needs an explicit block lambda
+   * (curly braces + its own {@code return}) rather than a single continued expression.
+   */
+  private void writeSetterConstruction(boolean computeIfAbsent, String targetShort, String rootVariable, Set<DtoPropertyMeta> variableProps) {
+    String indent = computeIfAbsent ? "      " : "    ";
+    if (computeIfAbsent) {
+      writer.append("    return context.computeIfAbsent(%s.class, source, s -> {", targetShort).eol();
+    }
+    writer.append("%s%s target = new %s();", indent, targetShort, targetShort).eol();
+    for (DtoPropertyMeta property : meta.properties()) {
+      writer.append("%starget.%s(%s);", indent, setterName(property.dtoFieldName()),
+        constructionValueExpression(property, rootVariable, variableProps)).eol();
+    }
+    writer.append("%sreturn target;", indent).eol();
+    if (computeIfAbsent) {
+      writer.append("    });").eol();
+    }
+  }
+
+  /** {@code referenceCode} -> {@code setReferenceCode} (standard JavaBean setter naming convention) - mirrors {@code DtoMappingReader.setterName}. */
+  private String setterName(String propertyName) {
+    return "set" + Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
   }
 
   private void writeConstructionArgs(String rootVariable, Set<DtoPropertyMeta> variableProps, String closing) {
@@ -471,6 +600,10 @@ class DtoMapperWriter {
    * to be excluded by a variant.
    */
   private String constructionValueExpression(DtoPropertyMeta property, String rootVariable, Set<DtoPropertyMeta> variableProps) {
+    if (property.isIgnored()) {
+      // permanently excluded (see DtoIgnore) - never resolved from source, regardless of variant
+      return defaultValueFor(property);
+    }
     String expression = propertyValueExpression(property, rootVariable);
     return variableProps.contains(property)
       ? includeFlagName(property) + " ? " + expression + " : " + defaultValueFor(property)
@@ -521,8 +654,23 @@ class DtoMapperWriter {
     String targetShort = Split.shortName(meta.targetFullName());
     writer.append("  private %s build(%s source, DtoMapContext context%s) {",
       targetShort, sourceShort, buildMethodParams(variableProps)).eol();
-    writeConstructionExpression("    return ", "source", variableProps, "");
+    if (meta.builderMeta() != null) {
+      // reuse the very same flagged builder chain as the private mapToBuilder(...) overload
+      // (see writeMapToBuilderMethod()) - no second copy of it here
+      writer.append("    return mapToBuilder(source, context%s).build();", buildMethodArgs(variableProps)).eol();
+    } else {
+      writeConstructionExpression(false, variableProps);
+    }
     writer.append("  }").eol().eol();
+  }
+
+  /** Forward each variable property's own {@code includeXxx} parameter unchanged - used when one method delegates its flags to another (e.g. {@code build()} delegating to the flagged {@code mapToBuilder(...)} overload). */
+  private String buildMethodArgs(Set<DtoPropertyMeta> variableProps) {
+    StringBuilder sb = new StringBuilder();
+    for (DtoPropertyMeta property : variableProps) {
+      sb.append(", ").append(includeFlagName(property));
+    }
+    return sb.toString();
   }
 
   private String buildMethodParams(Set<DtoPropertyMeta> variableProps) {
@@ -540,12 +688,13 @@ class DtoMapperWriter {
   }
 
   /**
-   * The empty/default value a variant supplies for a property it excludes - {@code null} for a
-   * {@code NESTED_ONE}, {@code List.of()} for a {@code NESTED_MANY} (always valid since
-   * {@code NESTED_MANY} only ever derives from a {@code java.util.List<X>} target property).
+   * The empty/default value a variant supplies for a property it excludes - {@code List.of()}
+   * when the property's DTO field type is a {@code List} ({@link DtoPropertyMeta.Kind#NESTED_MANY},
+   * always list-shaped, or a {@link DtoPropertyMeta.Kind#SCALAR}/{@code @DtoConvert}-backed
+   * property whose field happens to be a {@code List}), {@code null} otherwise.
    */
   private String defaultValueFor(DtoPropertyMeta property) {
-    return property.kind() == DtoPropertyMeta.Kind.NESTED_MANY ? "List.of()" : "null";
+    return property.isListTarget() ? "List.of()" : "null";
   }
 
   /**
@@ -555,6 +704,13 @@ class DtoMapperWriter {
    * {@code DtoMapContext} identity-dedup wrapper used by the base mapping when
    * {@link DtoBeanMeta#nestedElsewhere()} - named variants are only ever used as an independent,
    * top-level {@code query.mapTo(...)} result, never nested inside another DTO graph.
+   * <p>
+   * When the target uses a builder, each variant additionally gets its own named
+   * {@code mapToBuilder<Suffix>(source, context)} accessor (e.g. {@code mapToBuilderNoFleets(...)})
+   * - not a raw flags parameter, and not a method on the variant's own (deliberately {@code
+   * private}, inaccessible-by-type-from-outside) inner class - {@code mapToBuilder(...)} isn't
+   * part of the {@link DtoMapper} interface (builder types vary per target), so there'd be no way
+   * for external code to call it on a {@code DtoMapper<SOURCE, TARGET>}-typed variant view at all.
    */
   private void writeVariantAccessors() {
     Set<DtoPropertyMeta> variableProps = variableProperties();
@@ -567,9 +723,33 @@ class DtoMapperWriter {
       writer.append("    return %s;", variant.fieldName()).eol();
       writer.append("  }").eol().eol();
     }
+    if (meta.builderMeta() != null) {
+      for (DtoMapperVariant variant : meta.variants()) {
+        writeVariantMapToBuilderMethods(variant, variableProps, sourceShort);
+      }
+    }
     for (DtoMapperVariant variant : meta.variants()) {
       writeVariantInnerClass(variant, variableProps, sourceShort, targetShort);
     }
+  }
+
+  /**
+   * Write one named variant's {@code mapToBuilder<Suffix>(source, context)} (+ single-arg
+   * convenience overload) - delegates to the same shared, once-written flagged
+   * {@code mapToBuilder(source, context, includeXxx...)} overload (see
+   * {@link #writeMapToBuilderMethod()}) with this variant's own excluded properties fixed to
+   * {@code false}, so no property's chain expression is ever duplicated per variant.
+   */
+  private void writeVariantMapToBuilderMethods(DtoMapperVariant variant, Set<DtoPropertyMeta> variableProps, String sourceShort) {
+    String builderShort = meta.builderMeta().builderTypeShortName();
+    writer.append("  /** {@code mapToBuilder(...)} for the {%s} variant - see {@link #%s()}. */",
+      variant.name(), variant.name()).eol();
+    writer.append("  public %s mapToBuilder%s(%s source, DtoMapContext context) {", builderShort, variant.suffix(), sourceShort).eol();
+    writer.append("    return mapToBuilder(source, context%s);", variantBuildArgs(variant, variableProps)).eol();
+    writer.append("  }").eol().eol();
+    writer.append("  public %s mapToBuilder%s(%s source) {", builderShort, variant.suffix(), sourceShort).eol();
+    writer.append("    return mapToBuilder%s(source, new DtoMapContext());", variant.suffix()).eol();
+    writer.append("  }").eol().eol();
   }
 
   private void writeVariantInnerClass(DtoMapperVariant variant, Set<DtoPropertyMeta> variableProps, String sourceShort, String targetShort) {

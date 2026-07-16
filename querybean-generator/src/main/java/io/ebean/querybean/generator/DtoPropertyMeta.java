@@ -29,9 +29,22 @@ class DtoPropertyMeta {
   private final boolean failOnNull;
   private final boolean computedSegment;
   private final List<String> requiredFetchPaths;
+  private final boolean listTarget;
+  private final boolean ignored;
 
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath, DtoBeanMeta nested) {
     this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, null);
+  }
+
+  /**
+   * {@code @DtoIgnore} factory - a property permanently excluded from every mapping (base and
+   * every named variant alike), always given its empty default rather than resolved from any
+   * source getter/path at all - see {@code DtoIgnore}'s javadoc. Kept as {@link Kind#SCALAR} with
+   * empty getter/property paths since {@link DtoMapperWriter} short-circuits on {@link #isIgnored()}
+   * before ever consulting them.
+   */
+  static DtoPropertyMeta ignored(String dtoFieldName, boolean listTarget) {
+    return new DtoPropertyMeta(dtoFieldName, Kind.SCALAR, List.of(), List.of(), null, null, false, false, false, List.of(), listTarget, true);
   }
 
   /**
@@ -43,16 +56,21 @@ class DtoPropertyMeta {
    */
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
                   DtoBeanMeta nested, boolean computedSegment, List<String> requiredFetchPaths) {
-    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, null, false, false, computedSegment, requiredFetchPaths);
+    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, null, false, false, computedSegment, requiredFetchPaths, false, false);
   }
 
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath, DtoBeanMeta nested, DtoConverterMeta converter) {
     this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, converter, false, false);
   }
 
+  /**
+   * Plain (no {@code @DtoPath}) {@link Kind#SCALAR} constructor variant that also records whether
+   * the DTO field type is a {@code java.util.List} - see {@code listTarget} on the full
+   * constructor.
+   */
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
-                  DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull) {
-    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, converter, primitiveTarget, failOnNull, false, List.of());
+                  DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean listTarget) {
+    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, converter, primitiveTarget, false, false, List.of(), listTarget, false);
   }
 
   /**
@@ -63,11 +81,15 @@ class DtoPropertyMeta {
    * {@code @DtoPath} that traverses a computed/derived getter segment (no backing field) - see
    * {@link #hasComputedSegment()}; kept separate from whether {@code requiredFetchPaths} happens
    * to be empty, since {@code @DtoPath(requires = {})} legitimately declares "nothing extra
-   * needed" for a computed segment.
+   * needed" for a computed segment. {@code listTarget} is {@code true} when this property's DTO
+   * field type is a {@code java.util.List} - relevant only for {@link Kind#SCALAR} (e.g. a
+   * {@code @DtoConvert}-backed {@code List} property with no registered nested DTO mapping of its
+   * own, like a fleet list populated from ad-hoc SQL) - see
+   * {@code DtoMapperWriter#defaultValueFor}.
    */
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
                   DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull,
-                  boolean computedSegment, List<String> requiredFetchPaths) {
+                  boolean computedSegment, List<String> requiredFetchPaths, boolean listTarget, boolean ignored) {
     this.dtoFieldName = dtoFieldName;
     this.kind = kind;
     this.sourceGetterPath = sourceGetterPath;
@@ -78,6 +100,8 @@ class DtoPropertyMeta {
     this.failOnNull = failOnNull;
     this.computedSegment = computedSegment;
     this.requiredFetchPaths = requiredFetchPaths;
+    this.listTarget = listTarget;
+    this.ignored = ignored;
   }
 
   String dtoFieldName() {
@@ -130,6 +154,36 @@ class DtoPropertyMeta {
    */
   boolean hasComputedSegment() {
     return computedSegment;
+  }
+
+  /**
+   * {@code true} when this property's DTO field type is a Java primitive - a primitive property
+   * has no type-safe "absent" value, so can never be excluded by a named
+   * {@code @DtoMapping(name = ..., exclude = ...)} variant.
+   */
+  boolean isPrimitiveTarget() {
+    return primitiveTarget;
+  }
+
+  /**
+   * {@code true} when this property's DTO field type is a {@code java.util.List} - set for
+   * {@link Kind#NESTED_MANY} (always list-shaped) and also for a {@link Kind#SCALAR}/
+   * {@code @DtoConvert}-backed property whose DTO field happens to be a {@code List} with no
+   * registered nested DTO mapping of its own (e.g. a fleet list populated from ad-hoc SQL) -
+   * used to pick {@code List.of()} rather than {@code null} as the excluded/empty default for a
+   * named variant, see {@code DtoMapperWriter#defaultValueFor}.
+   */
+  boolean isListTarget() {
+    return listTarget || kind == Kind.NESTED_MANY;
+  }
+
+  /**
+   * {@code true} when this property is marked {@code @DtoIgnore} - permanently excluded from
+   * every mapping (base and every named variant alike), always given its empty default rather
+   * than resolved from any source getter/path.
+   */
+  boolean isIgnored() {
+    return ignored;
   }
 
   /**

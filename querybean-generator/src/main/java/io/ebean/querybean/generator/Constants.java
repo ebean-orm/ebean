@@ -34,6 +34,7 @@ interface Constants {
   String DTO_PATH = "io.ebean.annotation.DtoPath";
   String DTO_REF = "io.ebean.annotation.DtoRef";
   String DTO_CONVERT = "io.ebean.annotation.DtoConvert";
+  String DTO_CONVERTERS = "io.ebean.annotation.DtoConverters";
   String DTO_MIXIN = "io.ebean.annotation.DtoMixin";
   String DTO_CONVERTER_MANAGER = "io.ebean.DtoConverterManager";
   String METAINF_SERVICES_DTOMAPPERREGISTER = "META-INF/services/io.ebean.config.DtoMapperRegister";
