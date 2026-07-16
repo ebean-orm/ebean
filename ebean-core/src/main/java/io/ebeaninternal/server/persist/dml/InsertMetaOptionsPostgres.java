@@ -4,11 +4,9 @@ import io.ebean.InsertOptions;
 import io.ebeaninternal.server.deploy.BeanDescriptor;
 import io.ebeaninternal.server.deploy.BeanProperty;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * Postgres specific generation of insert on conflict.
@@ -51,10 +49,7 @@ final class InsertMetaOptionsPostgres implements InsertMetaOptions {
     meta.sql(request, !withId, baseTable, false);
     request.append(" on conflict ");
 
-    List<String> uniqueColumns = desc.uniqueProps().stream()
-      .flatMap(Arrays::stream)
-      .map(BeanProperty::dbColumn)
-      .collect(Collectors.toList());
+    List<String> uniqueColumns = InsertMetaOptionsSupport.uniqueColumns(desc, withId);
 
     String constraintName = options.constraint();
     if (constraintName != null) {

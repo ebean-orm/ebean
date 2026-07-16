@@ -45,6 +45,34 @@ class TestInsertOnConflict extends BaseTestCase {
 
   @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
   @Test
+  void insertOnConflictUpdate_fallsBackToPrimaryKey_whenNoUniqueColumnsMapped() {
+    Database db = DB.getDefault();
+    LoggedSql.start();
+
+    var entity1 = new EStrIdBean();
+    entity1.setId("fallback-1");
+    entity1.setName("Example");
+    // no uniqueColumns()/constraint() explicitly set - id is not mapped @Column(unique=true)
+    // or @Index(unique=true) so this should fall back to using the primary key (id) column
+    db.insert(entity1, ON_CONFLICT_UPDATE);
+
+    var entity2 = new EStrIdBean();
+    entity2.setId("fallback-1");
+    entity2.setName("Updated");
+    db.insert(entity2, ON_CONFLICT_UPDATE);
+
+    var sql = LoggedSql.stop();
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("on conflict (id) do update set");
+    assertThat(sql.get(1)).contains("on conflict (id) do update set");
+
+    EStrIdBean found = db.find(EStrIdBean.class, "fallback-1");
+    assertThat(found).isNotNull();
+    assertThat(found.name()).isEqualTo("Updated");
+  }
+
+  @ForPlatform({Platform.POSTGRES, Platform.YUGABYTE, Platform.SQLITE})
+  @Test
   void insertOnConflictUpdateExplicitTransaction() {
     Database db = DB.getDefault();
     db.truncate(EPersonOnline.class);
