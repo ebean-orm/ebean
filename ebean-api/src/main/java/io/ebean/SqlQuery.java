@@ -3,6 +3,7 @@ package io.ebean;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import jakarta.persistence.EntityNotFoundException;
 import javax.sql.DataSource;
 import java.io.Serializable;
 import java.sql.Connection;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * Query object for performing native SQL queries that return SqlRow or directly read
@@ -143,6 +145,22 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    * Execute the query returning an optional row.
    */
   Optional<SqlRow> findOneOrEmpty();
+
+  /**
+   * Execute the query returning a single row or throwing a
+   * {@link jakarta.persistence.EntityNotFoundException} if there is no matching row.
+   */
+  default SqlRow findOneOrThrow() {
+    return findOneOrEmpty().orElseThrow(() -> new EntityNotFoundException("Not found"));
+  }
+
+  /**
+   * Execute the query returning a single row or throwing the exception produced
+   * by the given supplier if there is no matching row.
+   */
+  default SqlRow findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
+    return findOneOrEmpty().orElseThrow(exceptionSupplier);
+  }
 
   /**
    * Set one of more positioned parameters.
@@ -390,6 +408,22 @@ public interface SqlQuery extends Serializable, CancelableQuery {
      * Return the single value that is optional.
      */
     Optional<T> findOneOrEmpty();
+
+    /**
+     * Return the single value or throw a {@link jakarta.persistence.EntityNotFoundException}
+     * if there is no matching row.
+     */
+    default T findOneOrThrow() {
+      return findOneOrEmpty().orElseThrow(() -> new EntityNotFoundException("Not found"));
+    }
+
+    /**
+     * Return the single value or throw the exception produced by the given supplier
+     * if there is no matching row.
+     */
+    default T findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
+      return findOneOrEmpty().orElseThrow(exceptionSupplier);
+    }
 
     /**
      * Return the list of values.

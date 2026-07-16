@@ -3,9 +3,11 @@ package io.ebean;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
+import jakarta.persistence.EntityNotFoundException;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -72,6 +74,26 @@ public interface MappedQuery<D> {
    * Execute the query returning an optional mapped DTO.
    */
   Optional<D> findOneOrEmpty();
+
+  /**
+   * Execute the query returning a single mapped DTO or throwing a
+   * {@link jakarta.persistence.EntityNotFoundException} if there is no matching row.
+   * <p>
+   * The exception message reflects the underlying entity type and its id or single
+   * equality predicate (a likely natural/unique key) when the query is that simple,
+   * otherwise a generic "not found" message.
+   */
+  default D findOneOrThrow() {
+    return findOneOrEmpty().orElseThrow(() -> new EntityNotFoundException("Not found"));
+  }
+
+  /**
+   * Execute the query returning a single mapped DTO or throwing the exception produced
+   * by the given supplier if there is no matching row.
+   */
+  default D findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
+    return findOneOrEmpty().orElseThrow(exceptionSupplier);
+  }
 
   /**
    * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only

@@ -91,6 +91,11 @@ public final class DefaultMappedQuery<T, D> implements MappedQuery<D> {
   }
 
   @Override
+  public D findOneOrThrow() {
+    return mapper().map(query.findOneOrThrow());
+  }
+
+  @Override
   public PagedList<D> findPagedList() {
     DtoMapper<T, D> m = mapper();
     return new MappedPagedList<>(query.findPagedList(), m);

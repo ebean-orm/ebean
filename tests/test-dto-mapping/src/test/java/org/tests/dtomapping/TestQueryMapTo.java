@@ -5,6 +5,7 @@ import io.ebean.LazyInitialisationException;
 import io.ebean.PagedList;
 import io.ebean.Transaction;
 import io.ebean.test.LoggedSql;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceException;
 import org.junit.jupiter.api.Test;
 import org.tests.dtomapping.model.Address;
@@ -81,6 +82,29 @@ class TestQueryMapTo {
       .findOneOrEmpty();
 
     assertThat(dto).isEmpty();
+  }
+
+  @Test
+  void mapTo_findOneOrThrow_whenFound_expectPopulatedDto() {
+    Customer customer = new Customer("Gamma");
+    customer.save();
+
+    CustomerDto dto = DB.find(Customer.class)
+      .where().idEq(customer.getId())
+      .mapTo(CustomerDto.class)
+      .findOneOrThrow();
+
+    assertThat(dto.getName()).isEqualTo("Gamma");
+  }
+
+  @Test
+  void mapTo_findOneOrThrow_whenNoMatch_expectEntityNotFoundExceptionWithEntityTypeAndId() {
+    assertThatThrownBy(() -> DB.find(Customer.class)
+        .setId(-1L)
+        .mapTo(CustomerDto.class)
+        .findOneOrThrow())
+      .isInstanceOf(EntityNotFoundException.class)
+      .hasMessage("Customer not found for id: -1");
   }
 
   @Test

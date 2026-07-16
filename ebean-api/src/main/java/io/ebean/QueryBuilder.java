@@ -2,6 +2,7 @@ package io.ebean;
 
 import org.jspecify.annotations.Nullable;
 
+import jakarta.persistence.EntityNotFoundException;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.Timestamp;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -722,6 +724,37 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
    * Execute the query returning an optional bean.
    */
   Optional<T> findOneOrEmpty();
+
+  /**
+   * Execute the query returning a single bean or throwing a {@link jakarta.persistence.EntityNotFoundException}
+   * if there is no matching bean.
+   * <p>
+   * This is a convenience alternative to:
+   * <pre>{@code
+   *   query.findOneOrEmpty()
+   *     .orElseThrow(() -> new EntityNotFoundException(...));
+   * }</pre>
+   * <p>
+   * The exception message is a best effort - it uses the id when this is effectively a
+   * find-by-id query, or the single equality predicate when the query is filtered by what
+   * looks like a natural/unique key, otherwise a generic "not found" message.
+   */
+  default T findOneOrThrow() {
+    return findOneOrEmpty().orElseThrow(() ->
+      new EntityNotFoundException(getBeanType().getSimpleName() + " not found"));
+  }
+
+  /**
+   * Execute the query returning a single bean or throwing the exception produced by the
+   * given supplier if there is no matching bean.
+   * <pre>{@code
+   *   Customer customer = query
+   *     .findOneOrThrow(() -> new NotFoundException("Customer not found for id: " + id));
+   * }</pre>
+   */
+  default T findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
+    return findOneOrEmpty().orElseThrow(exceptionSupplier);
+  }
 
   /**
    * Execute the query returning the list of objects.

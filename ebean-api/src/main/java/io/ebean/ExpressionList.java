@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 /**
  * List of Expressions that make up a where or having clause.
@@ -420,6 +421,26 @@ public interface ExpressionList<T> {
    * Execute the query returning an optional bean.
    */
   Optional<T> findOneOrEmpty();
+
+  /**
+   * Execute the query returning a single bean or throwing a {@link jakarta.persistence.EntityNotFoundException}
+   * if there is no matching bean.
+   *
+   * @see Query#findOneOrThrow()
+   */
+  default T findOneOrThrow() {
+    return query().findOneOrThrow();
+  }
+
+  /**
+   * Execute the query returning a single bean or throwing the exception produced by the
+   * given supplier if there is no matching bean.
+   *
+   * @see Query#findOneOrThrow(Supplier)
+   */
+  default T findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
+    return query().findOneOrThrow(exceptionSupplier);
+  }
 
   /**
    * Execute find row count query in a background thread.
