@@ -56,6 +56,7 @@
 @DtoMapping(source = Customer.class, target = ComputedPathNoFetchDto.class)
 @DtoMapping(source = Contact.class, target = ContactLeafDto.class)
 @DtoMapping(source = Customer.class, target = ComputedNestedDto.class)
+@DtoMapping(source = Customer.class, target = ComputedNestedListDto.class)
 @DtoMapping(source = Customer.class, target = ComputedRefDto.class)
 @DtoMapping(source = Customer.class, target = FetchCollisionDto.class)
 package org.tests.dtomapping;

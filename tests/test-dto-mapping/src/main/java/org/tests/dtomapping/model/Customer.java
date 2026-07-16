@@ -84,4 +84,16 @@ public class Customer extends Model {
   public String getBillingSummary() {
     return billingAddress == null ? null : billingAddress.getLine1() + ", " + billingAddress.getCity();
   }
+
+  /**
+   * Computed/derived getter (no backing field) returning a {@code List} - the {@code NESTED_MANY}
+   * counterpart to {@link #getPrimaryContact()}'s {@code NESTED_ONE} case. Exercises
+   * {@code @DtoPath#requires()} through a computed getter whose return type is a {@code List} of
+   * a type with its own registered nested DTO mapping - same underlying code path as
+   * {@code getPrimaryContact()} (single-hop computed segment, {@code DtoMapperWriter}'s
+   * {@code NESTED_ONE}/{@code NESTED_MANY} branch), just the collection variant.
+   */
+  public List<Contact> getRecentContacts() {
+    return contacts.isEmpty() ? List.of() : contacts.subList(0, Math.min(2, contacts.size()));
+  }
 }

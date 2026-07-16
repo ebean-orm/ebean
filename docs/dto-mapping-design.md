@@ -812,7 +812,12 @@ callers must consume it via try-with-resources to ensure the underlying resource
     (happy path - generated `FetchGroup` is `.select("id").fetch("contacts")`, no broken
     `fetch("primaryContact", ...)` call, and the mapped value is correct end-to-end), and
     `querybean-generator`'s `DtoMapperComputedPathTest#dtoPathThroughComputedGetter_targetingNestedDto_withoutRequires_expectCompileError`
-    (negative case, mirroring the `SCALAR` one).
+    (negative case, mirroring the `SCALAR` one). The `NESTED_MANY` variant (a computed getter
+    returning a `List` of a type with its own registered nested DTO mapping) shares the identical
+    code path but had no dedicated regression test until later confirmed via `Customer
+    .getRecentContacts()` / `ComputedNestedListDto` / `TestComputedNestedListPath` (coverage only,
+    not a bug fix - passed cleanly first try, confirming the shared code path does work end-to-end
+    for both `NESTED_ONE` and `NESTED_MANY`).
 
 - **Fixed: `@DtoRef` never checked for a computed/derived association getter at all.** Unlike
   `@DtoPath`, `@DtoRef`'s association name (derived by stripping the `Id` suffix off the field
@@ -899,6 +904,84 @@ callers must consume it via try-with-resources to ensure the underlying resource
     when the fix is reverted, and pass cleanly (correct `line1`-derived value, generated
     `FetchGroup` is `.select("id").fetch("billingAddress")` with no narrowed variant at all) with
     it in place.
+
+- **Fixed: two `@DtoMixin` companion types targeting the same DTO class silently conflicted, with
+  the second-processed one winning.** `DtoMappingReader.collectMixins()` keyed a single
+  `mixinsByTarget` map by the target DTO's FQN, and `Map.put(...)` unconditionally overwrote any
+  existing entry - so if two mixin interfaces (e.g. a legitimate one plus an accidental duplicate,
+  or two independently-added mixins that both happened to target the same generated/unowned DTO)
+  both declared `@DtoMixin(SameDto.class)`, whichever was visited last by
+  `roundEnv.getElementsAnnotatedWith(...)` silently won, and *all* of the other mixin's
+  `@DtoPath`/`@DtoRef`/`@DtoConvert` overlays were discarded with no diagnostic at all.
+  - Resolution: `collectMixins()` now checks for an existing registration before storing a new one
+    and raises a compile `ERROR` naming both the target and the already-registered mixin's
+    qualified name, rather than silently overwriting it.
+  - Implemented in `querybean-generator` (`DtoMappingReader.collectMixins()`). Test coverage: new
+    negative compile-error test `DtoMapperComputedPathTest#duplicateDtoMixin_forSameTarget_expectCompileError`
+    (two minimal `@DtoMixin(FooDto.class)` interfaces both declaring a `bar()` method, compiled
+    together, asserting the `Duplicate @DtoMixin` diagnostic is raised); existing
+    `tests/test-dto-mapping` `TestDtoMixin` (single, legitimate mixin usage) continues to pass
+    unchanged.
+
+- **Fixed: `@DtoRef` and `@DtoPath` both present on the same field silently conflicted, with
+  `@DtoRef` always (invisibly) winning.** `resolveProperty()` checked `refPrism != null` first and
+  returned immediately whenever present, so a field carrying both annotations at once - whether by
+  copy/paste mistake, a half-finished rename from one style to the other, or simple confusion
+  between the two escape hatches - had its `@DtoPath` completely ignored with no diagnostic at all.
+  - Resolution: `resolveProperty()` now resolves both prisms upfront and raises a compile `ERROR`
+    naming the field when both are present, rather than silently picking `@DtoRef` and discarding
+    `@DtoPath`.
+  - Implemented in `querybean-generator` (`DtoMappingReader.resolveProperty()`). Test coverage: new
+    negative compile-error test `DtoMapperComputedPathTest#dtoRefAndDtoPath_onSameField_expectCompileError`
+    (a field carrying both `@DtoRef` and `@DtoPath("bar.id")` over a real, non-computed association,
+    isolating the conflict diagnostic from the separate computed-getter `requires()` diagnostics).
+
+- **Fixed: `@DtoConvert` on a `NESTED_ONE`/`NESTED_MANY` property was silently ignored.**
+  `resolveProperty()` resolves the property's `DtoConverterMeta` unconditionally up front (before
+  it's known whether the property will resolve to `SCALAR`/`REF`/`NESTED_ONE`/`NESTED_MANY`), but
+  only the `SCALAR`/`REF` `DtoPropertyMeta` constructors actually accept/store a converter - the
+  `NESTED_ONE`/`NESTED_MANY` constructor calls never took one, so a resolved converter was simply
+  dropped on the floor with no diagnostic. A developer adding `@DtoConvert` to a nested-DTO field
+  (e.g. hoping to post-process the nested mapper's result) would see it silently do nothing -
+  `DtoMapperWriter.propertyValueExpression()`'s `NESTED_ONE`/`NESTED_MANY` cases call straight into
+  `mapperFieldName(property) + ".map(...)"`/`".mapList(...)"` with no converter wrapping at all.
+  - Resolution: added `rejectConverterOnNested(...)`, called at each of the four call sites that
+    construct a `NESTED_ONE`/`NESTED_MANY` `DtoPropertyMeta` (the single-hop `@DtoPath`-rename
+    branch's two cases, and the plain non-`@DtoPath` branch's two cases) - raises a compile `ERROR`
+    naming the field whenever a converter was resolved for it, rather than silently discarding it.
+  - Implemented in `querybean-generator` (`DtoMappingReader.resolveProperty()`,
+    `rejectConverterOnNested()`). Test coverage: new negative compile-error test
+    `DtoMapperComputedPathTest#dtoConvertOnNestedOne_expectCompileError` (a `NESTED_ONE` field
+    carrying `@DtoConvert` over a legitimately nested, separately-`@DtoMapping`-registered type);
+    existing `tests/test-dto-mapping` suite (no nested property currently combines `@DtoConvert`
+    with `NESTED_ONE`/`NESTED_MANY`) continues to pass unchanged, confirming no false positives on
+    plain nested properties.
+
+- **Fixed: `@DtoConvert(method = ...)` resolution ignored parameter arity/overloads.** The shared
+  `findMethod(type, name)` helper (also used for the builder's `build()` lookup and `@DtoMixin`
+  companion-method lookup) matches purely by simple name - the first `ExecutableElement` found -
+  with no arity or parameter-type check at all. For `@DtoConvert` specifically this is a real risk:
+  its documented contract is a method "taking the source property value and returning the
+  converted DTO property value" (i.e. exactly one parameter), but a shared/reusable conversion
+  utility class is a very plausible place to have multiple same-named overloads (e.g. `format
+  (Instant)` and `format(LocalDate)`) - `findMethod` would silently bind to whichever one
+  `ElementFilter.methodsIn` happened to return first, independent of which one the developer
+  actually meant, generating either a confusing arity/type-mismatch compile error in the generated
+  mapper or, if both overloads happened to be call-compatible, silently invoking the wrong one.
+  - Resolution: added a dedicated `findConverterMethod(...)` (used only by `resolveConverter()`,
+    leaving the shared `findMethod()` untouched for the builder/mixin call sites which have their
+    own, different arity expectations) that filters same-named candidates down to those taking
+    exactly one parameter. Zero matches raises a clear "not found ... taking exactly one
+    parameter" error; more than one match (multiple 1-arg overloads sharing the name) raises an
+    "ambiguous - N overloads take exactly one parameter" error, since `@DtoConvert` has no
+    parameter-type-based way to disambiguate and the developer must rename one of the overloads.
+  - Implemented in `querybean-generator` (`DtoMappingReader.resolveConverter()`,
+    `findConverterMethod()`). Test coverage: new negative compile-error tests
+    `DtoMapperComputedPathTest#dtoConvertMethod_withAmbiguousOverloads_expectCompileError` (two
+    same-named 1-arg overloads) and `#dtoConvertMethod_withWrongArity_expectCompileError` (a
+    same-named 0-arg method, no 1-arg candidate at all); existing `tests/test-dto-mapping`
+    converter usage (a single, unambiguous 1-arg method per converter type) continues to resolve
+    and pass unchanged.
 
 ## References
 
