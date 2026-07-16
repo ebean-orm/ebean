@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 
+import java.util.UUID;
+
 @Entity
 public class Contact extends Model {
 
@@ -38,6 +40,13 @@ public class Contact extends Model {
    * {@code @DtoConvert}'s instance dispatch, resolved via {@code DtoConverterManager}.
    */
   private String secretCode;
+
+  /**
+   * Stand-in for a common recurring type pair (e.g. {@code UUID <-> String}) - exercises
+   * {@code @DtoConverters} package-level type-pair auto-dispatch (requirement r21), where no
+   * per-property {@code @DtoConvert} is needed at all unless overriding the registered default.
+   */
+  private UUID referenceCode;
 
   public Contact(String firstName, String lastName, Customer customer) {
     this.firstName = firstName;
@@ -103,5 +112,13 @@ public class Contact extends Model {
 
   public void setSecretCode(String secretCode) {
     this.secretCode = secretCode;
+  }
+
+  public UUID getReferenceCode() {
+    return referenceCode;
+  }
+
+  public void setReferenceCode(UUID referenceCode) {
+    this.referenceCode = referenceCode;
   }
 }

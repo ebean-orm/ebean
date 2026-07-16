@@ -42,6 +42,7 @@ public class Processor extends AbstractProcessor implements Constants {
     annotations.add(DTO_MAPPING);
     annotations.add(DTO_MAPPING_LIST);
     annotations.add(DTO_MIXIN);
+    annotations.add(DTO_CONVERTERS);
     return annotations;
   }
 

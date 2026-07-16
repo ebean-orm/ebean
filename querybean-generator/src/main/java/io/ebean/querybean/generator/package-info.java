@@ -5,7 +5,9 @@
 @GeneratePrism(io.ebean.annotation.DtoRef.class)
 @GeneratePrism(io.ebean.annotation.DtoMapping.class)
 @GeneratePrism(io.ebean.annotation.DtoConvert.class)
+@GeneratePrism(io.ebean.annotation.DtoConverters.class)
 @GeneratePrism(io.ebean.annotation.DtoMixin.class)
+@GeneratePrism(io.ebean.annotation.DtoIgnore.class)
 package io.ebean.querybean.generator;
 
 import io.avaje.prism.GeneratePrism;

@@ -811,4 +811,77 @@ class DtoMapperComputedPathTest {
       throw new UncheckedIOException(e);
     }
   }
+
+  /**
+   * A named variant may exclude a plain non-primitive {@code SCALAR} property (not just
+   * {@code NESTED_ONE}/{@code NESTED_MANY}) - see docs/dto-mapping-requirements.md "Section G"
+   * follow-up - but a primitive-typed scalar property still can't be excluded (no type-safe
+   * "absent" value).
+   */
+  @Test
+  void excludeVariant_onPrimitiveScalarProperty_expectCompileError() throws IOException {
+    Path sourceDir = Files.createTempDirectory("dto-variant-primitive-src");
+    Path outDir = Files.createTempDirectory("dto-variant-primitive-out");
+    writeSource(sourceDir, "org.tests.variantprimitive.Foo",
+      "package org.tests.variantprimitive;\n"
+        + "\n"
+        + "public class Foo {\n"
+        + "  private String name;\n"
+        + "  private int score;\n"
+        + "\n"
+        + "  public String getName() { return name; }\n"
+        + "  public int getScore() { return score; }\n"
+        + "}\n");
+    writeSource(sourceDir, "org.tests.variantprimitive.FooDto",
+      "package org.tests.variantprimitive;\n"
+        + "\n"
+        + "public class FooDto {\n"
+        + "  private final String name;\n"
+        + "  private final int score;\n"
+        + "\n"
+        + "  public FooDto(String name, int score) {\n"
+        + "    this.name = name;\n"
+        + "    this.score = score;\n"
+        + "  }\n"
+        + "\n"
+        + "  public String getName() { return name; }\n"
+        + "  public int getScore() { return score; }\n"
+        + "}\n");
+    writeSource(sourceDir, "org.tests.variantprimitive.package-info",
+      "@DtoMapping(source = Foo.class, target = FooDto.class)\n"
+        + "@DtoMapping(source = Foo.class, target = FooDto.class, name = \"noScore\", exclude = \"score\")\n"
+        + "package org.tests.variantprimitive;\n"
+        + "\n"
+        + "import io.ebean.annotation.DtoMapping;\n");
+
+    DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<>();
+    JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    try (StandardJavaFileManager fileManager = compiler.getStandardFileManager(diagnostics, Locale.getDefault(), null)) {
+      List<Path> sourceFiles;
+      try (var walk = Files.walk(sourceDir)) {
+        sourceFiles = walk.filter(p -> p.toString().endsWith(".java")).collect(Collectors.toList());
+      }
+      Iterable<? extends JavaFileObject> compilationUnits =
+        fileManager.getJavaFileObjectsFromPaths(sourceFiles);
+
+      List<String> options = List.of(
+        "-d", outDir.toString(),
+        "-classpath", System.getProperty("java.class.path"),
+        "-processor", Processor.class.getName());
+
+      JavaCompiler.CompilationTask task = compiler.getTask(
+        null, fileManager, diagnostics, options, null, compilationUnits);
+      boolean success = task.call();
+
+      assertFalse(success, "compilation should fail excluding a primitive scalar property from a variant");
+      List<Diagnostic<? extends JavaFileObject>> errors = diagnostics.getDiagnostics().stream()
+        .filter(d -> d.getKind() == Diagnostic.Kind.ERROR)
+        .collect(Collectors.toList());
+      assertFalse(errors.isEmpty(), "expected at least one compile ERROR diagnostic");
+      boolean matched = errors.stream()
+        .map(d -> d.getMessage(Locale.getDefault()))
+        .anyMatch(msg -> msg.contains("primitive property") && msg.contains("can't be"));
+      assertTrue(matched, "expected the primitive-scalar-exclusion error message, got: " + errors);
+    }
+  }
 }
