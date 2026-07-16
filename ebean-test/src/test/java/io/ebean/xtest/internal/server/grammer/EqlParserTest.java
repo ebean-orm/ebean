@@ -629,7 +629,7 @@ class EqlParserTest extends BaseTestCase {
     List<OrderDetail> details = query.findList();
 
     assertThat(details).isNotEmpty();
-    assertSql(query).contains("select sum(t0.order_qty), t1.id from o_order_detail t0 join o_order t1 on t1.id = t0.order_id group by t1.id");
+    assertSql(query).contains("select sum(t0.order_qty), t0.order_id from o_order_detail t0 group by t0.order_id");
   }
 
   @Test
