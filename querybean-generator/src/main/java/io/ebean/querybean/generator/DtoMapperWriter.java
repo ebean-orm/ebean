@@ -225,7 +225,8 @@ class DtoMapperWriter {
     }
     Set<String> nestedAssocPaths = new LinkedHashSet<>();
     for (DtoPropertyMeta property : activeProperties) {
-      if (property.kind() == DtoPropertyMeta.Kind.NESTED_ONE || property.kind() == DtoPropertyMeta.Kind.NESTED_MANY) {
+      if ((property.kind() == DtoPropertyMeta.Kind.NESTED_ONE || property.kind() == DtoPropertyMeta.Kind.NESTED_MANY)
+        && !property.hasComputedSegment()) {
         nestedAssocPaths.add(property.sourcePropertyPath().get(0));
       }
     }
@@ -237,6 +238,16 @@ class DtoMapperWriter {
       switch (property.kind()) {
         case NESTED_ONE:
         case NESTED_MANY:
+          if (property.hasComputedSegment()) {
+            // a single-hop @DtoPath rename traversing a computed/derived getter (no backing
+            // field) that happens to target a nested DTO type - just as unfetchable via
+            // fetch(path, mapper.fetchGroup()) as the analogous SCALAR case, since "path" here
+            // isn't a real Ebean fetch path either. The nested mapper is still invoked directly
+            // against whatever the getter returns (see DtoMapperWriter#propertyValueExpression) -
+            // it's purely the FetchGroup derivation that must fall back to @DtoPath#requires().
+            extraFetchPaths.addAll(property.requiredFetchPaths());
+            break;
+          }
           fetchCalls.add(String.format("fetch(\"%s\", %s.fetchGroup())",
             property.sourcePropertyPath().get(0), mapperFieldName(property)));
           break;
@@ -266,6 +277,15 @@ class DtoMapperWriter {
           break;
         case REF:
         default:
+          if (property.hasComputedSegment()) {
+            // the association has no backing field (a computed/derived getter) - "assoc" isn't a
+            // real Ebean property name, so it can't be handed to FetchGroup.select(...) directly;
+            // @DtoRef#requires() already names exactly what needs fetching instead - see
+            // DtoPropertyMeta#requiredFetchPaths(). The value mapping itself (source.getAssoc().
+            // getId()) still works via plain Java method invocation regardless.
+            extraFetchPaths.addAll(property.requiredFetchPaths());
+            break;
+          }
           String assoc = property.sourcePropertyPath().get(0);
           if (!nestedAssocPaths.contains(assoc)) {
             rootSelect.add(assoc);
@@ -274,12 +294,24 @@ class DtoMapperWriter {
       }
     }
     for (var entry : pathSelect.entrySet()) {
+      if (extraFetchPaths.contains(entry.getKey())) {
+        // an unrelated computed-segment property also needs a bare, full fetch(path) at this
+        // exact same path (emitted below) - FetchGroup's builder REPLACES (not merges) same-path
+        // fetch calls (OrmQueryDetail.fetch(...) is a plain Map.put keyed by path), so emitting
+        // both a narrowed fetch(path, "props") here and a bare fetch(path) below would leave
+        // only whichever call happens to be added last in effect, silently discarding the other's
+        // requirement depending on emission order. Skip the narrow entry - a full fetch(path) is
+        // always a safe superset of any narrower property selection, so let the bare fetch below
+        // win deterministically instead of depending on iteration order.
+        continue;
+      }
       fetchCalls.add(String.format("fetch(\"%s\", \"%s\")", entry.getKey(), String.join(",", entry.getValue())));
     }
     for (String extraPath : extraFetchPaths) {
-      // already covered by another property's fetch of the exact same path - a full fetch(path)
-      // isn't needed on top of an existing fetch(path, mapper.fetchGroup())/fetch(path, "props").
-      if (!nestedAssocPaths.contains(extraPath) && !pathSelect.containsKey(extraPath)) {
+      // already covered by another property's NESTED_ONE/MANY fetch of the exact same path (a
+      // full nested mapper.fetchGroup()) - that's richer than a bare fetch(path) (which would
+      // replace it and lose the nested mapper's own fetch requirements), so it must win instead.
+      if (!nestedAssocPaths.contains(extraPath)) {
         fetchCalls.add(String.format("fetch(\"%s\")", extraPath));
       }
     }

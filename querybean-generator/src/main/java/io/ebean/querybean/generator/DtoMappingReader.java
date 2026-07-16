@@ -449,10 +449,35 @@ class DtoMappingReader {
       String assocGetter = getterName(meta.source(), assocName);
       TypeElement assocType = getterReturnType(meta.source(), assocGetter);
       String idGetter = getterName(assocType, "id");
+      boolean computedSegment = meta.source() == null || !hasField(meta.source(), assocName);
+      List<String> requiredFetchPaths = List.of();
+      if (computedSegment) {
+        // the association has no backing field on the source - a computed/derived getter (e.g.
+        // picking one entry out of a collection) rather than a real, fetchable Ebean relation, so
+        // its data dependencies can't be inferred automatically - same problem class, and same
+        // requires() escape hatch, as the analogous @DtoPath handling above. Unlike @DtoPath there's
+        // no "real prefix" to combine with, since @DtoRef only ever derives a single association
+        // name directly off the source (no dotted value() of its own).
+        if (refPrism.values.requires() == null) {
+          ctx.logError(field,
+            "@DtoRef on %s traverses '%s' which has no backing field on %s - it looks like a"
+              + " computed/derived getter rather than a real, fetchable Ebean relation, so its data"
+              + " dependencies can't be inferred automatically. Specify @DtoRef(requires = {...})"
+              + " naming the real entity paths that must be fetched for it to execute safely, or"
+              + " requires = {} if it genuinely needs nothing extra fetched, or remove @DtoRef and"
+              + " compute this value another way (e.g. @DtoConvert).",
+            meta.targetFullName(), assocName, meta.source() != null ? meta.source().getSimpleName() : "?");
+        }
+        requiredFetchPaths = refPrism.requires();
+        String annotationDisplay = String.format("@DtoRef(requires = ...) on %s.%s", meta.targetFullName(), name);
+        for (String requiresPath : requiredFetchPaths) {
+          validateRequiresPath(field, meta.source(), requiresPath, annotationDisplay);
+        }
+      }
       // @DtoRef has no failOnNull escape hatch - always default to the primitive's zero-equivalent
       // rather than let a null-guarded getter chain auto-unbox to a NullPointerException.
       return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.REF, List.of(assocGetter, idGetter), List.of(assocName, "id"),
-        null, converter, field.asType().getKind().isPrimitive(), false);
+        null, converter, field.asType().getKind().isPrimitive(), false, computedSegment, requiredFetchPaths);
     }
     DtoPathPrism pathPrism = prismOn(field, meta, DtoPathPrism::getInstanceOn);
     if (pathPrism != null) {
@@ -471,27 +496,6 @@ class DtoMappingReader {
         }
         currentType = currentType != null ? getterReturnType(currentType, getter) : null;
       }
-      // a single-hop @DtoPath rename (e.g. @DtoPath("eboxStatus") on a field named "status")
-      // can still target a type with its own registered @DtoMapping - detect that the same way
-      // the plain (non-@DtoPath) branches below do, rather than always falling back to a raw
-      // scalar getter call that would fail to compile with a type mismatch against the nested
-      // DTO type. Multi-hop paths keep the existing scalar/flattening behaviour since fetch spec
-      // derivation for NESTED_ONE/MANY only supports a single association name.
-      if (properties.size() == 1) {
-        TypeMirror fieldType = field.asType();
-        TypeMirror listElementType = listElementType(fieldType);
-        if (listElementType != null) {
-          DtoBeanMeta nested = lookupByTarget(listElementType);
-          if (nested != null) {
-            return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_MANY, getters, properties, nested);
-          }
-        } else {
-          DtoBeanMeta nested = lookupByTarget(fieldType);
-          if (nested != null) {
-            return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_ONE, getters, properties, nested);
-          }
-        }
-      }
       List<String> requiredFetchPaths = List.of();
       if (computedFrom >= 0) {
         // a segment with no backing field is a computed/derived getter, not a real, fetchable
@@ -499,6 +503,9 @@ class DtoMappingReader {
         // inferred from the path alone, so require the developer to spell them out explicitly
         // via @DtoPath(requires = {...}) rather than silently generating a FetchGroup.fetch(...)
         // call for a path segment Ebean doesn't actually recognise (which only fails at runtime).
+        // Computed here regardless of whether the path ultimately resolves to a plain SCALAR or a
+        // single-hop NESTED_ONE/MANY rename below - both cases share the exact same problem: a
+        // fake path segment that can't be handed to FetchGroup as a real fetch/select target.
         String realPrefix = computedFrom == 0 ? null : String.join(".", properties.subList(0, computedFrom));
         // pathPrism.requires() always returns List.of() whether the attribute was explicitly
         // written as an empty array or omitted entirely - only pathPrism.values.requires() (which
@@ -526,6 +533,40 @@ class DtoMappingReader {
         }
         combined.addAll(pathPrism.requires());
         requiredFetchPaths = combined;
+        // realPrefix is already known-good (each of its segments was hasField-checked while
+        // walking value() above) - only the developer-declared requires() values themselves are
+        // unchecked and need validating here.
+        String annotationDisplay = String.format("@DtoPath(\"%s\").requires()", pathPrism.value());
+        for (String requiresPath : pathPrism.requires()) {
+          validateRequiresPath(field, meta.source(), requiresPath, annotationDisplay);
+        }
+      }
+      // a single-hop @DtoPath rename (e.g. @DtoPath("eboxStatus") on a field named "status")
+      // can still target a type with its own registered @DtoMapping - detect that the same way
+      // the plain (non-@DtoPath) branches below do, rather than always falling back to a raw
+      // scalar getter call that would fail to compile with a type mismatch against the nested
+      // DTO type. Multi-hop paths keep the existing scalar/flattening behaviour since fetch spec
+      // derivation for NESTED_ONE/MANY only supports a single association name. A computed
+      // segment here (the single segment has no backing field - e.g. @DtoPath("primaryContact")
+      // where getPrimaryContact() is a derived getter) is just as unfetchable as the SCALAR case
+      // above, so it carries the same computedFrom/requiredFetchPaths validation through - see
+      // DtoMapperWriter's NESTED_ONE/NESTED_MANY handling of DtoPropertyMeta#hasComputedSegment().
+      if (properties.size() == 1) {
+        TypeMirror fieldType = field.asType();
+        TypeMirror listElementType = listElementType(fieldType);
+        if (listElementType != null) {
+          DtoBeanMeta nested = lookupByTarget(listElementType);
+          if (nested != null) {
+            return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_MANY, getters, properties, nested,
+              computedFrom >= 0, requiredFetchPaths);
+          }
+        } else {
+          DtoBeanMeta nested = lookupByTarget(fieldType);
+          if (nested != null) {
+            return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_ONE, getters, properties, nested,
+              computedFrom >= 0, requiredFetchPaths);
+          }
+        }
       }
       // A multi-hop path can pass through a nullable intermediate relation - if the DTO field is
       // primitive, the generated null-guarded getter chain would otherwise auto-unbox a null
@@ -714,14 +755,59 @@ class DtoMappingReader {
    * which case later segments fall back to the guessed {@code getXxx()} name.
    */
   private TypeElement getterReturnType(TypeElement type, String getterMethodName) {
+    TypeMirror mirror = getterReturnTypeMirror(type, getterMethodName);
+    return mirror != null ? asTypeElement(mirror) : null;
+  }
+
+  /**
+   * As {@link #getterReturnType(TypeElement, String)}, but returns the raw {@link TypeMirror}
+   * rather than converting it to a {@link TypeElement} - needed by {@link #validateRequiresPath}
+   * to detect a {@code java.util.List}-typed return (via {@link #listElementType(TypeMirror)}),
+   * which {@link #getterReturnType(TypeElement, String)}'s {@code asTypeElement} conversion can't
+   * distinguish from any other declared type.
+   */
+  private TypeMirror getterReturnTypeMirror(TypeElement type, String getterMethodName) {
     for (TypeElement current = type; current != null; current = superclassOf(current)) {
       for (ExecutableElement method : ElementFilter.methodsIn(current.getEnclosedElements())) {
         if (method.getParameters().isEmpty() && method.getSimpleName().contentEquals(getterMethodName)) {
-          return asTypeElement(method.getReturnType());
+          return method.getReturnType();
         }
       }
     }
     return null;
+  }
+
+  /**
+   * Validate that every dot-notation segment of a declared {@code @DtoPath(requires = ...)}/
+   * {@code @DtoRef(requires = ...)} path value names a real, fetchable Ebean property (one with a
+   * backing field) on {@code source} - these are meant to be real entity fetch paths handed
+   * straight through to {@code FetchGroup.fetch(...)}, so a typo here would otherwise silently
+   * reintroduce the exact "compiles cleanly, fails at runtime with {@code PersistenceException}"
+   * problem the {@code requires()} escape hatch itself exists to prevent - it just wouldn't be
+   * caught until much later, since {@code requires()} paths are trusted verbatim rather than
+   * walked/checked like {@code @DtoPath#value()}'s own segments are. Handles a {@code List}-typed
+   * intermediate hop (e.g. {@code "currentMachine.organisationMachines"}) by unwrapping to the
+   * element type via {@link #listElementType(TypeMirror)}, mirroring how a real fetch path can
+   * traverse a collection.
+   */
+  private void validateRequiresPath(Element field, TypeElement source, String requiresPath, String annotationDisplay) {
+    TypeElement currentType = source;
+    for (String segment : requiresPath.split("\\.")) {
+      if (currentType == null) {
+        return; // already unresolvable upstream - don't cascade a confusing secondary error
+      }
+      if (!hasField(currentType, segment)) {
+        ctx.logError(field,
+          "%s names '%s' (in \"%s\") which has no backing field on %s - check for a typo, every"
+            + " requires() path segment must be a real, fetchable Ebean property.",
+          annotationDisplay, segment, requiresPath, currentType.getSimpleName());
+        return;
+      }
+      String getter = getterName(currentType, segment);
+      TypeMirror returnMirror = getterReturnTypeMirror(currentType, getter);
+      TypeMirror elementType = returnMirror != null ? listElementType(returnMirror) : null;
+      currentType = asTypeElement(elementType != null ? elementType : returnMirror);
+    }
   }
 
   private TypeElement superclassOf(TypeElement type) {

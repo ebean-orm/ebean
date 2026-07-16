@@ -34,6 +34,18 @@ class DtoPropertyMeta {
     this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, null);
   }
 
+  /**
+   * {@code NESTED_ONE}/{@code NESTED_MANY} constructor variant for a single-hop {@code @DtoPath}
+   * rename that traverses a computed/derived getter segment (no backing field) - see
+   * {@link #hasComputedSegment()}. Just as unfetchable via {@code FetchGroup.fetch(path, ...)} as
+   * the analogous {@link Kind#SCALAR} case, so it carries the same
+   * {@code computedSegment}/{@code requiredFetchPaths} through to {@code DtoMapperWriter}.
+   */
+  DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
+                  DtoBeanMeta nested, boolean computedSegment, List<String> requiredFetchPaths) {
+    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, null, false, false, computedSegment, requiredFetchPaths);
+  }
+
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath, DtoBeanMeta nested, DtoConverterMeta converter) {
     this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, converter, false, false);
   }
@@ -111,9 +123,10 @@ class DtoPropertyMeta {
   /**
    * {@code true} if this {@code @DtoPath} traverses a segment with no backing field (a computed/
    * derived getter rather than a real, fetchable Ebean property) - in which case
-   * {@link #sourcePropertyPath()} must NOT be used to derive a {@code .fetch(path, "props")} call
-   * (the path isn't a real Ebean fetch path), and {@link #requiredFetchPaths()} should be used
-   * instead (see {@code @DtoPath#requires()}).
+   * {@link #sourcePropertyPath()} must NOT be used to derive a {@code .fetch(path, "props")}
+   * ({@link Kind#SCALAR}) or {@code .fetch(path, mapper.fetchGroup())} ({@link Kind#NESTED_ONE}/
+   * {@link Kind#NESTED_MANY}) call (the path isn't a real Ebean fetch path), and
+   * {@link #requiredFetchPaths()} should be used instead (see {@code @DtoPath#requires()}).
    */
   boolean hasComputedSegment() {
     return computedSegment;

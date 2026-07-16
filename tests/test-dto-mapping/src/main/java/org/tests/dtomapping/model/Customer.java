@@ -70,4 +70,18 @@ public class Customer extends Model {
   public String getIdBadge() {
     return "CUST-" + id;
   }
+
+  /**
+   * Computed/derived getter (no backing field) reading {@code billingAddress.line1} - deliberately
+   * a different {@code Address} property to {@code city} (used narrowly elsewhere, see
+   * {@code FetchCollisionDto}), to exercise the priority between a bare, full {@code requires()}
+   * fetch of {@code billingAddress} and a sibling property's narrowed {@code fetch("billingAddress",
+   * "city")}: {@code FetchGroup}'s builder replaces (not merges) same-path fetch calls, so if the
+   * narrowed selection silently won, {@code line1} would never be loaded and calling this getter
+   * outside a persistence context would throw {@code LazyInitialisationException} instead of
+   * returning a value.
+   */
+  public String getBillingSummary() {
+    return billingAddress == null ? null : billingAddress.getLine1() + ", " + billingAddress.getCity();
+  }
 }
