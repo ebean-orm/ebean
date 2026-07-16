@@ -578,8 +578,7 @@ the chain.
 ### mapTo(Dto.class) runtime wiring (implemented)
 
 `query.mapTo(dtoType)` returns a `MappedQuery<D>` (`findList()`/`findOne()`/`findOneOrEmpty()`/
-`findPagedList()`/`findStream()`/`usingMaster(boolean)`/`usingTransaction(Transaction)`/
-`usingConnection(Connection)`).
+`findStream()`/`findPagedList()`/`usingMaster(boolean)`/`usingTransaction(Transaction)`/`usingConnection(Connection)`).
 On first use it resolves the generated `DtoMapper<S, D>` for the query's `(getBeanType(), dtoType)`
 pair via a `DtoMapperManager` (a `ServiceLoader`-backed aggregator over all generated
 `DtoMapperRegister`s, analogous to `DtoBeanManager`), then:
@@ -607,6 +606,7 @@ internally) and each entity is mapped to its target DTO lazily as the stream is 
 nested DTOs (e.g. several `Contact`s sharing the same `Customer`) still holds even when the source
 entities are never materialized into one `List` at all. As with the entity-level `findStream()`,
 callers must consume it via try-with-resources to ensure the underlying resources are closed.
+
 
 ## Still open / to revisit during implementation
 
