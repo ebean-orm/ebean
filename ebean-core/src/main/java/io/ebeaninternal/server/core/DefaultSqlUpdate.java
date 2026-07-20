@@ -2,6 +2,7 @@ package io.ebeaninternal.server.core;
 
 import io.ebean.DB;
 import io.ebean.SqlUpdate;
+import io.ebean.Transaction;
 import io.ebean.Update;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiEbeanServer;
@@ -140,7 +141,7 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
         server.executeBatch(this, transaction);
         return -1;
       }
-      return server.execute(this);
+      return server.execute(this, transaction);
     } else {
       // Hopefully this doesn't catch anyone out...
       return DB.getDefault().execute(this);
@@ -150,10 +151,16 @@ public final class DefaultSqlUpdate implements Serializable, SpiSqlUpdate {
   @Override
   public int executeNow() {
     if (server != null) {
-      return server.executeNow(this);
+      return server.executeNow(this, transaction);
     } else {
       throw new IllegalStateException("server is null?");
     }
+  }
+
+  @Override
+  public SqlUpdate usingTransaction(Transaction transaction) {
+    this.transaction = (SpiTransaction) transaction;
+    return this;
   }
 
   @Override
