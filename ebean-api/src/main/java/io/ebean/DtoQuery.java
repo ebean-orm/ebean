@@ -1,18 +1,11 @@
 package io.ebean;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
-import jakarta.persistence.EntityNotFoundException;
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * Query for performing native SQL queries that return DTO Bean's.
@@ -45,12 +38,7 @@ import java.util.stream.Stream;
  * }</pre>
  */
 @NullMarked
-public interface DtoQuery<T> extends CancelableQuery {
-
-  /**
-   * Execute the query returning a list.
-   */
-  List<T> findList();
+public interface DtoQuery<T> extends StreamableQuery<DtoQuery<T>, T> {
 
   /**
    * Execute the query iterating a row at a time.
@@ -60,15 +48,6 @@ public interface DtoQuery<T> extends CancelableQuery {
    * QueryIterator in a <em>try with resource block</em>.
    */
   QueryIterator<T> findIterate();
-
-  /**
-   * Execute the query returning a Stream.
-   * <p>
-   * Note that the Stream holds resources related to the underlying
-   * resultSet and potentially connection and MUST be closed. We should use
-   * the Stream in a <em>try with resource block</em>.
-   */
-  Stream<T> findStream();
 
   /**
    * Execute the query iterating a row at a time.
@@ -99,33 +78,6 @@ public interface DtoQuery<T> extends CancelableQuery {
    * </p>
    */
   void findEachWhile(Predicate<T> consumer);
-
-  /**
-   * Execute the query returning a single bean.
-   */
-  @Nullable
-  T findOne();
-
-  /**
-   * Execute the query returning an optional bean.
-   */
-  Optional<T> findOneOrEmpty();
-
-  /**
-   * Execute the query returning a single bean or throwing a
-   * {@link jakarta.persistence.EntityNotFoundException} if there is no matching row.
-   */
-  default T findOneOrThrow() {
-    return findOneOrEmpty().orElseThrow(() -> new EntityNotFoundException("Not found"));
-  }
-
-  /**
-   * Execute the query returning a single bean or throwing the exception produced
-   * by the given supplier if there is no matching row.
-   */
-  default T findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
-    return findOneOrEmpty().orElseThrow(exceptionSupplier);
-  }
 
   /**
    * Bind all the parameters using index positions.
@@ -233,38 +185,6 @@ public interface DtoQuery<T> extends CancelableQuery {
   DtoQuery<T> setBufferFetchSizeHint(int bufferFetchSizeHint);
 
   /**
-   * Use the explicit transaction to execute the query.
-   */
-  DtoQuery<T> usingTransaction(Transaction transaction);
-
-  /**
-   * Execute the query using the given connection.
-   */
-  DtoQuery<T> usingConnection(Connection connection);
-
-  /**
-   * Ensure that the master DataSource is used if there is a read only data source
-   * being used (that is using a read replica database potentially with replication lag).
-   * <p>
-   * When the database is configured with a read-only DataSource via
-   * say {@link io.ebean.DatabaseBuilder#readOnlyDataSource(DataSource)} then
-   * by default when a query is run without an active transaction, it uses the read-only data
-   * source. We use {@code usingMaster()} to instead ensure that the query is executed
-   * against the master data source.
-   */
-  default DtoQuery<T> usingMaster() {
-    return usingMaster(true);
-  }
-
-  /**
-   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
-   * data source can be used if defined.
-   *
-   * @see #usingMaster()
-   */
-  DtoQuery<T> usingMaster(boolean useMaster);
-
-  /**
    * Return a PagedList for this query using firstRow and maxRows.
    * <p>
    * The benefit of using this over findList() is that it provides functionality to get the
@@ -299,6 +219,7 @@ public interface DtoQuery<T> extends CancelableQuery {
    *
    * @return The PagedList
    */
+  @Override
   PagedList<T> findPagedList();
 
 }

@@ -43,44 +43,7 @@ import java.util.function.Supplier;
  * }</pre>
  */
 @NullMarked
-public interface SqlQuery extends Serializable, CancelableQuery {
-
-  /**
-   * Execute the query using the given transaction.
-   */
-  SqlQuery usingTransaction(Transaction transaction);
-
-  /**
-   * Execute the query using the given connection.
-   */
-  SqlQuery usingConnection(Connection connection);
-
-  /**
-   * Ensure that the master DataSource is used if there is a read only data source
-   * being used (that is using a read replica database potentially with replication lag).
-   * <p>
-   * When the database is configured with a read-only DataSource via
-   * say {@link io.ebean.DatabaseBuilder#readOnlyDataSource(DataSource)}then
-   * by default when a query is run without an active transaction, it uses the read-only data
-   * source. We use {@code usingMaster()} to instead ensure that the query is executed
-   * against the master data source.
-   */
-  default SqlQuery usingMaster() {
-    return usingMaster(true);
-  }
-
-  /**
-   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
-   * data source can be used if defined.
-   *
-   * @see #usingMaster()
-   */
-  SqlQuery usingMaster(boolean useMaster);
-
-  /**
-   * Execute the query returning a list.
-   */
-  List<SqlRow> findList();
+public interface SqlQuery extends Serializable, FindableQuery<SqlQuery, SqlRow> {
 
   /**
    * Execute the SqlQuery iterating a row at a time.
@@ -100,16 +63,6 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    * </p>
    */
   void findEachWhile(Predicate<SqlRow> consumer);
-
-  /**
-   * Execute the query returning a single row or null.
-   * <p>
-   * If this query finds 2 or more rows then it will throw a
-   * PersistenceException.
-   * </p>
-   */
-  @Nullable
-  SqlRow findOne();
 
   /**
    * Execute the query reading each row from ResultSet using the RowConsumer.
@@ -140,27 +93,6 @@ public interface SqlQuery extends Serializable, CancelableQuery {
    * @param consumer Used to read and process each ResultSet row.
    */
   void findEachRow(RowConsumer consumer);
-
-  /**
-   * Execute the query returning an optional row.
-   */
-  Optional<SqlRow> findOneOrEmpty();
-
-  /**
-   * Execute the query returning a single row or throwing a
-   * {@link jakarta.persistence.EntityNotFoundException} if there is no matching row.
-   */
-  default SqlRow findOneOrThrow() {
-    return findOneOrEmpty().orElseThrow(() -> new EntityNotFoundException("Not found"));
-  }
-
-  /**
-   * Execute the query returning a single row or throwing the exception produced
-   * by the given supplier if there is no matching row.
-   */
-  default SqlRow findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
-    return findOneOrEmpty().orElseThrow(exceptionSupplier);
-  }
 
   /**
    * Set one of more positioned parameters.

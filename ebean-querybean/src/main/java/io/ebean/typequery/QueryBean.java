@@ -739,6 +739,11 @@ public abstract class QueryBean<T, R extends QueryBean<T, R>> implements IQueryB
   }
 
   @Override
+  public void cancel() {
+    query.cancel();
+  }
+
+  @Override
   public final R usingTransaction(Transaction transaction) {
     query.usingTransaction(transaction);
     return root;

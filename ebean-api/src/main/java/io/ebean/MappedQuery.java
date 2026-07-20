@@ -1,13 +1,8 @@
 package io.ebean;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
-import jakarta.persistence.EntityNotFoundException;
-import java.sql.Connection;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
@@ -24,11 +19,12 @@ import java.util.stream.Stream;
  * @param <D> the target DTO type
  */
 @NullMarked
-public interface MappedQuery<D> extends CancelableQuery {
+public interface MappedQuery<D> extends StreamableQuery<MappedQuery<D>, D> {
 
   /**
    * Execute the query returning the mapped DTO list.
    */
+  @Override
   List<D> findList();
 
   /**
@@ -40,6 +36,7 @@ public interface MappedQuery<D> extends CancelableQuery {
    * ({@link PagedList#getTotalCount()}, {@link PagedList#hasNext()}, etc.) reflects the
    * underlying entity query and is unaffected by the DTO mapping.
    */
+  @Override
   PagedList<D> findPagedList();
 
   /**
@@ -62,53 +59,7 @@ public interface MappedQuery<D> extends CancelableQuery {
    *
    * }</pre>
    */
+  @Override
   Stream<D> findStream();
-
-  /**
-   * Execute the query returning a single mapped DTO, or {@code null} if there is no matching row.
-   */
-  @Nullable
-  D findOne();
-
-  /**
-   * Execute the query returning an optional mapped DTO.
-   */
-  Optional<D> findOneOrEmpty();
-
-  /**
-   * Execute the query returning a single mapped DTO or throwing a
-   * {@link jakarta.persistence.EntityNotFoundException} if there is no matching row.
-   * <p>
-   * The exception message reflects the underlying entity type and its id or single
-   * equality predicate (a likely natural/unique key) when the query is that simple,
-   * otherwise a generic "not found" message.
-   */
-  default D findOneOrThrow() {
-    return findOneOrEmpty().orElseThrow(() -> new EntityNotFoundException("Not found"));
-  }
-
-  /**
-   * Execute the query returning a single mapped DTO or throwing the exception produced
-   * by the given supplier if there is no matching row.
-   */
-  default D findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
-    return findOneOrEmpty().orElseThrow(exceptionSupplier);
-  }
-
-  /**
-   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
-   * data source can be used if defined.
-   */
-  MappedQuery<D> usingMaster(boolean useMaster);
-
-  /**
-   * Use the explicit transaction to execute the query.
-   */
-  MappedQuery<D> usingTransaction(Transaction transaction);
-
-  /**
-   * Execute the query using the given connection.
-   */
-  MappedQuery<D> usingConnection(Connection connection);
 
 }
