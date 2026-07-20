@@ -11,6 +11,8 @@ import io.ebeaninternal.api.SpiQuery;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -106,6 +108,27 @@ public final class DefaultMappedQuery<T, D> implements MappedQuery<D> {
     DtoMapper<T, D> m = mapper();
     DtoMapContext context = new DtoMapContext();
     return query.findStream().map(source -> m.map(source, context));
+  }
+
+  @Override
+  public void findEach(Consumer<D> consumer) {
+    DtoMapper<T, D> m = mapper();
+    DtoMapContext context = new DtoMapContext();
+    query.findEach(source -> consumer.accept(m.map(source, context)));
+  }
+
+  @Override
+  public void findEach(int batch, Consumer<List<D>> consumer) {
+    DtoMapper<T, D> m = mapper();
+    DtoMapContext context = new DtoMapContext();
+    query.findEach(batch, sourceBatch -> consumer.accept(m.mapList(sourceBatch, context)));
+  }
+
+  @Override
+  public void findEachWhile(Predicate<D> consumer) {
+    DtoMapper<T, D> m = mapper();
+    DtoMapContext context = new DtoMapContext();
+    query.findEachWhile(source -> consumer.test(m.map(source, context)));
   }
 
   @Override

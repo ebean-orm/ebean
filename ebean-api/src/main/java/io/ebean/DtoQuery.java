@@ -4,8 +4,6 @@ import org.jspecify.annotations.NullMarked;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 /**
  * Query for performing native SQL queries that return DTO Bean's.
@@ -48,36 +46,6 @@ public interface DtoQuery<T> extends StreamableQuery<DtoQuery<T>, T> {
    * QueryIterator in a <em>try with resource block</em>.
    */
   QueryIterator<T> findIterate();
-
-  /**
-   * Execute the query iterating a row at a time.
-   * <p>
-   * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
-   * </p>
-   */
-  void findEach(Consumer<T> consumer);
-
-  /**
-   * Execute the query iterating the results and batching them for the consumer.
-   * <p>
-   * This runs like findEach streaming results from the database but just collects the results
-   * into batches to pass to the consumer.
-   *
-   * @param batch    The number of dto beans to collect before given them to the consumer
-   * @param consumer The consumer to process the batch of DTO beans
-   */
-  void findEach(int batch, Consumer<List<T>> consumer);
-
-  /**
-   * Execute the query iterating a row at a time with the ability to stop consuming part way through.
-   * <p>
-   * Returning false after processing a row stops the iteration through the query results.
-   * </p>
-   * <p>
-   * This streaming type query is useful for large query execution as only 1 row needs to be held in memory.
-   * </p>
-   */
-  void findEachWhile(Predicate<T> consumer);
 
   /**
    * Bind all the parameters using index positions.
