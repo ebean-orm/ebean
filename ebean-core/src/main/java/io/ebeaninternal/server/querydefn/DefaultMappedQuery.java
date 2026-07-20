@@ -125,4 +125,9 @@ public final class DefaultMappedQuery<T, D> implements MappedQuery<D> {
     query.usingConnection(connection);
     return this;
   }
+
+  @Override
+  public void cancel() {
+    query.cancel();
+  }
 }
