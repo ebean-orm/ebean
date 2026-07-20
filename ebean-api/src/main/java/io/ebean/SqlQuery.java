@@ -3,8 +3,6 @@ package io.ebean;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-import jakarta.persistence.EntityNotFoundException;
-import javax.sql.DataSource;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.util.Collection;
@@ -12,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 /**
  * Query object for performing native SQL queries that return SqlRow or directly read
@@ -315,7 +312,7 @@ public interface SqlQuery extends Serializable, FindableQuery<SqlQuery, SqlRow> 
    *
    * @param <T> The type of the scalar values
    */
-  interface TypeQuery<T> {
+  interface TypeQuery<T> extends FindableQuery<TypeQuery<T>, T> {
 
     /**
      * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
@@ -323,43 +320,38 @@ public interface SqlQuery extends Serializable, FindableQuery<SqlQuery, SqlRow> 
      *
      * @see SqlQuery#usingMaster(boolean)
      */
+    @Override
     TypeQuery<T> usingMaster(boolean useMaster);
 
     /**
      * Execute the query using the given transaction.
      */
+    @Override
     TypeQuery<T> usingTransaction(Transaction transaction);
+
+    /**
+     * Execute the query using the given connection.
+     */
+    @Override
+    TypeQuery<T> usingConnection(Connection connection);
 
     /**
      * Return the single value.
      */
     @Nullable
+    @Override
     T findOne();
 
     /**
      * Return the single value that is optional.
      */
+    @Override
     Optional<T> findOneOrEmpty();
-
-    /**
-     * Return the single value or throw a {@link jakarta.persistence.EntityNotFoundException}
-     * if there is no matching row.
-     */
-    default T findOneOrThrow() {
-      return findOneOrEmpty().orElseThrow(() -> new EntityNotFoundException("Not found"));
-    }
-
-    /**
-     * Return the single value or throw the exception produced by the given supplier
-     * if there is no matching row.
-     */
-    default T findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
-      return findOneOrEmpty().orElseThrow(exceptionSupplier);
-    }
 
     /**
      * Return the list of values.
      */
+    @Override
     List<T> findList();
 
     /**
