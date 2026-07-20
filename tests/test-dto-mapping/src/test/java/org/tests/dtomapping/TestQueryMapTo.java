@@ -2,6 +2,7 @@ package org.tests.dtomapping;
 
 import io.ebean.DB;
 import io.ebean.LazyInitialisationException;
+import io.ebean.MappedQuery;
 import io.ebean.PagedList;
 import io.ebean.Transaction;
 import io.ebean.test.LoggedSql;
@@ -15,6 +16,7 @@ import org.tests.dtomapping.model.query.QCustomer;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -261,6 +263,29 @@ class TestQueryMapTo {
 
     assertThat(dtos).hasSize(2);
     assertThat(dtos.get(0).getCustomer()).isSameAs(dtos.get(1).getCustomer());
+  }
+
+  @Test
+  void mapTo_cancel_atBegin_expectPersistenceException() {
+    new Customer("CancelCo").save();
+
+    doCancelAtBegin(MappedQuery::findList);
+    doCancelAtBegin(MappedQuery::findOne);
+    doCancelAtBegin(MappedQuery::findStream);
+    doCancelAtBegin(q -> q.findPagedList().getList());
+  }
+
+  /**
+   * Cancel the underlying entity query before it executes - mirrors the "at begin" cancel
+   * coverage in {@code SqlQueryCancelTest} for {@code SqlQuery}/{@code Query}/{@code DtoQuery},
+   * extended here to {@link MappedQuery} since it also implements {@link io.ebean.CancelableQuery}.
+   */
+  private void doCancelAtBegin(Consumer<MappedQuery<CustomerDto>> test) {
+    MappedQuery<CustomerDto> query = DB.find(Customer.class).setMaxRows(10).mapTo(CustomerDto.class);
+    query.cancel();
+    assertThatThrownBy(() -> test.accept(query))
+      .isInstanceOf(PersistenceException.class)
+      .hasMessageContaining("Query was cancelled");
   }
 
   @Test
