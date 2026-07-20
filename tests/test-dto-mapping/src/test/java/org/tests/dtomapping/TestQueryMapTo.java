@@ -14,6 +14,7 @@ import org.tests.dtomapping.model.Contact;
 import org.tests.dtomapping.model.Customer;
 import org.tests.dtomapping.model.query.QCustomer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -263,6 +264,81 @@ class TestQueryMapTo {
 
     assertThat(dtos).hasSize(2);
     assertThat(dtos.get(0).getCustomer()).isSameAs(dtos.get(1).getCustomer());
+  }
+
+  @Test
+  void mapTo_findEach_expectAllDtosProcessedInOrder() {
+    Customer customerA = new Customer("EachCoA");
+    customerA.save();
+    Customer customerB = new Customer("EachCoB");
+    customerB.save();
+
+    List<String> names = new ArrayList<>();
+    DB.find(Customer.class)
+      .where().in("name", "EachCoA", "EachCoB")
+      .orderBy().asc("name")
+      .mapTo(CustomerDto.class)
+      .findEach(dto -> names.add(dto.getName()));
+
+    assertThat(names).containsExactly("EachCoA", "EachCoB");
+  }
+
+  @Test
+  void mapTo_findEach_expectIdentityDedupSharedAcrossCallback() {
+    Customer customer = new Customer("EachDedupCo");
+    customer.save();
+    new Contact("Jane", "Doe", customer).save();
+    new Contact("John", "Doe", customer).save();
+
+    // both contacts share the same underlying Customer instance - the shared DtoMapContext used
+    // across the whole findEach() call should still de-duplicate to the same nested DTO
+    List<ContactDto> dtos = new ArrayList<>();
+    DB.find(Contact.class)
+      .where().eq("customer", customer)
+      .orderBy().asc("firstName")
+      .mapTo(ContactDto.class)
+      .findEach(dtos::add);
+
+    assertThat(dtos).hasSize(2);
+    assertThat(dtos.get(0).getCustomer()).isSameAs(dtos.get(1).getCustomer());
+  }
+
+  @Test
+  void mapTo_findEachBatch_expectBatchedMappedDtos() {
+    new Customer("BatchCoA").save();
+    new Customer("BatchCoB").save();
+    new Customer("BatchCoC").save();
+
+    List<List<String>> batches = new ArrayList<>();
+    DB.find(Customer.class)
+      .where().startsWith("name", "BatchCo")
+      .orderBy().asc("name")
+      .mapTo(CustomerDto.class)
+      .findEach(2, batch -> batches.add(
+        batch.stream().map(CustomerDto::getName).collect(Collectors.toList())));
+
+    assertThat(batches).hasSize(2);
+    assertThat(batches.get(0)).containsExactly("BatchCoA", "BatchCoB");
+    assertThat(batches.get(1)).containsExactly("BatchCoC");
+  }
+
+  @Test
+  void mapTo_findEachWhile_expectStopsWhenPredicateReturnsFalse() {
+    new Customer("WhileCoA").save();
+    new Customer("WhileCoB").save();
+    new Customer("WhileCoC").save();
+
+    List<String> names = new ArrayList<>();
+    DB.find(Customer.class)
+      .where().startsWith("name", "WhileCo")
+      .orderBy().asc("name")
+      .mapTo(CustomerDto.class)
+      .findEachWhile(dto -> {
+        names.add(dto.getName());
+        return !dto.getName().equals("WhileCoB");
+      });
+
+    assertThat(names).containsExactly("WhileCoA", "WhileCoB");
   }
 
   @Test
