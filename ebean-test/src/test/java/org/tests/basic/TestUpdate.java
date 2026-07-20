@@ -1,6 +1,7 @@
 package org.tests.basic;
 
 import io.ebean.DB;
+import io.ebean.Transaction;
 import io.ebean.Update;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.AfterEach;
@@ -71,5 +72,30 @@ public class TestUpdate extends BaseTestCase {
     }
     Customer cust = DB.find(Customer.class).where().eq("name", "testUpdate3").findOne();
     assertThat(cust.getSmallnote()).isEqualTo("Note #3");
+  }
+
+  @Test
+  public void testUsingTransaction_explicitNonAmbientTransaction() {
+    Update<Customer> update = DB.createUpdate(Customer.class,
+      "update customer set smallnote = :smallnote where name = :name")
+      .setParameter("name", "testUpdate1")
+      .setParameter("smallnote", "explicit txn note");
+
+    // ambient/current transaction on the thread - deliberately rolled back
+    try (Transaction ambient = DB.beginTransaction()) {
+      // explicit transaction - NOT the ambient/current one on the thread
+      try (Transaction explicit = DB.createTransaction()) {
+        update.usingTransaction(explicit);
+        int rows = update.execute();
+        assertThat(rows).isEqualTo(1);
+        explicit.commit();
+      }
+      // rolling back the ambient transaction does not affect the update - it ran
+      // against the explicit transaction which has already been committed above
+      ambient.rollback();
+    }
+
+    Customer cust = DB.find(Customer.class).where().eq("name", "testUpdate1").findOne();
+    assertThat(cust.getSmallnote()).isEqualTo("explicit txn note");
   }
 }
