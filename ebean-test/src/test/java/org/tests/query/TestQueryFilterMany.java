@@ -462,7 +462,11 @@ public class TestQueryFilterMany extends BaseTestCase {
     // nested "group.name" reference forces this to a query join so the filter is applied
     // as a genuine WHERE clause (not misapplied to a LEFT JOIN's ON clause)
     assertThat(sql).hasSize(2);
-    assertSql(sql.get(1)).contains(" from contact t0 left join contact_group t1 on t1.id = t0.group_id where (t0.customer_id) in (");
+    if (isPostgresCompatible()) {
+      assertSql(sql.get(1)).contains(" from contact t0 left join contact_group t1 on t1.id = t0.group_id where (t0.customer_id) = any(");
+    } else {
+      assertSql(sql.get(1)).contains(" from contact t0 left join contact_group t1 on t1.id = t0.group_id where (t0.customer_id) in (");
+    }
     assertSql(sql.get(1)).contains(" and t1.name = ? and t0.cretime is not null");
   }
 }

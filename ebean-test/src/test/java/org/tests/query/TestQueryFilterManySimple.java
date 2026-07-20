@@ -58,7 +58,11 @@ public class TestQueryFilterManySimple extends BaseTestCase {
     // nested "customer.status" reference forces this to a query join so the filter is
     // applied as a genuine WHERE clause (not misapplied to a LEFT JOIN's ON clause)
     assertThat(sql).hasSize(2);
-    assertThat(sql.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) in (");
+    if (isPostgresCompatible()) {
+      assertThat(sql.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) = any(");
+    } else {
+      assertThat(sql.get(1)).contains("from o_order t0 join o_customer t1 on t1.id = t0.kcustomer_id where t0.order_date is not null and (t0.kcustomer_id) in (");
+    }
     assertThat(sql.get(1)).contains(" and t1.status = ?");
   }
 }
