@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * @param <D> the target DTO type
  */
 @NullMarked
-public interface MappedQuery<D> {
+public interface MappedQuery<D> extends CancelableQuery {
 
   /**
    * Execute the query returning the mapped DTO list.
