@@ -1938,7 +1938,12 @@ public final class DefaultServer implements SpiServer, SpiEbeanServer {
 
   @Override
   public int executeNow(SpiSqlUpdate sqlUpdate) {
-    return persister.executeSqlUpdateNow(sqlUpdate, null);
+    return executeNow(sqlUpdate, null);
+  }
+
+  @Override
+  public int executeNow(SpiSqlUpdate sqlUpdate, @Nullable Transaction transaction) {
+    return persister.executeSqlUpdateNow(sqlUpdate, transaction);
   }
 
   @Override

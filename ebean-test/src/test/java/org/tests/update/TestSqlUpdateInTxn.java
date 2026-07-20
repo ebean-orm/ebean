@@ -195,4 +195,58 @@ public class TestSqlUpdateInTxn extends BaseTestCase {
 
   }
 
+  @Test
+  public void testUsingTransaction_explicitNonAmbientTransaction() {
+
+    AuditLog log = new AuditLog();
+    log.setDescription("initial");
+    DB.save(log);
+
+    SqlUpdate update = DB.sqlUpdate("update audit_log set description = ? where id = ?")
+      .setParameter(1, "explicit")
+      .setParameter(2, log.getId());
+
+    // ambient/current transaction on the thread - deliberately rolled back
+    try (Transaction ambient = DB.beginTransaction()) {
+      // explicit transaction - NOT the ambient/current one on the thread
+      try (Transaction explicit = DB.createTransaction()) {
+        update.usingTransaction(explicit);
+        int rows = update.execute();
+        assertThat(rows).isEqualTo(1);
+        explicit.commit();
+      }
+      // rolling back the ambient transaction does not affect the update - it ran
+      // against the explicit transaction which has already been committed above
+      ambient.rollback();
+    }
+
+    AuditLog reloaded = DB.find(AuditLog.class, log.getId());
+    assertThat(reloaded.getDescription()).isEqualTo("explicit");
+  }
+
+  @Test
+  public void testUsingTransaction_executeNow_explicitNonAmbientTransaction() {
+
+    AuditLog log = new AuditLog();
+    log.setDescription("initial");
+    DB.save(log);
+
+    SqlUpdate update = DB.sqlUpdate("update audit_log set description = ? where id = ?")
+      .setParameter(1, "explicitNow")
+      .setParameter(2, log.getId());
+
+    try (Transaction ambient = DB.beginTransaction()) {
+      try (Transaction explicit = DB.createTransaction()) {
+        update.usingTransaction(explicit);
+        int rows = update.executeNow();
+        assertThat(rows).isEqualTo(1);
+        explicit.commit();
+      }
+      ambient.rollback();
+    }
+
+    AuditLog reloaded = DB.find(AuditLog.class, log.getId());
+    assertThat(reloaded.getDescription()).isEqualTo("explicitNow");
+  }
+
 }

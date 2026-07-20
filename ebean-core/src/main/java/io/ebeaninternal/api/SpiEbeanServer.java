@@ -335,6 +335,12 @@ public interface SpiEbeanServer extends SpiServer, BeanCollectionLoader {
   int executeNow(SpiSqlUpdate sqlUpdate);
 
   /**
+   * Execute the sql update regardless of transaction batch mode using the given
+   * explicit transaction (or the current ambient transaction when null).
+   */
+  int executeNow(SpiSqlUpdate sqlUpdate, @Nullable Transaction transaction);
+
+  /**
    * Create a query bind capture for the given query plan.
    */
   SpiQueryBindCapture createQueryBindCapture(SpiQueryPlan queryPlan);
