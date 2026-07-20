@@ -151,7 +151,7 @@ import org.jspecify.annotations.Nullable;
  * @param <T> the type of Entity bean this query will fetch.
  */
 @NullMarked
-public interface Query<T> extends CancelableQuery, QueryBuilder<Query<T>, T> {
+public interface Query<T> extends QueryBuilder<Query<T>, T> {
 
   /**
    * The lock type (strength) to use with query FOR UPDATE row locking.
