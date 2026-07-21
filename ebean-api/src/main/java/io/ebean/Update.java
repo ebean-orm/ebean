@@ -85,6 +85,15 @@ public interface Update<T> {
   int execute();
 
   /**
+   * Set an explicit transaction to use to execute this statement.
+   * <p>
+   * When not set, {@link #execute()} uses whatever transaction is currently active on
+   * the thread (or auto-commit if none is active) - consistent with
+   * {@link Database#execute(Update, Transaction)}.
+   */
+  Update<T> usingTransaction(Transaction transaction);
+
+  /**
    * Set an ordered bind parameter.
    * <p>
    * position starts at value 1 (not 0) to be consistent with PreparedStatement.
