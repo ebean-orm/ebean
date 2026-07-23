@@ -41,6 +41,7 @@
   <properties>
     <jackson.version>2.22.0</jackson.version>
     <avaje-json-core.version>3.14</avaje-json-core.version>
+    <avaje-jsonb.version>3.14</avaje-jsonb.version>
     <h2database.version>2.2.220</h2database.version>
     <ebean-persistence-api.version>3.2</ebean-persistence-api.version>
     <ebean-types.version>3.0</ebean-types.version>
@@ -98,6 +99,7 @@
     <module>platforms</module>
     <module>composites</module>
     <module>ebean-jackson-mapper</module>
+    <module>ebean-avajejsonb-mapper</module>
     <module>ebean-spring-txn</module>
     <module>ebean-opentelemetry</module>
     <module>ebean-core-json</module>

@@ -1,14 +1,19 @@
-package io.ebean.jackson.mapper;
+package io.ebean.core.type;
 
 /**
- * Helper that removes whitespace from JSON. Used to normalise Postgres JSONB content.
+ * Helper that removes whitespace from JSON content.
+ * <p>
+ * Used to normalise PostgreSQL JSONB content before it is retained for mutation detection.
  */
-final class JsonTrim {
+public final class JsonTrim {
+
+  private JsonTrim() {
+  }
 
   /**
    * Return JSON with whitespace trimmed.
    */
-  static String trim(String json) {
+  public static String trim(String json) {
     if (json == null) {
       return null;
     }
@@ -18,7 +23,7 @@ final class JsonTrim {
     boolean quoted = false;
     for (int i = 0; i < len; i++) {
       char c = json.charAt(i);
-      if (c == '\"') {
+      if (c == '"') {
         if (!escaped) {
           quoted = !quoted;
         } else {

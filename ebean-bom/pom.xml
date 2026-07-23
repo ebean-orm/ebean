@@ -130,6 +130,12 @@
 
       <dependency>
         <groupId>io.ebean</groupId>
+        <artifactId>ebean-avajejsonb-mapper</artifactId>
+        <version>18.3.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.ebean</groupId>
         <artifactId>ebean-ddl-generator</artifactId>
         <version>18.3.0</version>
       </dependency>
