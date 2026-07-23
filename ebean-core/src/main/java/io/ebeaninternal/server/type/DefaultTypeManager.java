@@ -88,8 +88,8 @@ public final class DefaultTypeManager implements TypeManager {
     this.databasePlatform = config.getDatabasePlatform();
     this.postgres = isPostgresCompatible(config.getDatabasePlatform());
     this.objectMapperPresent = config.getClassLoadConfig().isJacksonObjectMapperPresent();
-    this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : null;
-    this.jsonManager = (objectMapperPresent) ? new TypeJsonManager(postgres, objectMapper, config.getJsonMutationDetection()) : null;
+    this.objectMapper = (objectMapperPresent) ? initObjectMapper(config) : config.getObjectMapper();
+    this.jsonManager = new TypeJsonManager(postgres, objectMapper, config.getJsonMutationDetection());
     this.extraTypeFactory = new DefaultTypeFactory(config);
     this.arrayTypeListFactory = arrayTypeListFactory(config.getDatabasePlatform());
     this.arrayTypeSetFactory = arrayTypeSetFactory(config.getDatabasePlatform());
@@ -413,7 +413,7 @@ public final class DefaultTypeManager implements TypeManager {
 
   private ScalarType<?> createJsonObjectMapperType(DeployProperty prop, int dbType, DocPropertyType docType) {
     if (jsonMapper == null) {
-      throw new IllegalArgumentException("Unsupported @DbJson mapping - Missing dependency ebean-jackson-mapper? Jackson ObjectMapper not present for " + prop);
+      throw new IllegalArgumentException("Unsupported @DbJson mapping - missing JSON mapper dependency for " + prop);
     }
     if (MutationDetection.DEFAULT == prop.mutationDetection()) {
       prop.setMutationDetection(jsonManager.mutationDetection());

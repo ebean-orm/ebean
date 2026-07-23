@@ -1,0 +1,1 @@
+entity-packages: org.example.avajejsonb
