@@ -1,6 +1,7 @@
 package io.ebeaninternal.server.querydefn;
 
 import io.ebean.Database;
+import io.ebean.Transaction;
 import io.ebean.Update;
 import io.ebeaninternal.api.BindParams;
 import io.ebeaninternal.api.SpiUpdate;
@@ -30,6 +31,7 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
   private String generatedSql;
   private final String baseTable;
   private final OrmUpdateType type;
+  private transient Transaction transaction;
 
   /**
    * Create with a specific server. This means you can use the
@@ -88,7 +90,13 @@ public final class DefaultOrmUpdate<T> implements SpiUpdate<T>, Serializable {
 
   @Override
   public int execute() {
-    return server.execute(this);
+    return server.execute(this, transaction);
+  }
+
+  @Override
+  public DefaultOrmUpdate<T> usingTransaction(Transaction transaction) {
+    this.transaction = transaction;
+    return this;
   }
 
   /**

@@ -2,10 +2,12 @@ package io.ebean.xtest.base;
 
 import io.ebean.DB;
 import io.ebean.SqlRow;
+import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.QueryPlanInit;
 import io.ebean.meta.QueryPlanRequest;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.ResetBasicData;
 
@@ -34,6 +36,7 @@ class SqlQueryPlanCaptureTest extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.DB2)
   void sqlQuery_capturesQueryPlan() {
     ResetBasicData.reset();
 

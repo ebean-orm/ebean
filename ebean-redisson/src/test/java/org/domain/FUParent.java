@@ -15,7 +15,7 @@ import java.util.UUID;
 @Cache(enableQueryCache = true)
 @CacheBeanTuning(maxSecsToLive = 1)
 @Entity
-public class UParent extends Model {
+public class FUParent extends Model {
 
   @Id
   private UUID id;
@@ -23,9 +23,9 @@ public class UParent extends Model {
   private String name;
 
   @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-  private final List<UChild> children = new ArrayList<>();
+  private final List<FUChild> children = new ArrayList<>();
 
-  public UParent(String name) {
+  public FUParent(String name) {
     this.name = name;
   }
 
@@ -45,7 +45,7 @@ public class UParent extends Model {
     this.name = name;
   }
 
-  public List<UChild> children() {
+  public List<FUChild> children() {
     return children;
   }
 }

@@ -8,7 +8,7 @@ import jakarta.persistence.ManyToOne;
 
 @Cache
 @Entity
-public class UChild extends Model {
+public class FUChild extends Model {
 
   @Id
   long id;
@@ -16,9 +16,9 @@ public class UChild extends Model {
   String name;
 
   @ManyToOne
-  final UParent parent;
+  final FUParent parent;
 
-  public UChild(UParent parent, String name) {
+  public FUChild(FUParent parent, String name) {
     this.parent = parent;
     this.name = name;
   }

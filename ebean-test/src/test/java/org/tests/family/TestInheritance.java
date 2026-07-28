@@ -103,6 +103,7 @@ public class TestInheritance extends BaseTestCase {
 
 
     server().save(grandparent1);
+    var parent1Id = parent1.getIdentifier();
 
     testMyDynamicFormulaWithIncludes();
     testMyDynamicFormulaWithIncludesAndFetchJoin();
@@ -111,7 +112,7 @@ public class TestInheritance extends BaseTestCase {
     //grandparent1 = server().find(GrandParentPerson.class).setId(grandparent1.getIdentifier()).where()
     // .in("effectiveBean.id",2,null) // geht nicht!
     // .findOne();
-    parent1 = server().find(ParentPerson.class).setId(1).fetch("someBean").findOne();
+    parent1 = server().find(ParentPerson.class).setId(parent1Id).fetch("someBean").findOne();
     assertEquals("A Bean", parent1.getSomeBean().getName());
     grandparent1 = server().find(GrandParentPerson.class)
       .fetch("children", "*") // FIXME If I do not fetch childrenBean, I will get an exception

@@ -159,6 +159,15 @@ public interface SqlUpdate {
   int executeNow();
 
   /**
+   * Set an explicit transaction to use to execute this statement.
+   * <p>
+   * When not set, {@link #execute()} and {@link #executeNow()} use whatever transaction
+   * is currently active on the thread (or auto-commit if none is active) - consistent
+   * with {@link Database#execute(SqlUpdate, Transaction)}.
+   */
+  SqlUpdate usingTransaction(Transaction transaction);
+
+  /**
    * Execute when addBatch() has been used to batch multiple bind executions.
    *
    * @return The row counts for each of the batched statements.

@@ -7,16 +7,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
 @Entity
-public class TestTwo extends Model {
+public class RTestTwo extends Model {
 
     @Id
     private String id;
 
     @ManyToOne
     @JoinColumn
-    private TestOne testOne;
+    private RTestOne testOne;
 
-    public TestTwo(String id) {
+    public RTestTwo(String id) {
         this.id = id;
     }
 
@@ -24,11 +24,11 @@ public class TestTwo extends Model {
         return id;
     }
 
-    public TestOne getTestOne() {
+    public RTestOne getTestOne() {
         return testOne;
     }
 
-    public void setTestOne(TestOne testOne) {
+    public void setTestOne(RTestOne testOne) {
         this.testOne = testOne;
     }
 }

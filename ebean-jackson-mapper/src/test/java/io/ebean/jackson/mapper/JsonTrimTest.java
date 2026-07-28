@@ -1,6 +1,6 @@
 package io.ebean.jackson.mapper;
 
-
+import io.ebean.core.type.JsonTrim;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

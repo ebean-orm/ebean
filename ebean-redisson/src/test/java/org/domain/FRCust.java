@@ -7,12 +7,12 @@ import jakarta.persistence.Entity;
 
 @Cache(naturalKey = "name")
 @Entity
-public class RCust extends EBase {
+public class FRCust extends EBase {
 
   @Index(unique = true)
   String name;
 
-  public RCust(String name) {
+  public FRCust(String name) {
     this.name = name;
   }
 

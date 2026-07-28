@@ -3,8 +3,6 @@ package io.ebean;
 import org.jspecify.annotations.Nullable;
 
 import jakarta.persistence.EntityNotFoundException;
-import javax.sql.DataSource;
-import java.sql.Connection;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -12,9 +10,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 /**
  * Build and execute an ORM query.
@@ -22,7 +17,7 @@ import java.util.stream.Stream;
  * @param <SELF> The type of the builder
  * @param <T>    The entity bean type
  */
-public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends QueryBuilderProjection<SELF, T> {
+public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends QueryBuilderProjection<SELF, T>, StreamableQuery<SELF, T> {
 
   /**
    * Set root table alias.
@@ -144,46 +139,14 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   SELF copy();
 
   /**
-   * Execute the query using the given transaction.
-   */
-  SELF usingTransaction(Transaction transaction);
-
-  /**
    * Execute this query using immutable bean cache values for matching bean types.
    */
   SELF using(ImmutableBeanCache<?> beanCache);
 
   /**
-   * Execute the query using the given connection.
-   */
-  SELF usingConnection(Connection connection);
-
-  /**
    * Execute the query using the given database.
    */
   SELF usingDatabase(Database database);
-
-  /**
-   * Ensure that the master DataSource is used if there is a read only data source
-   * being used (that is using a read replica database potentially with replication lag).
-   * <p>
-   * When the database is configured with a read-only DataSource via
-   * say {@link io.ebean.config.DatabaseConfig#setReadOnlyDataSource(DataSource)} then
-   * by default when a query is run without an active transaction, it uses the read-only data
-   * source. We we use {@code usingMaster()} to instead ensure that the query is executed
-   * against the master data source.
-   */
-  default SELF usingMaster() {
-    return usingMaster(true);
-  }
-
-  /**
-   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
-   * data source can be used if defined.
-   *
-   * @see #usingMaster()
-   */
-  SELF usingMaster(boolean useMaster);
 
   /**
    * Set the base table to use for this query.
@@ -609,51 +572,6 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   boolean exists();
 
   /**
-   * Execute the query returning either a single bean or null (if no matching
-   * bean is found).
-   * <p>
-   * If more than 1 row is found for this query then a PersistenceException is
-   * thrown.
-   * <p>
-   * This is useful when your predicates dictate that your query should only
-   * return 0 or 1 results.
-   * <p>
-   * <pre>{@code
-   *
-   * // assuming the sku of products is unique...
-   * Product product =
-   *     new QProduct()
-   *         .sku.equalTo("aa113")
-   *         .findOne();
-   * ...
-   * }</pre>
-   * <p>
-   * It is also useful with finding objects by their id when you want to specify
-   * further join information to optimise the query.
-   * <p>
-   * <pre>{@code
-   *
-   * // Fetch order 42 and additionally fetch join its order details...
-   * Order order =
-   *     new QOrder()
-   *         .fetch("details") // eagerly load the order details
-   *         .id.equalTo(42)
-   *         .findOne();
-   *
-   * // the order details were eagerly loaded
-   * List<OrderDetail> details = order.getDetails();
-   * ...
-   * }</pre>
-   */
-  @Nullable
-  T findOne();
-
-  /**
-   * Execute the query returning an optional bean.
-   */
-  Optional<T> findOneOrEmpty();
-
-  /**
    * Execute the query returning a single bean or throwing a {@link jakarta.persistence.EntityNotFoundException}
    * if there is no matching bean.
    * <p>
@@ -667,61 +585,11 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
    * find-by-id query, or the single equality predicate when the query is filtered by what
    * looks like a natural/unique key, otherwise a generic "not found" message.
    */
+  @Override
   default T findOneOrThrow() {
     return findOneOrEmpty().orElseThrow(() ->
       new EntityNotFoundException(getBeanType().getSimpleName() + " not found"));
   }
-
-  /**
-   * Execute the query returning a single bean or throwing the exception produced by the
-   * given supplier if there is no matching bean.
-   * <pre>{@code
-   *   Customer customer = query
-   *     .findOneOrThrow(() -> new NotFoundException("Customer not found for id: " + id));
-   * }</pre>
-   */
-  default T findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
-    return findOneOrEmpty().orElseThrow(exceptionSupplier);
-  }
-
-  /**
-   * Execute the query returning the list of objects.
-   * <p>
-   * This query will execute against the EbeanServer that was used to create it.
-   * <p>
-   * <pre>{@code
-   *
-   * List<Customer> customers =
-   *     new QCustomer()
-   *       .name.ilike("rob%")
-   *       .findList();
-   *
-   * }</pre>
-   *
-   * @see Query#findList()
-   */
-  List<T> findList();
-
-  /**
-   * Execute the query returning the result as a Stream.
-   * <p>
-   * Note that this can support very large queries iterating
-   * any number of results. To do so internally it can use
-   * multiple persistence contexts.
-   * </p>
-   * <pre>{@code
-   *
-   *  // use try with resources to ensure Stream is closed
-   *
-   *  try (Stream<Customer> stream = query.findStream()) {
-   *    stream
-   *    .map(...)
-   *    .collect(...);
-   *  }
-   *
-   * }</pre>
-   */
-  Stream<T> findStream();
 
   /**
    * Execute the query returning the set of objects.
@@ -867,84 +735,6 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
   <A> Set<A> findSingleAttributeSet();
 
   /**
-   * Execute the query processing the beans one at a time.
-   * <p>
-   * This method is appropriate to process very large query results as the
-   * beans are consumed one at a time and do not need to be held in memory
-   * (unlike #findList #findSet etc)
-   * <p>
-   * Note that internally Ebean can inform the JDBC driver that it is expecting larger
-   * resultSet and specifically for MySQL this hint is required to stop it's JDBC driver
-   * from buffering the entire resultSet. As such, for smaller resultSets findList() is
-   * generally preferable.
-   * <p>
-   * Compared with #findEachWhile this will always process all the beans where as
-   * #findEachWhile provides a way to stop processing the query result early before
-   * all the beans have been read.
-   * <p>
-   * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the Consumer interface which is better suited to use with closures.
-   *
-   * <pre>{@code
-   *
-   *  new QCustomer()
-   *     .status.equalTo(Status.NEW)
-   *     .orderBy().id.asc()
-   *     .findEach((Customer customer) -> {
-   *
-   *       // do something with customer
-   *       System.out.println("-- visit " + customer);
-   *     });
-   *
-   * }</pre>
-   *
-   * @param consumer the consumer used to process the queried beans.
-   */
-  void findEach(Consumer<T> consumer);
-
-  /**
-   * Execute findEach streaming query batching the results for consuming.
-   * <p>
-   * This query execution will stream the results and is suited to consuming
-   * large numbers of results from the database.
-   * <p>
-   * Typically, we use this batch consumer when we want to do further processing on
-   * the beans and want to do that processing in batch form, for example - 100 at
-   * a time.
-   *
-   * @param batch    The number of beans processed in the batch
-   * @param consumer Process the batch of beans
-   */
-  void findEach(int batch, Consumer<List<T>> consumer);
-
-  /**
-   * Execute the query using callbacks to a visitor to process the resulting
-   * beans one at a time.
-   * <p>
-   * This method is functionally equivalent to findIterate() but instead of using an
-   * iterator uses the Predicate interface which is better suited to use with closures.
-   *
-   * <pre>{@code
-   *
-   *  new QCustomer()
-   *     .status.equalTo(Status.NEW)
-   *     .orderBy().id.asc()
-   *     .findEachWhile((Customer customer) -> {
-   *
-   *       // do something with customer
-   *       System.out.println("-- visit " + customer);
-   *
-   *       // return true to continue processing or false to stop
-   *       return (customer.getId() < 40);
-   *     });
-   *
-   * }</pre>
-   *
-   * @param consumer the consumer used to process the queried beans.
-   */
-  void findEachWhile(Predicate<T> consumer);
-
-  /**
    * Return versions of a @History entity bean.
    * <p>
    * Generally this query is expected to be a find by id or unique predicates query.
@@ -1008,34 +798,5 @@ public interface QueryBuilder<SELF extends QueryBuilder<SELF, T>, T> extends Que
    * @return a Future object for the map result of the query
    */
   <K> FutureMap<K,T> findFutureMap();
-
-  /**
-   * Return a PagedList for this query using firstRow and maxRows.
-   * <p>
-   * The benefit of using this over findList() is that it provides functionality to get the
-   * total row count etc.
-   * <p>
-   * If maxRows is not set on the query prior to calling findPagedList() then a
-   * PersistenceException is thrown.
-   * <p>
-   * <pre>{@code
-   *
-   *  PagedList<Order> pagedList =
-   *    new QOrder()
-   *       .setFirstRow(50)
-   *       .setMaxRows(20)
-   *       .findPagedList();
-   *
-   *       // fetch the total row count in the background
-   *       pagedList.loadRowCount();
-   *
-   *       List<Order> orders = pagedList.getList();
-   *       int totalRowCount = pagedList.getTotalRowCount();
-   *
-   * }</pre>
-   *
-   * @return The PagedList
-   */
-  PagedList<T> findPagedList();
 
 }

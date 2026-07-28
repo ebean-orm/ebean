@@ -10,13 +10,13 @@ import jakarta.persistence.Entity;
 @SuppressWarnings("unused")
 @Cache(naturalKey = {"one", "two"})
 @Entity
-public class OtherOne extends EBase {
+public class FOtherOne extends EBase {
 
   private final String one;
   private final String two;
   private String notes;
 
-  public OtherOne(String one, String two, String notes) {
+  public FOtherOne(String one, String two, String notes) {
     this.one = one;
     this.two = two;
     this.notes = notes;

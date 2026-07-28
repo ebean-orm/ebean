@@ -1,13 +1,10 @@
 package io.ebean;
 
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
-import jakarta.persistence.EntityNotFoundException;
-import java.sql.Connection;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Supplier;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 /**
@@ -24,11 +21,12 @@ import java.util.stream.Stream;
  * @param <D> the target DTO type
  */
 @NullMarked
-public interface MappedQuery<D> {
+public interface MappedQuery<D> extends StreamableQuery<MappedQuery<D>, D> {
 
   /**
    * Execute the query returning the mapped DTO list.
    */
+  @Override
   List<D> findList();
 
   /**
@@ -40,6 +38,7 @@ public interface MappedQuery<D> {
    * ({@link PagedList#getTotalCount()}, {@link PagedList#hasNext()}, etc.) reflects the
    * underlying entity query and is unaffected by the DTO mapping.
    */
+  @Override
   PagedList<D> findPagedList();
 
   /**
@@ -62,53 +61,51 @@ public interface MappedQuery<D> {
    *
    * }</pre>
    */
+  @Override
   Stream<D> findStream();
 
   /**
-   * Execute the query returning a single mapped DTO, or {@code null} if there is no matching row.
-   */
-  @Nullable
-  D findOne();
-
-  /**
-   * Execute the query returning an optional mapped DTO.
-   */
-  Optional<D> findOneOrEmpty();
-
-  /**
-   * Execute the query returning a single mapped DTO or throwing a
-   * {@link jakarta.persistence.EntityNotFoundException} if there is no matching row.
+   * Execute the query processing the mapped DTOs one at a time.
    * <p>
-   * The exception message reflects the underlying entity type and its id or single
-   * equality predicate (a likely natural/unique key) when the query is that simple,
-   * otherwise a generic "not found" message.
+   * Mirrors {@link QueryBuilder#findEach(Consumer)} - the underlying entity graph query is
+   * streamed one entity at a time and each entity is mapped to its target DTO lazily as it is
+   * consumed, sharing one {@link DtoMapContext} across the whole callback so that repeated
+   * references to the same source entity still de-duplicate to the same DTO instance.
+   * <p>
+   * This method is appropriate to process very large query results as the mapped DTOs are
+   * consumed one at a time and do not need to be held in memory (unlike {@link #findList()}).
+   *
+   * @param consumer the consumer used to process the mapped DTOs.
    */
-  default D findOneOrThrow() {
-    return findOneOrEmpty().orElseThrow(() -> new EntityNotFoundException("Not found"));
-  }
+  @Override
+  void findEach(Consumer<D> consumer);
+  /**
+   * Execute findEach streaming query batching the mapped DTOs for consuming.
+   * <p>
+   * Mirrors {@link QueryBuilder#findEach(int, Consumer)} - typically used when we want to do
+   * further processing on the mapped DTOs in batch form, for example 100 at a time. Each batch
+   * shares one {@link DtoMapContext} with the rest of the query so that repeated references to
+   * the same source entity still de-duplicate to the same DTO instance.
+   *
+   * @param batch    The number of mapped DTOs processed in the batch
+   * @param consumer Process the batch of mapped DTOs
+   */
+  @Override
+  void findEach(int batch, Consumer<List<D>> consumer);
 
   /**
-   * Execute the query returning a single mapped DTO or throwing the exception produced
-   * by the given supplier if there is no matching row.
+   * Execute the query using callbacks to process the resulting mapped DTOs one at a time,
+   * with the ability to stop processing part way through.
+   * <p>
+   * Mirrors {@link QueryBuilder#findEachWhile(Predicate)} - returning {@code false} after
+   * processing a DTO stops the iteration through the query results. Sharing one
+   * {@link DtoMapContext} across the whole callback so that repeated references to the same
+   * source entity still de-duplicate to the same DTO instance.
+   *
+   * @param consumer the consumer used to process the mapped DTOs, returning {@code false} to
+   *                 stop processing.
    */
-  default D findOneOrThrow(Supplier<? extends RuntimeException> exceptionSupplier) {
-    return findOneOrEmpty().orElseThrow(exceptionSupplier);
-  }
-
-  /**
-   * Ensure the master DataSource is used when useMaster is true. Otherwise, the read only
-   * data source can be used if defined.
-   */
-  MappedQuery<D> usingMaster(boolean useMaster);
-
-  /**
-   * Use the explicit transaction to execute the query.
-   */
-  MappedQuery<D> usingTransaction(Transaction transaction);
-
-  /**
-   * Execute the query using the given connection.
-   */
-  MappedQuery<D> usingConnection(Connection connection);
+  @Override
+  void findEachWhile(Predicate<D> consumer);
 
 }

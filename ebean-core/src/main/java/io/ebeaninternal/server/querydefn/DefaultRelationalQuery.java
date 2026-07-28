@@ -282,6 +282,17 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
     }
 
     @Override
+    public TypeQuery<T> usingConnection(Connection connection) {
+      DefaultRelationalQuery.this.usingConnection(connection);
+      return this;
+    }
+
+    @Override
+    public void cancel() {
+      DefaultRelationalQuery.this.cancel();
+    }
+
+    @Override
     public T findOne() {
       return findSingleAttribute(type);
     }
@@ -324,6 +335,17 @@ public final class DefaultRelationalQuery extends AbstractQuery implements SpiSq
     public TypeQuery<T> usingTransaction(Transaction transaction) {
       transaction(transaction);
       return this;
+    }
+
+    @Override
+    public TypeQuery<T> usingConnection(Connection connection) {
+      DefaultRelationalQuery.this.usingConnection(connection);
+      return this;
+    }
+
+    @Override
+    public void cancel() {
+      DefaultRelationalQuery.this.cancel();
     }
 
     @Nullable
