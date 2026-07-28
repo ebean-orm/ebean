@@ -3,8 +3,8 @@ package org.integration;
 import io.ebean.DB;
 import io.ebean.Database;
 import io.ebean.redisson.DuelCache;
-import org.domain.Person;
-import org.domain.query.QPerson;
+import org.domain.FPerson;
+import org.domain.query.QFPerson;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -37,65 +37,65 @@ class ClusterTest {
 
   @Test
   void testBothNear() throws InterruptedException {
-    new QPerson()
+    new QFPerson()
       .name.eq("Someone")
       .delete();
 
-    Person foo = new Person("Someone");
+    FPerson foo = new FPerson("Someone");
     foo.save();
 
     DB.cacheManager().clearAll();
     db.metaInfo().resetAllMetrics();
     other.metaInfo().resetAllMetrics();
 
-    Person fooA = DB.find(Person.class, foo.getId());
+    FPerson fooA = DB.find(FPerson.class, foo.getId());
     allowAsyncMessaging(); // allow time for background cache load
-    Person fooB = other.find(Person.class, foo.getId());
+    FPerson fooB = other.find(FPerson.class, foo.getId());
 
-    DuelCache dualCacheA = db.cacheManager().beanCache(Person.class).unwrap(DuelCache.class);
+    DuelCache dualCacheA = db.cacheManager().beanCache(FPerson.class).unwrap(DuelCache.class);
     assertCounts(dualCacheA, 0, 1, 0, 1);
-    fooA = DB.find(Person.class, foo.getId());
+    fooA = DB.find(FPerson.class, foo.getId());
     assertCounts(dualCacheA, 1, 1, 0, 1);
-    fooB = other.find(Person.class, foo.getId());
-    fooA = DB.find(Person.class, foo.getId());
+    fooB = other.find(FPerson.class, foo.getId());
+    fooA = DB.find(FPerson.class, foo.getId());
     assertCounts(dualCacheA, 2, 1, 0, 1);
-    fooB = other.find(Person.class, foo.getId());
-    DuelCache dualCacheB = other.cacheManager().beanCache(Person.class).unwrap(DuelCache.class);
+    fooB = other.find(FPerson.class, foo.getId());
+    DuelCache dualCacheB = other.cacheManager().beanCache(FPerson.class).unwrap(DuelCache.class);
     assertCounts(dualCacheB, 2, 1, 1, 0);
   }
 
   @Test
   void test() throws InterruptedException {
     for (int i = 0; i < 10; i++) {
-      Person foo = new Person("name " + i);
+      FPerson foo = new FPerson("name " + i);
       foo.save();
     }
 
     other.cacheManager().clearAll();
     other.metaInfo().resetAllMetrics();
 
-    DuelCache dualCache = other.cacheManager().beanCache(Person.class).unwrap(DuelCache.class);
+    DuelCache dualCache = other.cacheManager().beanCache(FPerson.class).unwrap(DuelCache.class);
 
-    Person foo0 = other.find(Person.class, 1);
+    FPerson foo0 = other.find(FPerson.class, 1);
     assertCounts(dualCache, 0, 1, 0, 1);
 
-    other.find(Person.class, 1);
+    other.find(FPerson.class, 1);
     assertCounts(dualCache, 1, 1, 0, 1);
 
-    other.find(Person.class, 1);
+    other.find(FPerson.class, 1);
     assertCounts(dualCache, 2, 1, 0, 1);
 
-    other.find(Person.class, 1);
+    other.find(FPerson.class, 1);
     assertCounts(dualCache, 3, 1, 0, 1);
 
-    other.find(Person.class, 2);
+    other.find(FPerson.class, 2);
     assertCounts(dualCache, 3, 2, 0, 2);
 
     foo0.setName("name2");
     foo0.save();
     allowAsyncMessaging();
 
-    Person foo3 = other.find(Person.class, 1);
+    FPerson foo3 = other.find(FPerson.class, 1);
     assertThat(foo3.getName()).isEqualTo("name2");
     assertCounts(dualCache, 3, 3, 1, 2);
 
@@ -103,7 +103,7 @@ class ClusterTest {
     foo0.save();
     allowAsyncMessaging();
 
-    foo3 = other.find(Person.class, 1);
+    foo3 = other.find(FPerson.class, 1);
     assertThat(foo3.getName()).isEqualTo("name3");
     assertCounts(dualCache, 3, 4, 2, 2);
   }

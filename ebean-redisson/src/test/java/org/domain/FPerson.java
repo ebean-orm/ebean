@@ -11,7 +11,7 @@ import java.time.LocalDate;
 @Cache(enableQueryCache = true, nearCache = true, naturalKey = "name")
 @CacheBeanTuning(maxSecsToLive = 1)
 @Entity
-public class Person extends EBase {
+public class FPerson extends EBase {
 
   public enum Status {
     NEW,
@@ -33,7 +33,7 @@ public class Person extends EBase {
    */
   String key;
 
-  public Person(String name) {
+  public FPerson(String name) {
     this.name = name;
     this.status = Status.NEW;
   }

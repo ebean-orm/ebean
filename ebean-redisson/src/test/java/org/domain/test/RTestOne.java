@@ -9,7 +9,7 @@ import java.util.List;
 
 @Cache
 @Entity
-public class TestOne extends Model {
+public class RTestOne extends Model {
 
     @Id
     private String id;
@@ -18,9 +18,9 @@ public class TestOne extends Model {
     private String otherUnique;
 
     @OneToMany(mappedBy = "testOne", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<TestTwo> testTwos = new ArrayList<>();
+    private List<RTestTwo> testTwos = new ArrayList<>();
 
-    public TestOne(String id, String otherUnique) {
+    public RTestOne(String id, String otherUnique) {
         this.id = id;
         this.otherUnique = otherUnique;
     }
@@ -37,11 +37,11 @@ public class TestOne extends Model {
         this.otherUnique = otherUnique;
     }
 
-    public List<TestTwo> getTestTwos() {
+    public List<RTestTwo> getTestTwos() {
         return testTwos;
     }
 
-    public void setTestTwos(List<TestTwo> testTwos) {
+    public void setTestTwos(List<RTestTwo> testTwos) {
         this.testTwos = testTwos;
     }
 }
