@@ -2,6 +2,7 @@ package io.ebean.platform.db2;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DB2PlatformTest {
@@ -11,5 +12,6 @@ class DB2PlatformTest {
     DB2LuwPlatform platform = new DB2LuwPlatform();
 
     assertTrue(platform.existsWithCaseWhen());
+    assertEquals(" from sysibm.sysdummy1", platform.existsFromClause());
   }
 }

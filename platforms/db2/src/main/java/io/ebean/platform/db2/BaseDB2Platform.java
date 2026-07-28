@@ -20,6 +20,7 @@ public abstract class BaseDB2Platform extends DatabasePlatform {
     this.truncateTable = "truncate table %s reuse storage ignore delete triggers immediate";
     this.likeClauseRaw = "like ?";
     this.existsWithCaseWhen = true;
+    this.existsFromClause = " from sysibm.sysdummy1";
     this.sqlLimiter = new AnsiSqlRowsLimiter();
 
     this.dbIdentity.setSupportsGetGeneratedKeys(true);
