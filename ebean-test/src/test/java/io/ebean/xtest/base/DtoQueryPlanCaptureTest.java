@@ -2,10 +2,12 @@ package io.ebean.xtest.base;
 
 import io.ebean.DB;
 import io.ebean.ProfileLocation;
+import io.ebean.annotation.Platform;
 import io.ebean.meta.MetaQueryPlan;
 import io.ebean.meta.QueryPlanInit;
 import io.ebean.meta.QueryPlanRequest;
 import io.ebean.xtest.BaseTestCase;
+import io.ebean.xtest.IgnorePlatform;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.Customer;
 import org.tests.model.basic.ResetBasicData;
@@ -80,6 +82,7 @@ class DtoQueryPlanCaptureTest extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.DB2)
   void nativeDtoQuery_capturesQueryPlan() {
     ResetBasicData.reset();
 
@@ -127,6 +130,7 @@ class DtoQueryPlanCaptureTest extends BaseTestCase {
   }
 
   @Test
+  @IgnorePlatform(Platform.DB2)
   void nativeDtoQuery_withProfileLocation_capturesQueryPlan() {
     ResetBasicData.reset();
 
