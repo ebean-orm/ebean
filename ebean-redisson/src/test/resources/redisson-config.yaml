@@ -1,7 +1,8 @@
 singleServerConfig:
   address: "redis://127.0.0.1:6379"
   password: null
-  database: 0
+  # ebean-redis test clients use database 0 in the shared Redis container.
+  database: 1
   connectionMinimumIdleSize: 2
   connectionPoolSize: 10
   idleConnectionTimeout: 3000
