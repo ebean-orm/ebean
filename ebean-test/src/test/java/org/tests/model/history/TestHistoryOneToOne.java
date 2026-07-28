@@ -37,11 +37,12 @@ class TestHistoryOneToOne extends BaseTestCase {
 
   @IgnorePlatform({Platform.ORACLE, Platform.COCKROACH})
   @Test
-  void testVersionsWithHistoryOverHistoryless() {
+  void testVersionsWithHistoryOverHistoryless() throws InterruptedException {
     HistorylessOneToOne historylessOneToOne = new HistorylessOneToOne("less");
     historylessOneToOne.setHistoryOneToOne(new HistoryOneToOne("one"));
     historylessOneToOne.setHistoryManyToOne(new HistoryManyToOne("many"));
     DB.save(historylessOneToOne);
+    Thread.sleep(DB_CLOCK_DELTA);
 
     LoggedSql.start();
     int count = DB.find(HistoryOneToOne.class)
