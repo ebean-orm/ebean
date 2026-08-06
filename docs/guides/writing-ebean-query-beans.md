@@ -431,6 +431,48 @@ List<Customer> customers = new QCustomer()
 If the caller needs multiple to-many paths or a paged query, be suspicious of a
 plain `fetch(...)` on those paths. `fetchQuery()` is often the safer default.
 
+### `@OneToOne(mappedBy=...)` is EAGER by default — mark it LAZY
+
+The non-owning side of a `@OneToOne` (the side with `mappedBy`) defaults to
+`FetchType.EAGER` per JPA, same as `@ManyToOne`. Unlike a `@ManyToOne`
+reference (which is FK-only until `.fetch()`'d), Ebean's default select for an
+EAGER `@OneToOne(mappedBy=...)` still adds a `left join` to the target table
+on **every** query for the owning entity — even a plain `findById()` — because
+there is no local FK column to use as a lazy reference; the only way to know
+the associated row exists is to join to it.
+
+If that association is rarely needed (e.g. a rarely-read child/detail table),
+this join executes on every load of the parent, including in hot-path list
+queries, and can dominate query cost as more such associations accumulate.
+
+**Always set `fetch = FetchType.LAZY` on `@OneToOne(mappedBy=...)`
+associations unless the association is genuinely needed on (almost) every
+load:**
+
+```java
+@OneToOne(mappedBy = "device", fetch = FetchType.LAZY)
+private SensorBoard sensorBoard;
+```
+
+This correctly excludes the join from Ebean's default select clause (verified
+for FK-based, non-shared-primary-key `@OneToOne` relationships — the common
+case). Callers that do need the association can still `.fetch("sensorBoard")`
+explicitly on the query bean.
+
+**Caveat:** the exclusion is driven by Ebean's default-select-clause
+mechanism. It is bypassed if the query has already been switched into an
+"all properties" mode by something other than the deploy-time
+`FetchType.LAZY`/`EAGER` metadata (for example, an active AutoTune profile
+that supplies its own tuned property set). Confirm the join is actually gone
+by checking generated SQL (`LoggedSql` in tests, or query logging) after
+making this change — don't assume it's excluded from the annotation alone.
+
+### Agent rule
+
+Default new `@OneToOne(mappedBy=...)` fields to `fetch = FetchType.LAZY`
+unless there's a clear reason the association is needed on every load. This
+is a one-line, low-risk change that avoids an always-on join.
+
 ---
 
 ## Step 8 - Use DTO projection when the caller does not need entity beans
