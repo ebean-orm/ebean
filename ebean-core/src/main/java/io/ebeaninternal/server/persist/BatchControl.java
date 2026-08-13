@@ -81,6 +81,13 @@ public final class BatchControl {
    */
   private int bufferMax;
 
+  /**
+   * True while the batched requests are being executed. A persist performed from a
+   * BeanPersistController callback must not flush the batch that is executing it, the same way
+   * executeNow() stops a query from doing so.
+   */
+  private boolean executing;
+
   private final Queue[] queues = new Queue[2];
 
   static final int DELETE_QUEUE = 0;
@@ -163,8 +170,9 @@ public final class BatchControl {
    * according to the depth (object graph depth).
    */
   public int executeOrQueue(PersistRequestBean<?> request, boolean batch) throws BatchedSqlException {
-    if (!batch || (batchFlushOnMixed && !pstmtHolder.isEmpty())) {
-      // flush when mixing beans and updateSql
+    if (!executing && (!batch || (batchFlushOnMixed && !pstmtHolder.isEmpty()))) {
+      // flush when mixing beans and updateSql, unless we are inside the execution of the batch
+      // itself : flushing then would issue the statements queued behind the current one early
       flush();
     }
     if (!batch) {
@@ -226,7 +234,9 @@ public final class BatchControl {
   void executeNow(ArrayList<PersistRequest> list) throws BatchedSqlException {
     boolean old = transaction.isFlushOnQuery();
     transaction.setFlushOnQuery(false);
-    // disable flush on query due transaction callbacks
+    boolean oldExecuting = executing;
+    executing = true;
+    // disable flush on query and on persist due transaction callbacks
     try {
       for (int i = 0; i < list.size(); i++) {
         if (i % batchSize == 0) {
@@ -237,6 +247,7 @@ public final class BatchControl {
       }
       flushPstmtHolder();
     } finally {
+      executing = oldExecuting;
       transaction.setFlushOnQuery(old);
     }
   }
