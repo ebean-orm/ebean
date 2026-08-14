@@ -38,6 +38,16 @@ public interface TimedMetric {
   TimedMetricStats collect(boolean reset);
 
   /**
+   * Collect a snapshot using the given collection mode.
+   *
+   * <p>Implementations that do not support delta collection use cumulative
+   * collection for {@link MetricVisitor.Mode#DELTA}.</p>
+   */
+  default TimedMetricStats collect(MetricVisitor.Mode mode) {
+    return collect(mode == MetricVisitor.Mode.RESET);
+  }
+
+  /**
    * Visit non empty metrics.
    */
   void visit(MetricVisitor visitor);

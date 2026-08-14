@@ -30,7 +30,16 @@ public class BasicMetricVisitor extends AbstractMetricVisitor implements ServerM
    * Construct specifying reset and what to collect.
    */
   public BasicMetricVisitor(String name, Function<String,String> naming, boolean reset, boolean collectTransactionMetrics, boolean collectQueryMetrics, boolean collectL2Metrics) {
-    super(reset, collectTransactionMetrics, collectQueryMetrics, collectL2Metrics);
+    this(name, naming, reset ? Mode.RESET : Mode.CUMULATIVE,
+      collectTransactionMetrics, collectQueryMetrics, collectL2Metrics);
+  }
+
+  /**
+   * Construct specifying the collection mode and what to collect.
+   */
+  public BasicMetricVisitor(String name, Function<String,String> naming, Mode mode,
+                            boolean collectTransactionMetrics, boolean collectQueryMetrics, boolean collectL2Metrics) {
+    super(mode, collectTransactionMetrics, collectQueryMetrics, collectL2Metrics);
     this.name = name;
     this.naming = naming;
   }

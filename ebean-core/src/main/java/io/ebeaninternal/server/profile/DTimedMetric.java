@@ -4,7 +4,6 @@ import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.TimedMetric;
 
 import java.util.concurrent.atomic.LongAccumulator;
-import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Used to collect timed execution statistics.
@@ -15,8 +14,8 @@ import java.util.concurrent.atomic.LongAdder;
 final class DTimedMetric implements TimedMetric {
 
   private final String name;
-  private final LongAdder count = new LongAdder();
-  private final LongAdder total = new LongAdder();
+  private final ValueAdder count = new ValueAdder();
+  private final ValueAdder total = new ValueAdder();
   private final LongAccumulator max = new LongAccumulator(Math::max, 0);
   private boolean collected;
   private String reportName;
@@ -43,14 +42,14 @@ final class DTimedMetric implements TimedMetric {
 
   @Override
   public void add(long value) {
-    count.increment();
+    count.add(1);
     total.add(value);
     max.accumulate(value);
   }
 
   @Override
   public boolean isEmpty() {
-    return count.sum() == 0;
+    return count.currentValue() == 0;
   }
 
   @Override
@@ -62,29 +61,61 @@ final class DTimedMetric implements TimedMetric {
 
   @Override
   public void visit(MetricVisitor visitor) {
-    final long countSum = visitor.reset() ? count.sumThenReset() : count.sum();
-    if (countSum > 0) {
+    final DTimeMetricStats stats = collect(visitor.mode());
+    if (stats != null) {
       final String name = reportName != null ? reportName : reportName(visitor);
-      visitor.visitTimed(stats(visitor.reset(), name, countSum));
+      stats.setName(name);
+      visitor.visitTimed(stats);
     }
   }
 
   @Override
   public DTimeMetricStats collect(boolean reset) {
-    final long countSum = reset ? count.sumThenReset() : count.sum();
+    return collect(reset ? MetricVisitor.Mode.RESET : MetricVisitor.Mode.CUMULATIVE);
+  }
+
+  @Override
+  public DTimeMetricStats collect(MetricVisitor.Mode mode) {
+    final long countSum;
+    switch (mode) {
+      case RESET:
+        countSum = count.getAndReset();
+        break;
+      case CUMULATIVE:
+        countSum = count.cumulative();
+        break;
+      case DELTA:
+        countSum = count.delta();
+        break;
+      default:
+        throw new IllegalStateException("Unknown metric collection mode");
+    }
     if (countSum == 0) {
       return null;
     } else {
-      return stats(reset, name, countSum);
+      return stats(mode, name, countSum);
     }
   }
 
   /**
    * Return the current statistics resetting the internal values if reset is true.
    */
-  private DTimeMetricStats stats(boolean reset, String name, long countSum) {
+  private DTimeMetricStats stats(MetricVisitor.Mode mode, String name, long countSum) {
     try {
-      final long totalSum = reset ? total.sumThenReset() : total.sum();
+      final long totalSum;
+      switch (mode) {
+        case RESET:
+          totalSum = total.getAndReset();
+          break;
+        case CUMULATIVE:
+          totalSum = total.cumulative();
+          break;
+        case DELTA:
+          totalSum = total.delta();
+          break;
+        default:
+          throw new IllegalStateException("Unknown metric collection mode");
+      }
       return new DTimeMetricStats(name, collected, countSum, totalSum, max.getThenReset());
     } finally {
       collected = true;

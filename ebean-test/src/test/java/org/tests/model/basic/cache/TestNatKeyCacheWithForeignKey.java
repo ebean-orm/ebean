@@ -30,6 +30,7 @@ public class TestNatKeyCacheWithForeignKey extends BaseTestCase {
 
     setupData();
     clearAllL2Cache();
+    getStats();
 
     final OCachedAppDetail found0 = findDetail(app0, "detail0");
     assertThat(found0).isNotNull();

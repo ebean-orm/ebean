@@ -7,6 +7,12 @@ import java.util.function.Function;
  */
 public interface MetricVisitor {
 
+  enum Mode {
+    RESET,
+    CUMULATIVE,
+    DELTA
+  }
+
   /**
    * Return the naming convention that should be applied to the reported metric names.
    */
@@ -16,6 +22,13 @@ public interface MetricVisitor {
    * Return true if the metrics should be reset.
    */
   boolean reset();
+
+  /**
+   * Return the metric collection mode.
+   */
+  default Mode mode() {
+    return reset() ? Mode.RESET : Mode.CUMULATIVE;
+  }
 
   /**
    * Return true if we should visit the transaction metrics.
