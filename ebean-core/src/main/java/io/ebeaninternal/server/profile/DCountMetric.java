@@ -17,9 +17,6 @@ final class DCountMetric implements CountMetric {
     this.name = name;
   }
 
-  /**
-   * Add a value. Usually the value is Time or Bytes etc.
-   */
   @Override
   public void add(long value) {
     count.add(value);
@@ -42,12 +39,25 @@ final class DCountMetric implements CountMetric {
 
   @Override
   public long get(boolean reset) {
-    return count.get(reset);
+    return reset ? count.getAndReset() : count.cumulative();
   }
 
   @Override
   public void visit(MetricVisitor visitor) {
-    long val = count.get(visitor.reset());
+    long val;
+    switch (visitor.mode()) {
+      case RESET:
+        val = count.getAndReset();
+        break;
+      case CUMULATIVE:
+        val = count.cumulative();
+        break;
+      case DELTA:
+        val = count.delta();
+        break;
+      default:
+        throw new IllegalStateException("Unknown metric collection mode");
+    }
     if (val > 0) {
       final String name = reportName != null ? reportName : reportName(visitor);
       visitor.visitCount(new DCountMetricStats(name, val));

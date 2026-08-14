@@ -15,14 +15,20 @@ final class ValueAdder {
     value.add(amount);
   }
 
-  long get(boolean reset) {
-    long currentValue = value.sum();
-    if (!reset) {
-      return currentValue;
-    }
+  long cumulative() {
+    return value.sum();
+  }
 
+  long delta() {
+    long currentValue = value.sum();
     long previous = previousValue.getAndSet(currentValue);
     return currentValue >= previous ? currentValue - previous : currentValue;
+  }
+
+  long getAndReset() {
+    long currentValue = value.sumThenReset();
+    previousValue.set(0);
+    return currentValue;
   }
 
   void reset() {

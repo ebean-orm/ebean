@@ -134,7 +134,6 @@ public class DTimedMetricTest {
     assertThat(delta.total()).isEqualTo(1220);
 
     cumulative = metric.collect(false);
-    assertThat(cumulative.count()).isEqualTo(3);
-    assertThat(cumulative.total()).isEqualTo(1220);
+    assertThat(cumulative).isNull();
   }
 }

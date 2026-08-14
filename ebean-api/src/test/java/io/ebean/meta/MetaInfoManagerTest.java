@@ -43,4 +43,18 @@ class MetaInfoManagerTest {
 
     assertThat(manager.collectMetrics(false)).isSameAs(metrics);
   }
+
+  @Test
+  void basicMetricVisitorSupportsExplicitCollectionModes() {
+    var reset = new BasicMetricVisitor("db", MetricNamingMatch.INSTANCE, MetricVisitor.Mode.RESET, true, true, true);
+    var cumulative = new BasicMetricVisitor("db", MetricNamingMatch.INSTANCE, MetricVisitor.Mode.CUMULATIVE, true, true, true);
+    var delta = new BasicMetricVisitor("db", MetricNamingMatch.INSTANCE, MetricVisitor.Mode.DELTA, true, true, true);
+
+    assertThat(reset.reset()).isTrue();
+    assertThat(reset.mode()).isEqualTo(MetricVisitor.Mode.RESET);
+    assertThat(cumulative.reset()).isFalse();
+    assertThat(cumulative.mode()).isEqualTo(MetricVisitor.Mode.CUMULATIVE);
+    assertThat(delta.reset()).isFalse();
+    assertThat(delta.mode()).isEqualTo(MetricVisitor.Mode.DELTA);
+  }
 }

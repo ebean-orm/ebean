@@ -20,7 +20,7 @@ final class DQueryPlanMetric implements QueryPlanMetric {
 
   @Override
   public void visit(MetricVisitor visitor) {
-    TimedMetricStats stats = metric.collect(visitor.reset());
+    TimedMetricStats stats = metric.collect(visitor.mode());
     if (stats != null) {
       String name = reportName != null ? reportName : reportName(visitor);
       visitor.visitQuery(new Stats(name, meta, stats, collected));

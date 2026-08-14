@@ -61,30 +61,61 @@ final class DTimedMetric implements TimedMetric {
 
   @Override
   public void visit(MetricVisitor visitor) {
-    final boolean reset = visitor.reset();
-    final long countSum = count.get(reset);
-    if (countSum > 0) {
+    final DTimeMetricStats stats = collect(visitor.mode());
+    if (stats != null) {
       final String name = reportName != null ? reportName : reportName(visitor);
-      visitor.visitTimed(stats(reset, name, countSum));
+      stats.setName(name);
+      visitor.visitTimed(stats);
     }
   }
 
   @Override
   public DTimeMetricStats collect(boolean reset) {
-    final long countSum = count.get(reset);
+    return collect(reset ? MetricVisitor.Mode.RESET : MetricVisitor.Mode.CUMULATIVE);
+  }
+
+  @Override
+  public DTimeMetricStats collect(MetricVisitor.Mode mode) {
+    final long countSum;
+    switch (mode) {
+      case RESET:
+        countSum = count.getAndReset();
+        break;
+      case CUMULATIVE:
+        countSum = count.cumulative();
+        break;
+      case DELTA:
+        countSum = count.delta();
+        break;
+      default:
+        throw new IllegalStateException("Unknown metric collection mode");
+    }
     if (countSum == 0) {
       return null;
     } else {
-      return stats(reset, name, countSum);
+      return stats(mode, name, countSum);
     }
   }
 
   /**
    * Return the current statistics resetting the internal values if reset is true.
    */
-  private DTimeMetricStats stats(boolean reset, String name, long countSum) {
+  private DTimeMetricStats stats(MetricVisitor.Mode mode, String name, long countSum) {
     try {
-      final long totalSum = total.get(reset);
+      final long totalSum;
+      switch (mode) {
+        case RESET:
+          totalSum = total.getAndReset();
+          break;
+        case CUMULATIVE:
+          totalSum = total.cumulative();
+          break;
+        case DELTA:
+          totalSum = total.delta();
+          break;
+        default:
+          throw new IllegalStateException("Unknown metric collection mode");
+      }
       return new DTimeMetricStats(name, collected, countSum, totalSum, max.getThenReset());
     } finally {
       collected = true;
