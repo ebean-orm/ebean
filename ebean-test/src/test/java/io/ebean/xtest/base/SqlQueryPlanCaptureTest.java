@@ -71,6 +71,7 @@ class SqlQueryPlanCaptureTest extends BaseTestCase {
       .orElse(null);
 
     assertThat(sqlPlan).as("captured a SqlQuery query plan").isNotNull();
+    assertThat(sqlPlan.dbName()).isEqualTo(DB.getDefault().name());
     assertThat(sqlPlan.sql()).contains("from o_customer where id > ?");
     assertThat(sqlPlan.plan()).isNotEmpty();
   }

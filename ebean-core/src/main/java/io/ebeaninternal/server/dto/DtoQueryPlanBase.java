@@ -15,6 +15,7 @@ abstract class DtoQueryPlanBase implements DtoQueryPlan, SpiQueryPlan {
   private final QueryPlanMetric planMetric;
   private final TimedMetric metric;
   private final Class<?> beanType;
+  private final String dbName;
   private final String name;
   private final String hash;
   private final String sql;
@@ -26,6 +27,7 @@ abstract class DtoQueryPlanBase implements DtoQueryPlan, SpiQueryPlan {
     this.planMetric = request.createMetric();
     this.metric = planMetric.metric();
     this.beanType = request.type();
+    this.dbName = request.dbName();
     this.name = request.name();
     this.hash = request.hash();
     this.sql = request.sql();
@@ -91,6 +93,6 @@ abstract class DtoQueryPlanBase implements DtoQueryPlan, SpiQueryPlan {
 
   @Override
   public SpiDbQueryPlan createMeta(String bind, String planString) {
-    return new DQueryPlanOutput(beanType, name, hash, sql, profileLocation, bind, planString);
+    return new DQueryPlanOutput(beanType, dbName, name, hash, sql, profileLocation, bind, planString);
   }
 }

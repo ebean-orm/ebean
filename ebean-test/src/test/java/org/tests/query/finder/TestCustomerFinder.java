@@ -191,6 +191,7 @@ public class TestCustomerFinder extends BaseTestCase {
     request.maxTimeMillis(10_000);
     List<MetaQueryPlan> plans0 = server().metaInfo().queryPlanCollectNow(request);
     assertThat(plans0).isNotEmpty();
+    assertThat(plans0).extracting(MetaQueryPlan::dbName).containsOnly(server().name());
 
     for (MetaQueryPlan plan : plans0) {
       logger.info("queryPlan label:{}, queryTimeMicros:{} captureMicros:{} whenCaptured:{} captureCount:{} loc:{} sql:{} bind:{} plan:{}",
