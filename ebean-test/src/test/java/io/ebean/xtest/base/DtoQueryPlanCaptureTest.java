@@ -125,6 +125,7 @@ class DtoQueryPlanCaptureTest extends BaseTestCase {
       .orElse(null);
 
     assertThat(dtoPlan).as("captured a native DTO query plan").isNotNull();
+    assertThat(dtoPlan.dbName()).isEqualTo(DB.getDefault().name());
     assertThat(dtoPlan.sql()).contains("from o_customer where id > ?");
     assertThat(dtoPlan.plan()).isNotEmpty();
   }

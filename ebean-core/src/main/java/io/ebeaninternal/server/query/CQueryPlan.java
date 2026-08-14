@@ -274,7 +274,7 @@ public class CQueryPlan implements SpiQueryPlan {
 
   @Override
   public final DQueryPlanOutput createMeta(String bind, String planString) {
-    return new DQueryPlanOutput(beanType(), name, hash, sql, profileLocation, bind, planString);
+    return new DQueryPlanOutput(beanType(), server.name(), name, hash, sql, profileLocation, bind, planString);
   }
 
   public DataReader createDataReader(boolean unmodifiable, ResultSet rset) {

@@ -80,6 +80,10 @@ public final class DtoMappingRequest {
     return name;
   }
 
+  public String dbName() {
+    return server.name();
+  }
+
   public String hash() {
     return hash;
   }

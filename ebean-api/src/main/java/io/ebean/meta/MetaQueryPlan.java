@@ -10,6 +10,11 @@ import java.time.Instant;
 public interface MetaQueryPlan {
 
   /**
+   * Return the name of the database for the query.
+   */
+  String dbName();
+
+  /**
    * Return the bean type for the query.
    */
   Class<?> beanType();
