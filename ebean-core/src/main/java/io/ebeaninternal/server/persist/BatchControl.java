@@ -146,8 +146,9 @@ public final class BatchControl {
    * to the depth.
    */
   public int executeStatementOrBatch(PersistRequest request, boolean batch, boolean addBatch) throws BatchedSqlException {
-    if (!batch || (batchFlushOnMixed && !isBeansEmpty())) {
-      // flush when mixing beans and updateSql
+    if (!executing && (!batch || (batchFlushOnMixed && !isBeansEmpty()))) {
+      // flush when mixing beans and updateSql, unless we are inside the execution of the batch
+      // itself : flushing then would issue the statements queued behind the current one early
       flush();
     }
     if (!batch) {

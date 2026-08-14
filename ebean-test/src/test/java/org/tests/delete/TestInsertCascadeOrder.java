@@ -29,6 +29,7 @@ class TestInsertCascadeOrder extends BaseTestCase {
   @AfterEach
   void after() {
     DcoParentAdapter.writeOnPreInsert(false);
+    DcoParentAdapter.sqlUpdateOnPreInsert(false);
   }
 
   @Test
@@ -38,6 +39,21 @@ class TestInsertCascadeOrder extends BaseTestCase {
     List<String> sql = insertParents(3);
 
     // every parent has to be inserted before the link that points at it
+    assertThat(lastIndexOf(sql, "insert into dco_parent"))
+      .as("a parent must be inserted before the links referencing it, statements were :%n%s", String.join("\n", sql))
+      .isLessThan(lastIndexOf(sql, "insert into dco_link"));
+  }
+
+  /**
+   * Same as above but the callback runs a SqlUpdate, which reaches BatchControl by
+   * executeStatementOrBatch rather than executeOrQueue.
+   */
+  @Test
+  void insertParentBeforeItsLinks_whenCallbackRunsSqlUpdateDuringFlush() {
+    DcoParentAdapter.sqlUpdateOnPreInsert(true);
+
+    List<String> sql = insertParents(3);
+
     assertThat(lastIndexOf(sql, "insert into dco_parent"))
       .as("a parent must be inserted before the links referencing it, statements were :%n%s", String.join("\n", sql))
       .isLessThan(lastIndexOf(sql, "insert into dco_link"));
