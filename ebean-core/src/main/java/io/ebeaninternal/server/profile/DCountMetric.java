@@ -4,15 +4,13 @@ import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.CountMetric;
 import io.ebean.metric.CountMetricStats;
 
-import java.util.concurrent.atomic.LongAdder;
-
 /**
  * Used to collect counter metrics.
  */
 final class DCountMetric implements CountMetric {
 
   private final String name;
-  private final LongAdder count = new LongAdder();
+  private final ValueAdder count = new ValueAdder();
   private String reportName;
 
   DCountMetric(String name) {
@@ -29,12 +27,12 @@ final class DCountMetric implements CountMetric {
 
   @Override
   public void increment() {
-    count.increment();
+    count.add(1);
   }
 
   @Override
   public boolean isEmpty() {
-    return count.sum() == 0;
+    return count.currentValue() == 0;
   }
 
   @Override
@@ -44,12 +42,12 @@ final class DCountMetric implements CountMetric {
 
   @Override
   public long get(boolean reset) {
-    return reset ? count.sumThenReset() : count.sum();
+    return count.get(reset);
   }
 
   @Override
   public void visit(MetricVisitor visitor) {
-    long val = visitor.reset() ? count.sumThenReset() : count.sum();
+    long val = count.get(visitor.reset());
     if (val > 0) {
       final String name = reportName != null ? reportName : reportName(visitor);
       visitor.visitCount(new DCountMetricStats(name, val));

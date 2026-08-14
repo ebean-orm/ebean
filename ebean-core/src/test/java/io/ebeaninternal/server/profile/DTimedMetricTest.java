@@ -116,4 +116,25 @@ public class DTimedMetricTest {
     assertThat(stats.total()).isEqualTo(1470);
     assertThat(stats.max()).isEqualTo(160);
   }
+
+  @Test
+  void cumulativeAndDeltaAreIndependent() {
+    DTimedMetric metric = new DTimedMetric("org.timed");
+    metric.add(560);
+    metric.add(500);
+
+    DTimeMetricStats cumulative = metric.collect(false);
+    assertThat(cumulative.count()).isEqualTo(2);
+    assertThat(cumulative.total()).isEqualTo(1060);
+
+    metric.add(160);
+
+    DTimeMetricStats delta = metric.collect(true);
+    assertThat(delta.count()).isEqualTo(3);
+    assertThat(delta.total()).isEqualTo(1220);
+
+    cumulative = metric.collect(false);
+    assertThat(cumulative.count()).isEqualTo(3);
+    assertThat(cumulative.total()).isEqualTo(1220);
+  }
 }

@@ -40,4 +40,19 @@ class DCountMetricTest {
       assertThat(result2.get(0).count()).isEqualTo(12);
     }
   }
+
+  @Test
+  void cumulativeAndDeltaAreIndependent() {
+    DCountMetric counter = new DCountMetric("org.hello");
+    counter.add(7);
+
+    assertThat(counter.get(false)).isEqualTo(7);
+    assertThat(counter.get(false)).isEqualTo(7);
+    assertThat(counter.get(true)).isEqualTo(7);
+
+    counter.add(5);
+    assertThat(counter.get(false)).isEqualTo(12);
+    assertThat(counter.get(true)).isEqualTo(5);
+    assertThat(counter.get(true)).isEqualTo(0);
+  }
 }

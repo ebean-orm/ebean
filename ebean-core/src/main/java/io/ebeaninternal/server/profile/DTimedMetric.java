@@ -4,7 +4,6 @@ import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.TimedMetric;
 
 import java.util.concurrent.atomic.LongAccumulator;
-import java.util.concurrent.atomic.LongAdder;
 
 /**
  * Used to collect timed execution statistics.
@@ -15,8 +14,8 @@ import java.util.concurrent.atomic.LongAdder;
 final class DTimedMetric implements TimedMetric {
 
   private final String name;
-  private final LongAdder count = new LongAdder();
-  private final LongAdder total = new LongAdder();
+  private final ValueAdder count = new ValueAdder();
+  private final ValueAdder total = new ValueAdder();
   private final LongAccumulator max = new LongAccumulator(Math::max, 0);
   private boolean collected;
   private String reportName;
@@ -43,14 +42,14 @@ final class DTimedMetric implements TimedMetric {
 
   @Override
   public void add(long value) {
-    count.increment();
+    count.add(1);
     total.add(value);
     max.accumulate(value);
   }
 
   @Override
   public boolean isEmpty() {
-    return count.sum() == 0;
+    return count.currentValue() == 0;
   }
 
   @Override
@@ -62,16 +61,17 @@ final class DTimedMetric implements TimedMetric {
 
   @Override
   public void visit(MetricVisitor visitor) {
-    final long countSum = visitor.reset() ? count.sumThenReset() : count.sum();
+    final boolean reset = visitor.reset();
+    final long countSum = count.get(reset);
     if (countSum > 0) {
       final String name = reportName != null ? reportName : reportName(visitor);
-      visitor.visitTimed(stats(visitor.reset(), name, countSum));
+      visitor.visitTimed(stats(reset, name, countSum));
     }
   }
 
   @Override
   public DTimeMetricStats collect(boolean reset) {
-    final long countSum = reset ? count.sumThenReset() : count.sum();
+    final long countSum = count.get(reset);
     if (countSum == 0) {
       return null;
     } else {
@@ -84,7 +84,7 @@ final class DTimedMetric implements TimedMetric {
    */
   private DTimeMetricStats stats(boolean reset, String name, long countSum) {
     try {
-      final long totalSum = reset ? total.sumThenReset() : total.sum();
+      final long totalSum = total.get(reset);
       return new DTimeMetricStats(name, collected, countSum, totalSum, max.getThenReset());
     } finally {
       collected = true;
