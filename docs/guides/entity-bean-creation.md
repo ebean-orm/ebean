@@ -376,7 +376,12 @@ public class Customer {
 **Important:**
 - Use `List<>` not `Set<>` for collections (Set calls equals/hashCode before beans have IDs)
 - `mappedBy` means Order.customer is the owner
-- Relationships are lazy-loaded by default
+- Relationships are lazy-loaded by default — **except** `@OneToOne(mappedBy=...)`,
+  which defaults to `FetchType.EAGER` and adds a `left join` to every default
+  select of the owning entity. Explicitly set `fetch = FetchType.LAZY` on
+  `@OneToOne(mappedBy=...)` fields unless the association is needed on
+  (almost) every load. See "`@OneToOne(mappedBy=...)` is EAGER by default" in
+  the query-beans guide for details.
 
 ---
 

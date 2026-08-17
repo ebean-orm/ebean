@@ -269,7 +269,9 @@ public class TransactionManager implements SpiTransactionManager {
 
   private SpiTransaction createTransaction(TxScope txScope) {
     if (txScope.isReadonly()) {
-      return createReadOnlyTransaction(null, false);
+      // Honor isolation on read-only scopes (e.g. @Transactional(readOnly=true, isolation=...))
+      SpiTransaction transaction = createReadOnlyTransaction(null, false);
+      return transactionFactory.setIsolationLevel(transaction, txScope.getIsolationLevel());
     } else {
       return createTransaction(true, txScope.getIsolationLevel());
     }

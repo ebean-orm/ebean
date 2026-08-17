@@ -21,11 +21,13 @@ public final class SqlQueryPlan implements SpiQueryPlan {
   private final String name;
   private final String hash;
   private final String sql;
+  private final String dbName;
   private final SpiQueryBindCapture bindCapture;
 
   SqlQueryPlan(SpiEbeanServer server, String name, String sql) {
     this.name = name;
     this.sql = sql;
+    this.dbName = server.name();
     this.hash = Md5.hash(sql, name);
     this.bindCapture = server.createQueryBindCapture(this);
   }
@@ -77,6 +79,6 @@ public final class SqlQueryPlan implements SpiQueryPlan {
 
   @Override
   public SpiDbQueryPlan createMeta(String bind, String planString) {
-    return new DQueryPlanOutput(null, name, hash, sql, null, bind, planString);
+    return new DQueryPlanOutput(null, dbName, name, hash, sql, null, bind, planString);
   }
 }
