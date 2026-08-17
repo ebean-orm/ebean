@@ -15,8 +15,8 @@ mvn -T 4 clean package
 mvn -T 4 deploy -pl '!composites,!platforms' -Pcentral -DskipTests
 
 ## git commit, git tag, git push --tags
-git commit -am 'Version 18.5.0-RC1'
-git tag 18.5.0-RC1
+git commit -am 'Version 18.5.0'
+git tag 18.5.0
 git push --tags
 
 ### convert to javax
