@@ -5,16 +5,20 @@ import io.ebean.meta.MetaTimedMetric;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class DTimedMetricTest {
 
+  private final AtomicLong nanoTime = new AtomicLong();
+
   @Test
   public void addSinceNanos() throws InterruptedException {
 
-    DTimedMetric metric = new DTimedMetric("addSinceNanos");
+    DTimedMetric metric = new DTimedMetric("addSinceNanos", new ValueMax(nanoTime::get));
 
     long start = System.nanoTime();
     Thread.sleep(11);
@@ -28,6 +32,7 @@ public class DTimedMetricTest {
 
     metric.addSinceNanos(start);
 
+    nanoTime.addAndGet(TimeUnit.SECONDS.toNanos(59));
     stats = metric.collect(true);
     assertThat(stats.count()).isEqualTo(1);
     assertThat(stats.total()).isGreaterThan(10);
@@ -37,7 +42,7 @@ public class DTimedMetricTest {
   @Test
   public void addBatchSince() throws InterruptedException {
 
-    DTimedMetric metric = new DTimedMetric("addSinceNanos");
+    DTimedMetric metric = new DTimedMetric("addSinceNanos", new ValueMax(nanoTime::get));
 
     long start = System.nanoTime();
     Thread.sleep(11);
@@ -52,6 +57,7 @@ public class DTimedMetricTest {
 
     metric.addBatchSince(start, 2);
 
+    nanoTime.addAndGet(TimeUnit.SECONDS.toNanos(59));
     stats = metric.collect(true);
     assertThat(stats.count()).isEqualTo(2);
     assertThat(stats.total()).isGreaterThan(10000);
@@ -92,8 +98,8 @@ public class DTimedMetricTest {
   }
 
   @Test
-  void collectCumulativeResetsMax() {
-    DTimedMetric metric = new DTimedMetric("org.timed");
+  void collectCumulativePublishesSharedMax() {
+    DTimedMetric metric = new DTimedMetric("org.timed", new ValueMax(nanoTime::get));
     metric.add(560);
     metric.add(500);
 
@@ -105,7 +111,7 @@ public class DTimedMetricTest {
     stats = metric.collect(false);
     assertThat(stats.count()).isEqualTo(2);
     assertThat(stats.total()).isEqualTo(1060);
-    assertThat(stats.max()).isEqualTo(0);
+    assertThat(stats.max()).isEqualTo(560);
 
     metric.add(160);
     metric.add(100);
@@ -114,12 +120,16 @@ public class DTimedMetricTest {
     stats = metric.collect(false);
     assertThat(stats.count()).isEqualTo(5);
     assertThat(stats.total()).isEqualTo(1470);
+    assertThat(stats.max()).isEqualTo(560);
+
+    nanoTime.addAndGet(TimeUnit.SECONDS.toNanos(59));
+    stats = metric.collect(false);
     assertThat(stats.max()).isEqualTo(160);
   }
 
   @Test
   void cumulativeAndDeltaAreIndependent() {
-    DTimedMetric metric = new DTimedMetric("org.timed");
+    DTimedMetric metric = new DTimedMetric("org.timed", new ValueMax(nanoTime::get));
     metric.add(560);
     metric.add(500);
 
@@ -132,6 +142,7 @@ public class DTimedMetricTest {
     DTimeMetricStats delta = metric.collect(true);
     assertThat(delta.count()).isEqualTo(3);
     assertThat(delta.total()).isEqualTo(1220);
+    assertThat(delta.max()).isEqualTo(560);
 
     cumulative = metric.collect(false);
     assertThat(cumulative).isNull();
