@@ -5,19 +5,22 @@ import io.ebean.meta.MetaQueryMetric;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class DQueryPlanMetricTest {
 
+  private final AtomicLong nanoTime = new AtomicLong();
   Function<String, String> naming = (String name) -> "prefix[" + name.replace('.', '-') + "]";
 
   @Test
   void visit() {
 
     DQueryPlanMeta meta = new DQueryPlanMeta(Object.class, "dto.Object.lab", "lab", null, "sql", "hash");
-    DTimedMetric metric = new DTimedMetric("org.timed.plan");
+    DTimedMetric metric = new DTimedMetric("org.timed.plan", new ValueMax(nanoTime::get));
     DQueryPlanMetric planMetric = new DQueryPlanMetric(meta, metric);
 
     metric.add(560);
@@ -46,10 +49,10 @@ class DQueryPlanMetricTest {
   }
 
   @Test
-  void visitCumulativeResetsMax() {
+  void visitCumulativePublishesSharedMax() {
 
     DQueryPlanMeta meta = new DQueryPlanMeta(Object.class, "dto.Object.lab", "lab", null, "sql", "hash");
-    DTimedMetric metric = new DTimedMetric("org.timed.plan");
+    DTimedMetric metric = new DTimedMetric("org.timed.plan", new ValueMax(nanoTime::get));
     DQueryPlanMetric planMetric = new DQueryPlanMetric(meta, metric);
 
     metric.add(560);
@@ -74,7 +77,7 @@ class DQueryPlanMetricTest {
       assertThat(result.get(0).name()).isEqualTo("prefix[dto-Object-lab]");
       assertThat(result.get(0).count()).isEqualTo(2);
       assertThat(result.get(0).total()).isEqualTo(820);
-      assertThat(result.get(0).max()).isEqualTo(0);
+      assertThat(result.get(0).max()).isEqualTo(560);
     }
 
     metric.add(410);
@@ -87,7 +90,14 @@ class DQueryPlanMetricTest {
       assertThat(result.get(0).name()).isEqualTo("prefix[dto-Object-lab]");
       assertThat(result.get(0).count()).isEqualTo(3);
       assertThat(result.get(0).total()).isEqualTo(1230);
-      assertThat(result.get(0).max()).isEqualTo(410);
+      assertThat(result.get(0).max()).isEqualTo(560);
     }
+
+    nanoTime.addAndGet(TimeUnit.SECONDS.toNanos(59));
+    BasicMetricVisitor visitor = new BasicMetricVisitor("v", naming, false, true, true, true);
+    planMetric.visit(visitor);
+    List<MetaQueryMetric> result = visitor.queryMetrics();
+    assertThat(result).hasSize(1);
+    assertThat(result.get(0).max()).isEqualTo(410);
   }
 }
