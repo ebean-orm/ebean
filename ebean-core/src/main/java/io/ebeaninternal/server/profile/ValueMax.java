@@ -23,7 +23,7 @@ final class ValueMax {
   ValueMax(LongSupplier nanoTime) {
     this.nanoTime = nanoTime;
     this.value = new LongAccumulator(Math::max, 0);
-    this.lastResetNanos = nanoTime.getAsLong() - WINDOW_NANOS;
+    this.lastResetNanos = nanoTime.getAsLong() - 2 * WINDOW_NANOS;
   }
 
   void add(long amount) {
@@ -42,7 +42,7 @@ final class ValueMax {
   synchronized void reset() {
     value.reset();
     published = 0;
-    lastResetNanos = nanoTime.getAsLong();
+    lastResetNanos = nanoTime.getAsLong() - 2 * WINDOW_NANOS;
   }
 
 }
