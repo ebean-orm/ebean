@@ -89,6 +89,35 @@ public class DeleteById_SoftDelete_Tests extends BaseTestCase {
   }
 
   @Test
+  public void queryByIdDelete_when_softDelete() {
+
+    Cover cover = new Cover("q1");
+    cover.save();
+
+    LoggedSql.start();
+
+    DB.find(Cover.class).setId(cover.getId()).delete();
+
+    List<String> sql = LoggedSql.stop();
+    assertThat(sql).hasSize(1);
+    if (isPlatformBooleanNative()) {
+      assertSql(sql.get(0)).contains("update cover set deleted=true where id = ?");
+    } else {
+      assertSql(sql.get(0)).contains("update cover set deleted=1 where id = ?");
+    }
+
+    assertNull(DB.find(Cover.class, cover.getId()));
+    Cover softDeleted = DB.find(Cover.class)
+      .setIncludeSoftDeletes()
+      .setId(cover.getId())
+      .findOne();
+    assertNotNull(softDeleted);
+    assertThat(softDeleted.isDeleted()).isTrue();
+
+    cover.deletePermanent();
+  }
+
+  @Test
   public void deletePermanentById_when_softDelete() {
 
     Cover cover = new Cover("a2");
