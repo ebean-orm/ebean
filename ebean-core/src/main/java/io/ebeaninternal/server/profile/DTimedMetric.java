@@ -3,8 +3,6 @@ package io.ebeaninternal.server.profile;
 import io.ebean.meta.MetricVisitor;
 import io.ebean.metric.TimedMetric;
 
-import java.util.concurrent.atomic.LongAccumulator;
-
 /**
  * Used to collect timed execution statistics.
  * <p>
@@ -16,12 +14,17 @@ final class DTimedMetric implements TimedMetric {
   private final String name;
   private final ValueAdder count = new ValueAdder();
   private final ValueAdder total = new ValueAdder();
-  private final LongAccumulator max = new LongAccumulator(Math::max, 0);
+  private final ValueMax max;
   private boolean collected;
   private String reportName;
 
   DTimedMetric(String name) {
+    this(name, new ValueMax());
+  }
+
+  DTimedMetric(String name, ValueMax max) {
     this.name = name;
+    this.max = max;
   }
 
   @Override
@@ -31,7 +34,7 @@ final class DTimedMetric implements TimedMetric {
       final long mean = totalMicros / batch;
       count.add(batch);
       total.add(totalMicros);
-      max.accumulate(mean);
+      max.add(mean);
     }
   }
 
@@ -44,7 +47,7 @@ final class DTimedMetric implements TimedMetric {
   public void add(long value) {
     count.add(1);
     total.add(value);
-    max.accumulate(value);
+    max.add(value);
   }
 
   @Override
@@ -76,6 +79,7 @@ final class DTimedMetric implements TimedMetric {
 
   @Override
   public DTimeMetricStats collect(MetricVisitor.Mode mode) {
+    final long maxValue = max.collect();
     final long countSum;
     switch (mode) {
       case RESET:
@@ -93,14 +97,14 @@ final class DTimedMetric implements TimedMetric {
     if (countSum == 0) {
       return null;
     } else {
-      return stats(mode, name, countSum);
+      return stats(mode, name, countSum, maxValue);
     }
   }
 
   /**
    * Return the current statistics resetting the internal values if reset is true.
    */
-  private DTimeMetricStats stats(MetricVisitor.Mode mode, String name, long countSum) {
+  private DTimeMetricStats stats(MetricVisitor.Mode mode, String name, long countSum, long maxValue) {
     try {
       final long totalSum;
       switch (mode) {
@@ -116,7 +120,7 @@ final class DTimedMetric implements TimedMetric {
         default:
           throw new IllegalStateException("Unknown metric collection mode");
       }
-      return new DTimeMetricStats(name, collected, countSum, totalSum, max.getThenReset());
+      return new DTimeMetricStats(name, collected, countSum, totalSum, maxValue);
     } finally {
       collected = true;
     }
