@@ -19,6 +19,8 @@ public class Processor extends AbstractProcessor implements Constants {
   private ProcessingContext processingContext;
   private DtoMappingReader dtoMappingReader;
   private boolean wroteDtoMappers;
+  private SimpleModuleInfoWriter moduleWriter;
+  private boolean initModuleWriter;
 
   private boolean wroteLookup;
 
@@ -59,6 +61,7 @@ public class Processor extends AbstractProcessor implements Constants {
     final int loaded = processingContext.complete();
     dtoMappingReader.collect(roundEnv);
     if (!roundEnv.processingOver()) {
+      initModuleInfoBean();
       writeDtoMappers();
     }
     if (roundEnv.processingOver()) {
@@ -109,24 +112,33 @@ public class Processor extends AbstractProcessor implements Constants {
     }
   }
 
+  private void initModuleInfoBean() {
+    if (initModuleWriter || !processingContext.hasAnyEntitiesOrOther()) {
+      return;
+    }
+    try {
+      moduleWriter = new SimpleModuleInfoWriter(processingContext);
+    } catch (FilerException e) {
+      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
+    } catch (Throwable e) {
+      processingContext.logError(null, "Failed to initialise EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
+    } finally {
+      initModuleWriter = true;
+    }
+  }
+
   /**
-   * Write the {@code EbeanEntityRegister} at the end of processing - deferred until there is
-   * something to actually register (rather than eagerly reserving/creating the source file up
-   * front), since a compilation unit with no {@code @Entity}/{@code @Embeddable}/{@code @Converter}
-   * /other classes at all - e.g. a test-source-only module that only declares
-   * {@code @DtoMapping} - has nothing meaningful to write and no factory package to derive a
-   * sensible location from.
+   * Write the {@code EbeanEntityRegister} at the end of processing. The source file is reserved
+   * during an earlier round by {@link #initModuleInfoBean()} so javac does not warn that it was
+   * created in the final round.
    */
   private void writeModuleInfoBean() {
-    if (!processingContext.hasAnyEntitiesOrOther()) {
+    if (moduleWriter == null) {
       processingContext.logNote("EbeanEntityRegister skipped - no entities or other classes found");
       return;
     }
     try {
-      SimpleModuleInfoWriter moduleWriter = new SimpleModuleInfoWriter(processingContext);
       moduleWriter.write();
-    } catch (FilerException e) {
-      processingContext.logWarn(null, "FilerException trying to write EntityClassRegister error: " + e);
     } catch (Throwable e) {
       processingContext.logError(null, "Failed to write EntityClassRegister error:" + e + " stack:" + Arrays.toString(e.getStackTrace()));
     }
