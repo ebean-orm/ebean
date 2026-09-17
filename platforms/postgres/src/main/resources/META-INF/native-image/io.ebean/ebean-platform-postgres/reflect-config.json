@@ -1,0 +1,5 @@
+[
+  {"name": "org.postgis.DriverWrapperLW", "allDeclaredConstructors": true, "allDeclaredFields": true},
+  {"name": "org.postgis.DriverWrapper", "allDeclaredConstructors": true, "allDeclaredFields": true},
+  {"name": "org.postgis.DriverWrapper$TypesAdder80", "allDeclaredConstructors": true, "allDeclaredFields": true}
+]
