@@ -275,7 +275,7 @@ class ProcessingContext implements Constants {
   /**
    * Return true if it is a DbArray field.
    */
-  private static boolean dbArrayField(Element field) {
+  boolean isDbArrayField(Element field) {
     return hasAnnotations(field, DBARRAY);
   }
 
@@ -420,7 +420,7 @@ class ProcessingContext implements Constants {
     if (dbJsonField(field)) {
       return propertyTypeMap.getDbJsonType();
     }
-    if (dbArrayField(field)) {
+    if (isDbArrayField(field)) {
       // get generic parameter type
       DeclaredType declaredType = (DeclaredType) field.asType();
       TypeMirror arrayElementType = declaredType.getTypeArguments().get(0);

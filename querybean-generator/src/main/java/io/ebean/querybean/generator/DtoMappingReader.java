@@ -819,11 +819,12 @@ class DtoMappingReader {
       // straight into a NullPointerException. Default to the primitive's zero-equivalent value,
       // or fail fast with a clear message instead when @DtoPath(failOnNull = true).
       boolean isListTarget = listElementType(field.asType()) != null;
+      boolean scalarCollection = isListTarget && isDbArrayProperty(lastOwnerType, properties.get(properties.size() - 1));
       DtoConverterMeta pathConverter = isListTarget ? converter
         : autoTypeConverter(converter, lastOwnerType != null ? getterReturnTypeMirror(lastOwnerType, lastGetter) : null, field.asType());
       return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties, null, pathConverter,
         field.asType().getKind().isPrimitive(), pathPrism.failOnNull(), computedFrom >= 0, requiredFetchPaths,
-        isListTarget, false);
+        isListTarget, scalarCollection, false);
     }
     TypeMirror fieldType = field.asType();
     TypeMirror listElementType = listElementType(fieldType);
@@ -841,10 +842,11 @@ class DtoMappingReader {
       }
     }
     String getter = getterName(meta.source(), name);
+    boolean scalarCollection = listElementType != null && isDbArrayProperty(meta.source(), name);
     DtoConverterMeta scalarConverter = listElementType != null ? converter
       : autoTypeConverter(converter, getterReturnTypeMirror(meta.source(), getter), fieldType);
     return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, List.of(getter), List.of(name), null, scalarConverter,
-      fieldType.getKind().isPrimitive(), listElementType != null);
+      fieldType.getKind().isPrimitive(), false, false, List.of(), listElementType != null, scalarCollection, false);
   }
 
   /**
@@ -1056,6 +1058,20 @@ class DtoMappingReader {
       for (VariableElement f : ElementFilter.fieldsIn(current.getEnclosedElements())) {
         if (f.getSimpleName().contentEquals(propertyName)) {
           return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private boolean isDbArrayProperty(TypeElement type, String propertyName) {
+    if (type == null) {
+      return false;
+    }
+    for (TypeElement current = type; current != null; current = superclassOf(current)) {
+      for (VariableElement field : ElementFilter.fieldsIn(current.getEnclosedElements())) {
+        if (field.getSimpleName().contentEquals(propertyName)) {
+          return ctx.isDbArrayField(field);
         }
       }
     }

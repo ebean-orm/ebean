@@ -237,6 +237,7 @@ class DtoMapperWriter {
         && !property.hasComputedSegment()) {
         nestedAssocPaths.add(property.sourcePropertyPath().get(0));
       } else if (property.kind() == DtoPropertyMeta.Kind.SCALAR && property.isListTarget()
+        && !property.isScalarCollection()
         && !property.hasComputedSegment() && property.sourcePropertyPath().size() == 1) {
         // a single-segment SCALAR property whose DTO field is a List with no registered nested
         // DTO mapping of its own (e.g. @DtoConvert reducing a ToMany association) - still fully
@@ -277,7 +278,7 @@ class DtoMapperWriter {
           }
           List<String> path = property.sourcePropertyPath();
           if (path.size() == 1) {
-            if (property.isListTarget()) {
+            if (property.isListTarget() && !property.isScalarCollection()) {
               // a single-segment path whose DTO field type is a List, but with no registered
               // nested DTO mapping of its own (e.g. a @DtoConvert-backed property reducing a
               // ToMany association to a simpler element type) - the source side is still a real
