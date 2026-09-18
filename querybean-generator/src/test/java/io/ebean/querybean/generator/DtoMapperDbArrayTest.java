@@ -30,16 +30,34 @@ class DtoMapperDbArrayTest {
     writeSource(sourceDir, "org.tests.dbarray.ProcessLog",
       "package org.tests.dbarray;\n"
         + "import io.ebean.annotation.DbArray;\n"
+        + "import io.ebean.annotation.DbJson;\n"
+        + "import io.ebean.annotation.DbJsonB;\n"
+        + "import jakarta.persistence.Transient;\n"
         + "public class ProcessLog {\n"
         + "  @DbArray private java.util.List<Long> sourceIds;\n"
+        + "  @DbJson private java.util.List<Long> jsonIds;\n"
+        + "  @DbJsonB private java.util.List<Long> jsonbIds;\n"
+        + "  @Transient private String computed;\n"
         + "  public java.util.List<Long> sourceIds() { return sourceIds; }\n"
+        + "  public java.util.List<Long> jsonIds() { return jsonIds; }\n"
+        + "  public java.util.List<Long> jsonbIds() { return jsonbIds; }\n"
+        + "  public String computed() { return computed; }\n"
         + "}\n");
     writeSource(sourceDir, "org.tests.dbarray.ProcessLogDto",
       "package org.tests.dbarray;\n"
         + "public class ProcessLogDto {\n"
         + "  private final java.util.List<Long> sourceIds;\n"
-        + "  public ProcessLogDto(java.util.List<Long> sourceIds) { this.sourceIds = sourceIds; }\n"
+        + "  private final java.util.List<Long> jsonIds;\n"
+        + "  private final java.util.List<Long> jsonbIds;\n"
+        + "  private final String computed;\n"
+        + "  public ProcessLogDto(java.util.List<Long> sourceIds, java.util.List<Long> jsonIds,\n"
+        + "      java.util.List<Long> jsonbIds, String computed) {\n"
+        + "    this.sourceIds = sourceIds; this.jsonIds = jsonIds; this.jsonbIds = jsonbIds; this.computed = computed;\n"
+        + "  }\n"
         + "  public java.util.List<Long> getSourceIds() { return sourceIds; }\n"
+        + "  public java.util.List<Long> getJsonIds() { return jsonIds; }\n"
+        + "  public java.util.List<Long> getJsonbIds() { return jsonbIds; }\n"
+        + "  public String getComputed() { return computed; }\n"
         + "}\n");
     writeSource(sourceDir, "org.tests.dbarray.package-info",
       "@io.ebean.annotation.DtoMapping(source = ProcessLog.class, target = ProcessLogDto.class)\n"
@@ -73,9 +91,14 @@ class DtoMapperDbArrayTest {
           .orElseThrow(() -> new AssertionError("generated mapper source not found"));
       }
       String generated = Files.readString(mapperFile);
-      assertTrue(generated.contains("select(\"sourceIds\")"), generated);
+      assertTrue(generated.contains("select(\"sourceIds,jsonIds,jsonbIds\")"), generated);
       assertTrue(generated.contains("source.sourceIds()"), generated);
+      assertTrue(generated.contains("source.jsonIds()"), generated);
+      assertTrue(generated.contains("source.jsonbIds()"), generated);
+      assertTrue(generated.contains("source.computed()"), generated);
       assertTrue(!generated.contains("fetch(\"sourceIds\")"), generated);
+      assertTrue(!generated.contains("fetch(\"jsonIds\")"), generated);
+      assertTrue(!generated.contains("fetch(\"jsonbIds\")"), generated);
     }
   }
 

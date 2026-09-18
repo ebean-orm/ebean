@@ -234,6 +234,7 @@ class DtoMapperWriter {
     Set<String> nestedAssocPaths = new LinkedHashSet<>();
     for (DtoPropertyMeta property : activeProperties) {
       if ((property.kind() == DtoPropertyMeta.Kind.NESTED_ONE || property.kind() == DtoPropertyMeta.Kind.NESTED_MANY)
+        && !property.isUnfetchable()
         && !property.hasComputedSegment()) {
         nestedAssocPaths.add(property.sourcePropertyPath().get(0));
       } else if (property.kind() == DtoPropertyMeta.Kind.SCALAR && property.isListTarget()
@@ -254,7 +255,7 @@ class DtoMapperWriter {
       switch (property.kind()) {
         case NESTED_ONE:
         case NESTED_MANY:
-          if (property.hasComputedSegment()) {
+          if (property.hasComputedSegment() || property.isUnfetchable()) {
             // a single-hop @DtoPath rename traversing a computed/derived getter (no backing
             // field) that happens to target a nested DTO type - just as unfetchable via
             // fetch(path, mapper.fetchGroup()) as the analogous SCALAR case, since "path" here
@@ -268,7 +269,7 @@ class DtoMapperWriter {
             property.sourcePropertyPath().get(0), mapperFieldName(property)));
           break;
         case SCALAR:
-          if (property.hasComputedSegment()) {
+          if (property.hasComputedSegment() || property.isUnfetchable()) {
             // the path traverses a computed/derived getter (no backing field) - its own segments
             // past that point aren't real Ebean fetch paths, so don't add them to pathSelect/
             // rootSelect at all; @DtoPath#requires() (plus the real prefix, if any) already names

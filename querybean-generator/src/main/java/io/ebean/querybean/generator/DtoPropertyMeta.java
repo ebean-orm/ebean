@@ -31,6 +31,7 @@ class DtoPropertyMeta {
   private final List<String> requiredFetchPaths;
   private final boolean listTarget;
   private final boolean scalarCollection;
+  private final boolean unfetchable;
   private final boolean ignored;
 
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath, DtoBeanMeta nested) {
@@ -45,7 +46,7 @@ class DtoPropertyMeta {
    * before ever consulting them.
    */
   static DtoPropertyMeta ignored(String dtoFieldName, boolean listTarget) {
-    return new DtoPropertyMeta(dtoFieldName, Kind.SCALAR, List.of(), List.of(), null, null, false, false, false, List.of(), listTarget, false, true);
+    return new DtoPropertyMeta(dtoFieldName, Kind.SCALAR, List.of(), List.of(), null, null, false, false, false, List.of(), listTarget, false, false, true);
   }
 
   /**
@@ -99,6 +100,14 @@ class DtoPropertyMeta {
                   DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull,
                   boolean computedSegment, List<String> requiredFetchPaths, boolean listTarget,
                   boolean scalarCollection, boolean ignored) {
+    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, converter, primitiveTarget, failOnNull,
+      computedSegment, requiredFetchPaths, listTarget, scalarCollection, false, ignored);
+  }
+
+  DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
+                  DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull,
+                  boolean computedSegment, List<String> requiredFetchPaths, boolean listTarget,
+                  boolean scalarCollection, boolean unfetchable, boolean ignored) {
     this.dtoFieldName = dtoFieldName;
     this.kind = kind;
     this.sourceGetterPath = sourceGetterPath;
@@ -111,6 +120,7 @@ class DtoPropertyMeta {
     this.requiredFetchPaths = requiredFetchPaths;
     this.listTarget = listTarget;
     this.scalarCollection = scalarCollection;
+    this.unfetchable = unfetchable;
     this.ignored = ignored;
   }
 
@@ -193,6 +203,10 @@ class DtoPropertyMeta {
    */
   boolean isScalarCollection() {
     return scalarCollection;
+  }
+
+  boolean isUnfetchable() {
+    return unfetchable;
   }
 
   /**

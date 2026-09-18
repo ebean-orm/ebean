@@ -223,6 +223,15 @@ class ProcessingContext implements Constants {
     );
   }
 
+  boolean isTransientField(Element field) {
+    if (field.getKind() != ElementKind.FIELD) {
+      return false;
+    }
+    VariableElement variable = (VariableElement) field;
+    return variable.getModifiers().contains(Modifier.TRANSIENT)
+      || hasAnnotations(variable, "jakarta.persistence.Transient");
+  }
+
   private static boolean hasAnnotations(Element element, String... annotations) {
     return getAnnotation(element, annotations) != null;
   }
@@ -268,7 +277,7 @@ class ProcessingContext implements Constants {
   /**
    * Return true if it is a DbJson field.
    */
-  private static boolean dbJsonField(Element field) {
+  boolean isDbJsonField(Element field) {
     return hasAnnotations(field, DBJSON, DBJSONB);
   }
 
@@ -277,6 +286,10 @@ class ProcessingContext implements Constants {
    */
   boolean isDbArrayField(Element field) {
     return hasAnnotations(field, DBARRAY);
+  }
+
+  boolean isScalarCollectionField(Element field) {
+    return isDbArrayField(field) || isDbJsonField(field);
   }
 
   private static boolean dbToMany(Element field) {
@@ -417,7 +430,7 @@ class ProcessingContext implements Constants {
     }
 
     boolean toMany = dbToMany(field);
-    if (dbJsonField(field)) {
+    if (isDbJsonField(field)) {
       return propertyTypeMap.getDbJsonType();
     }
     if (isDbArrayField(field)) {
