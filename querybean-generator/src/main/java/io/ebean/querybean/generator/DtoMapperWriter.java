@@ -234,9 +234,11 @@ class DtoMapperWriter {
     Set<String> nestedAssocPaths = new LinkedHashSet<>();
     for (DtoPropertyMeta property : activeProperties) {
       if ((property.kind() == DtoPropertyMeta.Kind.NESTED_ONE || property.kind() == DtoPropertyMeta.Kind.NESTED_MANY)
+        && !property.isUnfetchable()
         && !property.hasComputedSegment()) {
         nestedAssocPaths.add(property.sourcePropertyPath().get(0));
       } else if (property.kind() == DtoPropertyMeta.Kind.SCALAR && property.isListTarget()
+        && !property.isScalarCollection()
         && !property.hasComputedSegment() && property.sourcePropertyPath().size() == 1) {
         // a single-segment SCALAR property whose DTO field is a List with no registered nested
         // DTO mapping of its own (e.g. @DtoConvert reducing a ToMany association) - still fully
@@ -253,7 +255,7 @@ class DtoMapperWriter {
       switch (property.kind()) {
         case NESTED_ONE:
         case NESTED_MANY:
-          if (property.hasComputedSegment()) {
+          if (property.hasComputedSegment() || property.isUnfetchable()) {
             // a single-hop @DtoPath rename traversing a computed/derived getter (no backing
             // field) that happens to target a nested DTO type - just as unfetchable via
             // fetch(path, mapper.fetchGroup()) as the analogous SCALAR case, since "path" here
@@ -267,7 +269,7 @@ class DtoMapperWriter {
             property.sourcePropertyPath().get(0), mapperFieldName(property)));
           break;
         case SCALAR:
-          if (property.hasComputedSegment()) {
+          if (property.hasComputedSegment() || property.isUnfetchable()) {
             // the path traverses a computed/derived getter (no backing field) - its own segments
             // past that point aren't real Ebean fetch paths, so don't add them to pathSelect/
             // rootSelect at all; @DtoPath#requires() (plus the real prefix, if any) already names
@@ -277,7 +279,7 @@ class DtoMapperWriter {
           }
           List<String> path = property.sourcePropertyPath();
           if (path.size() == 1) {
-            if (property.isListTarget()) {
+            if (property.isListTarget() && !property.isScalarCollection()) {
               // a single-segment path whose DTO field type is a List, but with no registered
               // nested DTO mapping of its own (e.g. a @DtoConvert-backed property reducing a
               // ToMany association to a simpler element type) - the source side is still a real
