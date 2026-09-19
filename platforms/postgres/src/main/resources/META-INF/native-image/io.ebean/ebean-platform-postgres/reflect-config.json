@@ -1,5 +1,11 @@
 [
-  {"name": "org.postgis.DriverWrapperLW", "allDeclaredConstructors": true, "allDeclaredFields": true},
-  {"name": "org.postgis.DriverWrapper", "allDeclaredConstructors": true, "allDeclaredFields": true},
-  {"name": "org.postgis.DriverWrapper$TypesAdder80", "allDeclaredConstructors": true, "allDeclaredFields": true}
+  {"name": "org.postgis.DriverWrapperLW", "allDeclaredConstructors": true},
+  {"name": "org.postgis.DriverWrapper", "allDeclaredConstructors": true},
+  {"name": "org.postgis.DriverWrapper$TypesAdder80", "allDeclaredConstructors": true},
+  {"name": "org.postgis.PGbox2d", "allDeclaredConstructors": true},
+  {"name": "org.postgis.PGbox3d", "allDeclaredConstructors": true},
+  {"name": "org.postgis.PGgeography", "allDeclaredConstructors": true},
+  {"name": "org.postgis.PGgeographyLW", "allDeclaredConstructors": true},
+  {"name": "org.postgis.PGgeometry", "allDeclaredConstructors": true},
+  {"name": "org.postgis.PGgeometryLW", "allDeclaredConstructors": true}
 ]
