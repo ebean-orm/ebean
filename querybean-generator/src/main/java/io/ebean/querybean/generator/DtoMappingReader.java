@@ -819,32 +819,37 @@ class DtoMappingReader {
       // straight into a NullPointerException. Default to the primitive's zero-equivalent value,
       // or fail fast with a clear message instead when @DtoPath(failOnNull = true).
       boolean isListTarget = listElementType(field.asType()) != null;
+      boolean scalarCollection = isListTarget && isScalarCollectionProperty(lastOwnerType, properties.get(properties.size() - 1));
       DtoConverterMeta pathConverter = isListTarget ? converter
         : autoTypeConverter(converter, lastOwnerType != null ? getterReturnTypeMirror(lastOwnerType, lastGetter) : null, field.asType());
       return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, getters, properties, null, pathConverter,
         field.asType().getKind().isPrimitive(), pathPrism.failOnNull(), computedFrom >= 0, requiredFetchPaths,
-        isListTarget, false);
+        isListTarget, scalarCollection, false);
     }
     TypeMirror fieldType = field.asType();
     TypeMirror listElementType = listElementType(fieldType);
+    boolean unfetchable = isUnfetchableProperty(meta.source(), name);
     if (listElementType != null) {
       DtoBeanMeta nested = lookupByTarget(listElementType);
       if (nested != null) {
         rejectConverterOnNested(field, converter, name, meta);
-        return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_MANY, List.of(getterName(meta.source(), name)), List.of(name), nested);
+        return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_MANY, List.of(getterName(meta.source(), name)), List.of(name), nested,
+          unfetchable, List.of());
       }
     } else {
       DtoBeanMeta nested = lookupByTarget(fieldType);
       if (nested != null) {
         rejectConverterOnNested(field, converter, name, meta);
-        return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_ONE, List.of(getterName(meta.source(), name)), List.of(name), nested);
+        return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.NESTED_ONE, List.of(getterName(meta.source(), name)), List.of(name), nested,
+          unfetchable, List.of());
       }
     }
     String getter = getterName(meta.source(), name);
+    boolean scalarCollection = listElementType != null && isScalarCollectionProperty(meta.source(), name);
     DtoConverterMeta scalarConverter = listElementType != null ? converter
       : autoTypeConverter(converter, getterReturnTypeMirror(meta.source(), getter), fieldType);
     return new DtoPropertyMeta(name, DtoPropertyMeta.Kind.SCALAR, List.of(getter), List.of(name), null, scalarConverter,
-      fieldType.getKind().isPrimitive(), listElementType != null);
+      fieldType.getKind().isPrimitive(), false, false, List.of(), listElementType != null, scalarCollection, unfetchable, false);
   }
 
   /**
@@ -1055,7 +1060,35 @@ class DtoMappingReader {
     for (TypeElement current = type; current != null; current = superclassOf(current)) {
       for (VariableElement f : ElementFilter.fieldsIn(current.getEnclosedElements())) {
         if (f.getSimpleName().contentEquals(propertyName)) {
-          return true;
+          return !ctx.isTransientField(f);
+        }
+      }
+    }
+    return false;
+  }
+
+  private boolean isScalarCollectionProperty(TypeElement type, String propertyName) {
+    if (type == null) {
+      return false;
+    }
+    for (TypeElement current = type; current != null; current = superclassOf(current)) {
+      for (VariableElement field : ElementFilter.fieldsIn(current.getEnclosedElements())) {
+        if (field.getSimpleName().contentEquals(propertyName)) {
+          return ctx.isScalarCollectionField(field);
+        }
+      }
+    }
+    return false;
+  }
+
+  private boolean isUnfetchableProperty(TypeElement type, String propertyName) {
+    if (type == null) {
+      return false;
+    }
+    for (TypeElement current = type; current != null; current = superclassOf(current)) {
+      for (VariableElement field : ElementFilter.fieldsIn(current.getEnclosedElements())) {
+        if (field.getSimpleName().contentEquals(propertyName)) {
+          return ctx.isTransientField(field);
         }
       }
     }

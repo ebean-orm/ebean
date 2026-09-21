@@ -30,6 +30,8 @@ class DtoPropertyMeta {
   private final boolean computedSegment;
   private final List<String> requiredFetchPaths;
   private final boolean listTarget;
+  private final boolean scalarCollection;
+  private final boolean unfetchable;
   private final boolean ignored;
 
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath, DtoBeanMeta nested) {
@@ -44,7 +46,7 @@ class DtoPropertyMeta {
    * before ever consulting them.
    */
   static DtoPropertyMeta ignored(String dtoFieldName, boolean listTarget) {
-    return new DtoPropertyMeta(dtoFieldName, Kind.SCALAR, List.of(), List.of(), null, null, false, false, false, List.of(), listTarget, true);
+    return new DtoPropertyMeta(dtoFieldName, Kind.SCALAR, List.of(), List.of(), null, null, false, false, false, List.of(), listTarget, false, false, true);
   }
 
   /**
@@ -90,6 +92,22 @@ class DtoPropertyMeta {
   DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
                   DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull,
                   boolean computedSegment, List<String> requiredFetchPaths, boolean listTarget, boolean ignored) {
+    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, converter, primitiveTarget, failOnNull,
+      computedSegment, requiredFetchPaths, listTarget, false, ignored);
+  }
+
+  DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
+                  DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull,
+                  boolean computedSegment, List<String> requiredFetchPaths, boolean listTarget,
+                  boolean scalarCollection, boolean ignored) {
+    this(dtoFieldName, kind, sourceGetterPath, sourcePropertyPath, nested, converter, primitiveTarget, failOnNull,
+      computedSegment, requiredFetchPaths, listTarget, scalarCollection, false, ignored);
+  }
+
+  DtoPropertyMeta(String dtoFieldName, Kind kind, List<String> sourceGetterPath, List<String> sourcePropertyPath,
+                  DtoBeanMeta nested, DtoConverterMeta converter, boolean primitiveTarget, boolean failOnNull,
+                  boolean computedSegment, List<String> requiredFetchPaths, boolean listTarget,
+                  boolean scalarCollection, boolean unfetchable, boolean ignored) {
     this.dtoFieldName = dtoFieldName;
     this.kind = kind;
     this.sourceGetterPath = sourceGetterPath;
@@ -101,6 +119,8 @@ class DtoPropertyMeta {
     this.computedSegment = computedSegment;
     this.requiredFetchPaths = requiredFetchPaths;
     this.listTarget = listTarget;
+    this.scalarCollection = scalarCollection;
+    this.unfetchable = unfetchable;
     this.ignored = ignored;
   }
 
@@ -178,6 +198,18 @@ class DtoPropertyMeta {
   }
 
   /**
+   * Return true when the source property is a scalar collection such as an Ebean {@code @DbArray},
+   * rather than a to-many association.
+   */
+  boolean isScalarCollection() {
+    return scalarCollection;
+  }
+
+  boolean isUnfetchable() {
+    return unfetchable;
+  }
+
+  /**
    * {@code true} when this property is marked {@code @DtoIgnore} - permanently excluded from
    * every mapping (base and every named variant alike), always given its empty default rather
    * than resolved from any source getter/path.
@@ -245,4 +277,3 @@ class DtoPropertyMeta {
     sb.append(')');
   }
 }
-
