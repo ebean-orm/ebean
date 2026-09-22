@@ -1,6 +1,7 @@
 package org.tests.model.array;
 
 import io.ebean.*;
+import io.ebeaninternal.server.deploy.BeanProperty;
 import io.ebean.xtest.BaseTestCase;
 import io.ebean.xtest.ForPlatform;
 import io.ebean.xtest.IgnorePlatform;
@@ -29,6 +30,12 @@ class TestDbArray_basic extends BaseTestCase {
   void insert() throws SQLException {
     DB.find(EArrayBean.class).delete();
     bean.setName("some stuff");
+    bean.getProgress().add(1);
+    bean.getProgress().add(2);
+    bean.getProgressDbArrayNullableFalse().add(3);
+    bean.getProgressDbArrayNullableFalse().add(4);
+    bean.getProgressBasicOptionalFalse().add(5);
+    bean.getProgressBasicOptionalFalse().add(6);
     assertThat(bean.getStatuses()).as("DbArray is auto initialised").isNotNull();
     assertThat(bean.getIntEnums()).as("DbArray is auto initialised").isNotNull();
     assertThat(bean.getUids()).as("DbArray is auto initialised").isNotNull();
@@ -68,6 +75,9 @@ class TestDbArray_basic extends BaseTestCase {
     found = DB.find(EArrayBean.class, bean.getId());
 
     assertThat(found.getPhoneNumbers()).containsExactly("4321", "9823");
+    assertThat(found.getProgress()).containsExactly(1, 2);
+    assertThat(found.getProgressDbArrayNullableFalse()).containsExactly(3, 4);
+    assertThat(found.getProgressBasicOptionalFalse()).containsExactly(5, 6);
     assertThat(found.getDoubs()).hasSize(2);
     assertThat(found.getFloats()).hasSize(2);
     assertThat(found.getTimes()).hasSize(2);
@@ -128,6 +138,36 @@ class TestDbArray_basic extends BaseTestCase {
     json_parse_format();
     update_when_notDirty();
     update_when_dirty();
+  }
+
+  @Test
+  @IgnorePlatform(Platform.HANA)
+  void columnNullableFalseIsAppliedToDbArray() {
+    BeanProperty progress = spiEbeanServer()
+      .descriptor(EArrayBean.class)
+      .findProperty("progress");
+    BeanProperty progressDbArrayNullableFalse = spiEbeanServer()
+      .descriptor(EArrayBean.class)
+      .findProperty("progressDbArrayNullableFalse");
+    BeanProperty progressBasicOptionalFalse = spiEbeanServer()
+      .descriptor(EArrayBean.class)
+      .findProperty("progressBasicOptionalFalse");
+
+    assertThat(progress.isNullable()).isFalse();
+    assertThat(progressDbArrayNullableFalse.isNullable()).isFalse();
+    assertThat(progressBasicOptionalFalse.isNullable()).isFalse();
+
+    EArrayBean bean = new EArrayBean();
+    bean.setName("non-null progress");
+    bean.setProgress(List.of(10, 20));
+    bean.setProgressDbArrayNullableFalse(List.of(30, 40));
+    bean.setProgressBasicOptionalFalse(List.of(50, 60));
+    DB.save(bean);
+
+    EArrayBean found = DB.find(EArrayBean.class, bean.getId());
+    assertThat(found.getProgress()).containsExactly(10, 20);
+    assertThat(found.getProgressDbArrayNullableFalse()).containsExactly(30, 40);
+    assertThat(found.getProgressBasicOptionalFalse()).containsExactly(50, 60);
   }
 
   //@Test//(dependsOnMethods = "insert")
