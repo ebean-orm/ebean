@@ -5,6 +5,8 @@ import io.ebean.annotation.Cache;
 import io.ebean.annotation.DbArray;
 import io.ebean.annotation.NotNull;
 
+import jakarta.persistence.Basic;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
@@ -50,6 +52,17 @@ public class EArrayBean {
 
   @DbArray(nullable = false)
   List<Status> statuses = new ArrayList<>();
+
+  @DbArray
+  @Column(nullable = false)
+  List<Integer> progress = new ArrayList<>();
+
+  @DbArray(nullable = false)
+  List<Integer> progressDbArrayNullableFalse = new ArrayList<>();
+
+  @DbArray
+  @Basic(optional = false)
+  List<Integer> progressBasicOptionalFalse = new ArrayList<>();
 
   @DbArray
   List<VarcharEnum> vcEnums = new ArrayList<>();
@@ -147,6 +160,30 @@ public class EArrayBean {
 
   public void setStatuses(List<Status> statuses) {
     this.statuses = statuses;
+  }
+
+  public List<Integer> getProgress() {
+    return progress;
+  }
+
+  public void setProgress(List<Integer> progress) {
+    this.progress = progress;
+  }
+
+  public List<Integer> getProgressDbArrayNullableFalse() {
+    return progressDbArrayNullableFalse;
+  }
+
+  public void setProgressDbArrayNullableFalse(List<Integer> progressDbArrayNullableFalse) {
+    this.progressDbArrayNullableFalse = progressDbArrayNullableFalse;
+  }
+
+  public List<Integer> getProgressBasicOptionalFalse() {
+    return progressBasicOptionalFalse;
+  }
+
+  public void setProgressBasicOptionalFalse(List<Integer> progressBasicOptionalFalse) {
+    this.progressBasicOptionalFalse = progressBasicOptionalFalse;
   }
 
   public List<VarcharEnum> getVcEnums() {
