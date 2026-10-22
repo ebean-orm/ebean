@@ -692,7 +692,17 @@ public final class DefaultPersister implements Persister {
         if (propImportDelete.length > 0) {
           return deleteImported(propImportDelete);
         }
+      }
+      // no imported relationships to fetch — children, intersections, then these beans
+      return deleteChildrenAndBeans();
+    }
 
+    /**
+     * Exported and many-side cascades, intersection rows, then the beans themselves.
+     * Does not fetch or delete imported relationships.
+     */
+    final int deleteChildrenAndBeans() {
+      if (transaction.isPersistCascade()) {
         // OneToOne exported side with delete cascade
         BeanPropertyAssocOne<?>[] expOnes = descriptor.propertiesOneExportedDelete();
         for (BeanPropertyAssocOne<?> expOne : expOnes) {
@@ -831,8 +841,39 @@ public final class DefaultPersister implements Persister {
         transaction.logSummary("-- DeleteById of {0} ids[{1}] requires fetch of foreign key values", descriptor.name(), idList);
       }
       List<?> beanList = server.findList(q);
-      deleteCascade(beanList, transaction, deleteMode, false);
-      return beanList.size();
+      if (beanList.isEmpty()) {
+        // missing ids must not invent cascades for relationships we never read
+        return 0;
+      }
+      if (!deleteMode.isHard() || !canBatchImportedDelete(descriptor)) {
+        deleteCascade(beanList, transaction, deleteMode, false);
+        return beanList.size();
+      }
+
+      // Group non-null imported targets by bean type, in the order the ids are seen,
+      // so mayor and viceMayor (same Person type) share one delete.
+      List<Object> ownerIds = new ArrayList<>(beanList.size());
+      Map<BeanDescriptor<?>, LinkedHashSet<Object>> importedIds = new LinkedHashMap<>();
+      for (Object bean : beanList) {
+        EntityBean entityBean = (EntityBean) bean;
+        ownerIds.add(descriptor.id(entityBean));
+        for (BeanPropertyAssocOne<?> prop : propImportDelete) {
+          addImportedDeleteId(importedIds, prop, entityBean);
+        }
+      }
+
+      // Children and these owners first. deleteChildrenAndBeans does not re-enter deleteImported.
+      // Only rows actually fetched are deleted — requested ids that no longer exist are ignored.
+      int rows = new DeleteBatchHelpMultiple(descriptor, ownerIds, transaction, deleteMode).deleteChildrenAndBeans();
+      if (!importedIds.isEmpty()) {
+        // Owner deletes may be sitting in the JDBC batch. They must hit the database
+        // before the beans they reference are removed.
+        transaction.flush();
+        for (Map.Entry<BeanDescriptor<?>, LinkedHashSet<Object>> entry : importedIds.entrySet()) {
+          delete(entry.getKey(), new ArrayList<>(entry.getValue()), transaction, deleteMode);
+        }
+      }
+      return rows;
     }
 
     SqlUpdate sqlDeleteChildren(BeanPropertyAssoc<?> prop) {
@@ -879,6 +920,70 @@ public final class DefaultPersister implements Persister {
         }
       }
     }
+  }
+
+  /**
+   * True when this descriptor and every bean it cascade-deletes can be removed in bulk.
+   * Listeners, controllers, many-to-many, soft delete, multi-tenant and cycles stay on
+   * the per-bean path. A descriptor already on the stack is a cycle; one already accepted
+   * is not walked again.
+   */
+  private boolean canBatchImportedDelete(BeanDescriptor<?> descriptor) {
+    return batchDeleteGraph(descriptor, new IdentityHashMap<>());
+  }
+
+  private boolean batchDeleteGraph(BeanDescriptor<?> desc, IdentityHashMap<BeanDescriptor<?>, Boolean> state) {
+    Boolean seen = state.get(desc);
+    if (seen != null) {
+      // FALSE while the descriptor is on the stack (a cycle); TRUE once it has been accepted
+      return seen;
+    }
+    if (desc.isMultiTenant() || desc.isSoftDelete() || !desc.isDeleteByBulk()) {
+      return false;
+    }
+    state.put(desc, Boolean.FALSE);
+    for (BeanPropertyAssocOne<?> prop : desc.propertiesOneImportedDelete()) {
+      if (!batchDeleteGraph(prop.targetDescriptor(), state)) {
+        return false;
+      }
+    }
+    for (BeanPropertyAssocOne<?> prop : desc.propertiesOneExportedDelete()) {
+      if (!batchDeleteGraph(prop.targetDescriptor(), state)) {
+        return false;
+      }
+    }
+    for (BeanPropertyAssocMany<?> prop : desc.propertiesManyDelete()) {
+      if (prop.isManyToMany() || prop.isElementCollection()) {
+        continue;
+      }
+      if (!batchDeleteGraph(prop.targetDescriptor(), state)) {
+        return false;
+      }
+    }
+    state.put(desc, Boolean.TRUE);
+    return true;
+  }
+
+  /**
+   * Record a non-null imported target id. Ids are grouped by target descriptor and kept
+   * in the order they are first seen so several relationships to the same type share one delete.
+   */
+  private static void addImportedDeleteId(Map<BeanDescriptor<?>, LinkedHashSet<Object>> importedIds,
+                                          BeanPropertyAssocOne<?> prop, EntityBean owner) {
+    Object value = prop.getValue(owner);
+    if (!(value instanceof EntityBean)) {
+      return;
+    }
+    EntityBean target = (EntityBean) value;
+    if (!prop.hasId(target)) {
+      return;
+    }
+    BeanDescriptor<?> targetDesc = prop.targetDescriptor();
+    Object targetId = targetDesc.id(target);
+    if (targetId == null) {
+      return;
+    }
+    importedIds.computeIfAbsent(targetDesc, key -> new LinkedHashSet<>()).add(targetId);
   }
 
   /**
