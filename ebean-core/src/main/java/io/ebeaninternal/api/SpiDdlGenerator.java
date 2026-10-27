@@ -12,4 +12,9 @@ public interface SpiDdlGenerator {
    */
   void execute(boolean online);
 
+  /**
+   * Run DDL manually. This can be used to initialize multi tenant environments or if you plan not to run
+   * DDL on startup
+   */
+  void runDdl();
 }
