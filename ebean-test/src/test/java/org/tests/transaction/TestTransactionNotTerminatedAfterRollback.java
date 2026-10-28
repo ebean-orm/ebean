@@ -18,8 +18,8 @@ import static org.assertj.core.api.Assertions.fail;
 /**
  * It shows the issue that the user record does NOT rolback when there is an exception thrown
  */
-public class TransactionNotTerminatedAfterRollback {
-  private static final Logger LOG = LoggerFactory.getLogger(TransactionNotTerminatedAfterRollback.class);
+public class TestTransactionNotTerminatedAfterRollback {
+  private static final Logger LOG = LoggerFactory.getLogger(TestTransactionNotTerminatedAfterRollback.class);
 
   @Test
   public void test() {

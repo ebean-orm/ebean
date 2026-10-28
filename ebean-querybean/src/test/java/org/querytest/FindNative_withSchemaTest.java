@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class FindNative_withSchema {
+public class FindNative_withSchemaTest {
 
   @Test
   public void test_rootLevelUsesSchema() {

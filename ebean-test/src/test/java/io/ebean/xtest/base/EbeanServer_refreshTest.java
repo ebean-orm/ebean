@@ -18,7 +18,7 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
-class EbeanServer_refresh {
+class EbeanServer_refreshTest {
 
   private Path createSqlFile() throws IOException {
     File f = File.createTempFile("test-script", ".sql");
