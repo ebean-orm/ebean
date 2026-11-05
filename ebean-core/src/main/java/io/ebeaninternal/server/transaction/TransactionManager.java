@@ -40,6 +40,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.RejectedExecutionException;
 
 import static java.lang.System.Logger.Level.DEBUG;
 import static java.lang.System.Logger.Level.ERROR;
@@ -336,7 +337,13 @@ public class TransactionManager implements SpiTransactionManager {
     try {
       PostCommitProcessing postCommit = new PostCommitProcessing(clusterManager, this, transaction);
       postCommit.notifyLocalCache();
-      backgroundExecutor.execute(postCommit.backgroundNotify());
+      Runnable backgroundNotify = postCommit.backgroundNotify();
+      try {
+        backgroundExecutor.execute(backgroundNotify);
+      } catch (RejectedExecutionException ex) {
+        // Preserve notifications when shutdown has stopped the background executor.
+        backgroundNotify.run();
+      }
     } catch (Exception ex) {
       log.log(ERROR, "NotifyOfCommit failed. L2 Cache potentially not notified.", ex);
     }
