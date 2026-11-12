@@ -719,7 +719,7 @@ public class BeanPropertyAssocMany<T> extends BeanPropertyAssoc<T> implements ST
   }
 
   public Object parentId(EntityBean parentBean) {
-    return descriptor.getId(parentBean);
+    return descriptor.descriptor(parentBean.getClass()).getId(parentBean);
   }
 
   @Override
