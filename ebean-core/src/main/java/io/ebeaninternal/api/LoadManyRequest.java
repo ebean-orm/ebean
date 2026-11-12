@@ -65,7 +65,7 @@ public final class LoadManyRequest extends LoadRequest {
       final BeanCollection<?> bc = loadContext.get(i);
       if (bc != null) {
         final var parent = bc.owner();
-        final var parentId = descriptor.getId(parent);
+        final var parentId = many.parentId(parent);
         idList.add(parentId);
         bc.setLoader(server); // don't use the load buffer again
         if (lazy) {
