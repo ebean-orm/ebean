@@ -16,6 +16,7 @@ import io.ebeaninternal.server.deploy.meta.DeployBeanProperty;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssoc;
 import io.ebeaninternal.server.deploy.meta.DeployBeanPropertyAssocOne;
 import io.ebeaninternal.server.type.DataEncryptSupport;
+import io.ebeaninternal.server.type.ScalarTypeArray;
 import io.ebeaninternal.server.type.ScalarTypeBytesBase;
 import io.ebeaninternal.server.type.ScalarTypeBytesEncrypted;
 import io.ebeaninternal.server.type.ScalarTypeEncryptedWrapper;
@@ -419,6 +420,9 @@ final class AnnotationFields extends AnnotationParser {
       }
     }
     prop.setScalarType(createScalarType(prop, st));
+    if (st instanceof ScalarTypeArray) {
+      prop.setDbColumnDefn(null);
+    }
     prop.setLocalEncrypted();
     if (dbLen > 0) {
       prop.setDbLength(dbLen);
