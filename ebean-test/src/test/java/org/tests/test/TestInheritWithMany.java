@@ -14,6 +14,7 @@ import org.tests.model.inheritmany.IMRootTwo;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
@@ -56,6 +57,43 @@ public class TestInheritWithMany extends BaseTestCase {
       }
     }
 
+  }
+
+  @Test
+  void lazyLoadManyOnNestedInheritance() {
+    lazyLoadManyOnNestedInheritance(10);
+  }
+
+  @Test
+  void lazyLoadManyAcrossInheritanceBatches() {
+    lazyLoadManyOnNestedInheritance(1);
+  }
+
+  private void lazyLoadManyOnNestedInheritance(int batchSize) {
+    IMRootOne one = new IMRootOne();
+    one.setName("nested one");
+    DB.save(one);
+    add(one, "one-a");
+    add(one, "one-b");
+
+    IMRootTwo two = new IMRootTwo();
+    two.setTitle("nested two");
+    DB.save(two);
+    add(two, "two-a");
+    add(two, "two-b");
+
+    List<IMRelated> related = DB.find(IMRelated.class)
+      .fetch("owner")
+      .setLazyLoadBatchSize(batchSize)
+      .where().in("owner.id", one.getId(), two.getId())
+      .orderBy("id")
+      .findList();
+
+    assertThat(related).hasSize(4);
+    assertThat(related.get(0).getOwner().getRelated())
+      .extracting(IMRelated::getName).containsExactlyInAnyOrder("one-a", "one-b");
+    assertThat(related.get(2).getOwner().getRelated())
+      .extracting(IMRelated::getName).containsExactlyInAnyOrder("two-a", "two-b");
   }
 
   private void add(IMRoot owner, String string) {
