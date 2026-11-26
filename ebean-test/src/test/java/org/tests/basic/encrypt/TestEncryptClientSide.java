@@ -1,11 +1,13 @@
 package org.tests.basic.encrypt;
 
 import io.ebean.DB;
+import io.ebean.test.LoggedSql;
 import io.ebean.xtest.BaseTestCase;
 import org.junit.jupiter.api.Test;
 import org.tests.model.basic.EBasicEncryptClient;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -61,5 +63,25 @@ public class TestEncryptClientSide extends BaseTestCase {
 
 
     DB.delete(found);
+  }
+
+  @Test
+  public void insertUpdate_bindLogMasksEncryptedValues() {
+    EBasicEncryptClient bean = new EBasicEncryptClient();
+    bean.setName("visible-name");
+    bean.setDescription("secret-insert");
+    bean.setDob(LocalDate.of(1990, 1, 2));
+
+    LoggedSql.start();
+    DB.save(bean);
+    bean.setDescription("secret-update");
+    DB.save(bean);
+    List<String> sql = LoggedSql.stop();
+
+    assertThat(sql).hasSize(2);
+    assertThat(sql.get(0)).contains("; -- bind(visible-name,description=****,dob=****,status=****,1)");
+    assertThat(sql.get(1)).contains("; -- bind(description=****,2," + bean.getId() + ",1)");
+
+    DB.delete(bean);
   }
 }
